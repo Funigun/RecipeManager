@@ -5,6 +5,7 @@ VisualStudioVersion = 17.13.35931.197
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionItems", "SolutionItems", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
 	ProjectSection(SolutionItems) = preProject
+		Directory.Build.props = Directory.Build.props
 		Directory.Packages.props = Directory.Packages.props
 	EndProjectSection
 EndProject
@@ -23,6 +24,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RecipeManager.UI.Blazor", "RecipeManager.UI.Blazor\RecipeManager.UI.Blazor\RecipeManager.UI.Blazor.csproj", "{DB8A1A6D-21E0-7689-1BF3-878247ED860A}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RecipeManager.UI.Blazor.Client", "RecipeManager.UI.Blazor\RecipeManager.UI.Blazor.Client\RecipeManager.UI.Blazor.Client.csproj", "{3545AD26-89DB-BD39-857C-5B1B4591FA44}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RecipeManager.Api.Shared", "RecipeManager.Api.Shared\RecipeManager.Api.Shared.csproj", "{6859A6AE-61CA-4778-9B85-BFFF5F37AFD5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -54,6 +57,10 @@ Global
 		{3545AD26-89DB-BD39-857C-5B1B4591FA44}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3545AD26-89DB-BD39-857C-5B1B4591FA44}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3545AD26-89DB-BD39-857C-5B1B4591FA44}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6859A6AE-61CA-4778-9B85-BFFF5F37AFD5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6859A6AE-61CA-4778-9B85-BFFF5F37AFD5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6859A6AE-61CA-4778-9B85-BFFF5F37AFD5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6859A6AE-61CA-4778-9B85-BFFF5F37AFD5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -63,6 +70,7 @@ Global
 		{A972962F-B388-022F-DE99-CAE79A634F21} = {47CCC8BF-5C6A-4FC3-8450-C71E80D3B0A9}
 		{DB8A1A6D-21E0-7689-1BF3-878247ED860A} = {CCAE8C25-572A-4E7B-B19A-EB509BE0603E}
 		{3545AD26-89DB-BD39-857C-5B1B4591FA44} = {CCAE8C25-572A-4E7B-B19A-EB509BE0603E}
+		{6859A6AE-61CA-4778-9B85-BFFF5F37AFD5} = {47CCC8BF-5C6A-4FC3-8450-C71E80D3B0A9}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {5E867AB8-9EB2-4C53-938B-EFE283FA361A}
