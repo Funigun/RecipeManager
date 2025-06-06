@@ -27,6 +27,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RecipeManager.UI.Blazor.Cli
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RecipeManager.Api.Shared", "RecipeManager.Api.Shared\RecipeManager.Api.Shared.csproj", "{6859A6AE-61CA-4778-9B85-BFFF5F37AFD5}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{3D592DCD-C0CF-4CA5-8962-31BADC4819F1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RecipeManager.Tests", "RecipeManager.Tests\RecipeManager.Tests.csproj", "{99F5C032-9C9F-4CE8-8C9A-9A8319073C24}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -61,6 +65,10 @@ Global
 		{6859A6AE-61CA-4778-9B85-BFFF5F37AFD5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6859A6AE-61CA-4778-9B85-BFFF5F37AFD5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6859A6AE-61CA-4778-9B85-BFFF5F37AFD5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{99F5C032-9C9F-4CE8-8C9A-9A8319073C24}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{99F5C032-9C9F-4CE8-8C9A-9A8319073C24}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{99F5C032-9C9F-4CE8-8C9A-9A8319073C24}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{99F5C032-9C9F-4CE8-8C9A-9A8319073C24}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -71,6 +79,7 @@ Global
 		{DB8A1A6D-21E0-7689-1BF3-878247ED860A} = {CCAE8C25-572A-4E7B-B19A-EB509BE0603E}
 		{3545AD26-89DB-BD39-857C-5B1B4591FA44} = {CCAE8C25-572A-4E7B-B19A-EB509BE0603E}
 		{6859A6AE-61CA-4778-9B85-BFFF5F37AFD5} = {47CCC8BF-5C6A-4FC3-8450-C71E80D3B0A9}
+		{99F5C032-9C9F-4CE8-8C9A-9A8319073C24} = {3D592DCD-C0CF-4CA5-8962-31BADC4819F1}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {5E867AB8-9EB2-4C53-938B-EFE283FA361A}
