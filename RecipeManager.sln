@@ -1,0 +1,70 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.13.35931.197
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionItems", "SolutionItems", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
+	ProjectSection(SolutionItems) = preProject
+		Directory.Packages.props = Directory.Packages.props
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RecipeManager.Identity.API", "RecipeManager.Identity.API\RecipeManager.Identity.API.csproj", "{764EDD56-C00F-3B92-31D5-F461FCAD8240}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RecipeManager.AppHost", "RecipeManager.AppHost\RecipeManager.AppHost.csproj", "{59065276-154C-4ACC-B369-BE1F54D1BA74}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RecipeManager.ServiceDefaults", "RecipeManager.ServiceDefaults\RecipeManager.ServiceDefaults.csproj", "{57B28925-2D52-49E0-4EE0-10883C923647}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "WebApi", "WebApi", "{47CCC8BF-5C6A-4FC3-8450-C71E80D3B0A9}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "UI", "UI", "{CCAE8C25-572A-4E7B-B19A-EB509BE0603E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RecipeManager.API", "RecipeManager.API\RecipeManager.API.csproj", "{A972962F-B388-022F-DE99-CAE79A634F21}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RecipeManager.UI.Blazor", "RecipeManager.UI.Blazor\RecipeManager.UI.Blazor\RecipeManager.UI.Blazor.csproj", "{DB8A1A6D-21E0-7689-1BF3-878247ED860A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RecipeManager.UI.Blazor.Client", "RecipeManager.UI.Blazor\RecipeManager.UI.Blazor.Client\RecipeManager.UI.Blazor.Client.csproj", "{3545AD26-89DB-BD39-857C-5B1B4591FA44}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{764EDD56-C00F-3B92-31D5-F461FCAD8240}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{764EDD56-C00F-3B92-31D5-F461FCAD8240}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{764EDD56-C00F-3B92-31D5-F461FCAD8240}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{764EDD56-C00F-3B92-31D5-F461FCAD8240}.Release|Any CPU.Build.0 = Release|Any CPU
+		{59065276-154C-4ACC-B369-BE1F54D1BA74}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{59065276-154C-4ACC-B369-BE1F54D1BA74}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{59065276-154C-4ACC-B369-BE1F54D1BA74}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{59065276-154C-4ACC-B369-BE1F54D1BA74}.Release|Any CPU.Build.0 = Release|Any CPU
+		{57B28925-2D52-49E0-4EE0-10883C923647}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{57B28925-2D52-49E0-4EE0-10883C923647}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{57B28925-2D52-49E0-4EE0-10883C923647}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{57B28925-2D52-49E0-4EE0-10883C923647}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A972962F-B388-022F-DE99-CAE79A634F21}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A972962F-B388-022F-DE99-CAE79A634F21}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A972962F-B388-022F-DE99-CAE79A634F21}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A972962F-B388-022F-DE99-CAE79A634F21}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DB8A1A6D-21E0-7689-1BF3-878247ED860A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DB8A1A6D-21E0-7689-1BF3-878247ED860A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DB8A1A6D-21E0-7689-1BF3-878247ED860A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DB8A1A6D-21E0-7689-1BF3-878247ED860A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3545AD26-89DB-BD39-857C-5B1B4591FA44}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3545AD26-89DB-BD39-857C-5B1B4591FA44}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3545AD26-89DB-BD39-857C-5B1B4591FA44}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3545AD26-89DB-BD39-857C-5B1B4591FA44}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{764EDD56-C00F-3B92-31D5-F461FCAD8240} = {47CCC8BF-5C6A-4FC3-8450-C71E80D3B0A9}
+		{A972962F-B388-022F-DE99-CAE79A634F21} = {47CCC8BF-5C6A-4FC3-8450-C71E80D3B0A9}
+		{DB8A1A6D-21E0-7689-1BF3-878247ED860A} = {CCAE8C25-572A-4E7B-B19A-EB509BE0603E}
+		{3545AD26-89DB-BD39-857C-5B1B4591FA44} = {CCAE8C25-572A-4E7B-B19A-EB509BE0603E}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {5E867AB8-9EB2-4C53-938B-EFE283FA361A}
+	EndGlobalSection
+EndGlobal

@@ -1,0 +1,24 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <Sdk Name="Aspire.AppHost.Sdk" Version="9.0.0" />
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net9.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <IsAspireHost>true</IsAspireHost>
+    <UserSecretsId>03ffec0f-7732-4f82-8eca-2d039e08ee1f</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Aspire.Hosting.AppHost" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\RecipeManager.API\RecipeManager.API.csproj" />
+    <ProjectReference Include="..\RecipeManager.Identity.API\RecipeManager.Identity.API.csproj" />
+    <ProjectReference Include="..\RecipeManager.UI.Blazor\RecipeManager.UI.Blazor\RecipeManager.UI.Blazor.csproj" />
+  </ItemGroup>
+
+</Project>
