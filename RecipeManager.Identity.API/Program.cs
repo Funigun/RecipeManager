@@ -1,11 +1,16 @@
+using RecipeManager.Api.Shared;
 using RecipeManager.ServiceDefaults;
 using Scalar.AspNetCore;
+using System.Reflection;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 builder.AddServiceDefaults();
 
 builder.Services.AddOpenApi();
+
+builder.Services.AddSharedServices()
+                .AddEndpoints(Assembly.GetExecutingAssembly());
 
 WebApplication app = builder.Build();
 
@@ -25,5 +30,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.MapEndpoints();
 
 await app.RunAsync();
