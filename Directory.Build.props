@@ -4,4 +4,9 @@
 		<Nullable>enable</Nullable>
 		<ImplicitUsings>enable</ImplicitUsings>
 	</PropertyGroup>
+
+	<PropertyGroup>
+		<NoWarn>IDE0305</NoWarn>
+	</PropertyGroup>
+
 </Project>

@@ -66,12 +66,6 @@ public class HateoasCollectionResponseBuilder<TItem> : HateoasBuilder, IHateoasR
         return _collectionListBuilder;
     }
 
-    public HateoasCollectionListBuilder<TItem> WithCollectionLink(Action<HateoasCollectionListBuilder<TItem>> action)
-    {
-        action(_collectionListBuilder);
-        return _collectionListBuilder;
-    }
-
     public object Build()
     {
         return new HateoasLinkCollectionWrapper<TItem>(_items) { Links = _links };

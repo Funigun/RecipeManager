@@ -1,11 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <ItemGroup>
-	  <PackageReference Include="Microsoft.AspNetCore.OpenApi"/>
-	  <PackageReference Include="Scalar.AspNetCore"/>
+	  <PackageReference Include="Microsoft.AspNetCore.OpenApi" />
+	  <PackageReference Include="Scalar.AspNetCore" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\RecipeManager.Api.Shared\RecipeManager.Api.Shared.csproj" />
     <ProjectReference Include="..\RecipeManager.ServiceDefaults\RecipeManager.ServiceDefaults.csproj" />
   </ItemGroup>
 

@@ -2,12 +2,8 @@
 
 namespace RecipeManager.Api.Shared.Hateoas.Builder;
 
-public class HateoasCollectionListBuilder<TItem> : HateoasCollectionResponseBuilder<TItem>
+public class HateoasCollectionListBuilder<TItem>(IEnumerable<HateoasResponse<TItem>> items, List<Link> links) : HateoasCollectionResponseBuilder<TItem>(items, links)
 {
-    public HateoasCollectionListBuilder(IEnumerable<HateoasResponse<TItem>> items, List<Link> links) : base(items, links)
-    {
-    }
-
     public HateoasCollectionListBuilder<TItem> WithGet(Func<TItem, string> href, string rel, bool isActionAllowed)
     {
         if (isActionAllowed)

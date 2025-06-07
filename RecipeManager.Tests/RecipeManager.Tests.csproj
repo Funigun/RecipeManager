@@ -14,6 +14,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\RecipeManager.Api.Shared\RecipeManager.Api.Shared.csproj" />
+    <ProjectReference Include="..\RecipeManager.API\RecipeManager.API.csproj" />
+    <ProjectReference Include="..\RecipeManager.Identity.API\RecipeManager.Identity.API.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Using Include="Xunit" />
   </ItemGroup>
 

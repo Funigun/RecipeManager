@@ -6,6 +6,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\RecipeManager.Api.Shared\RecipeManager.Api.Shared.csproj" />
     <ProjectReference Include="..\RecipeManager.ServiceDefaults\RecipeManager.ServiceDefaults.csproj" />
   </ItemGroup>
 
