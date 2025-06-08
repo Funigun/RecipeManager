@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using RecipeManager.Api.Shared.Endpoint;
 using RecipeManager.Api.Shared.Hateoas.Builder;
+using RecipeManager.Api.Shared.Middleware;
 using System.Reflection;
 
 namespace RecipeManager.Api.Shared;
@@ -88,6 +89,15 @@ public static class DependencyInjection
         {
             endpoint.MapEndpoint(app);
         }
+
+        return app;
+    }
+
+    public static IApplicationBuilder UseMiddlewares(this IApplicationBuilder app)
+    {
+        app.UseMiddleware<ExceptionHandlingMiddleware>();
+        app.UseMiddleware<LoggingMiddleware>();
+        app.UseMiddleware<PerformanceMiddleware>();
 
         return app;
     }

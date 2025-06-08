@@ -16,6 +16,9 @@ WebApplication app = builder.Build();
 
 app.MapDefaultEndpoints();
 
+app.UseMiddlewares();
+app.UseRouting();
+
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();

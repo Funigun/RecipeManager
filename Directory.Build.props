@@ -6,7 +6,7 @@
 	</PropertyGroup>
 
 	<PropertyGroup>
-		<NoWarn>IDE0305</NoWarn>
+		<NoWarn>IDE0305;CA1822</NoWarn>
 	</PropertyGroup>
 
 </Project>
