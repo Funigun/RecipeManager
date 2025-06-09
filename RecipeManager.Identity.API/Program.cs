@@ -19,11 +19,6 @@ app.MapDefaultEndpoints();
 app.UseMiddlewares();
 app.UseRouting();
 
-app.MapGet("", () =>
-{
-    return "Hello world";
-});
-
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
