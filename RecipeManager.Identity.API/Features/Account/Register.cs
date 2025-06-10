@@ -1,19 +1,28 @@
-﻿using RecipeManager.Api.Shared.Endpoint;
+﻿using Microsoft.AspNetCore.Http.HttpResults;
+using RecipeManager.Api.Shared.Endpoint;
+using RecipeManager.Shared.Contracts.Authorization;
 
 namespace RecipeManager.Identity.API.Features.Account;
 
 public static class Register
 {
+    public record Request(UserLoginDto UserDto);
+    public record Response(string Token);
+
     [GroupEndpoint("Account")]
-    public sealed class Enpoint : IEndpoint
+    public class Enpoint : IEndpoint
     {
-        public void MapEndpoint(IEndpointRouteBuilder app)
+        public void MapEndpoint(IEndpointRouteBuilder endpoints)
         {
-            app.MapPost("Register", () =>
-            {
-                // Logic for changing the password goes here
-                return Results.Ok("Acount created.");
-            });
+            endpoints.MapPost("/register", Handler)
+                     .WithName("Register")
+                     .WithDescription("Creates new user account");
         }
+    }
+
+    internal static async Task<Results<Ok<Response>, NotFound>> Handler(Request request)
+    {
+        // Logic for changing the password goes here
+        return TypedResults.Ok(new Response("asd"));
     }
 }

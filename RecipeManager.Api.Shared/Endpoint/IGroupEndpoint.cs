@@ -3,7 +3,7 @@
 namespace RecipeManager.Api.Shared.Endpoint;
 public interface IGroupEndpoint
 {
-    string Name { get; }
+    string GroupName { get; }
 
     void Configure(RouteGroupBuilder groupBuilder);
 }
