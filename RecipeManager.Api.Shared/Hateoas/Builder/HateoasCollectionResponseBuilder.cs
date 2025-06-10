@@ -1,4 +1,5 @@
-﻿using RecipeManager.Api.Shared.Hateoas.Models;
+﻿using RecipeManager.Api.Shared.Hateoas.Common;
+using RecipeManager.Api.Shared.Hateoas.Models;
 
 namespace RecipeManager.Api.Shared.Hateoas.Builder;
 
@@ -9,53 +10,53 @@ public class HateoasCollectionResponseBuilder<TItem> : HateoasBuilder, IHateoasR
 
     private readonly HateoasCollectionListBuilder<TItem> _collectionListBuilder = default!;
 
-    protected HateoasCollectionResponseBuilder(IEnumerable<HateoasResponse<TItem>> items, List<Link> links)
+    protected HateoasCollectionResponseBuilder(IEnumerable<HateoasResponse<TItem>> items, List<Link> links, HateoasLinkService linkService) : base(linkService)
     {
         _items = items.ToList();
         _links = links;
     }
 
-    public HateoasCollectionResponseBuilder(IEnumerable<TItem> items)
+    public HateoasCollectionResponseBuilder(IEnumerable<TItem> items, HateoasLinkService linkService) : base(linkService)
     {
         _items = items.Select(item => new HateoasResponse<TItem>(item)).ToList();
-        _collectionListBuilder = new(_items, _links);
+        _collectionListBuilder = new(_items, _links, linkService);
     }
 
-    public HateoasCollectionResponseBuilder<TItem> AddGet(string href, string rel, bool isActionAllowed)
+    public HateoasCollectionResponseBuilder<TItem> AddGet(LinkOptions options, object? routeValues)
     {
-        if (isActionAllowed)
+        if (options.IsActionAllowed)
         {
-            _links.Add(Link.CreateGet(href, rel));
+            _links.Add(LinkService.GenerateGet(options.Endpoint, routeValues, options.Rel));
         }
 
         return this;
     }
 
-    public HateoasCollectionResponseBuilder<TItem> AddPost(string href, string rel, bool isActionAllowed)
+    public HateoasCollectionResponseBuilder<TItem> AddPost(LinkOptions options, object? routeValues)
     {
-        if (isActionAllowed)
+        if (options.IsActionAllowed)
         {
-            _links.Add(Link.CreatePost(href, rel));
+            _links.Add(LinkService.GeneratePost(options.Endpoint, routeValues, options.Rel));
         }
 
         return this;
     }
 
-    public HateoasCollectionResponseBuilder<TItem> AddPut(string href, string rel, bool isActionAllowed)
+    public HateoasCollectionResponseBuilder<TItem> AddPut(LinkOptions options, object? routeValues)
     {
-        if (isActionAllowed)
+        if (options.IsActionAllowed)
         {
-            _links.Add(Link.CreatePut(href, rel));
+            _links.Add(LinkService.GeneratePut(options.Endpoint, routeValues, options.Rel));
         }
 
         return this;
     }
 
-    public HateoasCollectionResponseBuilder<TItem> AddDelete(string href, string rel, bool isActionAllowed)
+    public HateoasCollectionResponseBuilder<TItem> AddDelete(LinkOptions options, object? routeValues)
     {
-        if (isActionAllowed)
+        if (options.IsActionAllowed)
         {
-            _links.Add(Link.CreateDelete(href, rel));
+            _links.Add(LinkService.GenerateDelete(options.Endpoint, routeValues, options.Rel));
         }
 
         return this;
