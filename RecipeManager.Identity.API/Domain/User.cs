@@ -1,5 +1,7 @@
-﻿namespace RecipeManager.Identity.API.Domain;
+﻿using Microsoft.AspNetCore.Identity;
 
-public class User
+namespace RecipeManager.Identity.API.Domain;
+
+public class User : IdentityUser<int>
 {
 }

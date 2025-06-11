@@ -1,52 +1,48 @@
-﻿using RecipeManager.Api.Shared.Hateoas.Models;
+﻿using RecipeManager.Api.Shared.Hateoas.Common;
+using RecipeManager.Api.Shared.Hateoas.Models;
 
 namespace RecipeManager.Api.Shared.Hateoas.Builder;
 
-public sealed class HateoasResponseBuilder<TItem> : HateoasBuilder, IHateoasResponseBuilder
+public sealed class HateoasResponseBuilder<TItem>(TItem item, HateoasLinkService linkService) : HateoasBuilder(linkService), IHateoasResponseBuilder
 {
-    private readonly TItem Item;
+    private readonly TItem Item = item;
     private readonly List<Link> Links = [];
 
-    public HateoasResponseBuilder(TItem item)
+    public HateoasResponseBuilder<TItem> AddGet(LinkOptions options, object? routeValues)
     {
-        Item = item;
-    }
-
-    public HateoasResponseBuilder<TItem> AddGet(string href, string rel, bool isActionAllowed)
-    {
-        if (isActionAllowed)
+        if (options.IsActionAllowed)
         {
-            Links.Add(Link.CreateGet(href, rel));
+            Links.Add(LinkService.GenerateGet(options.Endpoint, routeValues, options.Rel));
         }
 
         return this;
     }
 
-    public HateoasResponseBuilder<TItem> AddPost(string href, string rel, bool isActionAllowed)
+    public HateoasResponseBuilder<TItem> AddPost(LinkOptions options, object? routeValues)
     {
-        if (isActionAllowed)
+        if (options.IsActionAllowed)
         {
-            Links.Add(Link.CreatePost(href, rel));
+            Links.Add(LinkService.GeneratePost(options.Endpoint, routeValues, options.Rel));
         }
 
         return this;
     }
 
-    public HateoasResponseBuilder<TItem> AddPut(string href, string rel, bool isActionAllowed)
+    public HateoasResponseBuilder<TItem> AddPut(LinkOptions options, object? routeValues)
     {
-        if (isActionAllowed)
+        if (options.IsActionAllowed)
         {
-            Links.Add(Link.CreatePut(href, rel));
+            Links.Add(LinkService.GeneratePut(options.Endpoint, routeValues, options.Rel));
         }
 
         return this;
     }
 
-    public HateoasResponseBuilder<TItem> AddDelete(string href, string rel, bool isActionAllowed)
+    public HateoasResponseBuilder<TItem> AddDelete(LinkOptions options, object? routeValues)
     {
-        if (isActionAllowed)
+        if (options.IsActionAllowed)
         {
-            Links.Add(Link.CreateDelete(href, rel));
+            Links.Add(LinkService.GenerateDelete(options.Endpoint, routeValues, options.Rel));
         }
 
         return this;

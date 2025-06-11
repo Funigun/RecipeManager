@@ -1,8 +1,12 @@
 ﻿using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using RecipeManager.Api.Shared.Contracts.Authorization;
 using RecipeManager.Api.Shared.Endpoint;
 using RecipeManager.Api.Shared.Hateoas.Builder;
+using RecipeManager.Api.Shared.Hateoas.Common;
 using RecipeManager.Api.Shared.Middleware;
 using System.Reflection;
 
@@ -12,7 +16,28 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddSharedServices(this IServiceCollection services)
     {
+        services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
         services.AddScoped<HateoasBuilder>();
+        services.AddScoped<HateoasLinkService>();
+
+        return services;
+    }
+
+    public static IServiceCollection AddAuthorizationPolicies(this IServiceCollection services, Assembly assembly)
+    {
+        Type authorizationPolicyType = typeof(IAuthorizationPolicy<>);
+
+        List<Type>? types = assembly.GetExportedTypes()
+                                    .Where(t => t.GetInterfaces()
+                                                     .Any(i => i.IsGenericType && i.GetGenericTypeDefinition() == authorizationPolicyType))
+                                    .ToList();
+
+        foreach (Type type in types)
+        {
+            Type interfaceType = type.GetInterfaces().First(i => i.IsGenericType && i.GetGenericTypeDefinition() == authorizationPolicyType);
+            services.AddScoped(interfaceType, type);
+        }
+
         return services;
     }
 
@@ -40,7 +65,7 @@ public static class DependencyInjection
     public static WebApplication MapEndpoints(this WebApplication app)
     {
         Dictionary<string, IGroupEndpoint> endpointGroups = app.Services.GetServices<IGroupEndpoint>()
-                                                                        .ToDictionary(g => g.Name);
+                                                                        .ToDictionary(g => g.GroupName);
 
         List<IEndpoint> endpoints = app.Services.GetServices<IEndpoint>().ToList();
 

@@ -4,13 +4,15 @@ using Scalar.AspNetCore;
 using System.Reflection;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
+Assembly assembly = Assembly.GetExecutingAssembly();
 
 builder.AddServiceDefaults();
 
 builder.Services.AddOpenApi();
 
 builder.Services.AddSharedServices()
-                .AddEndpoints(Assembly.GetExecutingAssembly());
+                .AddEndpoints(assembly)
+                .AddAuthorizationPolicies(assembly);
 
 WebApplication app = builder.Build();
 
