@@ -38,6 +38,17 @@ internal static class DependencyInjection
                 .AddEntityFrameworkStores<AppDbContext>()
                 .AddApiEndpoints();
 
+        services.Configure<IdentityOptions>(options =>
+        {
+            options.Password.RequireDigit = true;
+            options.Password.RequiredLength = 10;
+            options.Password.RequireLowercase = true;
+            options.Password.RequireUppercase = true;
+            options.Password.RequireNonAlphanumeric = true;
+            options.Password.RequiredUniqueChars = 3;
+            options.User.RequireUniqueEmail = true;
+        });
+
         return services;
     }
 
@@ -48,7 +59,16 @@ internal static class DependencyInjection
             options.UseSqlServer(configuration.GetConnectionString("RecipeManager"));
         });
 
+        services.AddScoped<DatabaseService>();
+
         return services;
+    }
+
+    public static async Task InitDatabase(this WebApplication app)
+    {
+        using IServiceScope scope = app.Services.CreateScope();
+        DatabaseService dbService = scope.ServiceProvider.GetRequiredService<DatabaseService>();
+        await dbService.InitDatabase();
     }
 
     public static ScalarOptions ConfigureScalarOptions(this ScalarOptions options)

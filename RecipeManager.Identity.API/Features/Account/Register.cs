@@ -1,12 +1,11 @@
 ﻿using Microsoft.AspNetCore.Http.HttpResults;
 using RecipeManager.Api.Shared.Endpoint;
-using RecipeManager.Shared.Contracts.Authorization;
 
 namespace RecipeManager.Identity.API.Features.Account;
 
 public static class Register
 {
-    public record Request(UserLoginDto UserDto);
+    public record Request(string UserName);
     public record Response(string Token);
 
     [GroupEndpoint("Account")]

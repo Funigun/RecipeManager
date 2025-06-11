@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using FluentValidation;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using RecipeManager.Api.Shared.Contracts.Exceptions;
 using System.Net;
@@ -43,10 +44,17 @@ public sealed class ExceptionHandlingMiddleware(RequestDelegate next, ILogger<Ex
                 Message = exception.Message,
             },
 
-            NotAuthorizedException => new ResponseBody
+            UnauthorizedAccessException => new ResponseBody
             {
                 StatusCode = (int)HttpStatusCode.Unauthorized,
                 Message = "You are not authorized to perform this action",
+            },
+
+            ValidationException e => new ResponseBody
+            {
+                StatusCode = (int)HttpStatusCode.BadRequest,
+                Message = "Validation failed",
+                Errors = e.Errors.ToList()
             },
 
             ApplicationValidationException e => new ResponseBody
