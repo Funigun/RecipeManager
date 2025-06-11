@@ -1,10 +1,10 @@
 ﻿namespace RecipeManager.Api.Shared.Contracts.Exceptions;
 
-internal sealed record ResponseBody
+public sealed record ResponseBody
 {
-    internal required int StatusCode { get; init; }
+    public required int StatusCode { get; init; }
 
-    internal required string Message { get; init; }
+    public required string Message { get; init; }
 
-    internal object? Errors { get; init; }
+    public object? Errors { get; init; }
 }

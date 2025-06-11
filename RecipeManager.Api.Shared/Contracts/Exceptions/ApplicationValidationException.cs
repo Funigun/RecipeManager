@@ -2,5 +2,7 @@
 
 public abstract class ApplicationValidationException : Exception
 {
-    public IEnumerable<string> Errors { get; } = [];
+    protected ApplicationValidationException(string message) : base(message) { }
+
+    public IEnumerable<string> Errors { get; protected set; } = [];
 }

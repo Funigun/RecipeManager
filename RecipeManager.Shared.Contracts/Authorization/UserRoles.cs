@@ -1,6 +1,6 @@
 ﻿namespace RecipeManager.Shared.Contracts.Authorization;
 
-public static class UserRole
+public static class UserRoles
 {
     public const string Admin = "Admin";
 

@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using FluentValidation;
 using FluentValidation.Results;
+using RecipeManager.Api.Shared.Contracts.Exceptions;
 
 namespace RecipeManager.Api.Shared.Filters;
 
@@ -21,9 +22,30 @@ public class ValidationFilter<TRequest>(IValidator<TRequest> validator) : BaseEn
 
         if (!validationResult.IsValid)
         {
-            throw new ValidationException(validationResult.Errors);
+            throw CustomValidationException.ValidationFailed
+            (
+                validationResult.Errors.Select(e => $"{e.PropertyName}: {e.ErrorMessage}")
+                                       .ToList()
+            );
         }
 
         return null;
+    }
+}
+
+public class CustomValidationException : ApplicationValidationException
+{
+    private CustomValidationException(string message) : base(message)
+    {
+    }
+
+    public static CustomValidationException ValidationFailed(List<string> errors)
+    {
+        CustomValidationException exception = new("Registration failed. Please check the provided data and try again.")
+        {
+            Errors = errors
+        };
+
+        return exception;
     }
 }

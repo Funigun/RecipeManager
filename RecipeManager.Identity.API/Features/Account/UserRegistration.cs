@@ -1,0 +1,67 @@
+﻿using FluentValidation;
+using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using RecipeManager.Api.Shared.Endpoint;
+using RecipeManager.Identity.API.Common.Exceptions;
+using RecipeManager.Identity.API.Domain;
+using RecipeManager.Shared.Contracts.Authorization;
+using RecipeManager.Shared.Contracts.User.Registration;
+
+namespace RecipeManager.Identity.API.Features.Account;
+
+public static class UserRegistration
+{
+    public record Request(UserRegistrationDto UserDto);
+    public record Response(string Token);
+
+    public sealed class Validator : AbstractValidator<Request>
+    {
+        public Validator()
+        {
+            RuleFor(request => request.UserDto)
+                .SetValidator(new UserRegistrationValidator());
+        }
+    }
+
+    [GroupEndpoint("Account")]
+    public class Enpoint : IEndpoint
+    {
+        public void MapEndpoint(IEndpointRouteBuilder endpoints)
+        {
+            endpoints.MapStandardValidatedPost<Request, Response>("/register", Handler)
+                     .WithName("Register")
+                     .WithDescription("Creates new user account");
+        }
+    }
+
+    internal static async Task<Results<Ok, BadRequest>> Handler(Request request, UserManager<User> userManager, CancellationToken cancellationToken)
+    {
+        User user = request.UserDto.ToUser();
+
+        if (await userManager.Users.AnyAsync(usr => usr.UserName!.Equals(user.UserName, StringComparison.CurrentCultureIgnoreCase), cancellationToken))
+        {
+            throw IdentityValidationException.UserNameAlreadyInUse();
+        }
+
+        IdentityResult result = await userManager.CreateAsync(user, request.UserDto.Password);
+
+        if (!result.Succeeded)
+        {
+            throw IdentityValidationException.RegistrationFailed(result.Errors.Select(error => error.Description));
+        }
+
+        await userManager.AddToRoleAsync(user, UserRoles.User);
+
+        return TypedResults.Ok();
+    }
+
+    internal static User ToUser(this UserRegistrationDto userDto)
+    {
+        return new User
+        {
+            UserName = userDto.UserName,
+            Email = userDto.Email,
+        };
+    }
+}
