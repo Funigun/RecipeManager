@@ -8,14 +8,16 @@
     <MudForm @ref="form" Model="@registrationModel" Validation="@(validator.ValidateValue)" ValidationDelay="0" @bind-IsValid="@isSubmitEnabled">
         <MudText Typo="Typo.h5" Class="mb-4">Register</MudText>
 
-        <MudTextField @bind-Value="registrationModel.UserName" Label="Username" For="@(() => registrationModel.UserName)" />
-        <MudTextField @bind-Value="registrationModel.Email" Label="Email" For="@(() => registrationModel.Email)" />
-        <MudTextField @bind-Value="registrationModel.Password" Label="Password" For="@(() => registrationModel.Password)" InputType="InputType.Password" />
-        <MudTextField @bind-Value="registrationModel.ConfirmationPassword" Label="Confirmation Password" For="@(() => registrationModel.ConfirmationPassword)" InputType="InputType.Password" />
+        <MudTextField @bind-Value="registrationModel.UserName" Label="Username" For="@(() => registrationModel.UserName)" Required=true/>
+        <MudTextField @bind-Value="registrationModel.Email" Label="Email" For="@(() => registrationModel.Email)"  Required=true/>
+        <MudTextField @bind-Value="registrationModel.Password" Label="Password" For="@(() => registrationModel.Password)" InputType="InputType.Password" Required=true />
+        <MudTextField @bind-Value="registrationModel.ConfirmationPassword" Label="Confirmation Password" For="@(() => registrationModel.ConfirmationPassword)" InputType="InputType.Password" Required=true />
 
         <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="OnSubmit" Disabled="@(!isSubmitEnabled)" Class="mt-4" FullWidth>
             Register
         </MudButton>
+        <MudText ReadOnly="true" Color="Color.Error">@errorMessage</MudText>
+
     </MudForm>
 </MudPaper>
 
@@ -24,6 +26,7 @@
     private UserRegistrationModel registrationModel = new();
     private readonly UserRegistrationValidator validator = new();
     private bool isSubmitEnabled = false;
+    private string errorMessage = "";
 
     private async Task OnSubmit()
     {
@@ -34,6 +37,7 @@
             // TODO: Call your registration API here
             Snackbar.Add("Registration successful!", MudBlazor.Severity.Success);
             registrationModel = new();
+            errorMessage = "User Name is already in use";
             await form?.ResetAsync();
         }
         else
