@@ -14,7 +14,7 @@ public class DatabaseService(AppDbContext dbContext)
     private async Task SeedRoles()
     {
         IEnumerable<Role> existingRoles = await dbContext.Roles.ToListAsync();
-        IEnumerable<string> missingRoles = UserRole.AllRoles
+        IEnumerable<string> missingRoles = UserRoles.AllRoles
                                                    .Where(roleName => !existingRoles.Any(role => role.Name == roleName));
 
         if (!missingRoles.Any())

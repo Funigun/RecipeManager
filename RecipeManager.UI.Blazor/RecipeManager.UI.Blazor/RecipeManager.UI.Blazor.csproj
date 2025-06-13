@@ -1,9 +1,15 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
-  <ItemGroup>
-    <ProjectReference Include="..\..\RecipeManager.ServiceDefaults\RecipeManager.ServiceDefaults.csproj" />
-    <ProjectReference Include="..\RecipeManager.UI.Blazor.Client\RecipeManager.UI.Blazor.Client.csproj" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server"/>
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="MudBlazor" />
+		<PackageReference Include="FluentValidation" />
+	</ItemGroup>
+	
+	<ItemGroup>
+	  <ProjectReference Include="..\..\RecipeManager.ServiceDefaults\RecipeManager.ServiceDefaults.csproj" />
+	  <ProjectReference Include="..\..\RecipeManager.Shared.Contracts\RecipeManager.Shared.Contracts.csproj" />
+	  <ProjectReference Include="..\RecipeManager.UI.Blazor.Client\RecipeManager.UI.Blazor.Client.csproj" />
+	  <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" />
+	</ItemGroup>
 
 </Project>

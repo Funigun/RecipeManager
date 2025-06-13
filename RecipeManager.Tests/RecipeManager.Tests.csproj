@@ -13,13 +13,20 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="Moq" />
     <PackageReference Include="xunit.v3" />
+	<PackageReference Include="xunit.runner.visualstudio">
+	  <PrivateAssets>all</PrivateAssets>
+	  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+	</PackageReference>
+	<PackageReference Include="FluentValidation" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\RecipeManager.Api.Shared\RecipeManager.Api.Shared.csproj" />
     <ProjectReference Include="..\RecipeManager.API\RecipeManager.API.csproj" />
     <ProjectReference Include="..\RecipeManager.Identity.API\RecipeManager.Identity.API.csproj" />
+    <ProjectReference Include="..\RecipeManager.Shared.Contracts\RecipeManager.Shared.Contracts.csproj" />
   </ItemGroup>
 
   <ItemGroup>
