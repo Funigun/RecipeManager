@@ -19,8 +19,14 @@ public static class UserRegistration
     {
         public Validator()
         {
-            RuleFor(request => request.UserDto)
-                .SetValidator(new UserRegistrationValidator());
+            RuleFor(request => request.UserDto.UserName)
+                .SetValidator(new UserNameValidator());
+
+            RuleFor(request => request.UserDto.Password)
+                .SetValidator(new PasswordValidator());
+
+            RuleFor(request => request.UserDto.Email)
+                .SetValidator(new EmailValidator());
         }
     }
 

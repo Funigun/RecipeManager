@@ -33,6 +33,7 @@
     <!-- External Packages -->
     <PackageVersion Include="FluentValidation" Version="12.0.0" />
 	<PackageVersion Include="FluentValidation.DependencyInjectionExtensions" Version="12.0.0" />
+	<PackageVersion Include="MudBlazor" Version="8.7.0" />
     <PackageVersion Include="Serilog" Version="4.2.0" />
     <PackageVersion Include="Serilog.AspNetCore" Version="9.0.0" />
     <PackageVersion Include="Serilog.Sinks.OpenTelemetry" Version="4.2.0-dev-02302" />

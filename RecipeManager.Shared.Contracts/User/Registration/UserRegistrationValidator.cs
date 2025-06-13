@@ -2,17 +2,23 @@
 
 namespace RecipeManager.Shared.Contracts.User.Registration;
 
-public sealed class UserRegistrationValidator : AbstractValidator<UserRegistrationDto>
+public sealed class UserNameValidator : AbstractValidator<string>
 {
-    public UserRegistrationValidator()
+    public UserNameValidator()
     {
-        RuleFor(dto => dto.UserName)
+        RuleFor(userName => userName)
             .NotEmpty()
                 .WithMessage("Username is required")
             .MaximumLength(15)
                 .WithMessage("Username must not exceed 15 characters");
+    }
+}
 
-        RuleFor(dto => dto.Password)
+public sealed class PasswordValidator : AbstractValidator<string>
+{
+    public PasswordValidator()
+    {
+            RuleFor(password => password)
             .NotEmpty()
                 .WithMessage("Password is required")
             .MinimumLength(10)
@@ -25,12 +31,17 @@ public sealed class UserRegistrationValidator : AbstractValidator<UserRegistrati
                 .WithMessage("Password must contain at least one digit")
             .Matches(@"[^a-zA-Z0-9]")
                 .WithMessage("Password must contain at least one special character");
+    }
+}
 
-
-        RuleFor(dto => dto.Email)
+public sealed class EmailValidator : AbstractValidator<string>
+{
+    public EmailValidator()
+    {
+        RuleFor(email => email)
             .NotEmpty()
                 .WithMessage("Email is required")
             .EmailAddress()
                 .WithMessage("Invalid email format");
     }
-}
+}   

@@ -1,0 +1,65 @@
+﻿@using FluentValidation
+@using MudBlazor
+@using RecipeManager.Shared.Contracts.User.Registration
+@using RecipeManager.UI.Blazor.Components.Extensions
+@inject ISnackbar Snackbar
+
+<MudPaper Class="pa-6 mx-auto" MaxWidth="400px">
+    <MudForm @ref="form" Model="@registrationModel" Validation="@(validator.ValidateValue)" ValidationDelay="0" @bind-IsValid="@isSubmitEnabled">
+        <MudText Typo="Typo.h5" Class="mb-4">Register</MudText>
+
+        <MudTextField @bind-Value="registrationModel.UserName" Label="Username" For="@(() => registrationModel.UserName)" />
+        <MudTextField @bind-Value="registrationModel.Email" Label="Email" For="@(() => registrationModel.Email)" />
+        <MudTextField @bind-Value="registrationModel.Password" Label="Password" For="@(() => registrationModel.Password)" InputType="InputType.Password" />
+        <MudTextField @bind-Value="registrationModel.ConfirmationPassword" Label="Confirmation Password" For="@(() => registrationModel.ConfirmationPassword)" InputType="InputType.Password" />
+
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="OnSubmit" Disabled="@(!isSubmitEnabled)" Class="mt-4" FullWidth>
+            Register
+        </MudButton>
+    </MudForm>
+</MudPaper>
+
+@code {
+    private MudForm? form;
+    private UserRegistrationModel registrationModel = new();
+    private readonly UserRegistrationValidator validator = new();
+    private bool isSubmitEnabled = false;
+
+    private async Task OnSubmit()
+    {
+        var result = validator.Validate(registrationModel);
+
+        if (result.IsValid)
+        {
+            // TODO: Call your registration API here
+            Snackbar.Add("Registration successful!", MudBlazor.Severity.Success);
+            registrationModel = new();
+            await form?.ResetAsync();
+        }
+        else
+        {
+            foreach (var error in result.Errors)
+                Snackbar.ShowError(error.ErrorMessage);
+        }
+    }
+
+    public class UserRegistrationValidator : AbstractValidator<UserRegistrationModel>
+    {
+        public UserRegistrationValidator()
+        {
+
+            RuleFor(x => x.UserName).SetValidator(new UserNameValidator());
+            RuleFor(x => x.Email).SetValidator(new EmailValidator());
+            RuleFor(x => x.Password).SetValidator(new PasswordValidator());
+            RuleFor(x => x.ConfirmationPassword).Equal(x => x.Password)
+                .WithMessage("Confirmation password must match the password.");
+        }
+
+        public Func<object, string, Task<IEnumerable<string>>> ValidateValue => async (model, propertyName) =>
+        {
+            var result = await ValidateAsync(ValidationContext<UserRegistrationModel>.CreateWithOptions((UserRegistrationModel)model, x => x.IncludeProperties(propertyName)));
+
+            return result.IsValid ? Array.Empty<string>() : result.Errors.Select(e => e.ErrorMessage);
+        };
+    }
+}
