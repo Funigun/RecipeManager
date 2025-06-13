@@ -17,10 +17,18 @@ public static class UserRegistration
 
     public sealed class Validator : AbstractValidator<Request>
     {
-        public Validator()
+        public Validator(UserManager<User> userManager)
         {
             RuleFor(request => request.UserDto.UserName)
-                .SetValidator(new UserNameValidator());
+                .SetValidator(new UserNameValidator())
+                .MustAsync
+                (
+                    async (name, cancellationToken) =>
+                    {
+                        bool userExists = await userManager.FindByNameAsync(name) != null;
+                        return !userExists;
+                    }
+                ).WithMessage("User Name is already in use");
 
             RuleFor(request => request.UserDto.Password)
                 .SetValidator(new PasswordValidator());
