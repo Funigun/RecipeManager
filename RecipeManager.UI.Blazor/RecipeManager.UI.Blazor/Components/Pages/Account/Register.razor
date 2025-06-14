@@ -1,11 +1,15 @@
-﻿@using FluentValidation
+﻿@page "/register"
+
+@using FluentValidation
 @using MudBlazor
 @using RecipeManager.Shared.Contracts.User.Registration
 @using RecipeManager.UI.Blazor.Components.Extensions
+
 @inject ISnackbar Snackbar
+@inject NavigationManager Navigation
 
 <MudPaper Class="pa-6 mx-auto" MaxWidth="400px">
-    <MudForm @ref="form" Model="@registrationModel" Validation="@(validator.ValidateValue)" ValidationDelay="0" @bind-IsValid="@isSubmitEnabled">
+    <MudForm Model="@registrationModel" Validation="@(validator.ValidateValue)" ValidationDelay="0" @bind-IsValid="@isSubmitEnabled">
         <MudText Typo="Typo.h5" Class="mb-4">Register</MudText>
 
         <MudTextField @bind-Value="registrationModel.UserName" Label="Username" For="@(() => registrationModel.UserName)" Required=true/>
@@ -18,11 +22,19 @@
         </MudButton>
         <MudText ReadOnly="true" Color="Color.Error">@errorMessage</MudText>
 
+        <MudGrid AlignItems="AlignItems.Center" Class="mt-6">
+            <MudItem xs="12" Class="d-flex justify-space-between align-center mt-4">
+                <MudText Typo="Typo.body1">Not a member yet?</MudText>
+                <MudButton Variant="Variant.Text" Color="Color.Primary" OnClick="NavigateToLoginPage">
+                    Sign In
+                </MudButton>
+            </MudItem>
+        </MudGrid>
+
     </MudForm>
 </MudPaper>
 
 @code {
-    private MudForm? form;
     private UserRegistrationModel registrationModel = new();
     private readonly UserRegistrationValidator validator = new();
     private bool isSubmitEnabled = false;
@@ -38,13 +50,17 @@
             Snackbar.Add("Registration successful!", MudBlazor.Severity.Success);
             registrationModel = new();
             errorMessage = "User Name is already in use";
-            await form?.ResetAsync();
         }
         else
         {
             foreach (var error in result.Errors)
                 Snackbar.ShowError(error.ErrorMessage);
         }
+    }
+
+    private void NavigateToLoginPage()
+    {
+        Navigation.NavigateTo("/login");
     }
 
     public class UserRegistrationValidator : AbstractValidator<UserRegistrationModel>

@@ -1,6 +1,6 @@
 ﻿@inherits LayoutComponentBase
 
-@inject ISnackbar Snackbar
+@inject NavigationManager Navigation
 
 <MudThemeProvider />
 <MudPopoverProvider />
@@ -9,15 +9,18 @@
 
 <MudLayout>
     <MudAppBar Elevation="1">
-        <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
+        @if (showSideMenu)
+        {
+            <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
+        }
         <MudText Typo="Typo.h5" Class="ml-3">Recipes Manager</MudText>
         <MudSpacer />
         <MudSpacer />
-        <MudIconButton Icon="@Icons.Material.Filled.AccountCircle" Color="Color.Inherit" Edge="Edge.End" OnClick="@(() => Snackbar.Add("Simple Snackbar"))" />
+        <MudIconButton Icon="@Icons.Material.Filled.AccountCircle" Color="Color.Inherit" Edge="Edge.End" OnClick="@((e) => SignIn())" />
         <MudSpacer  />
     </MudAppBar>
 
-    <MudDrawer @bind-Open="_drawerOpen" ClipMode="DrawerClipMode.Always" Elevation="2">
+    <MudDrawer @bind-Open="showSideMenu" ClipMode="DrawerClipMode.Always" Elevation="2">
         <NavMenu/>
     </MudDrawer>
 
@@ -25,11 +28,22 @@
         @Body
     </MudMainContent>
 </MudLayout>
-@code {
-    bool _drawerOpen = true;
 
-    void DrawerToggle()
+@code {
+    bool showSideMenu;
+
+    protected override void OnInitialized()
     {
-        _drawerOpen = !_drawerOpen;
+        showSideMenu = false;
+    }
+
+    private void DrawerToggle()
+    {
+        showSideMenu = !showSideMenu;
+    }
+
+    private void SignIn() 
+    {
+        Navigation.NavigateTo("/login");
     }
 }

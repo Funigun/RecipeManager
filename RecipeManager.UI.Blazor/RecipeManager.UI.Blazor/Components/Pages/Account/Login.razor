@@ -1,0 +1,49 @@
+﻿@page "/login"
+
+@using FluentValidation
+@using MudBlazor
+@using RecipeManager.Shared.Contracts.User.Login
+@using RecipeManager.Shared.Contracts.User.Registration
+@using RecipeManager.UI.Blazor.Components.Extensions
+
+@inject ISnackbar Snackbar
+@inject NavigationManager Navigation
+
+<MudPaper Class="pa-6 mx-auto" MaxWidth="400px">
+    <MudForm Model="@loginModel" ValidationDelay="0" @bind-IsValid="@isSubmitEnabled">
+        <MudText Typo="Typo.h5" Class="mb-4">Sign in</MudText>
+
+        <MudTextField @bind-Value="loginModel.UserName" Label="Username" For="@(() => loginModel.UserName)" Required=true/>
+        <MudTextField @bind-Value="loginModel.Password" Label="Password" For="@(() => loginModel.Password)" InputType="InputType.Password" Required=true />
+
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="Submit" Disabled="@(!isSubmitEnabled)" Class="mt-4" FullWidth>
+            Sign In
+        </MudButton>
+
+        <MudGrid AlignItems="AlignItems.Center" Class="mt-6">
+            <MudItem xs="12" Class="d-flex justify-space-between align-center mt-4">
+                <MudText Typo="Typo.body1">Not a member yet?</MudText>
+                <MudButton Variant="Variant.Text" Color="Color.Primary" OnClick="NavigateToRegisterPage">
+                    Register
+                </MudButton>
+            </MudItem>
+        </MudGrid>
+    </MudForm>
+</MudPaper>
+
+@code {
+    private UserLoginModel loginModel = new();
+    private bool isSubmitEnabled = false;
+
+    private async Task Submit()
+    {
+        // TODO: Call your registration API here
+        Snackbar.Add("Registration successful!", MudBlazor.Severity.Success);
+        loginModel = new();
+    }
+
+    private void NavigateToRegisterPage()
+    {
+        Navigation.NavigateTo("/register");
+    }
+}
