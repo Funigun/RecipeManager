@@ -5,9 +5,11 @@
 @using RecipeManager.Shared.Contracts.User.Login
 @using RecipeManager.Shared.Contracts.User.Registration
 @using RecipeManager.UI.Blazor.Components.Extensions
+@using RecipeManager.UI.Blazor.Services
 
 @inject ISnackbar Snackbar
 @inject NavigationManager Navigation
+@inject IdentityApiService IdentityApi
 
 <MudPaper Class="pa-6 mx-auto" MaxWidth="400px">
     <MudForm Model="@loginModel" ValidationDelay="0" @bind-IsValid="@isSubmitEnabled">
@@ -19,6 +21,7 @@
         <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="Submit" Disabled="@(!isSubmitEnabled)" Class="mt-4" FullWidth>
             Sign In
         </MudButton>
+        <MudText ReadOnly="true" Color="Color.Error">@errorMessage</MudText>
 
         <MudGrid AlignItems="AlignItems.Center" Class="mt-6">
             <MudItem xs="12" Class="d-flex justify-space-between align-center mt-4">
@@ -34,12 +37,11 @@
 @code {
     private UserLoginModel loginModel = new();
     private bool isSubmitEnabled = false;
+    private string errorMessage = "";
 
     private async Task Submit()
     {
-        // TODO: Call your registration API here
-        Snackbar.Add("Registration successful!", MudBlazor.Severity.Success);
-        loginModel = new();
+        await IdentityApi.SignIn(loginModel);
     }
 
     private void NavigateToRegisterPage()
