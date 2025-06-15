@@ -5,7 +5,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using RecipeManager.Api.Shared.Endpoint;
 using RecipeManager.Identity.API.Domain;
-using RecipeManager.Shared.Contracts.User.Login;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -16,7 +15,7 @@ public static class LogIn
 {
     public sealed record Request(string UserName, string Password);
 
-    public sealed record Response(UserLoginResponseDto UserLoginResponseDto) { };
+    public sealed record Response(string Token, string RefreshToken, DateTime ExpirationDate) { };
 
     public sealed class Validator : AbstractValidator<Request>
     {
@@ -47,43 +46,51 @@ public static class LogIn
     {
         User user = await userManager.Users.FirstAsync(userManager => userManager.UserName == request.UserName, cancellationToken);
 
-        UserLoginResponseDto response = new()
-        {
-            Token = await GenerateToken(user, userManager, configuration),
-        };
+        string token = await GenerateToken(user, userManager, configuration, isRefreshToken: false);
+        string refreshToken = await GenerateToken(user, userManager, configuration, isRefreshToken: true);
+        
+        Response response = new(token, refreshToken, DateTime.UtcNow.AddMinutes(Convert.ToInt32(configuration["JwtSettings:Duration"])));
 
-        // Logic for changing the password goes here
-        return TypedResults.Ok(new Response(response));
+        return TypedResults.Ok(response);
     }
 
-    private static async Task<string> GenerateToken(User user, UserManager<User> userManager, IConfiguration configuration)
+    private static async Task<string> GenerateToken(User user, UserManager<User> userManager, IConfiguration configuration, bool isRefreshToken)
     {
-        SymmetricSecurityKey? securitykey = new(Encoding.UTF8.GetBytes(configuration["JwtSettings:Key"]!));
+        string tokenKey = isRefreshToken ? configuration["JwtSettings:RefreshKey"]! : configuration["JwtSettings:Key"]!;
+
+        SymmetricSecurityKey? securitykey = new(Encoding.UTF8.GetBytes(tokenKey));
         SigningCredentials? credentials = new(securitykey, SecurityAlgorithms.HmacSha256);
 
-        IList<string>? roles = await userManager.GetRolesAsync(user);
-        IList<Claim>? roleClaims = roles.Select(q => new Claim(ClaimTypes.Role, q)).ToList();
-
-        IList<Claim>? userClaims = await userManager.GetClaimsAsync(user);
-
-        List<Claim> claims = 
-        [
-            new ("Id", user.Id.ToString()),
-            new (JwtRegisteredClaimNames.Sub, user.UserName!),
-        ];
-
-        claims.AddRange(userClaims);
-        claims.AddRange(roleClaims);
+        int tokenDuration = isRefreshToken ? Convert.ToInt32(configuration["JwtSettings:RefreshDuration"]) : Convert.ToInt32(configuration["JwtSettings:Duration"]);
 
         JwtSecurityToken? token = new
         (
             issuer: configuration["JwtSettings:Issuer"],
             audience: configuration["JwtSettings:Audience"],
-            claims: claims,
-            expires: DateTime.UtcNow.AddMinutes(Convert.ToInt32(configuration["JwtSettings:Duration"])),
+            claims: await GetClaims(user, userManager),
+            expires: DateTime.UtcNow.AddMinutes(tokenDuration),
             signingCredentials: credentials
         );
 
         return new JwtSecurityTokenHandler().WriteToken(token);
+    }
+
+    private static async Task<IList<Claim>> GetClaims(User user, UserManager<User> userManager)
+    {
+        IList<string> roles = await userManager.GetRolesAsync(user);
+        IList<Claim> roleClaims = roles.Select(q => new Claim(ClaimTypes.Role, q)).ToList();
+
+        IList<Claim> userClaims = await userManager.GetClaimsAsync(user);
+
+        List<Claim> claims =
+        [
+            new ("Id", user.Id.ToString()),
+            new (JwtRegisteredClaimNames.Nickname, user.UserName!),
+        ];
+
+        claims.AddRange(userClaims);
+        claims.AddRange(roleClaims);
+
+        return claims;
     }
 }
