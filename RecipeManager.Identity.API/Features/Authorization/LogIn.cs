@@ -14,7 +14,7 @@ namespace RecipeManager.Identity.API.Features.Authorization;
 
 public static class LogIn
 {
-    public sealed record Request(UserLoginDto UserDto) { };
+    public sealed record Request(string UserName, string Password);
 
     public sealed record Response(UserLoginResponseDto UserLoginResponseDto) { };
 
@@ -22,12 +22,12 @@ public static class LogIn
     {
         public Validator(UserManager<User> userManager)
         {
-            RuleFor(request => request.UserDto)
-                .MustAsync(async (userDto, cancellationToken) =>
+            RuleFor(request => request)
+                .MustAsync(async (request, cancellationToken) =>
                 {
-                    User? user = await userManager.Users.FirstOrDefaultAsync(userManager => userManager.UserName == userDto.UserName, cancellationToken);
+                    User? user = await userManager.Users.FirstOrDefaultAsync(userManager => userManager.UserName == request.UserName, cancellationToken);
 
-                    return user != null && await userManager.CheckPasswordAsync(user, userDto.Password);
+                    return user != null && await userManager.CheckPasswordAsync(user, request.Password);
                 }).WithMessage("User Name or password is not correct");
         }
     }
@@ -45,7 +45,7 @@ public static class LogIn
 
     internal static async Task<Results<Ok<Response>, BadRequest>> Handler(Request request, UserManager<User> userManager, IConfiguration configuration, CancellationToken cancellationToken)
     {
-        User user = await userManager.Users.FirstAsync(userManager => userManager.UserName == request.UserDto.UserName, cancellationToken);
+        User user = await userManager.Users.FirstAsync(userManager => userManager.UserName == request.UserName, cancellationToken);
 
         UserLoginResponseDto response = new()
         {

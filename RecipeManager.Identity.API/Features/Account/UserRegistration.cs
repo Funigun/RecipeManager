@@ -12,14 +12,13 @@ namespace RecipeManager.Identity.API.Features.Account;
 
 public static class UserRegistration
 {
-    public record Request(UserRegistrationDto UserDto);
-    public record Response(string Token);
+    public record Request(string UserName, string Password, string Email);
 
     public sealed class Validator : AbstractValidator<Request>
     {
         public Validator(UserManager<User> userManager)
         {
-            RuleFor(request => request.UserDto.UserName)
+            RuleFor(request => request.UserName)
                 .SetValidator(new UserNameValidator())
                 .MustAsync
                 (
@@ -30,10 +29,10 @@ public static class UserRegistration
                     }
                 ).WithMessage("User Name is already in use");
 
-            RuleFor(request => request.UserDto.Password)
+            RuleFor(request => request.Password)
                 .SetValidator(new PasswordValidator());
 
-            RuleFor(request => request.UserDto.Email)
+            RuleFor(request => request.Email)
                 .SetValidator(new EmailValidator());
         }
     }
@@ -43,7 +42,7 @@ public static class UserRegistration
     {
         public void MapEndpoint(IEndpointRouteBuilder endpoints)
         {
-            endpoints.MapStandardValidatedPost<Request, Response>("/register", Handler)
+            endpoints.MapStandardValidatedPost<Request, string>("/register", Handler)
                      .WithName("Register")
                      .WithDescription("Creates new user account");
         }
@@ -51,14 +50,14 @@ public static class UserRegistration
 
     internal static async Task<Results<Ok, BadRequest>> Handler(Request request, UserManager<User> userManager, CancellationToken cancellationToken)
     {
-        User user = request.UserDto.ToUser();
+        User user = request.ToUser();
 
         if (await userManager.Users.AnyAsync(usr => usr.UserName!.Equals(user.UserName, StringComparison.CurrentCultureIgnoreCase), cancellationToken))
         {
             throw IdentityValidationException.UserNameAlreadyInUse();
         }
 
-        IdentityResult result = await userManager.CreateAsync(user, request.UserDto.Password);
+        IdentityResult result = await userManager.CreateAsync(user, request.Password);
 
         if (!result.Succeeded)
         {
@@ -70,7 +69,7 @@ public static class UserRegistration
         return TypedResults.Ok();
     }
 
-    internal static User ToUser(this UserRegistrationDto userDto)
+    internal static User ToUser(this Request userDto)
     {
         return new User
         {
