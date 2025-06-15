@@ -2,9 +2,9 @@
 
 @using FluentValidation
 @using MudBlazor
-@using RecipeManager.Shared.Contracts.User.Login
 @using RecipeManager.Shared.Contracts.User.Registration
 @using RecipeManager.UI.Blazor.Components.Extensions
+@using RecipeManager.UI.Blazor.Components.Pages.Account
 @using RecipeManager.UI.Blazor.Services
 
 @inject ISnackbar Snackbar
@@ -35,13 +35,27 @@
 </MudPaper>
 
 @code {
-    private UserLoginModel loginModel = new();
+    private LoginRequest loginModel = new();
     private bool isSubmitEnabled = false;
     private string errorMessage = "";
 
     private async Task Submit()
     {
-        await IdentityApi.SignIn(loginModel);
+        try
+        {
+            string message = await IdentityApi.SignIn(loginModel);
+
+            if (string.IsNullOrEmpty(message))
+            {
+                Navigation.NavigateTo("/");
+            }
+
+            errorMessage = message;
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"An error occurred while signing in: {ex.Message}";
+        }
     }
 
     private void NavigateToRegisterPage()

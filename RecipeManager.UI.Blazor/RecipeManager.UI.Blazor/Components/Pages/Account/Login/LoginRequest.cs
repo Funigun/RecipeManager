@@ -1,6 +1,6 @@
-﻿namespace RecipeManager.Shared.Contracts.User.Login;
+﻿namespace RecipeManager.UI.Blazor.Components.Pages.Account;
 
-public sealed class UserLoginModel
+public sealed class LoginRequest
 {
     public string UserName { get; set; } = string.Empty;
 

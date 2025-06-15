@@ -12,5 +12,9 @@
 	  <ProjectReference Include="..\RecipeManager.UI.Blazor.Client\RecipeManager.UI.Blazor.Client.csproj" />
 	  <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" />
 	</ItemGroup>
+	
+	<ItemGroup>
+	  <Folder Include="Services\Extensions\" />
+	</ItemGroup>
 
 </Project>
