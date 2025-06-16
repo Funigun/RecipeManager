@@ -9,28 +9,17 @@
 @inject NavigationManager Navigation
 @inject IdentityApiService IdentityApi
 
-@* <MudPaper Class="pa-6 mx-auto" MaxWidth="400px"> *@
-    <MudForm Model="@loginModel" ValidationDelay="0" @bind-IsValid="@isSubmitEnabled">
-        <MudText Typo="Typo.h5" Class="mb-4">Sign in</MudText>
+<MudForm Model="@loginModel" ValidationDelay="0" @bind-IsValid="@isSubmitEnabled">
+    <MudText Typo="Typo.h5" Class="mb-4">Sign in</MudText>
 
-        <MudTextField @bind-Value="loginModel.UserName" Label="Username" For="@(() => loginModel.UserName)" Required=true/>
-        <MudTextField @bind-Value="loginModel.Password" Label="Password" For="@(() => loginModel.Password)" InputType="InputType.Password" Required=true />
+    <MudTextField @bind-Value="loginModel.UserName" Label="Username" For="@(() => loginModel.UserName)" Required=true/>
+    <MudTextField @bind-Value="loginModel.Password" Label="Password" For="@(() => loginModel.Password)" InputType="InputType.Password" Required=true />
 
-        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="Submit" Disabled="@(!isSubmitEnabled)" Class="mt-4" FullWidth>
-            Sign In
-        </MudButton>
-        <MudText ReadOnly="true" Color="Color.Error">@errorMessage</MudText>
-
-        @* <MudGrid AlignItems="AlignItems.Center" Class="mt-6">
-        @*     <MudItem xs="12" Class="d-flex justify-space-between align-center mt-4"> *@
-        @*         <MudText Typo="Typo.body1">Not a member yet?</MudText> *@
-        @*         <MudButton Variant="Variant.Text" Color="Color.Primary" OnClick="NavigateToRegisterPage"> *@
-        @*             Register *@
-        @*         </MudButton> *@
-        @*     </MudItem> *@
-        @* </MudGrid> *@
-    </MudForm>
- @* </MudPaper> *@
+    <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="Submit" Disabled="@(!isSubmitEnabled)" Class="mt-4" FullWidth>
+        Sign In
+    </MudButton>
+    <MudText ReadOnly="true" Color="Color.Error">@errorMessage</MudText>
+</MudForm>
 
 @code {
     private LoginRequest loginModel = new();

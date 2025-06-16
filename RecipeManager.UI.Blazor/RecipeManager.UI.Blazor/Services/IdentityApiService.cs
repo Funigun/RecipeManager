@@ -8,9 +8,13 @@ namespace RecipeManager.UI.Blazor.Services;
 
 public class IdentityApiService(HttpClient httpClient, AuthenticationStateProvider authStateProvider)
 {
-    public async Task RegisterUser(UserRegistrationModel model, CancellationToken cancellationToken = default)
+    public async Task<string> RegisterUser(UserRegistrationModel model, CancellationToken cancellationToken = default)
     {
         HttpResponseMessage response = await httpClient.PostAsJsonAsync("api/auth/register", model, cancellationToken);
+       
+        return response.IsSuccessStatusCode
+               ? string.Empty
+               : string.Join('\n', (await response.Content.ReadFromJsonAsync<BaseApiResponse>(cancellationToken))!.Errors);
     }
 
     public async Task<string> SignIn(LoginRequest userModel, CancellationToken cancellationToken = default)

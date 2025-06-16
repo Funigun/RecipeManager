@@ -30,11 +30,11 @@
 
     private async Task OnSubmit()
     {
-        await IdentityApi.RegisterUser(registrationModel);
-    }
+        errorMessage = await IdentityApi.RegisterUser(registrationModel);
 
-    private void NavigateToLoginPage()
-    {
-        Navigation.NavigateTo("/login");
+        if (string.IsNullOrEmpty(errorMessage))
+        {
+            Navigation.NavigateTo("/login");
+        }
     }
 }
