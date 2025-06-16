@@ -1,4 +1,4 @@
-﻿namespace RecipeManager.UI.Blazor.Components.Pages.Account;
+﻿namespace RecipeManager.UI.Blazor.Features.Account.Login;
 
 public sealed class LoginRequest
 {

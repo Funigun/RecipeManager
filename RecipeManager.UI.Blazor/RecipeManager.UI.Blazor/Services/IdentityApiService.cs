@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Components.Authorization;
-using RecipeManager.Shared.Contracts.User.Registration;
 using RecipeManager.UI.Blazor.Common.Models;
-using RecipeManager.UI.Blazor.Components.Pages.Account;
+using RecipeManager.UI.Blazor.Features.Account.Login;
+using RecipeManager.UI.Blazor.Features.Account.Register;
 using RecipeManager.UI.Blazor.Services.Authorization;
 
 namespace RecipeManager.UI.Blazor.Services;

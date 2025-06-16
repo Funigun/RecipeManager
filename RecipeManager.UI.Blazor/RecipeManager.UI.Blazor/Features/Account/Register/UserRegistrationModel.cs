@@ -1,4 +1,4 @@
-﻿namespace RecipeManager.Shared.Contracts.User.Registration;
+﻿namespace RecipeManager.UI.Blazor.Features.Account.Register;
 
 public sealed class UserRegistrationModel
 {
