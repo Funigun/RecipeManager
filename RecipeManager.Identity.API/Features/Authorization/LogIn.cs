@@ -56,12 +56,12 @@ public static class LogIn
 
     private static async Task<string> GenerateToken(User user, UserManager<User> userManager, IConfiguration configuration, bool isRefreshToken)
     {
-        string tokenKey = isRefreshToken ? configuration["JwtSettings:RefreshKey"]! : configuration["JwtSettings:Key"]!;
+        string tokenKey = isRefreshToken ? configuration["JwtSettings:RefreshTokenKey"]! : configuration["JwtSettings:Key"]!;
 
         SymmetricSecurityKey? securitykey = new(Encoding.UTF8.GetBytes(tokenKey));
         SigningCredentials? credentials = new(securitykey, SecurityAlgorithms.HmacSha256);
 
-        int tokenDuration = isRefreshToken ? Convert.ToInt32(configuration["JwtSettings:RefreshDuration"]) : Convert.ToInt32(configuration["JwtSettings:Duration"]);
+        int tokenDuration = isRefreshToken ? Convert.ToInt32(configuration["JwtSettings:RefreshTokenDuration"]) : Convert.ToInt32(configuration["JwtSettings:Duration"]);
 
         JwtSecurityToken? token = new
         (
@@ -84,6 +84,7 @@ public static class LogIn
 
         List<Claim> claims =
         [
+            new Claim(ClaimTypes.Name, user.UserName!),
             new ("Id", user.Id.ToString()),
             new (JwtRegisteredClaimNames.Nickname, user.UserName!),
         ];

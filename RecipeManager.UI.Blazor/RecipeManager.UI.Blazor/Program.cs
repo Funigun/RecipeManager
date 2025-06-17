@@ -1,9 +1,11 @@
 using Microsoft.AspNetCore.Components.Authorization;
 using MudBlazor.Services;
 using RecipeManager.ServiceDefaults;
+using RecipeManager.UI.Blazor.Brokers.IdentityApi;
 using RecipeManager.UI.Blazor.Components;
-using RecipeManager.UI.Blazor.Services;
+using RecipeManager.UI.Blazor.Services.Authentication;
 using RecipeManager.UI.Blazor.Services.Authorization;
+
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
@@ -22,10 +24,12 @@ builder.Services.AddAuthenticationCore()
                 .AddCascadingAuthenticationState()
                 .AddScoped<AuthenticationStateProvider, CustomAuthenticationStateProvider>();
 
-builder.Services.AddHttpClient<IdentityApiService>(option =>
+builder.Services.AddHttpClient<IIdentityApi, IdentityApi>(option =>
 {
     option.BaseAddress = new Uri(builder.Configuration["IdentityApi:BaseUrl"]!);
 });
+
+builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
 
 WebApplication app = builder.Build();
 

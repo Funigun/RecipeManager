@@ -1,4 +1,4 @@
-﻿namespace RecipeManager.UI.Blazor.Common.Models;
+﻿namespace RecipeManager.UI.Blazor.Brokers;
 
 public class BaseApiResponse
 {

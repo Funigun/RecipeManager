@@ -3,10 +3,11 @@
 @using RecipeManager.Shared.Contracts.User.Registration
 @using RecipeManager.UI.Blazor.Components.Extensions
 @using RecipeManager.UI.Blazor.Services
+@using RecipeManager.UI.Blazor.Services.Authentication
 
 @inject ISnackbar Snackbar
 @inject NavigationManager Navigation
-@inject IdentityApiService IdentityApi
+@inject IAuthenticationService AuthenticationService
 
 <MudForm Model="@registrationModel" Validation="@(validator.ValidateValue)" ValidationDelay="0" @bind-IsValid="@isSubmitEnabled">
     <MudText Typo="Typo.h5" Class="mb-4">Register</MudText>
@@ -23,18 +24,16 @@
 </MudForm>
 
 @code {
-    private UserRegistrationModel registrationModel = new();
-    private readonly UserRegistrationValidator validator = new();
+    private readonly RegistrationRequest registrationModel = new();
+    private readonly RegistrationValidator validator = new();
     private bool isSubmitEnabled = false;
     private string errorMessage = "";
 
     private async Task OnSubmit()
     {
-        errorMessage = await IdentityApi.RegisterUser(registrationModel);
-
-        if (string.IsNullOrEmpty(errorMessage))
+        if (await AuthenticationService.Register(registrationModel))
         {
-            Navigation.NavigateTo("/login");
+            Navigation.NavigateTo("/login", true);
         }
     }
 }

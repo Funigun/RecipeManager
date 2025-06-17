@@ -1,10 +1,12 @@
 ﻿@inherits LayoutComponentBase
 
 @using Microsoft.AspNetCore.Components.Authorization
+@using RecipeManager.UI.Blazor.Services.Authentication
 @using RecipeManager.UI.Blazor.Services.Authorization
 
 @inject AuthenticationStateProvider AuthStateProvider
 @inject NavigationManager Navigation
+@inject IAuthenticationService AuthenticationService
 
 <MudThemeProvider />
 <MudPopoverProvider />
@@ -13,18 +15,26 @@
 
 <MudLayout>
     <MudAppBar Elevation="1">
-        @if (showSideMenu)
+        @if (isUserAuthenticated)
         {
-            <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
+            <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())"/>
         }
         <MudText Typo="Typo.h5" Class="ml-3">Recipes Manager</MudText>
         <MudSpacer />
+        @if (isUserAuthenticated)
+        {
+            <MudText Typo="Typo.h5" Class="ml-3" Style="margin-right: 15px">@user</MudText>
+            <MudIconButton Icon="@Icons.Material.Filled.Logout" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => Logout())"/>
+        }
+        <MudSpacer />
     </MudAppBar>
 
-    <MudDrawer @bind-Open="showSideMenu" ClipMode="DrawerClipMode.Always" Elevation="2">
-        <NavMenu/>
-    </MudDrawer>
-
+    @if (isUserAuthenticated)
+    {
+        <MudDrawer @bind-Open="showSideMenu" ClipMode="DrawerClipMode.Always" Elevation="2">
+            <NavMenu/>
+        </MudDrawer>
+    }
     <MudMainContent>
         @Body
     </MudMainContent>
@@ -32,20 +42,26 @@
 
 @code {
     bool showSideMenu = false;
+    bool isUserAuthenticated = false;
+    string user = "";
+
 
     protected override async Task OnInitializedAsync()
     {
         try
         {
-            var authState = await ((CustomAuthenticationStateProvider)AuthStateProvider).GetAuthenticationStateAsync();
-            bool isUserAuthenticated = authState.User?.Identity?.IsAuthenticated ?? false;
+            AuthenticationState authState = await ((CustomAuthenticationStateProvider)AuthStateProvider).GetAuthenticationStateAsync();
+            isUserAuthenticated = authState.User?.Identity?.IsAuthenticated ?? false;
 
             if (!isUserAuthenticated)
             {
                 Navigation.NavigateTo("/login");
             }
-
-            showSideMenu = isUserAuthenticated;
+            else
+            {
+                user = authState.User?.Identity?.Name ?? string.Empty;
+                showSideMenu = isUserAuthenticated;
+            }
         }
         catch (Exception ex)
         {
@@ -54,8 +70,11 @@
         }
     }
 
-    private void DrawerToggle()
+    private void DrawerToggle() => showSideMenu = !showSideMenu;
+    
+    private async Task Logout()
     {
-        showSideMenu = !showSideMenu;
+        await AuthenticationService.Logout();
+        Navigation.NavigateTo("/login", true);
     }
 }

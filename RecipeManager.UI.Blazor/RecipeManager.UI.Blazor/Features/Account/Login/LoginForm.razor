@@ -4,10 +4,11 @@
 @using RecipeManager.UI.Blazor.Components.Extensions
 @using RecipeManager.UI.Blazor.Components.Pages.Account
 @using RecipeManager.UI.Blazor.Services
+@using RecipeManager.UI.Blazor.Services.Authentication
 
 @inject ISnackbar Snackbar
 @inject NavigationManager Navigation
-@inject IdentityApiService IdentityApi
+@inject IAuthenticationService AuthenticationService
 
 <MudForm Model="@loginModel" ValidationDelay="0" @bind-IsValid="@isSubmitEnabled">
     <MudText Typo="Typo.h5" Class="mb-4">Sign in</MudText>
@@ -22,7 +23,7 @@
 </MudForm>
 
 @code {
-    private LoginRequest loginModel = new();
+    private readonly LoginRequest loginModel = new();
     private bool isSubmitEnabled = false;
     private string errorMessage = "";
 
@@ -30,14 +31,10 @@
     {
         try
         {
-            string message = await IdentityApi.SignIn(loginModel);
-
-            if (string.IsNullOrEmpty(message))
+            if (await AuthenticationService.Authenticate(loginModel))
             {
-                Navigation.NavigateTo("/");
+                Navigation.NavigateTo("/", true);
             }
-
-            errorMessage = message;
         }
         catch (Exception ex)
         {

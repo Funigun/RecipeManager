@@ -22,7 +22,7 @@ public class CustomAuthenticationStateProvider(ProtectedLocalStorage localStorag
         {
             await MarkUserAsLoggedOut();
             ClaimsIdentity identity = new ClaimsIdentity();
-            ClaimsPrincipal user = new ClaimsPrincipal(identity);
+            ClaimsPrincipal user = new (identity);
 
             return new AuthenticationState(user);
         }

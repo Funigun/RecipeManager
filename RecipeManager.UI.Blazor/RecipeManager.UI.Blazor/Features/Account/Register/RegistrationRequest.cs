@@ -1,6 +1,6 @@
 ﻿namespace RecipeManager.UI.Blazor.Features.Account.Register;
 
-public sealed class UserRegistrationModel
+public sealed class RegistrationRequest
 {
     public string UserName { get; set; } = string.Empty;
 

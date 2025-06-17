@@ -3,9 +3,9 @@ using RecipeManager.Shared.Contracts.User.Registration;
 
 namespace RecipeManager.UI.Blazor.Features.Account.Register;
 
-public sealed class UserRegistrationValidator : AbstractValidator<UserRegistrationModel>
+public sealed class RegistrationValidator : AbstractValidator<RegistrationRequest>
 {
-    public UserRegistrationValidator()
+    public RegistrationValidator()
     {
 
         RuleFor(x => x.UserName).SetValidator(new UserNameValidator());
@@ -17,7 +17,7 @@ public sealed class UserRegistrationValidator : AbstractValidator<UserRegistrati
 
     public Func<object, string, Task<IEnumerable<string>>> ValidateValue => async (model, propertyName) =>
     {
-        var result = await ValidateAsync(ValidationContext<UserRegistrationModel>.CreateWithOptions((UserRegistrationModel)model, x => x.IncludeProperties(propertyName)));
+        var result = await ValidateAsync(ValidationContext<RegistrationRequest>.CreateWithOptions((RegistrationRequest)model, x => x.IncludeProperties(propertyName)));
 
         return result.IsValid ? Array.Empty<string>() : result.Errors.Select(e => e.ErrorMessage);
     };
