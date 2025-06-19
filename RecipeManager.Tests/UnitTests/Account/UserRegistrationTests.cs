@@ -21,13 +21,13 @@ public class UserRegistrationTests
         userManagerMock.Setup(um => um.Users).Returns(users);
 
         UserRegistration.Validator validator = new(userManagerMock.Object);
-        UserRegistration.Request request = new(new() { UserName = "", Password = "Test", Email = "Test" });
+        UserRegistration.Request request = new("", "Test", "Test");
 
         // Act
         TestValidationResult<UserRegistration.Request> result = await validator.TestValidateAsync(request, null, TestContext.Current.CancellationToken);
 
         // Assert
-        result.ShouldHaveValidationErrorFor(req => req.UserDto.UserName);
+        result.ShouldHaveValidationErrorFor(req => req.UserName);
     }
 
     [Fact]
@@ -45,13 +45,13 @@ public class UserRegistrationTests
 
         UserRegistration.Validator validator = new(userManagerMock.Object);
 
-        UserRegistration.Request request = new(new() { UserName = new('t', numberOfUserNameCharacters), Password = "Test", Email = "Test" });
+        UserRegistration.Request request = new(new('t', numberOfUserNameCharacters), "Test", "Test");
         
         // Act
         TestValidationResult<UserRegistration.Request> result = await validator.TestValidateAsync(request, null, TestContext.Current.CancellationToken);
 
         // Assert
-        result.ShouldHaveValidationErrorFor(req => req.UserDto.UserName);
+        result.ShouldHaveValidationErrorFor(req => req.UserName);
     }
 
     [Fact]
@@ -67,13 +67,13 @@ public class UserRegistrationTests
         userManagerMock.Setup(um => um.FindByNameAsync("duplicateUser")).Returns(Task.FromResult(existingUser));
 
         UserRegistration.Validator validator = new(userManagerMock.Object);
-        UserRegistration.Request request = new(new() { UserName = "duplicateUser", Password = "ValidTestPass123!", Email = "testEmail@gmail.com" });
+        UserRegistration.Request request = new("duplicateUser", "ValidTestPass123!", "testEmail@gmail.com");
         // Act
         
         TestValidationResult<UserRegistration.Request> result = await validator.TestValidateAsync(request, null, TestContext.Current.CancellationToken);
         
         // Assert
-        result.ShouldHaveValidationErrorFor(req => req.UserDto.UserName)
+        result.ShouldHaveValidationErrorFor(req => req.UserName)
               .WithErrorMessage("User Name is already in use");
     }
 
@@ -90,12 +90,10 @@ public class UserRegistrationTests
 
         UserRegistration.Validator validator = new(userManagerMock.Object);
 
-        UserRegistration.Request request = new(new() { UserName = "Test", Password = "Test", Email = "" });
-
-        // Act
+        UserRegistration.Request request = new("Test", "Test", "");
         TestValidationResult<UserRegistration.Request> result = await validator.TestValidateAsync(request, null, TestContext.Current.CancellationToken);
         // Assert
-        result.ShouldHaveValidationErrorFor(req => req.UserDto.Email);
+        result.ShouldHaveValidationErrorFor(req => req.Email);
     }
 
     [Theory]
@@ -117,13 +115,13 @@ public class UserRegistrationTests
 
         UserRegistration.Validator validator = new(userManagerMock.Object);
 
-        UserRegistration.Request request = new(new() { UserName = "ValidUser", Password = password, Email = "validTest@gmail.com" });
+        UserRegistration.Request request = new("ValidUser", password, "validTest@gmail.com");
 
         // Act
         TestValidationResult<UserRegistration.Request> result = await validator.TestValidateAsync(request, null, TestContext.Current.CancellationToken);
 
         // Assert
-        result.ShouldHaveValidationErrorFor(req => req.UserDto.Password)
+        result.ShouldHaveValidationErrorFor(req => req.Password)
               .WithErrorMessage(expectedErrorMessage);
     }
 }

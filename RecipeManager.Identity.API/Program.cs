@@ -9,6 +9,9 @@ WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 Assembly apiAssembly = Assembly.GetExecutingAssembly();
 Assembly contractsAssembly = Assembly.GetAssembly(typeof(RecipeManager.Shared.Contracts.AssemblyReader))!;
 
+builder.Configuration.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+                     .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true);
+
 builder.AddServiceDefaults();
 
 builder.Services.AddOpenApi("v1", options =>

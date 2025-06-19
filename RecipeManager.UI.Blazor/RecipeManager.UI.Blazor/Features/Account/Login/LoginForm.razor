@@ -1,0 +1,45 @@
+﻿@using FluentValidation
+@using MudBlazor
+@using RecipeManager.Shared.Contracts.User.Registration
+@using RecipeManager.UI.Blazor.Components.Extensions
+@using RecipeManager.UI.Blazor.Components.Pages.Account
+@using RecipeManager.UI.Blazor.Services
+@using RecipeManager.UI.Blazor.Services.Authentication
+
+@inject ISnackbar Snackbar
+@inject NavigationManager Navigation
+@inject IAuthenticationService AuthenticationService
+
+<MudForm Model="@loginModel" ValidationDelay="0" @bind-IsValid="@isSubmitEnabled">
+    <MudText Typo="Typo.h5" Class="mb-4">Sign in</MudText>
+
+    <MudTextField @bind-Value="loginModel.UserName" Label="Username" For="@(() => loginModel.UserName)" Required=true/>
+    <MudTextField @bind-Value="loginModel.Password" Label="Password" For="@(() => loginModel.Password)" InputType="InputType.Password" Required=true />
+
+    <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="Submit" Disabled="@(!isSubmitEnabled)" Class="mt-4" FullWidth>
+        Sign In
+    </MudButton>
+    <MudText ReadOnly="true" Color="Color.Error">@errorMessage</MudText>
+    
+</MudForm>
+
+@code {
+    private readonly LoginRequest loginModel = new();
+    private bool isSubmitEnabled = false;
+    private string errorMessage = "";
+
+    private async Task Submit()
+    {
+        if (await AuthenticationService.Authenticate(loginModel))
+        {
+            Navigation.NavigateTo("/", true);
+        }
+        
+        errorMessage = string.Join('\n', AuthenticationService.ResponseBody.Errors);
+    }
+
+    private void NavigateToRegisterPage()
+    {
+        Navigation.NavigateTo("/register");
+    }
+}

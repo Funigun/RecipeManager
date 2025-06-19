@@ -1,0 +1,8 @@
+﻿<MudText Color="Color.Error" ReadOnly="true" Style="margin-top: 10px">
+    @ErrorMessage
+</MudText>
+
+@code {
+    [Parameter]
+    public string ErrorMessage { get; set; } = string.Empty;
+}

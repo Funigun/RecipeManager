@@ -1,0 +1,30 @@
+﻿@page "/login"
+
+@using RecipeManager.UI.Blazor.Features.Account.Login
+@using RecipeManager.UI.Blazor.Features.Account.Register
+
+<MudPaper Class="pa-6 mx-auto" MaxWidth="400px">
+    @if (showLogin)
+    {
+        <LoginForm/>
+        <MudText Class="mt-2" Align="Align.Center">
+            Don't have an account?
+            <MudButton Variant="Variant.Text" Color="Color.Primary" OnClick="ShowRegister">Register</MudButton>
+        </MudText>
+    }
+    else
+    {
+        <RegisterForm />
+        <MudText Class="mt-2" Align="Align.Center">
+            Already have an account?
+            <MudButton Variant="Variant.Text" Color="Color.Primary" OnClick="ShowLogin">Login</MudButton>
+        </MudText>
+    }
+</MudPaper>
+
+@code {
+    private bool showLogin = true;
+
+    private void ShowLogin() => showLogin = true;
+    private void ShowRegister() => showLogin = false;
+}
