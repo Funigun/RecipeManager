@@ -24,7 +24,9 @@ public class ValidationFilter<TRequest>(IValidator<TRequest> validator) : BaseEn
         {
             throw CustomValidationException.ValidationFailed
             (
-                validationResult.Errors.Select(e => $"{e.PropertyName}: {e.ErrorMessage}")
+                validationResult.Errors.Select(e => string.IsNullOrEmpty(e.PropertyName) 
+                                                                ? e.ErrorMessage
+                                                                : $"{e.PropertyName} : {e.ErrorMessage}")
                                        .ToList()
             );
         }

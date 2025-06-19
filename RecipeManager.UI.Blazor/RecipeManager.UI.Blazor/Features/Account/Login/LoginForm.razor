@@ -20,6 +20,7 @@
         Sign In
     </MudButton>
     <MudText ReadOnly="true" Color="Color.Error">@errorMessage</MudText>
+    
 </MudForm>
 
 @code {
@@ -29,17 +30,12 @@
 
     private async Task Submit()
     {
-        try
+        if (await AuthenticationService.Authenticate(loginModel))
         {
-            if (await AuthenticationService.Authenticate(loginModel))
-            {
-                Navigation.NavigateTo("/", true);
-            }
+            Navigation.NavigateTo("/", true);
         }
-        catch (Exception ex)
-        {
-            errorMessage = $"An error occurred while signing in: {ex.Message}";
-        }
+        
+        errorMessage = string.Join('\n', AuthenticationService.ResponseBody.Errors);
     }
 
     private void NavigateToRegisterPage()

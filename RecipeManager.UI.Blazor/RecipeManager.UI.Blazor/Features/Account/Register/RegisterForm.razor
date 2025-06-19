@@ -1,11 +1,12 @@
 ﻿@using FluentValidation
 @using MudBlazor
+@using System.ComponentModel.DataAnnotations
 @using RecipeManager.Shared.Contracts.User.Registration
 @using RecipeManager.UI.Blazor.Components.Extensions
 @using RecipeManager.UI.Blazor.Services
 @using RecipeManager.UI.Blazor.Services.Authentication
+@using RecipeManager.UI.Blazor.Components.Common;
 
-@inject ISnackbar Snackbar
 @inject NavigationManager Navigation
 @inject IAuthenticationService AuthenticationService
 
@@ -20,7 +21,7 @@
     <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="OnSubmit" Disabled="@(!isSubmitEnabled)" Class="mt-4" FullWidth>
         Register
     </MudButton>
-    <MudText ReadOnly="true" Color="Color.Error">@errorMessage</MudText>
+    <CustomValidationSummary ErrorMessage="@errorMessage"/>
 </MudForm>
 
 @code {
@@ -35,5 +36,7 @@
         {
             Navigation.NavigateTo("/login", true);
         }
+
+        errorMessage = string.Join('\n', AuthenticationService.ResponseBody.Errors);
     }
 }
