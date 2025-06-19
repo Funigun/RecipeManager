@@ -22,13 +22,7 @@ public class ValidationFilter<TRequest>(IValidator<TRequest> validator) : BaseEn
 
         if (!validationResult.IsValid)
         {
-            throw CustomValidationException.ValidationFailed
-            (
-                validationResult.Errors.Select(e => string.IsNullOrEmpty(e.PropertyName) 
-                                                                ? e.ErrorMessage
-                                                                : $"{e.PropertyName} : {e.ErrorMessage}")
-                                       .ToList()
-            );
+            throw CustomValidationException.ValidationFailed (validationResult.Errors);
         }
 
         return null;
@@ -41,11 +35,14 @@ public class CustomValidationException : ApplicationValidationException
     {
     }
 
-    public static CustomValidationException ValidationFailed(List<string> errors)
+    public static CustomValidationException ValidationFailed(IEnumerable<ValidationFailure> errors)
     {
         CustomValidationException exception = new("Registration failed. Please check the provided data and try again.")
         {
-            Errors = errors
+            ValidationErrors = errors.GroupBy(error => error.PropertyName)
+                                     .ToDictionary(group => group.Key,
+                                                   group => group.Select(error => error.ErrorMessage)),
+
         };
 
         return exception;

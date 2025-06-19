@@ -18,16 +18,26 @@ public static class UserRegistration
     {
         public Validator(UserManager<User> userManager)
         {
-            RuleFor(request => request.UserName)
-                .SetValidator(new UserNameValidator())
+            RuleFor(request => request)
                 .MustAsync
                 (
-                    async (name, cancellationToken) =>
+                    async (request, cancellationToken) =>
                     {
-                        bool userExists = await userManager.FindByNameAsync(name) != null;
+                        bool userExists = await userManager.FindByNameAsync(request.UserName) != null;
                         return !userExists;
                     }
-                ).WithMessage("User Name is already in use");
+                ).WithMessage("User Name is already in use")
+                .MustAsync
+                (
+                    async (request, cancellationToken) =>
+                    {
+                        bool userExists = await userManager.FindByEmailAsync(request.Email) != null;
+                        return !userExists;
+                    }
+                ).WithMessage("Email is already in use");
+
+            RuleFor(request => request.UserName)
+                .SetValidator(new UserNameValidator());
 
             RuleFor(request => request.Password)
                 .SetValidator(new PasswordValidator());
