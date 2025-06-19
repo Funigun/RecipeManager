@@ -8,5 +8,5 @@ public class ApiResponseBody
 
     public IEnumerable<string> Errors { get; set; } = [];
 
-    public Dictionary<string, IEnumerable<string>> ValidationErrors { get; set; } = new();
+    public Dictionary<string, IEnumerable<string>> ValidationErrors { get; set; } = [];
 }

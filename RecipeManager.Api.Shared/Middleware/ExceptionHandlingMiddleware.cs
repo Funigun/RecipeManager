@@ -34,47 +34,44 @@ public sealed class ExceptionHandlingMiddleware(RequestDelegate next, ILogger<Ex
         await context.Response.WriteAsync(jsonResponse);
     }
 
-    private ResponseBody ToResponseBody(Exception exception)
+    private ResponseBody ToResponseBody(Exception exception) => exception switch
     {
-        return exception switch
+        NotFoundException => new ResponseBody
         {
-            NotFoundException => new ResponseBody
-            {
-                StatusCode = (int)HttpStatusCode.NotFound,
-                Message = exception.Message,
-            },
+            StatusCode = (int)HttpStatusCode.NotFound,
+            Message = exception.Message,
+        },
 
-            UnauthorizedAccessException => new ResponseBody
-            {
-                StatusCode = (int)HttpStatusCode.Unauthorized,
-                Message = "You are not authorized to perform this action",
-            },
+        UnauthorizedAccessException => new ResponseBody
+        {
+            StatusCode = (int)HttpStatusCode.Unauthorized,
+            Message = "You are not authorized to perform this action",
+        },
 
-            ValidationException e => new ResponseBody
-            {
-                StatusCode = (int)HttpStatusCode.BadRequest,
-                Message = e.Message,
+        ValidationException e => new ResponseBody
+        {
+            StatusCode = (int)HttpStatusCode.BadRequest,
+            Message = e.Message,
 
-                Errors = e.Errors.Where(error => string.IsNullOrEmpty(error.PropertyName))
-                                 .Select(error => error.ErrorMessage)
-                                 .ToList(),
+            Errors = e.Errors.Where(error => string.IsNullOrEmpty(error.PropertyName))
+                             .Select(error => error.ErrorMessage)
+                             .ToList(),
 
-                ValidationErrors = e.Errors.Where(error => !string.IsNullOrEmpty(error.PropertyName))
-                                           .GroupBy(x => x.PropertyName)
-                                           .ToDictionary(group => group.Key,
-                                                         group => group.Select(x => x.ErrorMessage))
-            },
+            ValidationErrors = e.Errors.Where(error => !string.IsNullOrEmpty(error.PropertyName))
+                                       .GroupBy(x => x.PropertyName)
+                                       .ToDictionary(group => group.Key,
+                                                     group => group.Select(x => x.ErrorMessage))
+        },
 
-            ApplicationValidationException e => ToResponseBody(e, (int)HttpStatusCode.BadRequest),
+        ApplicationValidationException e => ToResponseBody(e, (int)HttpStatusCode.BadRequest),
 
-            _ => new ResponseBody
-            {
-                StatusCode = (int)HttpStatusCode.InternalServerError,
-                Message = "An unexpected error occurred. Please try again later.",
-                Errors = [exception.Message],
-            }
-        };
-    }
+        _ => new ResponseBody
+        {
+            StatusCode = (int)HttpStatusCode.InternalServerError,
+            Message = "An unexpected error occurred. Please try again later.",
+            Errors = [exception.Message],
+        }
+    };
 
     internal ResponseBody ToResponseBody(ApplicationValidationException applicationException, int statusCode)
     {
