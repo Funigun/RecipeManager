@@ -53,22 +53,44 @@ public sealed class ExceptionHandlingMiddleware(RequestDelegate next, ILogger<Ex
             ValidationException e => new ResponseBody
             {
                 StatusCode = (int)HttpStatusCode.BadRequest,
-                Message = "Validation failed",
-                Errors = e.Errors.ToList()
+                Message = e.Message,
+
+                Errors = e.Errors.Where(error => string.IsNullOrEmpty(error.PropertyName))
+                                 .Select(error => error.ErrorMessage)
+                                 .ToList(),
+
+                ValidationErrors = e.Errors.Where(error => !string.IsNullOrEmpty(error.PropertyName))
+                                           .GroupBy(x => x.PropertyName)
+                                           .ToDictionary(group => group.Key,
+                                                         group => group.Select(x => x.ErrorMessage))
             },
 
-            ApplicationValidationException e => new ResponseBody
-            {
-                StatusCode = (int)HttpStatusCode.BadRequest,
-                Message = "Validation failed",
-                Errors = e.Errors.ToList()
-            },
+            ApplicationValidationException e => ToResponseBody(e, (int)HttpStatusCode.BadRequest),
 
             _ => new ResponseBody
             {
                 StatusCode = (int)HttpStatusCode.InternalServerError,
                 Message = "An unexpected error occurred. Please try again later.",
+                Errors = [exception.Message],
             }
+        };
+    }
+
+    internal ResponseBody ToResponseBody(ApplicationValidationException applicationException, int statusCode)
+    {
+        List<string> errors = applicationException.Errors.ToList();
+        applicationException.ValidationErrors.TryGetValue("", out IEnumerable<string>? validationErrors);
+        errors.AddRange(validationErrors ?? []);
+
+        return new()
+        {
+            StatusCode = statusCode,
+            Message = applicationException.Message,
+            Errors = errors,
+            ValidationErrors = applicationException.ValidationErrors
+                                                   .Where(validationError => !string.IsNullOrEmpty(validationError.Key))
+                                                   .ToDictionary(errors => errors.Key,
+                                                                 errors => errors.Value)
         };
     }
 }

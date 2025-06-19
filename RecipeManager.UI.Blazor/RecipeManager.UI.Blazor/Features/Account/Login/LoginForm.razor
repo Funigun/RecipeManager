@@ -1,6 +1,7 @@
 ﻿@using FluentValidation
 @using MudBlazor
 @using RecipeManager.Shared.Contracts.User.Registration
+@using RecipeManager.UI.Blazor.Components.Common
 @using RecipeManager.UI.Blazor.Components.Extensions
 @using RecipeManager.UI.Blazor.Components.Pages.Account
 @using RecipeManager.UI.Blazor.Services
@@ -19,14 +20,14 @@
     <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="Submit" Disabled="@(!isSubmitEnabled)" Class="mt-4" FullWidth>
         Sign In
     </MudButton>
-    <MudText ReadOnly="true" Color="Color.Error">@errorMessage</MudText>
+    <CustomValidationSummary ErrorMessages="@errorMessages" />
     
 </MudForm>
 
 @code {
     private readonly LoginRequest loginModel = new();
     private bool isSubmitEnabled = false;
-    private string errorMessage = "";
+    private IEnumerable<string> errorMessages = [];
 
     private async Task Submit()
     {
@@ -35,7 +36,7 @@
             Navigation.NavigateTo("/", true);
         }
         
-        errorMessage = string.Join('\n', AuthenticationService.ResponseBody.Errors);
+        errorMessages = AuthenticationService.ResponseBody.Errors;
     }
 
     private void NavigateToRegisterPage()

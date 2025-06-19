@@ -7,4 +7,6 @@ public class ApiResponseBody
     public string Message { get; set; } = string.Empty;
 
     public IEnumerable<string> Errors { get; set; } = [];
+
+    public Dictionary<string, IEnumerable<string>> ValidationErrors { get; set; } = new();
 }

@@ -16,7 +16,7 @@ public class UserRegistrationTests
         IQueryable<User> users = new List<User>().AsQueryable();
 
         Mock<IUserStore<User>> userStoreMock = new();
-        Mock<UserManager<User>> userManagerMock = new(userStoreMock.Object, null, null, null, null, null, null, null, null);
+        Mock<UserManager<User>> userManagerMock = new(userStoreMock.Object, null!, null!, null!, null!, null!, null!, null!, null!);
 
         userManagerMock.Setup(um => um.Users).Returns(users);
 
@@ -39,12 +39,11 @@ public class UserRegistrationTests
         IQueryable<User> users = new List<User>().AsQueryable();
 
         Mock<IUserStore<User>> userStoreMock = new();
-        Mock<UserManager<User>> userManagerMock = new(userStoreMock.Object, null, null, null, null, null, null, null, null);
+        Mock<UserManager<User>> userManagerMock = new(userStoreMock.Object, null!, null!, null!, null!, null!, null!, null!, null!);
 
         userManagerMock.Setup(um => um.Users).Returns(users);
 
         UserRegistration.Validator validator = new(userManagerMock.Object);
-
         UserRegistration.Request request = new(new('t', numberOfUserNameCharacters), "Test", "Test");
         
         // Act
@@ -59,22 +58,44 @@ public class UserRegistrationTests
     {
         // Arrange
         User existingUser = new() { UserName = "duplicateUser" };
-        IQueryable<User> users = new[] { existingUser }.AsQueryable();
 
         Mock<IUserStore<User>> userStoreMock = new ();
-        Mock<UserManager<User>> userManagerMock = new (userStoreMock.Object, null, null, null, null, null, null, null, null);
+        Mock<UserManager<User>> userManagerMock = new (userStoreMock.Object, null!, null!, null!, null!, null!, null!, null!, null!);
         
-        userManagerMock.Setup(um => um.FindByNameAsync("duplicateUser")).Returns(Task.FromResult(existingUser));
+        userManagerMock.Setup(um => um.FindByNameAsync("duplicateUser")).Returns(Task.FromResult(existingUser)!);
 
         UserRegistration.Validator validator = new(userManagerMock.Object);
         UserRegistration.Request request = new("duplicateUser", "ValidTestPass123!", "testEmail@gmail.com");
-        // Act
         
+        // Act        
         TestValidationResult<UserRegistration.Request> result = await validator.TestValidateAsync(request, null, TestContext.Current.CancellationToken);
         
         // Assert
-        result.ShouldHaveValidationErrorFor(req => req.UserName)
+        result.ShouldHaveValidationErrorFor(req => req)
               .WithErrorMessage("User Name is already in use");
+    }
+
+    [Fact]
+    public async Task Validator_ShouldHaveError_WhenEmailIsDuplicated()
+    {
+        // Arrange
+        User existingUser = new() { UserName = "ValidUser", Email = "duplicated@com" };
+
+        Mock<IUserStore<User>> userStoreMock = new();
+        Mock<UserManager<User>> userManagerMock = new(userStoreMock.Object, null!, null!, null!, null!, null!, null!, null!, null!);
+
+        userManagerMock.Setup(um => um.FindByEmailAsync("duplicated@com"))
+                       .Returns(Task.FromResult(existingUser)!);
+
+        UserRegistration.Validator validator = new(userManagerMock.Object);
+        UserRegistration.Request request = new("ValidUser", "ValidTestPass123!", "duplicated@com");
+        
+        // Act
+        TestValidationResult<UserRegistration.Request> result = await validator.TestValidateAsync(request, null, TestContext.Current.CancellationToken);
+
+        // Assert
+        result.ShouldHaveValidationErrorFor(req => req)
+              .WithErrorMessage("Email is already in use");
     }
 
     [Fact]
@@ -84,14 +105,16 @@ public class UserRegistrationTests
         IQueryable<User> users = new List<User>().AsQueryable();
 
         Mock<IUserStore<User>> userStoreMock = new();
-        Mock<UserManager<User>> userManagerMock = new(userStoreMock.Object, null, null, null, null, null, null, null, null);
+        Mock<UserManager<User>> userManagerMock = new(userStoreMock.Object, null!, null!, null!, null!, null!, null!, null!, null!);
 
         userManagerMock.Setup(um => um.Users).Returns(users);
 
         UserRegistration.Validator validator = new(userManagerMock.Object);
-
         UserRegistration.Request request = new("Test", "Test", "");
+
+        // Act
         TestValidationResult<UserRegistration.Request> result = await validator.TestValidateAsync(request, null, TestContext.Current.CancellationToken);
+        
         // Assert
         result.ShouldHaveValidationErrorFor(req => req.Email);
     }
@@ -109,12 +132,11 @@ public class UserRegistrationTests
         IQueryable<User> users = new List<User>().AsQueryable();
 
         Mock<IUserStore<User>> userStoreMock = new();
-        Mock<UserManager<User>> userManagerMock = new(userStoreMock.Object, null, null, null, null, null, null, null, null);
+        Mock<UserManager<User>> userManagerMock = new(userStoreMock.Object, null!, null!, null!, null!, null!, null!, null!, null!);
 
         userManagerMock.Setup(um => um.Users).Returns(users);
 
         UserRegistration.Validator validator = new(userManagerMock.Object);
-
         UserRegistration.Request request = new("ValidUser", password, "validTest@gmail.com");
 
         // Act

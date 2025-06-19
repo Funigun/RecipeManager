@@ -21,14 +21,14 @@
     <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="OnSubmit" Disabled="@(!isSubmitEnabled)" Class="mt-4" FullWidth>
         Register
     </MudButton>
-    <CustomValidationSummary ErrorMessage="@errorMessage"/>
+    <CustomValidationSummary ErrorMessages="@errorMessages" />
 </MudForm>
 
 @code {
     private readonly RegistrationRequest registrationModel = new();
     private readonly RegistrationValidator validator = new();
     private bool isSubmitEnabled = false;
-    private string errorMessage = "";
+    private IEnumerable<string> errorMessages = [];
 
     private async Task OnSubmit()
     {
@@ -37,6 +37,6 @@
             Navigation.NavigateTo("/login", true);
         }
 
-        errorMessage = string.Join('\n', AuthenticationService.ResponseBody.Errors);
+        errorMessages = AuthenticationService.ResponseBody.Errors;
     }
 }
