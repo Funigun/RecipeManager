@@ -5,9 +5,4 @@
     <StaticWebAssetProjectMode>Default</StaticWebAssetProjectMode>
   </PropertyGroup>
 
-  <ItemGroup>
-      <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly"/>
-	  <PackageReference Include="MudBlazor" />
-  </ItemGroup>
-
 </Project>

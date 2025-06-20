@@ -11,4 +11,57 @@
 		<EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
 	</PropertyGroup>
 
+	<!-- All projects -->
+	<ItemGroup Condition="'$(MSBuildProjectExtension)' != '.dcproj'">
+	  <PackageReference Include="SonarAnalyzer.CSharp" >
+	    <PrivateAssets>all</PrivateAssets>
+	    <IncludeAssets>
+	      runtime; build; native; contentfiles; analyzers; buildtransitive
+	    </IncludeAssets>
+	  </PackageReference>
+	</ItemGroup>
+	
+	<!-- Web API Exclusive -->
+	<ItemGroup Condition="'$(MSBuildProjectName.EndsWith(`API`))'">
+		<PackageReference Include="Scalar.AspNetCore" />
+		<PackageReference Include="Microsoft.AspNetCore.OpenApi" />
+		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" />
+		<PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Tools" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" />
+		<PackageReference Include="FluentValidation.DependencyInjectionExtensions" />
+	</ItemGroup>
+	
+	<!-- Blazor Server Exclusive -->
+	<ItemGroup Condition="'$(MSBuildProjectName.EndsWith(`UI.Blazor`))'">
+		<PackageReference Include="System.IdentityModel.Tokens.Jwt" />
+		<PackageReference Include="MudBlazor" />
+	</ItemGroup>
+
+	<!-- Blazor WASM Exclusive -->
+	<ItemGroup Condition="'$(MSBuildProjectName.EndsWith(`UI.Blazor.Client`))'">
+		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" />
+		<PackageReference Include="MudBlazor" />
+	</ItemGroup>
+	
+	<!-- Tests Exclusive -->
+	<ItemGroup Condition="'$(MSBuildProjectName.EndsWith(`Tests`))'">
+		<PackageReference Include="coverlet.collector">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="Microsoft.NET.Test.Sdk" />
+		<PackageReference Include="Moq" />
+		<PackageReference Include="xunit.v3" />
+		<PackageReference Include="xunit.runner.visualstudio">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="NetArchTest.Rules" />
+	</ItemGroup>
+
+	<!-- All except Aspire projects-->
+	<ItemGroup Condition="'$(MSBuildProjectName.EndsWith(`AppHost`))' == false and '$(MSBuildProjectName.EndsWith(`ServiceDefaults`))' == false">
+		<PackageReference Include="FluentValidation" />
+	</ItemGroup>
 </Project>
