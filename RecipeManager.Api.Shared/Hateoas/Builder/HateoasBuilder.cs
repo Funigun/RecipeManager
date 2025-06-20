@@ -1,12 +1,11 @@
-﻿using Microsoft.AspNetCore.Routing;
-using RecipeManager.Api.Shared.Hateoas.Common;
+﻿using RecipeManager.Api.Shared.Hateoas.Common;
 
 namespace RecipeManager.Api.Shared.Hateoas.Builder;
 
 public class HateoasBuilder(HateoasLinkService linkService)
 {
-    protected readonly HateoasLinkService LinkService = linkService;
-    protected readonly List<IHateoasResponseBuilder> Builders = [];
+    public HateoasLinkService LinkService { get; protected set; } = linkService;
+    public ICollection<IHateoasResponseBuilder> Builders { get; protected set; } = [];
 
     public HateoasResponseBuilder<TItem> ForItem<TItem>(TItem dto)
     {
@@ -30,7 +29,7 @@ public class HateoasBuilder(HateoasLinkService linkService)
     {
         if (Builders.Count == 1)
         {
-            return Builders[0].Build();
+            return Builders.First().Build();
         }
 
         List<object> results = [];

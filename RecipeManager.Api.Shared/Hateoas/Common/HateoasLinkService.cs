@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using RecipeManager.Api.Shared.Hateoas.Models;
+
 namespace RecipeManager.Api.Shared.Hateoas.Common;
 
 public sealed class HateoasLinkService(IHttpContextAccessor httpAccessor, LinkGenerator linkGenerator)

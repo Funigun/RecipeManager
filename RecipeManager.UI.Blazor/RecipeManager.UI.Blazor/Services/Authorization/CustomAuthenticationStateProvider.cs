@@ -1,8 +1,8 @@
-﻿using Microsoft.AspNetCore.Components.Authorization;
+﻿using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 using RecipeManager.UI.Blazor.Features.Account.Login;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
 
 namespace RecipeManager.UI.Blazor.Services.Authorization;
 

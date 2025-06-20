@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using System.Reflection;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
@@ -8,7 +9,6 @@ using RecipeManager.Api.Shared.Endpoint;
 using RecipeManager.Api.Shared.Hateoas.Builder;
 using RecipeManager.Api.Shared.Hateoas.Common;
 using RecipeManager.Api.Shared.Middleware;
-using System.Reflection;
 
 namespace RecipeManager.Api.Shared;
 

@@ -1,9 +1,9 @@
-﻿using FluentValidation;
+﻿using System.Net;
+using System.Text.Json;
+using FluentValidation;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using RecipeManager.Api.Shared.Contracts.Exceptions;
-using System.Net;
-using System.Text.Json;
 
 namespace RecipeManager.Api.Shared.Middleware;
 
@@ -73,7 +73,7 @@ public sealed class ExceptionHandlingMiddleware(RequestDelegate next, ILogger<Ex
         }
     };
 
-    internal ResponseBody ToResponseBody(ApplicationValidationException applicationException, int statusCode)
+    private ResponseBody ToResponseBody(ApplicationValidationException applicationException, int statusCode)
     {
         List<string> errors = applicationException.Errors.ToList();
         applicationException.ValidationErrors.TryGetValue("", out IEnumerable<string>? validationErrors);
@@ -87,7 +87,7 @@ public sealed class ExceptionHandlingMiddleware(RequestDelegate next, ILogger<Ex
             ValidationErrors = applicationException.ValidationErrors
                                                    .Where(validationError => !string.IsNullOrEmpty(validationError.Key))
                                                    .ToDictionary(errors => errors.Key,
-                                                                 errors => errors.Value)
+                                                                 errors => errors.Value),
         };
     }
 }

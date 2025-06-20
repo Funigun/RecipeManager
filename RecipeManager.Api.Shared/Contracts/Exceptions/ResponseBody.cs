@@ -2,9 +2,9 @@
 
 public sealed record ResponseBody
 {
-    public required int StatusCode { get; init; }
+    required public int StatusCode { get; init; }
 
-    public required string Message { get; init; }
+    required public string Message { get; init; }
 
     public IEnumerable<string> Errors { get; init; } = [];
 

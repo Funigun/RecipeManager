@@ -99,7 +99,7 @@ csharp_style_var_when_type_is_apparent = false:error
 csharp_style_expression_bodied_accessors = true:error
 csharp_style_expression_bodied_constructors = true:suggestion
 csharp_style_expression_bodied_indexers = true:error
-csharp_style_expression_bodied_lambdas = true:error
+csharp_style_expression_bodied_lambdas = true:suggestion
 csharp_style_expression_bodied_local_functions = true:error
 csharp_style_expression_bodied_methods = true:suggestion
 csharp_style_expression_bodied_operators = true:error
@@ -255,5 +255,52 @@ dotnet_diagnostic.IDE0305.severity = none
 # IDE0290: Use primary constructors
 dotnet_diagnostic.IDE0290.severity = none
 
+# CA1031: Do not catch general exception types
+dotnet_diagnostic.CA1031.severity = none
+
+# CA1040: Avoid empty interfaces
+dotnet_diagnostic.CA1040.severity = none
+
+# CA1062: Validate arguments of public methods
+dotnet_diagnostic.CA1062.severity = none
+
+# CA1711: Identifiers should not have incorrect suffix
+dotnet_diagnostic.CA1711.severity = none
+
+# CA1716: Identifiers should not match keywords
+dotnet_diagnostic.CA1716.severity = none
+
+# CA1724: Type names should not match namespaces
+dotnet_diagnostic.CA1724.severity = none
+
 # CA1822: Mark members as static
 dotnet_diagnostic.CA1822.severity = none
+
+# CA2007: Consider calling ConfigureAwait on the awaited task
+dotnet_diagnostic.CA2007.severity = none
+
+# CA2227: Collection properties should be read only ToDo: TBC
+dotnet_diagnostic.CA2007.severity = none
+
+# StyleCop.Analyzers
+
+# SA1101: Prefix local calls with "this" keyword
+dotnet_diagnostic.SA1101.severity = none
+
+# SA1128: Put constructors of derived types on a separate line
+dotnet_diagnostic.SA1128.severity = none
+
+# SA1505: Opening brace should not be followed by a blank line
+dotnet_diagnostic.SA1505.severity = none
+
+# SA1508: Closing brace should not be preceed by a blank line
+dotnet_diagnostic.SA1508.severity = none
+
+# SA1600: Elements should be documented
+dotnet_diagnostic.SA1600.severity = none
+
+# SA1633: File should have header
+dotnet_diagnostic.SA1633.severity = none
+
+# SA1200: Using Directives Must Be Placed Within Namespace
+dotnet_diagnostic.SA1200.severity = none

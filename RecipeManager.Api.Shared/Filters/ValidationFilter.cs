@@ -1,6 +1,6 @@
-﻿using Microsoft.AspNetCore.Http;
-using FluentValidation;
+﻿using FluentValidation;
 using FluentValidation.Results;
+using Microsoft.AspNetCore.Http;
 using RecipeManager.Api.Shared.Contracts.Exceptions;
 
 namespace RecipeManager.Api.Shared.Filters;
@@ -22,7 +22,7 @@ public class ValidationFilter<TRequest>(IValidator<TRequest> validator) : BaseEn
 
         if (!validationResult.IsValid)
         {
-            throw CustomValidationException.ValidationFailed (validationResult.Errors);
+            throw CustomValidationException.ValidationFailed(validationResult.Errors);
         }
 
         return null;
@@ -42,7 +42,6 @@ public class CustomValidationException : ApplicationValidationException
             ValidationErrors = errors.GroupBy(error => error.PropertyName)
                                      .ToDictionary(group => group.Key,
                                                    group => group.Select(error => error.ErrorMessage)),
-
         };
 
         return exception;

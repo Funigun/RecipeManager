@@ -1,9 +1,9 @@
 ﻿namespace RecipeManager.Tests;
-public static class TestCategories
+internal static class TestCategories
 {
-    public const string UnitTests = "Unit";
+    internal const string UnitTests = "Unit";
 
-    public const string IntegrationTests = "Integration";
+    internal const string IntegrationTests = "Integration";
 
-    public const string ArchitectureTests = "Architecture";
+    internal const string ArchitectureTests = "Architecture";
 }

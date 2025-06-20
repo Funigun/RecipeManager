@@ -1,11 +1,11 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+﻿using System.Text;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using RecipeManager.Identity.API.Domain;
 using RecipeManager.Identity.API.Persistance;
 using Scalar.AspNetCore;
-using System.Text;
 
 namespace RecipeManager.Identity.API.Presentation;
 
@@ -19,8 +19,8 @@ internal static class DependencyInjection
                     options.TokenValidationParameters = new TokenValidationParameters
                     {
                         IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(configuration["JwtSettings:Key"]!)),
-                        ValidIssuer = configuration["JwtSettings:Issuer"]!,
-                        ValidAudience = configuration["JwtSettings:Audience"]!,
+                        ValidIssuer = configuration["JwtSettings:Issuer"],
+                        ValidAudience = configuration["JwtSettings:Audience"],
                         ValidateIssuerSigningKey = true,
                         ValidateIssuer = true,
                         ValidateAudience = true,

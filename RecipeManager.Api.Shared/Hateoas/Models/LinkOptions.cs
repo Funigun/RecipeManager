@@ -2,11 +2,11 @@
 
 public sealed class LinkOptions
 {
-    public required string Endpoint { get; set; }
+    required public string Endpoint { get; set; }
 
-    public required string Rel { get; set; }
+    required public string Rel { get; set; }
 
-    public required bool IsActionAllowed { get; set; }
+    required public bool IsActionAllowed { get; set; }
 
     private LinkOptions() { }
 
@@ -14,9 +14,9 @@ public sealed class LinkOptions
     {
         return new()
         { 
-            Endpoint= endpoint,
+            Endpoint = endpoint,
             Rel = rel,
-            IsActionAllowed = isActionAllowed
+            IsActionAllowed = isActionAllowed,
         };
     }
 }

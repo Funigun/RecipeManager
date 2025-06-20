@@ -1,6 +1,6 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using System.Diagnostics;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
-using System.Diagnostics;
 
 namespace RecipeManager.Api.Shared.Middleware;
 public sealed class PerformanceMiddleware(RequestDelegate next, ILogger<PerformanceMiddleware> logger)
@@ -20,8 +20,13 @@ public sealed class PerformanceMiddleware(RequestDelegate next, ILogger<Performa
             stopwatch.Stop();
             TimeSpan elapsed = stopwatch.Elapsed;
 
-            logger.LogWarning("Request {RequestPath} took {ElapsedMilliseconds}ms which exceeds the threshold of {ThresholdMilliseconds}ms",
-                              context.Request.Path, elapsed.TotalMilliseconds, _threshold.TotalMilliseconds);
+            logger.LogWarning
+            (
+                "Request {RequestPath} took {ElapsedMilliseconds}ms which exceeds the threshold of {ThresholdMilliseconds}ms",
+                context.Request.Path, 
+                elapsed.TotalMilliseconds, 
+                _threshold.TotalMilliseconds
+            );
         }
     }
 }

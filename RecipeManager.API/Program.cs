@@ -1,7 +1,7 @@
+using System.Reflection;
 using RecipeManager.Api.Shared;
 using RecipeManager.ServiceDefaults;
 using Scalar.AspNetCore;
-using System.Reflection;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 Assembly assembly = Assembly.GetExecutingAssembly();
