@@ -13,16 +13,16 @@ public class CustomAuthenticationStateProvider(ProtectedLocalStorage localStorag
         try
         {
             LoginResponse? sessionModel = (await localStorage.GetAsync<LoginResponse>("sessionState")).Value;
-            ClaimsIdentity identity = sessionModel == null ? new () : GetClaimsIdentity(sessionModel.Token);
-            ClaimsPrincipal user = new (identity);
+            ClaimsIdentity identity = sessionModel == null ? new() : GetClaimsIdentity(sessionModel.Token);
+            ClaimsPrincipal user = new(identity);
 
             return new AuthenticationState(user);
         }
         catch (Exception)
         {
             await MarkUserAsLoggedOut();
-            ClaimsIdentity identity = new ClaimsIdentity();
-            ClaimsPrincipal user = new (identity);
+            ClaimsIdentity identity = new();
+            ClaimsPrincipal user = new(identity);
 
             return new AuthenticationState(user);
         }
@@ -32,14 +32,14 @@ public class CustomAuthenticationStateProvider(ProtectedLocalStorage localStorag
     {
         await localStorage.SetAsync("sessionState", userDto);
         ClaimsIdentity identity = GetClaimsIdentity(userDto.Token);
-        ClaimsPrincipal user = new (identity);
+        ClaimsPrincipal user = new(identity);
 
         NotifyAuthenticationStateChanged(Task.FromResult(new AuthenticationState(user)));
     }
 
     private static ClaimsIdentity GetClaimsIdentity(string token)
     {
-        JwtSecurityTokenHandler handler = new ();
+        JwtSecurityTokenHandler handler = new();
         JwtSecurityToken jwtToken = handler.ReadJwtToken(token);
         IEnumerable<Claim> claims = jwtToken.Claims;
 
@@ -50,8 +50,8 @@ public class CustomAuthenticationStateProvider(ProtectedLocalStorage localStorag
     {
         await localStorage.DeleteAsync("sessionState");
 
-        ClaimsIdentity identity = new ();
-        ClaimsPrincipal user = new (identity);
+        ClaimsIdentity identity = new();
+        ClaimsPrincipal user = new(identity);
 
         NotifyAuthenticationStateChanged(Task.FromResult(new AuthenticationState(user)));
     }

@@ -60,7 +60,7 @@ public sealed class ExceptionHandlingMiddleware(RequestDelegate next, ILogger<Ex
             ValidationErrors = e.Errors.Where(error => !string.IsNullOrEmpty(error.PropertyName))
                                        .GroupBy(x => x.PropertyName)
                                        .ToDictionary(group => group.Key,
-                                                     group => group.Select(x => x.ErrorMessage))
+                                                     group => group.Select(x => x.ErrorMessage)),
         },
 
         ApplicationValidationException e => ToResponseBody(e, (int)HttpStatusCode.BadRequest),
@@ -70,7 +70,7 @@ public sealed class ExceptionHandlingMiddleware(RequestDelegate next, ILogger<Ex
             StatusCode = (int)HttpStatusCode.InternalServerError,
             Message = "An unexpected error occurred. Please try again later.",
             Errors = [exception.Message],
-        }
+        },
     };
 
     private ResponseBody ToResponseBody(ApplicationValidationException applicationException, int statusCode)

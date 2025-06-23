@@ -264,6 +264,9 @@ dotnet_diagnostic.CA1040.severity = none
 # CA1062: Validate arguments of public methods
 dotnet_diagnostic.CA1062.severity = none
 
+# CA1515: Make type internal
+dotnet_diagnostic.CA1515.severity = none
+
 # CA1711: Identifiers should not have incorrect suffix
 dotnet_diagnostic.CA1711.severity = none
 
@@ -284,8 +287,14 @@ dotnet_diagnostic.CA2007.severity = none
 
 # StyleCop.Analyzers
 
+# SA0001: XML comment analysis is disabled due to project configuration
+dotnet_diagnostic.SA0001.severity = none
+
 # SA1101: Prefix local calls with "this" keyword
 dotnet_diagnostic.SA1101.severity = none
+
+# SA1309: Field should not use underscore prefix
+dotnet_diagnostic.SA1309.severity = none
 
 # SA1128: Put constructors of derived types on a separate line
 dotnet_diagnostic.SA1128.severity = none
@@ -299,8 +308,14 @@ dotnet_diagnostic.SA1508.severity = none
 # SA1600: Elements should be documented
 dotnet_diagnostic.SA1600.severity = none
 
+# SA1602: Enumeration items should be documented
+dotnet_diagnostic.SA1602.severity = none
+
 # SA1633: File should have header
 dotnet_diagnostic.SA1633.severity = none
 
 # SA1200: Using Directives Must Be Placed Within Namespace
 dotnet_diagnostic.SA1200.severity = none
+
+# CA1707: Identifiers should not contain underscores
+dotnet_diagnostic.CA1707.severity = none

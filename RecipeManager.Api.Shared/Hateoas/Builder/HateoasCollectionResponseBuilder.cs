@@ -5,16 +5,16 @@ namespace RecipeManager.Api.Shared.Hateoas.Builder;
 
 public class HateoasCollectionResponseBuilder<TItem> : HateoasBuilder, IHateoasResponseBuilder
 {
-    public ICollection<HateoasResponse<TItem>> Items { get; protected set; }
-    public ICollection<Link> Links { get; protected set; } = [];
-
     private readonly HateoasCollectionListBuilder<TItem> _collectionListBuilder = default!;
+
+    public ICollection<HateoasResponse<TItem>> Items { get; protected set; }
+
+    public ICollection<Link> Links { get; protected set; } = [];
 
     public HateoasCollectionResponseBuilder(IEnumerable<TItem> items, HateoasLinkService linkService) : base(linkService)
     {
         Items = items.Select(item => new HateoasResponse<TItem>(item)).ToList();
         _collectionListBuilder = new(Items, Links, linkService);
-
     }
 
     protected HateoasCollectionResponseBuilder(IEnumerable<HateoasResponse<TItem>> items, ICollection<Link> links, HateoasLinkService linkService) : base(linkService)

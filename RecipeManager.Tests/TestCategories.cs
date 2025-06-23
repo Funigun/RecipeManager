@@ -1,4 +1,5 @@
 ﻿namespace RecipeManager.Tests;
+
 internal static class TestCategories
 {
     internal const string UnitTests = "Unit";

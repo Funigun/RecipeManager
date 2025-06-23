@@ -8,5 +8,5 @@ public static class UserRoles
 
     public const string Guest = "Guest";
 
-    public static readonly IEnumerable<string> AllRoles = [ Admin, User, Guest ];
+    public static readonly IEnumerable<string> AllRoles = [Admin, User, Guest];
 }

@@ -84,9 +84,9 @@ public static class LogIn
 
         List<Claim> claims =
         [
-            new Claim(ClaimTypes.Name, user.UserName!),
-            new ("Id", user.Id.ToString()),
-            new (JwtRegisteredClaimNames.Nickname, user.UserName!),
+            new(ClaimTypes.Name, user.UserName!),
+            new("Id", user.Id.ToString()),
+            new(JwtRegisteredClaimNames.Nickname, user.UserName!),
         ];
 
         claims.AddRange(userClaims);

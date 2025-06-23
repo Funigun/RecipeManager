@@ -7,7 +7,7 @@
     <PackageVersion Include="Scalar.AspNetCore" Version="2.4.13" />
     <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Version="9.0.5" />
     <!-- AspNetCore and extensions -->
-	<PackageVersion Include="Microsoft.AspNetCore.Routing" Version="2.3.0" />
+    <PackageVersion Include="Microsoft.AspNetCore.Routing" Version="2.3.0" />
     <PackageVersion Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.5" />
     <PackageVersion Include="Microsoft.Extensions.Http.Resilience" Version="9.5.0" />
     <PackageVersion Include="Microsoft.Extensions.ServiceDiscovery" Version="9.3.0" />
@@ -21,14 +21,14 @@
     <!-- Blazor packs -->
     <PackageVersion Include="Microsoft.AspNetCore.Components.WebAssembly" Version="9.0.5" />
     <PackageVersion Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="9.0.5" />
-	<PackageVersion Include="MudBlazor" Version="8.7.0" />
+    <PackageVersion Include="MudBlazor" Version="8.7.0" />
     <!-- Testing packs -->
     <PackageVersion Include="Moq" Version="4.20.72" />
     <PackageVersion Include="coverlet.collector" Version="6.0.4" />
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
     <PackageVersion Include="xunit.v3" Version="2.0.3" />
     <PackageVersion Include="xunit.runner.visualstudio" Version="3.1.1" />
-	<PackageVersion Include="NetArchTest.Rules" Version="1.3.2" />
+    <PackageVersion Include="NetArchTest.Rules" Version="1.3.2" />
     <!-- Auth and EF Core -->
     <PackageVersion Include="System.IdentityModel.Tokens.Jwt" Version="8.12.0" />
     <PackageVersion Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.5" />
@@ -42,7 +42,7 @@
     <PackageVersion Include="Serilog.AspNetCore" Version="9.0.0" />
     <PackageVersion Include="Serilog.Sinks.OpenTelemetry" Version="4.2.0-dev-02302" />
     <PackageVersion Include="Serilog.Sinks.Seq" Version="9.0.0" />
-	<PackageVersion Include="SonarAnalyzer.CSharp" Version="10.12.0.118525" />
-	<PackageVersion Include="StyleCop.Analyzers" Version="1.1.118" />
+    <PackageVersion Include="SonarAnalyzer.CSharp" Version="10.12.0.118525" />
+    <PackageVersion Include="StyleCop.Analyzers" Version="1.2.0-beta.556" />
   </ItemGroup>
 </Project>

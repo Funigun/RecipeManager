@@ -5,7 +5,7 @@ using RecipeManager.Api.Shared.Contracts.Authorization;
 
 namespace RecipeManager.Api.Shared.Filters;
 
-internal class AuthorizationFilter<TRequest>(IAuthorizationPolicy<TRequest> authorizationPolicy) : BaseEnpointFilter
+internal sealed class AuthorizationFilter<TRequest>(IAuthorizationPolicy<TRequest> authorizationPolicy) : BaseEnpointFilter
 {
     protected override async ValueTask<object?> OnBeforeExecutionAsync(EndpointFilterInvocationContext context)
     {
