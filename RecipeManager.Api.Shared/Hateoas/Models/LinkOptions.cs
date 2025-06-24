@@ -2,18 +2,20 @@
 
 public sealed class LinkOptions
 {
-    required public string Endpoint { get; set; }
+    public required string Endpoint { get; set; }
 
-    required public string Rel { get; set; }
+    public required string Rel { get; set; }
 
-    required public bool IsActionAllowed { get; set; }
+    public required bool IsActionAllowed { get; set; }
 
-    private LinkOptions() { }
+    private LinkOptions()
+    {
+    }
 
     public static LinkOptions Create(string endpoint, string rel, bool isActionAllowed)
     {
         return new()
-        { 
+        {
             Endpoint = endpoint,
             Rel = rel,
             IsActionAllowed = isActionAllowed,

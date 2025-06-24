@@ -5,7 +5,7 @@ using RecipeManager.Api.Shared.Contracts.Authorization;
 
 namespace RecipeManager.Api.Shared.Filters;
 
-internal sealed class AuthorizationFilter<TRequest>(IAuthorizationPolicy<TRequest> authorizationPolicy) : BaseEnpointFilter
+internal sealed class AuthorizationFilter<TRequest>(IAuthorizationPolicy<TRequest> authorizationPolicy) : BaseEndpointFilter
 {
     protected override async ValueTask<object?> OnBeforeExecutionAsync(EndpointFilterInvocationContext context)
     {
@@ -13,7 +13,7 @@ internal sealed class AuthorizationFilter<TRequest>(IAuthorizationPolicy<TReques
 
         if (request == null)
         {
-            List<ValidationFailure> error = [new("", "Invalid request format")];
+            List<ValidationFailure> error = [new(string.Empty, "Invalid request format")];
             throw new ValidationException(error);
         }
 

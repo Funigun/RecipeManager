@@ -59,8 +59,7 @@ public sealed class ExceptionHandlingMiddleware(RequestDelegate next, ILogger<Ex
 
             ValidationErrors = e.Errors.Where(error => !string.IsNullOrEmpty(error.PropertyName))
                                        .GroupBy(x => x.PropertyName)
-                                       .ToDictionary(group => group.Key,
-                                                     group => group.Select(x => x.ErrorMessage)),
+                                       .ToDictionary(group => group.Key, group => group.Select(x => x.ErrorMessage)),
         },
 
         ApplicationValidationException e => ToResponseBody(e, (int)HttpStatusCode.BadRequest),
@@ -76,7 +75,7 @@ public sealed class ExceptionHandlingMiddleware(RequestDelegate next, ILogger<Ex
     private ResponseBody ToResponseBody(ApplicationValidationException applicationException, int statusCode)
     {
         List<string> errors = applicationException.Errors.ToList();
-        applicationException.ValidationErrors.TryGetValue("", out IEnumerable<string>? validationErrors);
+        applicationException.ValidationErrors.TryGetValue(string.Empty, out IEnumerable<string>? validationErrors);
         errors.AddRange(validationErrors ?? []);
 
         return new()
@@ -86,8 +85,7 @@ public sealed class ExceptionHandlingMiddleware(RequestDelegate next, ILogger<Ex
             Errors = errors,
             ValidationErrors = applicationException.ValidationErrors
                                                    .Where(validationError => !string.IsNullOrEmpty(validationError.Key))
-                                                   .ToDictionary(errors => errors.Key,
-                                                                 errors => errors.Value),
+                                                   .ToDictionary(errors => errors.Key, errors => errors.Value),
         };
     }
 }

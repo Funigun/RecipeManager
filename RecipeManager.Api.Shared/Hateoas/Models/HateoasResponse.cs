@@ -4,9 +4,9 @@ public sealed class HateoasResponse<TItem>(TItem value)
 {
     public TItem Item { get; init; } = value;
 
-    public List<Link> Links { get; set; } = [];
+    public ICollection<Link> Links { get; set; } = [];
 
-    public HateoasResponse(TItem value, List<Link> links) : this(value)
+    public HateoasResponse(TItem value, ICollection<Link> links) : this(value)
     {
         Links = links;
     }

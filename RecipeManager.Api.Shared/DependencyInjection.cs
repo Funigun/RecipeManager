@@ -78,12 +78,12 @@ public static class DependencyInjection
 
             if (attribute != null)
             {
-                if (!groupedEndpoints.ContainsKey(attribute.GroupName))
+                if (!groupedEndpoints.TryGetValue(attribute.GroupName, out List<IEndpoint>? groupEndpoints))
                 {
-                    groupedEndpoints[attribute.GroupName] = [];
+                    groupEndpoints = [];
                 }
 
-                groupedEndpoints[attribute.GroupName].Add(endpoint);
+                groupEndpoints.Add(endpoint);
             }
             else
             {
@@ -96,7 +96,7 @@ public static class DependencyInjection
             string groupName = group.Key;
             List<IEndpoint> groupEndpoints = group.Value;
 
-            string groupRoute = $"api/{groupName.ToLowerInvariant()}";
+            string groupRoute = $"api/{groupName.ToUpperInvariant()}";
             RouteGroupBuilder routeGroupBuilder = app.MapGroup(groupRoute);
 
             if (endpointGroups.TryGetValue(groupName, out IGroupEndpoint? endpointGroup))

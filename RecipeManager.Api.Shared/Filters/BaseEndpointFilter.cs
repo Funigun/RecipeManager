@@ -2,7 +2,7 @@
 
 namespace RecipeManager.Api.Shared.Filters;
 
-public abstract class BaseEnpointFilter : IEndpointFilter
+public abstract class BaseEndpointFilter : IEndpointFilter
 {
     public async ValueTask<object?> InvokeAsync(EndpointFilterInvocationContext context, EndpointFilterDelegate next)
     {

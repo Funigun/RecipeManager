@@ -258,6 +258,9 @@ dotnet_diagnostic.IDE0290.severity = none
 # CA1031: Do not catch general exception types
 dotnet_diagnostic.CA1031.severity = none
 
+# CA1032: Add constructor to exception types
+dotnet_diagnostic.CA1032.severity = none
+
 # CA1040: Avoid empty interfaces
 dotnet_diagnostic.CA1040.severity = none
 
@@ -279,6 +282,9 @@ dotnet_diagnostic.CA1724.severity = none
 # CA1822: Mark members as static
 dotnet_diagnostic.CA1822.severity = none
 
+# CA1848: Use the LoggerMessage delegates
+dotnet_diagnostic.CA1848.severity = none
+
 # CA2007: Consider calling ConfigureAwait on the awaited task
 dotnet_diagnostic.CA2007.severity = none
 
@@ -290,8 +296,20 @@ dotnet_diagnostic.CA2007.severity = none
 # SA0001: XML comment analysis is disabled due to project configuration
 dotnet_diagnostic.SA0001.severity = none
 
+# SA1009: Closing paranthesis or bracket should not be preceed by space
+dotnet_diagnostic.SA1009.severity = none
+
 # SA1101: Prefix local calls with "this" keyword
 dotnet_diagnostic.SA1101.severity = none
+
+# SA1110: Opening paranthesis or bracket should be on declaration line
+dotnet_diagnostic.SA1110.severity = none
+
+# SA1111: Closing paranthesis should be on line of last parameter
+dotnet_diagnostic.SA1111.severity = none
+
+# SA1201: Constuctor should not follow a property
+dotnet_diagnostic.SA1201.severity = none
 
 # SA1309: Field should not use underscore prefix
 dotnet_diagnostic.SA1309.severity = none

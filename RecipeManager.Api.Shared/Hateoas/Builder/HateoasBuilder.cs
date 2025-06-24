@@ -5,6 +5,7 @@ namespace RecipeManager.Api.Shared.Hateoas.Builder;
 public class HateoasBuilder(HateoasLinkService linkService)
 {
     public HateoasLinkService LinkService { get; protected set; } = linkService;
+
     public ICollection<IHateoasResponseBuilder> Builders { get; protected set; } = [];
 
     public HateoasResponseBuilder<TItem> ForItem<TItem>(TItem dto)
