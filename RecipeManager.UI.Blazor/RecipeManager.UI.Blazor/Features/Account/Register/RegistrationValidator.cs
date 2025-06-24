@@ -17,8 +17,8 @@ public sealed class RegistrationValidator : AbstractValidator<RegistrationReques
 
     public Func<object, string, Task<IEnumerable<string>>> ValidateValue => async (model, propertyName) =>
     {
-        var result = await ValidateAsync(ValidationContext<RegistrationRequest>.CreateWithOptions((RegistrationRequest)model, x => x.IncludeProperties(propertyName)));
+        FluentValidation.Results.ValidationResult? result = await ValidateAsync(ValidationContext<RegistrationRequest>.CreateWithOptions((RegistrationRequest)model, x => x.IncludeProperties(propertyName)));
 
-        return result.IsValid ? Array.Empty<string>() : result.Errors.Select(e => e.ErrorMessage);
+        return result.IsValid ? [] : result.Errors.Select(e => e.ErrorMessage);
     };
 }

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using System.Reflection;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
@@ -8,7 +9,6 @@ using RecipeManager.Api.Shared.Endpoint;
 using RecipeManager.Api.Shared.Hateoas.Builder;
 using RecipeManager.Api.Shared.Hateoas.Common;
 using RecipeManager.Api.Shared.Middleware;
-using System.Reflection;
 
 namespace RecipeManager.Api.Shared;
 
@@ -78,12 +78,12 @@ public static class DependencyInjection
 
             if (attribute != null)
             {
-                if (!groupedEndpoints.ContainsKey(attribute.GroupName))
+                if (!groupedEndpoints.TryGetValue(attribute.GroupName, out List<IEndpoint>? groupEndpoints))
                 {
-                    groupedEndpoints[attribute.GroupName] = [];
+                    groupEndpoints = [];
                 }
 
-                groupedEndpoints[attribute.GroupName].Add(endpoint);
+                groupEndpoints.Add(endpoint);
             }
             else
             {
@@ -96,7 +96,7 @@ public static class DependencyInjection
             string groupName = group.Key;
             List<IEndpoint> groupEndpoints = group.Value;
 
-            string groupRoute = $"api/{groupName.ToLowerInvariant()}";
+            string groupRoute = $"api/{groupName.ToUpperInvariant()}";
             RouteGroupBuilder routeGroupBuilder = app.MapGroup(groupRoute);
 
             if (endpointGroups.TryGetValue(groupName, out IGroupEndpoint? endpointGroup))

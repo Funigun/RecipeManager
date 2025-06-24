@@ -7,11 +7,11 @@ public class IdentityApi(HttpClient httpClient) : ApiBroker(httpClient), IIdenti
 {
     public async Task<HttpResponseMessage> LoginUser(LoginRequest userLoginModel)
     {
-        return await Post("api/auth/login", userLoginModel);
+        return await Post(new Uri("api/auth/login"), userLoginModel);
     }
 
     public async Task<HttpResponseMessage> RegisterUser(RegistrationRequest userRegistrationModel)
     {
-        return await Post("api/account/register", userRegistrationModel);
+        return await Post(new Uri("api/account/register"), userRegistrationModel);
     }
 }

@@ -30,7 +30,7 @@ public class AuthenticationService(IIdentityApi identityApi, AuthenticationState
         if (response.IsSuccessStatusCode)
         {
             LoginResponse user = (await response.Content.ReadFromJsonAsync<LoginResponse>())!;
-            
+
             await ((CustomAuthenticationStateProvider)authenticationStateProvider).MarkUserAsAuthenticated(user);
             return true;
         }

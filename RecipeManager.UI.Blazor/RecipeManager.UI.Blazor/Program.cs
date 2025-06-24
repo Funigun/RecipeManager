@@ -6,7 +6,6 @@ using RecipeManager.UI.Blazor.Components;
 using RecipeManager.UI.Blazor.Services.Authentication;
 using RecipeManager.UI.Blazor.Services.Authorization;
 
-
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 builder.Configuration.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)

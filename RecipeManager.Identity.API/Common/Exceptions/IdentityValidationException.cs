@@ -12,7 +12,7 @@ public class IdentityValidationException : ApplicationValidationException
     {
         IdentityValidationException exception = new("Registration failed. Please check the provided data and try again.")
         {
-            Errors = errors
+            Errors = errors,
         };
 
         return exception;
@@ -20,6 +20,6 @@ public class IdentityValidationException : ApplicationValidationException
 
     public static IdentityValidationException UserNameAlreadyInUse() => new("Registration failed")
     {
-        Errors = ["User name already in use"]
+        Errors = ["User name already in use"],
     };
 }

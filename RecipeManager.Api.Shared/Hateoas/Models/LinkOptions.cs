@@ -8,15 +8,17 @@ public sealed class LinkOptions
 
     public required bool IsActionAllowed { get; set; }
 
-    private LinkOptions() { }
+    private LinkOptions()
+    {
+    }
 
     public static LinkOptions Create(string endpoint, string rel, bool isActionAllowed)
     {
         return new()
-        { 
-            Endpoint= endpoint,
+        {
+            Endpoint = endpoint,
             Rel = rel,
-            IsActionAllowed = isActionAllowed
+            IsActionAllowed = isActionAllowed,
         };
     }
 }

@@ -1,11 +1,11 @@
-﻿using Microsoft.AspNetCore.Http;
-using FluentValidation;
+﻿using FluentValidation;
 using FluentValidation.Results;
+using Microsoft.AspNetCore.Http;
 using RecipeManager.Api.Shared.Contracts.Exceptions;
 
 namespace RecipeManager.Api.Shared.Filters;
 
-public class ValidationFilter<TRequest>(IValidator<TRequest> validator) : BaseEnpointFilter
+public class ValidationFilter<TRequest>(IValidator<TRequest> validator) : BaseEndpointFilter
 {
     protected override async ValueTask<object?> OnBeforeExecutionAsync(EndpointFilterInvocationContext context)
     {
@@ -13,7 +13,7 @@ public class ValidationFilter<TRequest>(IValidator<TRequest> validator) : BaseEn
 
         if (request == null)
         {
-            List<ValidationFailure> error = [new("", "Invalid request format")];
+            List<ValidationFailure> error = [new(string.Empty, "Invalid request format")];
             throw new ValidationException(error);
         }
 
@@ -22,29 +22,9 @@ public class ValidationFilter<TRequest>(IValidator<TRequest> validator) : BaseEn
 
         if (!validationResult.IsValid)
         {
-            throw CustomValidationException.ValidationFailed (validationResult.Errors);
+            throw CustomValidationException.ValidationFailed(validationResult.Errors);
         }
 
         return null;
-    }
-}
-
-public class CustomValidationException : ApplicationValidationException
-{
-    private CustomValidationException(string message) : base(message)
-    {
-    }
-
-    public static CustomValidationException ValidationFailed(IEnumerable<ValidationFailure> errors)
-    {
-        CustomValidationException exception = new("Registration failed. Please check the provided data and try again.")
-        {
-            ValidationErrors = errors.GroupBy(error => error.PropertyName)
-                                     .ToDictionary(group => group.Key,
-                                                   group => group.Select(error => error.ErrorMessage)),
-
-        };
-
-        return exception;
     }
 }

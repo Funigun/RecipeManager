@@ -8,14 +8,14 @@ public sealed class AppDbContext : IdentityDbContext<User, Role, int>
 {
     public DbSet<Permission> Permissions { get; set; } = default!;
 
-    public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) 
+    public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
     {
 
     }
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
-        base.OnModelCreating(builder);  
+        base.OnModelCreating(builder);
 
         builder.Entity<User>(b =>
         {

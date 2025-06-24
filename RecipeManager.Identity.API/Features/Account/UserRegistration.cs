@@ -62,7 +62,7 @@ public static class UserRegistration
     {
         User user = request.ToUser();
 
-        if (await userManager.Users.AnyAsync(usr => usr.UserName!.ToLower() == user.UserName!.ToLower(), cancellationToken))
+        if (await userManager.Users.AnyAsync(usr => usr.UserName!.ToUpperInvariant() == user.UserName!.ToUpperInvariant(), cancellationToken))
         {
             throw IdentityValidationException.UserNameAlreadyInUse();
         }

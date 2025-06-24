@@ -12,4 +12,4 @@ public sealed class EmailValidator : AbstractValidator<string>
             .EmailAddress()
                 .WithMessage("Invalid email format");
     }
-}   
+}

@@ -1,9 +1,9 @@
+using System.Reflection;
+using FluentValidation;
 using RecipeManager.Api.Shared;
 using RecipeManager.Identity.API.Presentation;
 using RecipeManager.ServiceDefaults;
 using Scalar.AspNetCore;
-using System.Reflection;
-using FluentValidation;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 Assembly apiAssembly = Assembly.GetExecutingAssembly();
@@ -26,7 +26,7 @@ builder.Services.AddSharedServices()
                 .AddValidatorsFromAssembly(contractsAssembly);
 
 builder.Services.ConfigureIdentity()
-                .ConfigureDatabase(builder.Configuration);   
+                .ConfigureDatabase(builder.Configuration);
 
 builder.Services.ConfigureAuthentication(builder.Configuration)
                 .AddAuthorizationBuilder()

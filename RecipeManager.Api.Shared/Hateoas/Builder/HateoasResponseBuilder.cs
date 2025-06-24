@@ -5,14 +5,14 @@ namespace RecipeManager.Api.Shared.Hateoas.Builder;
 
 public sealed class HateoasResponseBuilder<TItem>(TItem item, HateoasLinkService linkService) : HateoasBuilder(linkService), IHateoasResponseBuilder
 {
-    private readonly TItem Item = item;
-    private readonly List<Link> Links = [];
+    private readonly TItem _item = item;
+    private readonly List<Link> _links = [];
 
     public HateoasResponseBuilder<TItem> AddGet(LinkOptions options, object? routeValues)
     {
         if (options.IsActionAllowed)
         {
-            Links.Add(LinkService.GenerateGet(options.Endpoint, routeValues, options.Rel));
+            _links.Add(LinkService.GenerateGet(options.Endpoint, routeValues, options.Rel));
         }
 
         return this;
@@ -22,7 +22,7 @@ public sealed class HateoasResponseBuilder<TItem>(TItem item, HateoasLinkService
     {
         if (options.IsActionAllowed)
         {
-            Links.Add(LinkService.GeneratePost(options.Endpoint, routeValues, options.Rel));
+            _links.Add(LinkService.GeneratePost(options.Endpoint, routeValues, options.Rel));
         }
 
         return this;
@@ -32,7 +32,7 @@ public sealed class HateoasResponseBuilder<TItem>(TItem item, HateoasLinkService
     {
         if (options.IsActionAllowed)
         {
-            Links.Add(LinkService.GeneratePut(options.Endpoint, routeValues, options.Rel));
+            _links.Add(LinkService.GeneratePut(options.Endpoint, routeValues, options.Rel));
         }
 
         return this;
@@ -42,7 +42,7 @@ public sealed class HateoasResponseBuilder<TItem>(TItem item, HateoasLinkService
     {
         if (options.IsActionAllowed)
         {
-            Links.Add(LinkService.GenerateDelete(options.Endpoint, routeValues, options.Rel));
+            _links.Add(LinkService.GenerateDelete(options.Endpoint, routeValues, options.Rel));
         }
 
         return this;
@@ -50,6 +50,6 @@ public sealed class HateoasResponseBuilder<TItem>(TItem item, HateoasLinkService
 
     public object Build()
     {
-        return new HateoasResponse<TItem>(Item, Links);
+        return new HateoasResponse<TItem>(_item, _links);
     }
 }

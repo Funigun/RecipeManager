@@ -2,7 +2,7 @@
 
 [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
 
-public class GroupEndpointAttribute(string groupName) : Attribute
+public sealed class GroupEndpointAttribute(string groupName) : Attribute
 {
     public string GroupName { get; } = groupName;
 }

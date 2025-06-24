@@ -2,9 +2,9 @@
 
 internal static class HateoasMethodConstants
 {
-    internal static readonly string HttpPost = "POST";
-    internal static readonly string HttpGet = "GET";
-    internal static readonly string HttpPut = "PUT";
-    internal static readonly string HttpPatch = "PATCH";
-    internal static readonly string HttpDelete = "DELETE";
+    internal const string HttpPost = "POST";
+    internal const string HttpGet = "GET";
+    internal const string HttpPut = "PUT";
+    internal const string HttpPatch = "PATCH";
+    internal const string HttpDelete = "DELETE";
 }

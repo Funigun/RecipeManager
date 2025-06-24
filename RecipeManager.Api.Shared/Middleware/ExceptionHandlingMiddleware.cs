@@ -1,9 +1,9 @@
-﻿using FluentValidation;
+﻿using System.Net;
+using System.Text.Json;
+using FluentValidation;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using RecipeManager.Api.Shared.Contracts.Exceptions;
-using System.Net;
-using System.Text.Json;
 
 namespace RecipeManager.Api.Shared.Middleware;
 
@@ -34,52 +34,48 @@ public sealed class ExceptionHandlingMiddleware(RequestDelegate next, ILogger<Ex
         await context.Response.WriteAsync(jsonResponse);
     }
 
-    private ResponseBody ToResponseBody(Exception exception)
+    private ResponseBody ToResponseBody(Exception exception) => exception switch
     {
-        return exception switch
+        NotFoundException => new ResponseBody
         {
-            NotFoundException => new ResponseBody
-            {
-                StatusCode = (int)HttpStatusCode.NotFound,
-                Message = exception.Message,
-            },
+            StatusCode = (int)HttpStatusCode.NotFound,
+            Message = exception.Message,
+        },
 
-            UnauthorizedAccessException => new ResponseBody
-            {
-                StatusCode = (int)HttpStatusCode.Unauthorized,
-                Message = "You are not authorized to perform this action",
-            },
+        UnauthorizedAccessException => new ResponseBody
+        {
+            StatusCode = (int)HttpStatusCode.Unauthorized,
+            Message = "You are not authorized to perform this action",
+        },
 
-            ValidationException e => new ResponseBody
-            {
-                StatusCode = (int)HttpStatusCode.BadRequest,
-                Message = e.Message,
+        ValidationException e => new ResponseBody
+        {
+            StatusCode = (int)HttpStatusCode.BadRequest,
+            Message = e.Message,
 
-                Errors = e.Errors.Where(error => string.IsNullOrEmpty(error.PropertyName))
-                                 .Select(error => error.ErrorMessage)
-                                 .ToList(),
+            Errors = e.Errors.Where(error => string.IsNullOrEmpty(error.PropertyName))
+                             .Select(error => error.ErrorMessage)
+                             .ToList(),
 
-                ValidationErrors = e.Errors.Where(error => !string.IsNullOrEmpty(error.PropertyName))
-                                           .GroupBy(x => x.PropertyName)
-                                           .ToDictionary(group => group.Key,
-                                                         group => group.Select(x => x.ErrorMessage))
-            },
+            ValidationErrors = e.Errors.Where(error => !string.IsNullOrEmpty(error.PropertyName))
+                                       .GroupBy(x => x.PropertyName)
+                                       .ToDictionary(group => group.Key, group => group.Select(x => x.ErrorMessage)),
+        },
 
-            ApplicationValidationException e => ToResponseBody(e, (int)HttpStatusCode.BadRequest),
+        ApplicationValidationException e => ToResponseBody(e, (int)HttpStatusCode.BadRequest),
 
-            _ => new ResponseBody
-            {
-                StatusCode = (int)HttpStatusCode.InternalServerError,
-                Message = "An unexpected error occurred. Please try again later.",
-                Errors = [exception.Message],
-            }
-        };
-    }
+        _ => new ResponseBody
+        {
+            StatusCode = (int)HttpStatusCode.InternalServerError,
+            Message = "An unexpected error occurred. Please try again later.",
+            Errors = [exception.Message],
+        },
+    };
 
-    internal ResponseBody ToResponseBody(ApplicationValidationException applicationException, int statusCode)
+    private ResponseBody ToResponseBody(ApplicationValidationException applicationException, int statusCode)
     {
         List<string> errors = applicationException.Errors.ToList();
-        applicationException.ValidationErrors.TryGetValue("", out IEnumerable<string>? validationErrors);
+        applicationException.ValidationErrors.TryGetValue(string.Empty, out IEnumerable<string>? validationErrors);
         errors.AddRange(validationErrors ?? []);
 
         return new()
@@ -89,8 +85,7 @@ public sealed class ExceptionHandlingMiddleware(RequestDelegate next, ILogger<Ex
             Errors = errors,
             ValidationErrors = applicationException.ValidationErrors
                                                    .Where(validationError => !string.IsNullOrEmpty(validationError.Key))
-                                                   .ToDictionary(errors => errors.Key,
-                                                                 errors => errors.Value)
+                                                   .ToDictionary(errors => errors.Key, errors => errors.Value),
         };
     }
 }

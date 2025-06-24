@@ -13,8 +13,7 @@ internal sealed class BearerSecuritySchemeTransformer : IOpenApiDocumentTransfor
             Type = SecuritySchemeType.Http,
             Scheme = "bearer",
             In = ParameterLocation.Header,
-            BearerFormat = "JWT"
+            BearerFormat = "JWT",
         };
     }
 }
-

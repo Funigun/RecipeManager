@@ -3,13 +3,13 @@ using RecipeManager.Api.Shared.Hateoas.Models;
 
 namespace RecipeManager.Api.Shared.Hateoas.Builder;
 
-public class HateoasCollectionListBuilder<TItem>(IEnumerable<HateoasResponse<TItem>> items, List<Link> links, HateoasLinkService linkService) : HateoasCollectionResponseBuilder<TItem>(items, links, linkService)
+public class HateoasCollectionListBuilder<TItem>(IEnumerable<HateoasResponse<TItem>> items, ICollection<Link> links, HateoasLinkService linkService) : HateoasCollectionResponseBuilder<TItem>(items, links, linkService)
 {
     public HateoasCollectionListBuilder<TItem> WithGet(LinkOptions options, Func<TItem, object> itemParams)
     {
         if (options.IsActionAllowed)
         {
-            foreach (var item in _items)
+            foreach (HateoasResponse<TItem> item in Items)
             {
                 item.Links.Add(LinkService.GenerateGet(options.Endpoint, itemParams(item.Item), options.Rel));
             }
@@ -22,7 +22,7 @@ public class HateoasCollectionListBuilder<TItem>(IEnumerable<HateoasResponse<TIt
     {
         if (options.IsActionAllowed)
         {
-            foreach (var item in _items)
+            foreach (HateoasResponse<TItem> item in Items)
             {
                 item.Links.Add(LinkService.GeneratePost(options.Endpoint, itemParams(item.Item), options.Rel));
             }
@@ -35,7 +35,7 @@ public class HateoasCollectionListBuilder<TItem>(IEnumerable<HateoasResponse<TIt
     {
         if (options.IsActionAllowed)
         {
-            foreach (var item in _items)
+            foreach (HateoasResponse<TItem> item in Items)
             {
                 item.Links.Add(LinkService.GeneratePut(options.Endpoint, itemParams(item.Item), options.Rel));
             }
@@ -48,7 +48,7 @@ public class HateoasCollectionListBuilder<TItem>(IEnumerable<HateoasResponse<TIt
     {
         if (options.IsActionAllowed)
         {
-            foreach (var item in _items)
+            foreach (HateoasResponse<TItem> item in Items)
             {
                 item.Links.Add(LinkService.GenerateDelete(options.Endpoint, itemParams(item.Item), options.Rel));
             }
