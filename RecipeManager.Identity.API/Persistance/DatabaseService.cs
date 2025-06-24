@@ -19,7 +19,7 @@ public class DatabaseService(AppDbContext dbContext)
 
         if (!missingRoles.Any())
         {
-            IEnumerable<Role> rolesToAdd = missingRoles.Select(roleName => new Role { Name = roleName, NormalizedName = roleName.ToUpper() });
+            IEnumerable<Role> rolesToAdd = missingRoles.Select(roleName => new Role { Name = roleName, NormalizedName = roleName.ToUpperInvariant() });
 
             await dbContext.Roles.AddRangeAsync(rolesToAdd);
             await dbContext.SaveChangesAsync();

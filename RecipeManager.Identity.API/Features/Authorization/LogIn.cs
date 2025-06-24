@@ -15,7 +15,7 @@ public static class LogIn
 {
     public sealed record Request(string UserName, string Password);
 
-    public sealed record Response(string Token, string RefreshToken, DateTime ExpirationDate) { };
+    public sealed record Response(string Token, string RefreshToken, DateTime ExpirationDate);
 
     public sealed class Validator : AbstractValidator<Request>
     {
@@ -48,7 +48,7 @@ public static class LogIn
 
         string token = await GenerateToken(user, userManager, configuration, isRefreshToken: false);
         string refreshToken = await GenerateToken(user, userManager, configuration, isRefreshToken: true);
-        
+
         Response response = new(token, refreshToken, DateTime.UtcNow.AddMinutes(Convert.ToInt32(configuration["JwtSettings:Duration"])));
 
         return TypedResults.Ok(response);
@@ -85,7 +85,7 @@ public static class LogIn
         List<Claim> claims =
         [
             new(ClaimTypes.Name, user.UserName!),
-            new("Id", user.Id.ToString()),
+            new("Id", user.Id.ToString("/d")),
             new(JwtRegisteredClaimNames.Nickname, user.UserName!),
         ];
 

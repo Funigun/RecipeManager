@@ -11,7 +11,40 @@ namespace RecipeManager.Identity.API.Presentation;
 
 internal static class DependencyInjection
 {
-    internal static IServiceCollection ConfigureAuthentication(this IServiceCollection services, IConfiguration configuration)  
+    public static ScalarOptions ConfigureScalarOptions(this ScalarOptions options)
+    {
+        options.WithTitle("Recipe Manager Identity API")
+               .WithTheme(ScalarTheme.Kepler)
+               .WithDefaultHttpClient(ScalarTarget.CSharp, ScalarClient.HttpClient);
+
+        options.AddPreferredSecuritySchemes("Bearer");
+        options.AddHttpAuthentication("Bearer", o => o.Description = "Provide valid token");
+
+        options.Servers = [new("https://localhost:7002")];
+
+        return options;
+    }
+
+    public static IServiceCollection ConfigureDatabase(this IServiceCollection services, IConfiguration configuration)
+    {
+        services.AddDbContext<AppDbContext>(options =>
+        {
+            options.UseSqlServer(configuration.GetConnectionString("RecipeManager"));
+        });
+
+        services.AddScoped<DatabaseService>();
+
+        return services;
+    }
+
+    public static async Task InitDatabase(this WebApplication app)
+    {
+        using IServiceScope scope = app.Services.CreateScope();
+        DatabaseService dbService = scope.ServiceProvider.GetRequiredService<DatabaseService>();
+        await dbService.InitDatabase();
+    }
+
+    internal static IServiceCollection ConfigureAuthentication(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer("Bearer", options =>
@@ -50,38 +83,5 @@ internal static class DependencyInjection
         });
 
         return services;
-    }
-
-    public static IServiceCollection ConfigureDatabase(this IServiceCollection services, IConfiguration configuration)
-    {
-        services.AddDbContext<AppDbContext>(options =>
-        {
-            options.UseSqlServer(configuration.GetConnectionString("RecipeManager"));
-        });
-
-        services.AddScoped<DatabaseService>();
-
-        return services;
-    }
-
-    public static async Task InitDatabase(this WebApplication app)
-    {
-        using IServiceScope scope = app.Services.CreateScope();
-        DatabaseService dbService = scope.ServiceProvider.GetRequiredService<DatabaseService>();
-        await dbService.InitDatabase();
-    }
-
-    public static ScalarOptions ConfigureScalarOptions(this ScalarOptions options)
-    {
-        options.WithTitle("Recipe Manager Identity API")
-               .WithTheme(ScalarTheme.Kepler)
-               .WithDefaultHttpClient(ScalarTarget.CSharp, ScalarClient.HttpClient);
-
-        options.AddPreferredSecuritySchemes("Bearer");
-        options.AddHttpAuthentication("Bearer", o => o.Description = "Provide valid token");
-
-        options.Servers = [new("https://localhost:7002")];
-
-        return options;
     }
 }
