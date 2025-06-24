@@ -6,7 +6,7 @@ public static class SnackbarExtensions
 {
     public static void ShowError(this ISnackbar snackbar, string message)
     {
-        snackbar.Configuration.PositionClass = Defaults.Classes.Position.TopCenter;        
+        snackbar.Configuration.PositionClass = Defaults.Classes.Position.TopCenter;
         snackbar.Add(message, Severity.Error);
     }
 

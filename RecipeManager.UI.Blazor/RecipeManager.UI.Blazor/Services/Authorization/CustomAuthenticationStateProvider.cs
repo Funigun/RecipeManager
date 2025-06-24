@@ -28,6 +28,16 @@ public class CustomAuthenticationStateProvider(ProtectedLocalStorage localStorag
         }
     }
 
+    public async Task MarkUserAsLoggedOut()
+    {
+        await localStorage.DeleteAsync("sessionState");
+
+        ClaimsIdentity identity = new();
+        ClaimsPrincipal user = new(identity);
+
+        NotifyAuthenticationStateChanged(Task.FromResult(new AuthenticationState(user)));
+    }
+
     public async Task MarkUserAsAuthenticated(LoginResponse userDto)
     {
         await localStorage.SetAsync("sessionState", userDto);
@@ -43,16 +53,6 @@ public class CustomAuthenticationStateProvider(ProtectedLocalStorage localStorag
         JwtSecurityToken jwtToken = handler.ReadJwtToken(token);
         IEnumerable<Claim> claims = jwtToken.Claims;
 
-        return new ClaimsIdentity(claims, "jwt");
-    }
-
-    public async Task MarkUserAsLoggedOut()
-    {
-        await localStorage.DeleteAsync("sessionState");
-
-        ClaimsIdentity identity = new();
-        ClaimsPrincipal user = new(identity);
-
-        NotifyAuthenticationStateChanged(Task.FromResult(new AuthenticationState(user)));
+        return new(claims, "jwt");
     }
 }
