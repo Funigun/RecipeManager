@@ -4,7 +4,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using OpenTelemetry;
+using OpenTelemetry.Exporter;
+using OpenTelemetry.Logs;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Trace;
 
@@ -12,10 +13,10 @@ namespace RecipeManager.ServiceDefaults;
 
 public static class Extensions
 {
-    public static TBuilder AddServiceDefaults<TBuilder>(this TBuilder builder)
+    public static TBuilder AddServiceDefaults<TBuilder>(this TBuilder builder, string sourceName)
             where TBuilder : IHostApplicationBuilder
     {
-        builder.ConfigureOpenTelemetry();
+        builder.ConfigureOpenTelemetry(sourceName);
 
         builder.AddDefaultHealthChecks();
 
@@ -44,8 +45,8 @@ public static class Extensions
         return app;
     }
 
-    public static TBuilder ConfigureOpenTelemetry<TBuilder>(this TBuilder builder)
-            where TBuilder : IHostApplicationBuilder
+    private static TBuilder ConfigureOpenTelemetry<TBuilder>(this TBuilder builder, string sourceName)
+             where TBuilder : IHostApplicationBuilder
     {
         builder.Logging.AddOpenTelemetry(logging =>
         {
@@ -64,16 +65,17 @@ public static class Extensions
             {
                 tracing.AddSource(builder.Environment.ApplicationName)
                     .AddAspNetCoreInstrumentation()
-                    .AddHttpClientInstrumentation();
+                    .AddHttpClientInstrumentation()
+                    .AddEntityFrameworkCoreInstrumentation();
             });
 
-        builder.AddOpenTelemetryExporters();
+        builder.AddOpenTelemetryExporters(sourceName);
 
         return builder;
     }
 
     private static TBuilder AddDefaultHealthChecks<TBuilder>(this TBuilder builder)
-    where TBuilder : IHostApplicationBuilder
+             where TBuilder : IHostApplicationBuilder
     {
         builder.Services.AddHealthChecks()
                         .AddCheck("self", () => HealthCheckResult.Healthy(), ["live"]);
@@ -81,14 +83,30 @@ public static class Extensions
         return builder;
     }
 
-    private static TBuilder AddOpenTelemetryExporters<TBuilder>(this TBuilder builder)
+    private static TBuilder AddOpenTelemetryExporters<TBuilder>(this TBuilder builder, string sourceName)
              where TBuilder : IHostApplicationBuilder
     {
         bool useOtlpExporter = !string.IsNullOrWhiteSpace(builder.Configuration["OTEL_EXPORTER_OTLP_ENDPOINT"]);
 
         if (useOtlpExporter)
         {
-            builder.Services.AddOpenTelemetry().UseOtlpExporter();
+            builder.Services.Configure<OpenTelemetryLoggerOptions>(logging => logging.AddOtlpExporter());
+            builder.Services.ConfigureOpenTelemetryMeterProvider(metrics => metrics.AddOtlpExporter());
+            builder.Services.ConfigureOpenTelemetryTracerProvider(tracing => tracing.AddOtlpExporter());
+
+            builder.Services.Configure<OpenTelemetryLoggerOptions>(logging => logging.AddOtlpExporter(opt =>
+            {
+                opt.Endpoint = new Uri(builder.Configuration["OpenTelemetry:Seq:LogsExportEndpoint"]!);
+                opt.Protocol = OtlpExportProtocol.HttpProtobuf;
+            }));
+
+            builder.Services.ConfigureOpenTelemetryTracerProvider(tracing => tracing
+                            .AddSource(sourceName)
+                            .AddOtlpExporter(opt =>
+                            {
+                                opt.Endpoint = new Uri(builder.Configuration["OpenTelemetry:Seq:TracesExportEndpoint"]!);
+                                opt.Protocol = OtlpExportProtocol.HttpProtobuf;
+                            }));
         }
 
         return builder;

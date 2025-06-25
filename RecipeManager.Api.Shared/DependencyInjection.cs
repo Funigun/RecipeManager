@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using RecipeManager.Api.Shared.Contracts.Authorization;
@@ -62,6 +63,15 @@ public static class DependencyInjection
         return services;
     }
 
+    public static IApplicationBuilder UseMiddlewares(this IApplicationBuilder app)
+    {
+        app.UseMiddleware<ExceptionHandlingMiddleware>();
+        app.UseMiddleware<LoggingMiddleware>();
+        app.UseMiddleware<PerformanceMiddleware>();
+
+        return app;
+    }
+
     public static WebApplication MapEndpoints(this WebApplication app)
     {
         Dictionary<string, IGroupEndpoint> endpointGroups = app.Services.GetServices<IGroupEndpoint>()
@@ -118,12 +128,11 @@ public static class DependencyInjection
         return app;
     }
 
-    public static IApplicationBuilder UseMiddlewares(this IApplicationBuilder app)
+    public static WebApplicationBuilder AddConfiguration(this WebApplicationBuilder builder)
     {
-        app.UseMiddleware<ExceptionHandlingMiddleware>();
-        app.UseMiddleware<LoggingMiddleware>();
-        app.UseMiddleware<PerformanceMiddleware>();
+        builder.Configuration.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+                             .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true);
 
-        return app;
+        return builder;
     }
 }
