@@ -24,6 +24,17 @@ try
     Log.Information("Starting Recipe Manager Identity API");
 
     builder.AddConfiguration();
+
+    builder.Services.AddCors(options =>
+    {
+        options.AddPolicy("RecipeManagerCorsPolicy", policy =>
+        {
+            policy.WithOrigins("https://localhost:7000")
+                  .AllowAnyMethod()
+                  .AllowAnyHeader();
+        });
+    });
+
     builder.Services.AddSerilog();
     builder.AddServiceDefaults("recipe-manager-identity-api");
 
@@ -50,8 +61,6 @@ try
 
     WebApplication app = builder.Build();
 
-    app.MapDefaultEndpoints();
-
     app.UseMiddlewares();
     app.UseRouting();
 
@@ -63,6 +72,9 @@ try
 
     app.UseHttpsRedirection();
     app.UseAuthentication();
+    app.UseSerilogRequestLogging();
+    app.UseCors("RecipeManagerCorsPolicy");
+    app.MapDefaultEndpoints();
     app.MapEndpoints();
     app.UseAuthorization();
 

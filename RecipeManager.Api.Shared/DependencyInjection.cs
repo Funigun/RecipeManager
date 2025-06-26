@@ -91,6 +91,7 @@ public static class DependencyInjection
                 if (!groupedEndpoints.TryGetValue(attribute.GroupName, out List<IEndpoint>? groupEndpoints))
                 {
                     groupEndpoints = [];
+                    groupedEndpoints[attribute.GroupName] = groupEndpoints;
                 }
 
                 groupEndpoints.Add(endpoint);
@@ -106,7 +107,9 @@ public static class DependencyInjection
             string groupName = group.Key;
             List<IEndpoint> groupEndpoints = group.Value;
 
-            string groupRoute = $"api/{groupName.ToUpperInvariant()}";
+#pragma warning disable CA1308 // Normalize strings to uppercase
+            string groupRoute = $"api/{groupName.ToLowerInvariant()}";
+#pragma warning restore CA1308 // Normalize strings to uppercase
             RouteGroupBuilder routeGroupBuilder = app.MapGroup(groupRoute);
 
             if (endpointGroups.TryGetValue(groupName, out IGroupEndpoint? endpointGroup))
