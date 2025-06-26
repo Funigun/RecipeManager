@@ -5,53 +5,76 @@ using RecipeManager.UI.Blazor.Brokers.IdentityApi;
 using RecipeManager.UI.Blazor.Components;
 using RecipeManager.UI.Blazor.Services.Authentication;
 using RecipeManager.UI.Blazor.Services.Authorization;
+using Serilog;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 builder.Configuration.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
                      .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true);
 
-builder.AddServiceDefaults();
+Log.Logger = new LoggerConfiguration().ReadFrom
+                                      .Configuration(new ConfigurationBuilder()
+                                      .SetBasePath(Directory.GetCurrentDirectory())
+                                      .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+                                      .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true, reloadOnChange: true)
+                                      .Build())
+                                      .CreateLogger();
 
-builder.Services.AddMudServices();
-
-builder.Services.AddRazorComponents()
-                .AddInteractiveServerComponents()
-                .AddInteractiveWebAssemblyComponents();
-
-builder.Services.AddAuthenticationCore()
-                .AddCascadingAuthenticationState()
-                .AddScoped<AuthenticationStateProvider, CustomAuthenticationStateProvider>();
-
-builder.Services.AddHttpClient<IIdentityApi, IdentityApi>(option =>
+try
 {
-    option.BaseAddress = new Uri(builder.Configuration["IdentityApi:BaseUrl"]!);
-});
+    Log.Information("Starting Recipe Manager Blazor UI");
 
-builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
+    builder.Services.AddSerilog();
+    builder.AddServiceDefaults("recipe-manager-ui");
 
-WebApplication app = builder.Build();
+    builder.Services.AddMudServices();
 
-app.MapDefaultEndpoints();
+    builder.Services.AddRazorComponents()
+                    .AddInteractiveServerComponents()
+                    .AddInteractiveWebAssemblyComponents();
 
-if (app.Environment.IsDevelopment())
-{
-    app.UseWebAssemblyDebugging();
+    builder.Services.AddAuthenticationCore()
+                    .AddCascadingAuthenticationState()
+                    .AddScoped<AuthenticationStateProvider, CustomAuthenticationStateProvider>();
+
+    builder.Services.AddHttpClient<IIdentityApi, IdentityApi>(option =>
+    {
+        option.BaseAddress = new Uri(builder.Configuration["IdentityApi:BaseUrl"]!);
+    });
+
+    builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
+
+    WebApplication app = builder.Build();
+
+    app.MapDefaultEndpoints();
+
+    if (app.Environment.IsDevelopment())
+    {
+        app.UseWebAssemblyDebugging();
+    }
+    else
+    {
+        app.UseExceptionHandler("/Error", createScopeForErrors: true);
+        app.UseHsts();
+    }
+
+    app.UseHttpsRedirection();
+
+    app.UseAntiforgery();
+
+    app.MapStaticAssets();
+    app.MapRazorComponents<App>()
+       .AddInteractiveServerRenderMode()
+       .AddInteractiveWebAssemblyRenderMode()
+       .AddAdditionalAssemblies(typeof(RecipeManager.UI.Blazor.Client._Imports).Assembly);
+
+    await app.RunAsync();
 }
-else
+catch (Exception ex)
 {
-    app.UseExceptionHandler("/Error", createScopeForErrors: true);
-    app.UseHsts();
+    Log.Fatal(ex, "An error occurred while starting the Recipe Manager UI");
 }
-
-app.UseHttpsRedirection();
-
-app.UseAntiforgery();
-
-app.MapStaticAssets();
-app.MapRazorComponents<App>()
-   .AddInteractiveServerRenderMode()
-   .AddInteractiveWebAssemblyRenderMode()
-   .AddAdditionalAssemblies(typeof(RecipeManager.UI.Blazor.Client._Imports).Assembly);
-
-await app.RunAsync();
+finally
+{
+    await Log.CloseAndFlushAsync();
+}

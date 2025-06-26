@@ -36,12 +36,20 @@
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Tools" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" />
 		<PackageReference Include="FluentValidation.DependencyInjectionExtensions" />
+		<PackageReference Include="Serilog"/>
+		<PackageReference Include="Serilog.AspNetCore" />
+		<PackageReference Include="Serilog.Sinks.Seq" />
+		<PackageReference Include="Serilog.Sinks.OpenTelemetry"/>
 	</ItemGroup>
 	
 	<!-- Blazor Server Exclusive -->
 	<ItemGroup Condition="'$(MSBuildProjectName.EndsWith(`UI.Blazor`))'">
 		<PackageReference Include="System.IdentityModel.Tokens.Jwt" />
 		<PackageReference Include="MudBlazor" />
+		<PackageReference Include="Serilog"/>
+		<PackageReference Include="Serilog.AspNetCore" />
+		<PackageReference Include="Serilog.Sinks.Seq" />
+		<PackageReference Include="Serilog.Sinks.OpenTelemetry"/>
 	</ItemGroup>
 
 	<!-- Blazor WASM Exclusive -->
