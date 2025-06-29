@@ -1,5 +1,13 @@
-﻿<MudPaper Width="250px" Elevation="0">
+﻿@using Microsoft.AspNetCore.Components.Authorization
+
+<MudPaper Width="250px" Elevation="0">
     <MudNavMenu Rounded="true" Margin="Margin.Dense" Color="Color.Primary" Class="pa-2">
         <MudNavLink Match="NavLinkMatch.All" Href="" Icon="@Icons.Material.Filled.Home">Home</MudNavLink>
+        <MudNavLink Href="cookbooks" Icon="@Icons.Material.Filled.Book">Cookbooks</MudNavLink>
+        <MudNavLink Href="recipes" Icon="@Icons.Material.Filled.List">Recipes</MudNavLink>
+        <MudNavLink Href="ingredients" Icon="@Icons.Material.Filled.Kitchen">Ingredients</MudNavLink>
+        <AuthorizeView Roles="Admin">
+            <MudNavLink Href="admin" Icon="@Icons.Material.Filled.AdminPanelSettings">Admin Panel</MudNavLink>
+        </AuthorizeView>
     </MudNavMenu>
 </MudPaper>
