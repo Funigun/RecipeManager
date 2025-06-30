@@ -8,9 +8,9 @@ public class CustomValidationException : ApplicationValidationException
     {
     }
 
-    public static CustomValidationException ValidationFailed(IEnumerable<ValidationFailure> errors)
+    public static CustomValidationException ValidationFailed(string message, IEnumerable<ValidationFailure> errors)
     {
-        CustomValidationException exception = new("Registration failed. Please check the provided data and try again.")
+        CustomValidationException exception = new(message)
         {
             ValidationErrors = errors.GroupBy(error => error.PropertyName)
                                      .ToDictionary(group => group.Key, group => group.Select(error => error.ErrorMessage)),

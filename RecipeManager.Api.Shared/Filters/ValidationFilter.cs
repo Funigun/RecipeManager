@@ -22,7 +22,7 @@ public class ValidationFilter<TRequest>(IValidator<TRequest> validator) : BaseEn
 
         if (!validationResult.IsValid)
         {
-            throw CustomValidationException.ValidationFailed(validationResult.Errors);
+            throw CustomValidationException.ValidationFailed("Validation failed", validationResult.Errors);
         }
 
         return null;

@@ -7,7 +7,11 @@
         <MudNavLink Href="recipes" Icon="@Icons.Material.Filled.List">Recipes</MudNavLink>
         <MudNavLink Href="ingredients" Icon="@Icons.Material.Filled.Kitchen">Ingredients</MudNavLink>
         <AuthorizeView Roles="Admin">
-            <MudNavLink Href="admin" Icon="@Icons.Material.Filled.AdminPanelSettings">Admin Panel</MudNavLink>
+            <MudNavGroup Title="Admin Panel" Icon="@Icons.Material.Filled.AdminPanelSettings" Expanded=false>
+                <MudNavLink Href="admin/measurement-units" Icon="@Icons.Material.Filled.Timer">Units</MudNavLink>
+                <MudNavLink Href="admin/recipe-categories" Icon="@Icons.Material.Filled.Dining">Recipe Categories</MudNavLink>
+                <MudNavLink Href="admin/ingredient-categories" Icon="@Icons.Material.Filled.Spa">Ingredient Categories</MudNavLink>
+            </MudNavGroup>
         </AuthorizeView>
     </MudNavMenu>
 </MudPaper>
