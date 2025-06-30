@@ -1,5 +1,6 @@
 using System.Reflection;
 using FluentValidation;
+using RecipeManager.API.Persistance;
 using RecipeManager.API.Presentation;
 using RecipeManager.Api.Shared;
 using RecipeManager.ServiceDefaults;
@@ -48,6 +49,8 @@ try
                     .AddAuthorizationPolicies(assembly)
                     .AddValidatorsFromAssembly(assembly)
                     .AddValidatorsFromAssembly(contractsAssembly);
+
+    builder.Services.AddPersistance(builder.Configuration);
 
     builder.Services.ConfigureAuthentication(builder.Configuration)
                     .AddAuthorizationBuilder()
