@@ -85,7 +85,7 @@ public static class LogIn
         List<Claim> claims =
         [
             new(ClaimTypes.Name, user.UserName!),
-            new("Id", user.Id.ToString("/d")),
+            new("Id", user.Id.ToString()),
             new(JwtRegisteredClaimNames.Nickname, user.UserName!),
         ];
 

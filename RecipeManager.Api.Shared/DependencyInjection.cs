@@ -20,6 +20,7 @@ public static class DependencyInjection
         services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
         services.AddScoped<HateoasBuilder>();
         services.AddScoped<HateoasLinkService>();
+        services.AddScoped<ICurrentUser, CurrentUser>();
 
         return services;
     }

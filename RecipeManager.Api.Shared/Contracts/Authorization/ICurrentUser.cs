@@ -3,4 +3,6 @@
 public interface ICurrentUser
 {
     int Id { get; init; }
+
+    bool HasRole(string role);
 }

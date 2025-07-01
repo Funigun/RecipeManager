@@ -33,13 +33,15 @@ public static class EndpointMappingExtensions
 
     public static RouteHandlerBuilder WithValidationFilter<TRequest>(this RouteHandlerBuilder builder)
     {
-        return builder.AddEndpointFilter<ValidationFilter<TRequest>>();
+        return builder.AddEndpointFilter<ValidationFilter<TRequest>>()
+                      .WithMetadata("Uses validation filter");
     }
 
     public static RouteHandlerBuilder WithAuthenticationFilter<TRequest>(this RouteHandlerBuilder builder)
     {
         return builder.ProducesProblem(StatusCodes.Status403Forbidden)
-                      .AddEndpointFilter<AuthorizationFilter<TRequest>>();
+                      .AddEndpointFilter<AuthorizationFilter<TRequest>>()
+                      .WithMetadata("Uses authentication filter");
     }
 
     public static RouteHandlerBuilder MapStandardGet<TResponse>(this IEndpointRouteBuilder builder, string pattern, Delegate handler)

@@ -3,9 +3,9 @@ using NetArchTest.Rules;
 using RecipeManager.API.Domain.Common.Abstractions;
 using TestResult = NetArchTest.Rules.TestResult;
 
-namespace RecipeManager.Tests.ArchitectureTests;
+namespace RecipeManager.Tests.ArchitectureTests.MainApi;
 
-[Trait("Domain", TestCategories.ArchitectureTests)]
+[Trait("Core.Api.Domain", TestCategories.ArchitectureTests)]
 public sealed class DomainArchitectureTests
 {
     private readonly Assembly _assembly = typeof(IEntity).Assembly;
