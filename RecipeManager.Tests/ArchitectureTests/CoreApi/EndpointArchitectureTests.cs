@@ -3,9 +3,9 @@ using FluentValidation;
 using Microsoft.AspNetCore.Routing;
 using RecipeManager.Api.Shared.Contracts.Authorization;
 using RecipeManager.Api.Shared.Endpoint;
-using RecipeManager.Tests.ArchitectureTests.MainApi.Fixtures;
+using RecipeManager.Tests.ArchitectureTests.CoreApi.TestFixtures;
 
-namespace RecipeManager.Tests.ArchitectureTests.MainApi;
+namespace RecipeManager.Tests.ArchitectureTests.CoreApi;
 
 [Trait("Core.Api.Endpoints", TestCategories.ArchitectureTests)]
 public sealed class EndpointArchitectureTests : IClassFixture<WebApplicationFixture>

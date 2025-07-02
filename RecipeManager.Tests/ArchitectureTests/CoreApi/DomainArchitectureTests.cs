@@ -3,7 +3,7 @@ using NetArchTest.Rules;
 using RecipeManager.API.Domain.Common.Abstractions;
 using TestResult = NetArchTest.Rules.TestResult;
 
-namespace RecipeManager.Tests.ArchitectureTests.MainApi;
+namespace RecipeManager.Tests.ArchitectureTests.CoreApi;
 
 [Trait("Core.Api.Domain", TestCategories.ArchitectureTests)]
 public sealed class DomainArchitectureTests

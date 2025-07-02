@@ -73,6 +73,8 @@
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
 		<PackageReference Include="NetArchTest.Rules" />
+		<PackageReference Include="Testcontainers.MsSql" />
+		<PackageReference Include="Respawn" />
 	</ItemGroup>
 
 	<!-- All except Aspire projects-->

@@ -88,3 +88,10 @@ finally
 {
     await Log.CloseAndFlushAsync();
 }
+
+namespace RecipeManager.API
+{
+    public abstract partial class Program
+    {
+    }
+}

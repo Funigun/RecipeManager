@@ -6,7 +6,7 @@ using RecipeManager.API.Application.Abstractions;
 using RecipeManager.API.Persistance;
 using RecipeManager.Api.Shared;
 
-namespace RecipeManager.Tests.ArchitectureTests.MainApi.Fixtures;
+namespace RecipeManager.Tests.ArchitectureTests.CoreApi.TestFixtures;
 
 public sealed class WebApplicationFixture
 {
