@@ -46,8 +46,7 @@ public static class CreateUnit
         {
             endpoints.MapStandardAuthenticatedPost<Request, Response>(string.Empty, Handler)
                      .WithName("CreateMeasurementUnit")
-                     .WithDescription("Creates new measurement unit")
-                     .WithMetadata(typeof(Enpoint));
+                     .WithDescription("Creates new measurement unit");
         }
     }
 

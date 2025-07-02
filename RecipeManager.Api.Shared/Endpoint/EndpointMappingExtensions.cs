@@ -13,7 +13,8 @@ public static class EndpointMappingExtensions
                                                   .Produces<TResponse>(StatusCodes.Status201Created)
                                                   .ProducesProblem(StatusCodes.Status400BadRequest)
                                                   .ProducesProblem(StatusCodes.Status404NotFound)
-                                                  .ProducesProblem(StatusCodes.Status500InternalServerError);
+                                                  .ProducesProblem(StatusCodes.Status500InternalServerError)
+                                                  .WithMetadata(typeof(TRequest).DeclaringType!);
 
         return routeHandler;
     }
@@ -66,7 +67,8 @@ public static class EndpointMappingExtensions
                                                   .Produces(StatusCodes.Status204NoContent)
                                                   .ProducesProblem(StatusCodes.Status400BadRequest)
                                                   .ProducesProblem(StatusCodes.Status404NotFound)
-                                                  .ProducesProblem(StatusCodes.Status500InternalServerError);
+                                                  .ProducesProblem(StatusCodes.Status500InternalServerError)
+                                                  .WithMetadata(typeof(TRequest));
 
         return routeHandler;
     }
@@ -89,7 +91,8 @@ public static class EndpointMappingExtensions
         RouteHandlerBuilder routeHandler = builder.MapDelete(pattern, handler)
                                                   .Produces(StatusCodes.Status204NoContent)
                                                   .ProducesProblem(StatusCodes.Status404NotFound)
-                                                  .ProducesProblem(StatusCodes.Status500InternalServerError);
+                                                  .ProducesProblem(StatusCodes.Status500InternalServerError)
+                                                  .WithMetadata(typeof(TRequest));
 
         return routeHandler;
     }
