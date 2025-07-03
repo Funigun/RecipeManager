@@ -9,8 +9,7 @@ public static class DependencyInjection
     {
         services.AddDbContext<AppDbContext>(options =>
         {
-            options.UseInMemoryDatabase("RecipeManagerDb");
-            //options.UseSqlServer(configuration.GetConnectionString("RecipeManager"));
+            options.UseSqlServer(configuration.GetConnectionString("RecipeManager"));
         });
 
         services.AddScoped<IAppDbContext, AppDbContext>();

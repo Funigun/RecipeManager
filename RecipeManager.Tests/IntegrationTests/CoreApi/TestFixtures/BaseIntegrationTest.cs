@@ -4,7 +4,7 @@ using Respawn;
 
 namespace RecipeManager.Tests.IntegrationTests.CoreApi.TestFixtures;
 
-public abstract class BaseIntegrationTest : IAsyncLifetime
+public class BaseIntegrationTest : IAsyncLifetime
 {
     private static readonly Lock _lock = new();
     private static bool _databaseInitialized;

@@ -6,9 +6,9 @@ namespace RecipeManager.Api.Shared.Contracts.Authorization;
 
 internal sealed class CurrentUser : ICurrentUser
 {
-    public int Id { get; init; }
+    public int Id { get; set; }
 
-    public IEnumerable<string> Roles { get; init; } = [];
+    public IEnumerable<string> Roles { get; set; } = [];
 
     public CurrentUser(IHttpContextAccessor httpContextAccessor)
     {

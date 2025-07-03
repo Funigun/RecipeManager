@@ -7,6 +7,7 @@ using RecipeManager.Api.Shared.Contracts.Authorization;
 using RecipeManager.Api.Shared.Endpoint;
 using RecipeManager.Shared.Contracts.Authorization;
 using RecipeManager.Shared.Contracts.Units;
+using Microsoft.EntityFrameworkCore;
 
 namespace RecipeManager.API.Features.Units;
 
@@ -18,16 +19,31 @@ public static class CreateUnit
 
     public sealed class Validator : AbstractValidator<Request>
     {
-        public Validator()
+        public Validator(IAppDbContext dbContext)
         {
-            RuleFor(x => x.Name).SetValidator(new UnitNameValidator());
+            RuleFor(x => x.Name)
+                .SetValidator(new UnitNameValidator())
+                .MustAsync(async (name, cancellationToken) =>
+                {
+                    return await dbContext.Units.CountAsync(unit => unit.Name == name, CancellationToken.None) == 0;
+                }).WithMessage("Unit Name must be unique");
 
-            RuleFor(x => x.ShortName).SetValidator(new UnitShortNameValidator());
+            When(x => x.ShortName is not null, () =>
+            {
+                RuleFor(x => x.ShortName)
+                    .SetValidator(new UnitShortNameValidator())
+                    .MustAsync(async (shortName, cancellationToken) =>
+                    {
+                        return await dbContext.Units.CountAsync(unit => unit.ShortName == shortName, CancellationToken.None) == 0;
+                    }).WithMessage("Unit Short Name must be unique");
+            });
 
             RuleFor(x => x.Group)
                 .Must(group => group.IsUnitGroup())
                     .WithMessage("Invalid unit group")
                     .WithName("Unit Group");
+
+
         }
     }
 

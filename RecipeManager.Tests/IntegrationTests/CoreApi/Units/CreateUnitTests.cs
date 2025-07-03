@@ -1,11 +1,13 @@
-﻿using System.Net.Http.Json;
+﻿using System.Net.Http.Headers;
+using System.Net.Http.Json;
+using RecipeManager.Tests.IntegrationTests.Common.Users;
 using RecipeManager.Tests.IntegrationTests.CoreApi.TestFixtures;
 using Xunit;
 
 namespace RecipeManager.Tests.IntegrationTests.CoreApi.Units;
 
+//[Collection("SharedDockerServices")]
 [Trait("Units", TestCategories.IntegrationTests)]
-[Collection("Database collection")]
 public sealed class CreateUnitTests : BaseIntegrationTest
 {
     public CreateUnitTests(DbContainerFactory dockerServicesFactory) : base(dockerServicesFactory)
@@ -13,9 +15,11 @@ public sealed class CreateUnitTests : BaseIntegrationTest
     }
 
     [Fact]
-    public async Task CreateUnit_ShouldReturn_CreatedUnit()
+    public async Task CreateUnit_ShouldReturn_NotAuthorized_ForNonAdminUser()
     {
         // Arrange
+        HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", TokenMockFactory.GenerateJwtToken(UserMockFactory.CreateMockedUser()));
+
         var createUnitRequest = new
         {
             Name = "Test Unit",
@@ -27,9 +31,29 @@ public sealed class CreateUnitTests : BaseIntegrationTest
         HttpResponseMessage response = await HttpClient.PostAsJsonAsync("/api/units", createUnitRequest, CancellationToken.None);
 
         // Assert
-        response.EnsureSuccessStatusCode();
-        Guid createdUnit = await response.Content.ReadFromJsonAsync<Guid>(CancellationToken.None);
+        Assert.Equal(System.Net.HttpStatusCode.Forbidden, response.StatusCode);
+    }
 
-        Assert.NotEqual(Guid.Empty, createdUnit);
+    [Theory]
+    [InlineData("", "TU", 1, "Missing Unit Name")]
+    [InlineData("Test", "", 1, "Missing Short Name")]
+    [InlineData("Another Unit", "AU", 100, "Invalid Unit Group")]
+    public async Task CreateUnit_ShouldReturn_BadRequest_ForInvalidInput(string unitName, string? shortName, int group, string justification)
+    {
+        // Arrange
+        HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", TokenMockFactory.GenerateJwtToken(UserMockFactory.CreateMockedAdmin()));
+
+        var createUnitRequest = new
+        {
+            Name = unitName,
+            ShortName = shortName,
+            Group = group
+        };
+
+        // Act
+        HttpResponseMessage response = await HttpClient.PostAsJsonAsync("/api/units", createUnitRequest, CancellationToken.None);
+
+        // Assert
+        Assert.Equal(System.Net.HttpStatusCode.BadRequest, response.StatusCode);
     }
 }

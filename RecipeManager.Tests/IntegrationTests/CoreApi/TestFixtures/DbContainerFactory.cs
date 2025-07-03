@@ -1,17 +1,20 @@
 ﻿using DotNet.Testcontainers.Builders;
+using RecipeManager.Tests.IntegrationTests.CoreApi.TestFixtures;
 using Testcontainers.MsSql;
+
+[assembly: AssemblyFixture(typeof(DbContainerFactory))]
 
 namespace RecipeManager.Tests.IntegrationTests.CoreApi.TestFixtures;
 
-public sealed class DbContainerFactory : IAsyncLifetime
+public sealed class DbContainerFactory : IAsyncLifetime, IDisposable
 {
     private readonly MsSqlContainer _sqlContainer = new MsSqlBuilder().WithImage("mcr.microsoft.com/mssql/server:2022-latest")
-                                                                       .WithPassword("Str0ng_P@ssw0rd4Tests")
-                                                                       .WithPortBinding(1433)
-                                                                       .WithEnvironment("ACCEPT_EULA", "Y")
-                                                                       .WithName("MealsManagerTestDb")
-                                                                       .WithWaitStrategy(Wait.ForUnixContainer().UntilPortIsAvailable(1433))
-                                                                       .Build();
+                                                                      .WithPassword("Str0ng_P@ssw0rd4Tests")
+                                                                      .WithPortBinding(1433)
+                                                                      .WithEnvironment("ACCEPT_EULA", "Y")
+                                                                      .WithName("MealsManagerTestDb")
+                                                                      .WithWaitStrategy(Wait.ForUnixContainer().UntilPortIsAvailable(1433))
+                                                                      .Build();
 
     public DbContainerFactory()
     {
@@ -20,23 +23,24 @@ public sealed class DbContainerFactory : IAsyncLifetime
 
     public string GetConnectionString() => _sqlContainer.GetConnectionString();
 
-    ValueTask IAsyncLifetime.InitializeAsync()
+    async ValueTask IAsyncLifetime.InitializeAsync()
     {
-        _sqlContainer.StopAsync(CancellationToken.None);
-
-        return _sqlContainer.DisposeAsync();
+        await _sqlContainer.StartAsync();
     }
 
-    ValueTask IAsyncDisposable.DisposeAsync()
+    async ValueTask IAsyncDisposable.DisposeAsync()
     {
-        _sqlContainer.StartAsync(CancellationToken.None);
+        await _sqlContainer.StopAsync();
+    }
 
-        return ValueTask.CompletedTask;
+    public void Dispose()
+    {
+        _sqlContainer.DisposeAsync();
     }
 }
 
-[CollectionDefinition("Database collection")]
-public class DatabaseCollection : ICollectionFixture<DbContainerFactory>
+[CollectionDefinition("SharedDockerServices")]
+public class SharedDockerServicesFactory : ICollectionFixture<DbContainerFactory>
 {
-    // No code needed here—just the attribute and interface
+
 }
