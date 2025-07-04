@@ -4,9 +4,8 @@ using Moq;
 using RecipeManager.Identity.API.Domain;
 using RecipeManager.Identity.API.Features.Account;
 
-namespace RecipeManager.Tests.UnitTests.Account;
+namespace RecipeManager.Unit.Tests.IdentityApi;
 
-[Trait("Account", TestCategories.UnitTests)]
 public class UserRegistrationTests
 {
     [Fact]
@@ -21,7 +20,7 @@ public class UserRegistrationTests
         userManagerMock.Setup(um => um.Users).Returns(users);
 
         UserRegistration.Validator validator = new(userManagerMock.Object);
-        UserRegistration.Request request = new("", "Test", "Test");
+        UserRegistration.Request request = new(string.Empty, "Test", "Test");
 
         // Act
         TestValidationResult<UserRegistration.Request> result = await validator.TestValidateAsync(request, null, TestContext.Current.CancellationToken);
@@ -110,7 +109,7 @@ public class UserRegistrationTests
         userManagerMock.Setup(um => um.Users).Returns(users);
 
         UserRegistration.Validator validator = new(userManagerMock.Object);
-        UserRegistration.Request request = new("Test", "Test", "");
+        UserRegistration.Request request = new("Test", "Test", string.Empty);
 
         // Act
         TestValidationResult<UserRegistration.Request> result = await validator.TestValidateAsync(request, null, TestContext.Current.CancellationToken);

@@ -1,8 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using RecipeManager.API.Persistance;
-using RecipeManager.Tests.IntegrationTests.Common.Users;
+using RecipeManager.Integration.Factory.Tests.Common.Users;
 
-namespace RecipeManager.Tests.IntegrationTests.CoreApi.TestFixtures;
+namespace RecipeManager.Integration.Factory.Tests.CoreApi.TestFixtures;
 
 public class BaseIntegrationTest : IAsyncLifetime
 {

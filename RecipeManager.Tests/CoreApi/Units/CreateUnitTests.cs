@@ -1,11 +1,11 @@
 ﻿using System.Net.Http.Headers;
 using System.Net.Http.Json;
-using RecipeManager.Tests.IntegrationTests.Common.Users;
-using RecipeManager.Tests.IntegrationTests.CoreApi.TestFixtures;
+using RecipeManager.Integration.Factory.Tests.Common.Users;
+using RecipeManager.Integration.Factory.Tests.CoreApi.TestFixtures;
 
-namespace RecipeManager.Tests.IntegrationTests.CoreApi.Units;
+namespace RecipeManager.Integration.Factory.Tests.CoreApi.Units;
 
-[Trait("Units", TestCategories.IntegrationTests)]
+[Trait("Core.Api", "Units")]
 public sealed class CreateUnitTests : BaseIntegrationTest
 {
     public CreateUnitTests(DbContainerFactory dockerServicesFactory) : base(dockerServicesFactory)

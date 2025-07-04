@@ -1,10 +1,10 @@
 ﻿using DotNet.Testcontainers.Builders;
-using RecipeManager.Tests.IntegrationTests.CoreApi.TestFixtures;
+using RecipeManager.Integration.Factory.Tests.CoreApi.TestFixtures;
 using Testcontainers.MsSql;
 
 [assembly: AssemblyFixture(typeof(DbContainerFactory))]
 
-namespace RecipeManager.Tests.IntegrationTests.CoreApi.TestFixtures;
+namespace RecipeManager.Integration.Factory.Tests.CoreApi.TestFixtures;
 
 public sealed class DbContainerFactory : IAsyncLifetime, IDisposable
 {

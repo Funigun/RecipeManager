@@ -4,7 +4,7 @@ using System.Security.Cryptography;
 using Microsoft.IdentityModel.Tokens;
 using RecipeManager.Api.Shared.Contracts.Authorization;
 
-namespace RecipeManager.Tests.IntegrationTests.Common.Users;
+namespace RecipeManager.Integration.Factory.Tests.Common.Users;
 
 internal static class TokenMockFactory
 {
