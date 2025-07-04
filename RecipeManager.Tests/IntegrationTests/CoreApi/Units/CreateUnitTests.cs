@@ -2,11 +2,9 @@
 using System.Net.Http.Json;
 using RecipeManager.Tests.IntegrationTests.Common.Users;
 using RecipeManager.Tests.IntegrationTests.CoreApi.TestFixtures;
-using Xunit;
 
 namespace RecipeManager.Tests.IntegrationTests.CoreApi.Units;
 
-//[Collection("SharedDockerServices")]
 [Trait("Units", TestCategories.IntegrationTests)]
 public sealed class CreateUnitTests : BaseIntegrationTest
 {
@@ -38,6 +36,8 @@ public sealed class CreateUnitTests : BaseIntegrationTest
     [InlineData("", "TU", 1, "Missing Unit Name")]
     [InlineData("Test", "", 1, "Missing Short Name")]
     [InlineData("Another Unit", "AU", 100, "Invalid Unit Group")]
+    [InlineData("Duplicated Name", null, 1, "Duplicate Unit Name")]
+    [InlineData("Test", "Duplicated Short Name", 1, "Duplicate Unit Short Name")]
     public async Task CreateUnit_ShouldReturn_BadRequest_ForInvalidInput(string unitName, string? shortName, int group, string justification)
     {
         // Arrange

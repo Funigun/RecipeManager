@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using RecipeManager.API.Persistance;
-using Respawn;
+using RecipeManager.Tests.IntegrationTests.Common.Users;
 
 namespace RecipeManager.Tests.IntegrationTests.CoreApi.TestFixtures;
 
@@ -9,7 +9,6 @@ public class BaseIntegrationTest : IAsyncLifetime
     private static readonly Lock _lock = new();
     private static bool _databaseInitialized;
     private static bool _databaseSeeded;
-    private static Respawner _respawner = default!;
 
     protected DbContainerFactory DockerServicesFactory { get; private set; }
 
@@ -30,14 +29,14 @@ public class BaseIntegrationTest : IAsyncLifetime
                                                           .Options;
             if (!_databaseInitialized)
             {
-                DbContext = new(options);
+                DbContext = new(options, UserMockFactory.CreateMockedAdmin());
                 DbContext.Database.Migrate();
 
                 _databaseInitialized = true;
             }
             else
             {
-                DbContext = new(options);
+                DbContext = new(options, UserMockFactory.CreateMockedAdmin());
             }
         }
 
@@ -49,12 +48,7 @@ public class BaseIntegrationTest : IAsyncLifetime
     {
         if (!_databaseSeeded)
         {
-            _respawner = await Respawner.CreateAsync(DockerServicesFactory.GetConnectionString(),
-                         new RespawnerOptions
-                         {
-                             DbAdapter = DbAdapter.SqlServer,
-                             SchemasToInclude = new[] { "dbo" },
-                         });
+            await DbContext.SeedAsync();
 
             _databaseSeeded = true;
         }
@@ -62,7 +56,6 @@ public class BaseIntegrationTest : IAsyncLifetime
 
     public async ValueTask DisposeAsync()
     {
-        await _respawner.ResetAsync(DockerServicesFactory.GetConnectionString());
-        _databaseSeeded = false;
+        await ValueTask.CompletedTask;
     }
 }

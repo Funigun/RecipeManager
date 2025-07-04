@@ -33,14 +33,8 @@ public sealed class DbContainerFactory : IAsyncLifetime, IDisposable
         await _sqlContainer.StopAsync();
     }
 
-    public void Dispose()
+    public async void Dispose()
     {
-        _sqlContainer.DisposeAsync();
+        await _sqlContainer.DisposeAsync();
     }
-}
-
-[CollectionDefinition("SharedDockerServices")]
-public class SharedDockerServicesFactory : ICollectionFixture<DbContainerFactory>
-{
-
 }
