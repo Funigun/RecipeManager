@@ -66,7 +66,7 @@ public static class CreateUnit
         }
     }
 
-    internal static async Task<Results<Ok<Response>, NotFound>> Handler(Request request, IAppDbContext dbContext, CancellationToken cancellationToken)
+    public static async Task<Results<Ok<Response>, NotFound>> Handler(Request request, IAppDbContext dbContext, CancellationToken cancellationToken)
     {
         Unit unit = request.ToUnit();
 

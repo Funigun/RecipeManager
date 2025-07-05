@@ -5,9 +5,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using RecipeManager.API;
 using RecipeManager.API.Persistance;
-using RecipeManager.Integration.Factory.Tests.Common.Users;
+using RecipeManager.Integration.Tests.Common.Users;
 
-namespace RecipeManager.Integration.Factory.Tests.CoreApi.TestFixtures;
+namespace RecipeManager.Integration.Tests.CoreApi.TestFixtures;
 
 public class WebApiFactory(string connectionString) : WebApplicationFactory<Program>
 {

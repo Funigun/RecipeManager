@@ -1,6 +1,6 @@
 ﻿using RecipeManager.Api.Shared.Contracts.Authorization;
 
-namespace RecipeManager.Integration.Factory.Tests.Common.Users;
+namespace RecipeManager.Integration.Tests.Common.Users;
 
 public class FakeCurrentUser : ICurrentUser
 {

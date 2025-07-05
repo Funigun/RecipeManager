@@ -2,7 +2,7 @@
 using RecipeManager.API.Domain.Units.Enums;
 using RecipeManager.API.Persistance;
 
-namespace RecipeManager.Integration.Factory.Tests.CoreApi.TestFixtures;
+namespace RecipeManager.Integration.Tests.CoreApi.TestFixtures;
 
 internal static class DatabaseSeeder
 {

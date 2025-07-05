@@ -1,9 +1,9 @@
 ﻿using System.Net.Http.Headers;
 using System.Net.Http.Json;
-using RecipeManager.Integration.Factory.Tests.Common.Users;
-using RecipeManager.Integration.Factory.Tests.CoreApi.TestFixtures;
+using RecipeManager.Integration.Tests.Common.Users;
+using RecipeManager.Integration.Tests.CoreApi.TestFixtures;
 
-namespace RecipeManager.Integration.Factory.Tests.CoreApi.Units;
+namespace RecipeManager.Integration.Tests.CoreApi.Units;
 
 [Trait("Core.Api", "Units")]
 public sealed class CreateUnitTests : BaseIntegrationTest

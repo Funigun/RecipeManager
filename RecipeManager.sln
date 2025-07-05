@@ -26,7 +26,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RecipeManager.Api.Shared", 
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{3D592DCD-C0CF-4CA5-8962-31BADC4819F1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RecipeManager.Integration.Factory.Tests", "RecipeManager.Tests\RecipeManager.Integration.Factory.Tests.csproj", "{99F5C032-9C9F-4CE8-8C9A-9A8319073C24}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RecipeManager.Integration.Tests", "RecipeManager.Tests\RecipeManager.Integration.Tests.csproj", "{99F5C032-9C9F-4CE8-8C9A-9A8319073C24}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RecipeManager.Shared.Contracts", "RecipeManager.Shared.Contracts\RecipeManager.Shared.Contracts.csproj", "{B33B9F52-4775-47A4-904A-CCFA463EE905}"
 EndProject
