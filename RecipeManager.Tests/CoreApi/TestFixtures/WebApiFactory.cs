@@ -22,8 +22,7 @@ public class WebApiFactory(string connectionString) : WebApplicationFactory<Prog
                 services.Remove(descriptor);
             }
 
-            services.AddDbContext<AppDbContext>(options =>
-                options.UseSqlServer(connectionString));
+            services.AddDbContext<AppDbContext>(options => options.UseSqlServer(connectionString));
 
             services.Configure<JwtBearerOptions>(JwtBearerDefaults.AuthenticationScheme, options =>
             {

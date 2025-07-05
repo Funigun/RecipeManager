@@ -1,4 +1,7 @@
 ﻿using DotNet.Testcontainers.Builders;
+using Microsoft.EntityFrameworkCore;
+using RecipeManager.Api.Persistance;
+using RecipeManager.Integration.Tests.Common.Users;
 using RecipeManager.Integration.Tests.CoreApi.TestFixtures;
 using Testcontainers.MsSql;
 
@@ -16,9 +19,10 @@ public sealed class DbContainerFactory : IAsyncLifetime, IDisposable
                                                                       .WithWaitStrategy(Wait.ForUnixContainer().UntilPortIsAvailable(1433))
                                                                       .Build();
 
+    private AppDbContext _dbContext = default!;
+
     public DbContainerFactory()
     {
-
     }
 
     public string GetConnectionString() => _sqlContainer.GetConnectionString();
@@ -26,15 +30,25 @@ public sealed class DbContainerFactory : IAsyncLifetime, IDisposable
     async ValueTask IAsyncLifetime.InitializeAsync()
     {
         await _sqlContainer.StartAsync();
+
+        DbContextOptions<AppDbContext> options = new DbContextOptionsBuilder<AppDbContext>()
+                                                 .UseSqlServer(_sqlContainer.GetConnectionString())
+                                                 .Options;
+
+        _dbContext = new(options, UserMockFactory.CreateMockedAdmin());
+
+        await _dbContext.Database.MigrateAsync();
+        await _dbContext.SeedAsync();
     }
 
     async ValueTask IAsyncDisposable.DisposeAsync()
     {
+        await _dbContext.DisposeAsync();
         await _sqlContainer.StopAsync();
     }
 
-    public async void Dispose()
+    public void Dispose()
     {
-        await _sqlContainer.DisposeAsync();
+        _sqlContainer.DisposeAsync().AsTask().GetAwaiter().GetResult();
     }
 }
