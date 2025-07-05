@@ -10,13 +10,13 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		Directory.Packages.props = Directory.Packages.props
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RecipeManager.Identity.API", "RecipeManager.Identity.API\RecipeManager.Identity.API.csproj", "{764EDD56-C00F-3B92-31D5-F461FCAD8240}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RecipeManager.Identity.Api", "RecipeManager.Identity.API\RecipeManager.Identity.Api.csproj", "{764EDD56-C00F-3B92-31D5-F461FCAD8240}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "WebApi", "WebApi", "{47CCC8BF-5C6A-4FC3-8450-C71E80D3B0A9}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "UI", "UI", "{CCAE8C25-572A-4E7B-B19A-EB509BE0603E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RecipeManager.API", "RecipeManager.API\RecipeManager.API.csproj", "{A972962F-B388-022F-DE99-CAE79A634F21}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RecipeManager.Api", "RecipeManager.API\RecipeManager.Api.csproj", "{A972962F-B388-022F-DE99-CAE79A634F21}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RecipeManager.UI.Blazor", "RecipeManager.UI.Blazor\RecipeManager.UI.Blazor\RecipeManager.UI.Blazor.csproj", "{DB8A1A6D-21E0-7689-1BF3-878247ED860A}"
 EndProject

@@ -1,6 +1,6 @@
 ﻿using RecipeManager.Api.Shared.Endpoint;
 
-namespace RecipeManager.API.Features.Units;
+namespace RecipeManager.Api.Features.Units;
 
 public class UnitsGroup : IGroupEndpoint
 {

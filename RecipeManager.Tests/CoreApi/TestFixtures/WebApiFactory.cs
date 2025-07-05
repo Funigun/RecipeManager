@@ -3,8 +3,8 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using RecipeManager.API;
-using RecipeManager.API.Persistance;
+using RecipeManager.Api;
+using RecipeManager.Api.Persistance;
 using RecipeManager.Integration.Tests.Common.Users;
 
 namespace RecipeManager.Integration.Tests.CoreApi.TestFixtures;

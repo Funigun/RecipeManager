@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using RecipeManager.API.Application.Abstractions;
+using RecipeManager.Api.Application.Abstractions;
 
-namespace RecipeManager.API.Persistance;
+namespace RecipeManager.Api.Persistance;
 
 public static class DependencyInjection
 {

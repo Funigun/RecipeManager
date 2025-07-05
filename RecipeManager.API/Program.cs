@@ -1,7 +1,7 @@
 using System.Reflection;
 using FluentValidation;
-using RecipeManager.API.Persistance;
-using RecipeManager.API.Presentation;
+using RecipeManager.Api.Persistance;
+using RecipeManager.Api.Presentation;
 using RecipeManager.Api.Shared;
 using RecipeManager.ServiceDefaults;
 using Scalar.AspNetCore;
@@ -89,7 +89,7 @@ finally
     await Log.CloseAndFlushAsync();
 }
 
-namespace RecipeManager.API
+namespace RecipeManager.Api
 {
     public abstract partial class Program
     {

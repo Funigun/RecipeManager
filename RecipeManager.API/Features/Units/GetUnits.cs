@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http.HttpResults;
 using RecipeManager.Api.Shared.Endpoint;
 
-namespace RecipeManager.API.Features.Units;
+namespace RecipeManager.Api.Features.Units;
 
 public static class GetUnits
 {

@@ -1,6 +1,6 @@
-﻿using RecipeManager.API.Domain.Common.Abstractions;
+﻿using RecipeManager.Api.Domain.Common.Abstractions;
 
-namespace RecipeManager.API.Domain.Units;
+namespace RecipeManager.Api.Domain.Units;
 
 public class UnitDomainValidator : IDomainModelValidator<Unit>
 {

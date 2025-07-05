@@ -1,8 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using RecipeManager.Identity.API.Domain;
+using RecipeManager.Identity.Api.Domain;
 using RecipeManager.Shared.Contracts.Authorization;
 
-namespace RecipeManager.Identity.API.Persistance;
+namespace RecipeManager.Identity.Api.Persistance;
 
 public class DatabaseService(AppDbContext dbContext)
 {

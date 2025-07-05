@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using RecipeManager.API.Persistance;
+using RecipeManager.Api.Persistance;
 using RecipeManager.Integration.Tests.Common.Users;
 
 namespace RecipeManager.Integration.Tests.CoreApi.TestFixtures;

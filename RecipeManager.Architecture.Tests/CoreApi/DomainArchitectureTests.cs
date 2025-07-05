@@ -1,6 +1,6 @@
 ﻿using System.Reflection;
 using NetArchTest.Rules;
-using RecipeManager.API.Domain.Common.Abstractions;
+using RecipeManager.Api.Domain.Common.Abstractions;
 using TestResult = NetArchTest.Rules.TestResult;
 
 namespace RecipeManager.Architecture.Tests.CoreApi;

@@ -1,4 +1,4 @@
-﻿namespace RecipeManager.API.Domain.Common.Abstractions;
+﻿namespace RecipeManager.Api.Domain.Common.Abstractions;
 
 public abstract class AuditableEntity
 {

@@ -1,6 +1,6 @@
 ﻿using RecipeManager.Api.Shared.Endpoint;
 
-namespace RecipeManager.Identity.API.Features.Account;
+namespace RecipeManager.Identity.Api.Features.Account;
 
 public class AccountGroup : IGroupEndpoint
 {

@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace RecipeManager.API.Persistance.Migrations
+namespace RecipeManager.Api.Persistance.Migrations
 {
     /// <inheritdoc />
     public partial class Init_units : Migration

@@ -1,13 +1,13 @@
 ﻿using System.Reflection;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
-using RecipeManager.API.Application.Abstractions;
-using RecipeManager.API.Domain.Common.Abstractions;
-using RecipeManager.API.Domain.Units;
-using RecipeManager.API.Persistance.Configuration.Id;
+using RecipeManager.Api.Application.Abstractions;
+using RecipeManager.Api.Domain.Common.Abstractions;
+using RecipeManager.Api.Domain.Units;
+using RecipeManager.Api.Persistance.Configuration.Id;
 using RecipeManager.Api.Shared.Contracts.Authorization;
 
-namespace RecipeManager.API.Persistance;
+namespace RecipeManager.Api.Persistance;
 
 public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(options), IAppDbContext
 {

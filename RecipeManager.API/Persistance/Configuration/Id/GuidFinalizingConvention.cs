@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.EntityFrameworkCore.Metadata.Conventions;
 
-namespace RecipeManager.API.Persistance.Configuration.Id;
+namespace RecipeManager.Api.Persistance.Configuration.Id;
 
 public class GuidFinalizingConvention : IModelFinalizingConvention
 {

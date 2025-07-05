@@ -1,6 +1,6 @@
 ﻿using RecipeManager.Api.Shared.Contracts.Exceptions;
 
-namespace RecipeManager.Identity.API.Common.Exceptions;
+namespace RecipeManager.Identity.Api.Common.Exceptions;
 
 public class IdentityValidationException : ApplicationValidationException
 {

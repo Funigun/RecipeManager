@@ -3,11 +3,11 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using RecipeManager.Identity.API.Domain;
-using RecipeManager.Identity.API.Persistance;
+using RecipeManager.Identity.Api.Domain;
+using RecipeManager.Identity.Api.Persistance;
 using Scalar.AspNetCore;
 
-namespace RecipeManager.Identity.API.Presentation;
+namespace RecipeManager.Identity.Api.Presentation;
 
 internal static class DependencyInjection
 {

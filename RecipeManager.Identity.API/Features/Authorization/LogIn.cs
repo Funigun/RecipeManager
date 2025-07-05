@@ -7,9 +7,9 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using RecipeManager.Api.Shared.Endpoint;
-using RecipeManager.Identity.API.Domain;
+using RecipeManager.Identity.Api.Domain;
 
-namespace RecipeManager.Identity.API.Features.Authorization;
+namespace RecipeManager.Identity.Api.Features.Authorization;
 
 public static class LogIn
 {

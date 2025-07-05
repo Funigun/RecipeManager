@@ -1,8 +1,8 @@
 ﻿using FluentValidation.TestHelper;
 using Microsoft.AspNetCore.Identity;
 using Moq;
-using RecipeManager.Identity.API.Domain;
-using RecipeManager.Identity.API.Features.Account;
+using RecipeManager.Identity.Api.Domain;
+using RecipeManager.Identity.Api.Features.Account;
 
 namespace RecipeManager.Unit.Tests.IdentityApi;
 

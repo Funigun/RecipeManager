@@ -2,8 +2,8 @@
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using RecipeManager.API.Application.Abstractions;
-using RecipeManager.API.Persistance;
+using RecipeManager.Api.Application.Abstractions;
+using RecipeManager.Api.Persistance;
 using RecipeManager.Api.Shared;
 
 namespace RecipeManager.Architecture.Tests.CoreApi.TestFixtures;

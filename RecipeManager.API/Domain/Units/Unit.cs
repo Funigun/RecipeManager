@@ -1,7 +1,7 @@
-﻿using RecipeManager.API.Domain.Common.Abstractions;
-using RecipeManager.API.Domain.Units.Enums;
+﻿using RecipeManager.Api.Domain.Common.Abstractions;
+using RecipeManager.Api.Domain.Units.Enums;
 
-namespace RecipeManager.API.Domain.Units;
+namespace RecipeManager.Api.Domain.Units;
 
 public sealed class Unit : AuditableEntity, IEntity<UnitId>
 {

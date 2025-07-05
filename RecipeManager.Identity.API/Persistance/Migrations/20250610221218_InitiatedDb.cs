@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace RecipeManager.Identity.API.Persistance.Migrations
+namespace RecipeManager.Identity.Api.Persistance.Migrations
 {
     /// <inheritdoc />
     public partial class InitiatedDb : Migration

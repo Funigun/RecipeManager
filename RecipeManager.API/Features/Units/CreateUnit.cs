@@ -1,15 +1,15 @@
 ﻿using FluentValidation;
 using Microsoft.AspNetCore.Http.HttpResults;
-using RecipeManager.API.Application.Abstractions;
-using RecipeManager.API.Domain.Units;
-using RecipeManager.API.Domain.Units.Enums;
+using RecipeManager.Api.Application.Abstractions;
+using RecipeManager.Api.Domain.Units;
+using RecipeManager.Api.Domain.Units.Enums;
 using RecipeManager.Api.Shared.Contracts.Authorization;
 using RecipeManager.Api.Shared.Endpoint;
 using RecipeManager.Shared.Contracts.Authorization;
 using RecipeManager.Shared.Contracts.Units;
 using Microsoft.EntityFrameworkCore;
 
-namespace RecipeManager.API.Features.Units;
+namespace RecipeManager.Api.Features.Units;
 
 public static class CreateUnit
 {

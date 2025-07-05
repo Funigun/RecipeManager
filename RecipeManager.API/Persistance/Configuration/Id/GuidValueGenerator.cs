@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.ValueGeneration;
 
-namespace RecipeManager.API.Persistance.Configuration.Id;
+namespace RecipeManager.Api.Persistance.Configuration.Id;
 
 public class GuidValueGenerator : ValueGenerator<Guid>
 {

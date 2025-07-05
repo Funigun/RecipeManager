@@ -1,6 +1,6 @@
-﻿using RecipeManager.API.Domain.Units;
-using RecipeManager.API.Domain.Units.Enums;
-using RecipeManager.API.Persistance;
+﻿using RecipeManager.Api.Domain.Units;
+using RecipeManager.Api.Domain.Units.Enums;
+using RecipeManager.Api.Persistance;
 
 namespace RecipeManager.Integration.Tests.CoreApi.TestFixtures;
 

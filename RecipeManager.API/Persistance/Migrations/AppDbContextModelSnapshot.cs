@@ -4,11 +4,11 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using RecipeManager.API.Persistance;
+using RecipeManager.Api.Persistance;
 
 #nullable disable
 
-namespace RecipeManager.API.Persistance.Migrations
+namespace RecipeManager.Api.Persistance.Migrations
 {
     [DbContext(typeof(AppDbContext))]
     partial class AppDbContextModelSnapshot : ModelSnapshot
@@ -22,7 +22,7 @@ namespace RecipeManager.API.Persistance.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("RecipeManager.API.Domain.Units.Unit", b =>
+            modelBuilder.Entity("RecipeManager.Api.Domain.Units.Unit", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()

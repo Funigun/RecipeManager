@@ -3,12 +3,12 @@ using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using RecipeManager.Api.Shared.Endpoint;
-using RecipeManager.Identity.API.Common.Exceptions;
-using RecipeManager.Identity.API.Domain;
+using RecipeManager.Identity.Api.Common.Exceptions;
+using RecipeManager.Identity.Api.Domain;
 using RecipeManager.Shared.Contracts.Authorization;
 using RecipeManager.Shared.Contracts.User.Registration;
 
-namespace RecipeManager.Identity.API.Features.Account;
+namespace RecipeManager.Identity.Api.Features.Account;
 
 public static class UserRegistration
 {

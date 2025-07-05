@@ -1,8 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
-using RecipeManager.API.Domain.Units;
+using RecipeManager.Api.Domain.Units;
 
-namespace RecipeManager.API.Application.Abstractions;
+namespace RecipeManager.Api.Application.Abstractions;
 
 public interface IAppDbContext
 {

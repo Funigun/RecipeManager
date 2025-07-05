@@ -1,4 +1,4 @@
-﻿namespace RecipeManager.API.Domain.Units.Enums;
+﻿namespace RecipeManager.Api.Domain.Units.Enums;
 
 public static class UnitGroupExtensions
 {

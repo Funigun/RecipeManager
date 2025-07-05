@@ -1,8 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using RecipeManager.API.Domain.Units;
+using RecipeManager.Api.Domain.Units;
 
-namespace RecipeManager.API.Persistance.Configuration;
+namespace RecipeManager.Api.Persistance.Configuration;
 
 public class UnitsConfiguration : IEntityTypeConfiguration<Unit>
 {

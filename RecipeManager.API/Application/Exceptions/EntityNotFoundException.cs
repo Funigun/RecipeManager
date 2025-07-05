@@ -1,7 +1,7 @@
-﻿using RecipeManager.API.Domain.Common.Abstractions;
+﻿using RecipeManager.Api.Domain.Common.Abstractions;
 using RecipeManager.Api.Shared.Contracts.Exceptions;
 
-namespace RecipeManager.API.Application.Exceptions;
+namespace RecipeManager.Api.Application.Exceptions;
 
 public sealed class EntityNotFoundException<TEntity, TId> : NotFoundException
               where TEntity : class, IEntity<TId>

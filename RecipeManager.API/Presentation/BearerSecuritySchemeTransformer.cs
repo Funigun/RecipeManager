@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.OpenApi;
 using Microsoft.OpenApi.Models;
 
-namespace RecipeManager.API.Presentation;
+namespace RecipeManager.Api.Presentation;
 
 internal sealed class BearerSecuritySchemeTransformer : IOpenApiDocumentTransformer
 {

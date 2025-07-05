@@ -28,7 +28,7 @@
 	</ItemGroup>
 	
 	<!-- Web API Exclusive -->
-	<ItemGroup Condition="'$(MSBuildProjectName.EndsWith(`API`))'">
+	<ItemGroup Condition="'$(MSBuildProjectName.EndsWith(`Api`))'">
 		<PackageReference Include="Scalar.AspNetCore" />
 		<PackageReference Include="Microsoft.AspNetCore.OpenApi" />
 		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" />

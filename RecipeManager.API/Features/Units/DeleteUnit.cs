@@ -2,12 +2,12 @@
 using Microsoft.AspNetCore.Http.HttpResults;
 using RecipeManager.Api.Shared.Contracts.Authorization;
 using RecipeManager.Api.Shared.Endpoint;
-using RecipeManager.API.Application.Abstractions;
-using RecipeManager.API.Application.Exceptions;
-using RecipeManager.API.Domain.Units;
+using RecipeManager.Api.Application.Abstractions;
+using RecipeManager.Api.Application.Exceptions;
+using RecipeManager.Api.Domain.Units;
 using RecipeManager.Shared.Contracts.Authorization;
 
-namespace RecipeManager.API.Features.Units;
+namespace RecipeManager.Api.Features.Units;
 
 public static class DeleteUnit
 {

@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Scalar.AspNetCore;
 
-namespace RecipeManager.API.Presentation;
+namespace RecipeManager.Api.Presentation;
 
 internal static class DependencyInjection
 {
