@@ -1,24 +1,45 @@
-﻿using Microsoft.AspNetCore.Http.HttpResults;
+﻿using FluentValidation;
+using Microsoft.AspNetCore.Http.HttpResults;
+using RecipeManager.Api.Shared.Contracts.Authorization;
 using RecipeManager.Api.Shared.Endpoint;
+using RecipeManager.API.Application.Abstractions;
+using RecipeManager.API.Application.Exceptions;
+using RecipeManager.API.Domain.Units;
+using RecipeManager.Shared.Contracts.Authorization;
 
 namespace RecipeManager.API.Features.Units;
 
 public static class DeleteUnit
 {
+    public sealed record Request(UnitId UnitId);
+
+    public sealed class AuthorizationPolicy(ICurrentUser currentUser) : IAuthorizationPolicy<Request>
+    {
+        public Task<bool> IsAuthorized(Request request)
+        {
+            return Task.FromResult(currentUser.HasRole(UserRoles.Admin));
+        }
+    }
+
     [GroupEndpoint("Units")]
     public class Enpoint : IEndpoint
     {
         public void MapEndpoint(IEndpointRouteBuilder endpoints)
         {
-            endpoints.MapDelete("", Handler)
+            endpoints.MapStandardAuthenticatedDelete<Request>(string.Empty, Handler)
                      .WithName("DeleteMeasurementUnit")
                      .WithDescription("Deletes a measurement unit");
         }
     }
 
-    internal static async Task<Results<Ok<string>, NotFound>> Handler()
+    internal static async Task<Results<NoContent, NotFound>> Handler(Request request, IAppDbContext dbContext, CancellationToken cancellationToken)
     {
-        // Logic for changing the password goes here
-        return TypedResults.Ok("Measurement unit deleted succesfully");
+        Unit? unit = await dbContext.Units.FindAsync([request.UnitId], cancellationToken) ?? throw new EntityNotFoundException<Unit, UnitId>(request.UnitId);
+
+        dbContext.Units.Remove(unit);
+
+        await dbContext.SaveChangesAsync(cancellationToken);
+
+        return TypedResults.NoContent();
     }
 }
