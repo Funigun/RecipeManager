@@ -1,5 +1,5 @@
 ﻿using FluentValidation;
-using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.EntityFrameworkCore;
 using RecipeManager.Api.Application.Abstractions;
 using RecipeManager.Api.Domain.Units;
 using RecipeManager.Api.Domain.Units.Enums;
@@ -7,7 +7,6 @@ using RecipeManager.Api.Shared.Contracts.Authorization;
 using RecipeManager.Api.Shared.Endpoint;
 using RecipeManager.Shared.Contracts.Authorization;
 using RecipeManager.Shared.Contracts.Units;
-using Microsoft.EntityFrameworkCore;
 
 namespace RecipeManager.Api.Features.Units;
 
@@ -42,8 +41,6 @@ public static class CreateUnit
                 .Must(group => group.IsUnitGroup())
                     .WithMessage("Invalid unit group")
                     .WithName("Unit Group");
-
-
         }
     }
 
@@ -66,7 +63,7 @@ public static class CreateUnit
         }
     }
 
-    public static async Task<Results<Ok<Response>, NotFound>> Handler(Request request, IAppDbContext dbContext, CancellationToken cancellationToken)
+    public static async Task<IResult> Handler(Request request, IAppDbContext dbContext, CancellationToken cancellationToken)
     {
         Unit unit = request.ToUnit();
 
@@ -74,7 +71,7 @@ public static class CreateUnit
 
         await dbContext.SaveChangesAsync(cancellationToken);
 
-        return TypedResults.Ok(unit.ToResponse());
+        return Results.Created($"/api/units/{unit.Id}", unit.ToResponse());
     }
 
     private static Unit ToUnit(this Request request)

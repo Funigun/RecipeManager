@@ -1,30 +1,11 @@
-﻿namespace RecipeManager.Integration.Tests.CoreApi.TestFixtures;
+﻿using System.Text.Json;
 
-public class BaseIntegrationTest : IAsyncLifetime
+namespace RecipeManager.Integration.Tests.CoreApi.TestFixtures;
+
+public abstract class BaseIntegrationTest
 {
-    protected DbContainerFactory DockerServicesFactory { get; private set; }
-
-    protected WebApiFactory WebApiFactory { get; private set; }
-
-    protected HttpClient HttpClient { get; private set; }
-
-    protected BaseIntegrationTest(DbContainerFactory dockerServicesFactory)
+    protected JsonSerializerOptions JsonOptions { get; private set; } = new()
     {
-        DockerServicesFactory = dockerServicesFactory;
-        WebApiFactory = new WebApiFactory(DockerServicesFactory.GetConnectionString());
-        HttpClient = WebApiFactory.CreateClient();
-    }
-
-    public async ValueTask InitializeAsync()
-    {
-
-    }
-
-    public async ValueTask DisposeAsync()
-    {
-        HttpClient?.Dispose();
-        WebApiFactory?.Dispose();
-
-        await ValueTask.CompletedTask;
-    }
+        PropertyNameCaseInsensitive = true
+    };
 }

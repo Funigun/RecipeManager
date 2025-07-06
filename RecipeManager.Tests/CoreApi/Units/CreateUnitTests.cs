@@ -1,5 +1,7 @@
 ﻿using System.Net.Http.Headers;
-using System.Net.Http.Json;
+using System.Text;
+using System.Text.Json;
+using RecipeManager.Api.Features.Units;
 using RecipeManager.Integration.Tests.Common.Users;
 using RecipeManager.Integration.Tests.CoreApi.TestFixtures;
 
@@ -8,8 +10,11 @@ namespace RecipeManager.Integration.Tests.CoreApi.Units;
 [Trait("Core.Api", "Units")]
 public sealed class CreateUnitTests : BaseIntegrationTest
 {
-    public CreateUnitTests(DbContainerFactory dockerServicesFactory) : base(dockerServicesFactory)
+    private HttpClient HttpClient { get; }
+
+    public CreateUnitTests(WebApiFactory apiFactory)
     {
+        HttpClient = apiFactory.CreateClient();
     }
 
     [Fact]
@@ -18,15 +23,11 @@ public sealed class CreateUnitTests : BaseIntegrationTest
         // Arrange
         HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", TokenMockFactory.GenerateJwtToken(UserMockFactory.CreateMockedUser()));
 
-        var createUnitRequest = new
-        {
-            Name = "Test Unit",
-            ShortName = "TU",
-            Group = 1
-        };
+        CreateUnit.Request createUnitRequest = new("Valid Unit", "VA", 0);
+        StringContent content = new(JsonSerializer.Serialize(createUnitRequest), Encoding.UTF8, "application/json");
 
         // Act
-        HttpResponseMessage response = await HttpClient.PostAsJsonAsync("/api/units", createUnitRequest, CancellationToken.None);
+        HttpResponseMessage response = await HttpClient.PostAsync("/api/units", content, CancellationToken.None);
 
         // Assert
         Assert.Equal(System.Net.HttpStatusCode.Forbidden, response.StatusCode);
@@ -43,17 +44,35 @@ public sealed class CreateUnitTests : BaseIntegrationTest
         // Arrange
         HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", TokenMockFactory.GenerateJwtToken(UserMockFactory.CreateMockedAdmin()));
 
-        var createUnitRequest = new
-        {
-            Name = unitName,
-            ShortName = shortName,
-            Group = group
-        };
+        CreateUnit.Request createUnitRequest = new(unitName, shortName, group);
+        StringContent content = new(JsonSerializer.Serialize(createUnitRequest), Encoding.UTF8, "application/json");
 
         // Act
-        HttpResponseMessage response = await HttpClient.PostAsJsonAsync("/api/units", createUnitRequest, CancellationToken.None);
+        HttpResponseMessage response = await HttpClient.PostAsync("/api/units", content, CancellationToken.None);
 
         // Assert
         Assert.Equal(System.Net.HttpStatusCode.BadRequest, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task CreateUnit_ShouldReturn_UnitId_ForValidInput()
+    {
+        // Arrange
+        HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", TokenMockFactory.GenerateJwtToken(UserMockFactory.CreateMockedAdmin()));
+
+        CreateUnit.Request createUnitRequest = new("Valid Unit", "VA", 0);
+        StringContent content = new(JsonSerializer.Serialize(createUnitRequest), Encoding.UTF8, "application/json");
+
+        // Act
+        HttpResponseMessage response = await HttpClient.PostAsync("/api/units", content, CancellationToken.None);
+        string responseContent = await response.Content.ReadAsStringAsync(CancellationToken.None);
+        CreateUnit.Response? unitId = JsonSerializer.Deserialize<CreateUnit.Response?>(responseContent, JsonOptions);
+
+        // Assert
+        response.EnsureSuccessStatusCode();
+        Assert.NotNull(unitId);
+        Assert.Equal(System.Net.HttpStatusCode.Created, response.StatusCode);
+        Assert.NotNull(response.Headers.Location);
+        Assert.Contains($"/api/units/{unitId.Id}", response.Headers.Location!.ToString(), StringComparison.OrdinalIgnoreCase);
     }
 }

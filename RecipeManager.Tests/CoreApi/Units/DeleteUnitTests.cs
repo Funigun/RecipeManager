@@ -1,5 +1,7 @@
 ﻿using System.Net.Http.Headers;
-using System.Net.Http.Json;
+using System.Text;
+using System.Text.Json;
+using RecipeManager.Api.Features.Units;
 using RecipeManager.Integration.Tests.Common.Users;
 using RecipeManager.Integration.Tests.CoreApi.TestFixtures;
 
@@ -8,8 +10,11 @@ namespace RecipeManager.Integration.Tests.CoreApi.Units;
 [Trait("Core.Api", "Units")]
 public sealed class DeleteUnitTests : BaseIntegrationTest
 {
-    public DeleteUnitTests(DbContainerFactory dbContainerFactory) : base(dbContainerFactory)
+    private HttpClient HttpClient { get; }
+
+    public DeleteUnitTests(WebApiFactory apiFactory) : base()
     {
+        HttpClient = apiFactory.CreateClient();
     }
 
     [Fact]
@@ -45,20 +50,18 @@ public sealed class DeleteUnitTests : BaseIntegrationTest
     {
         // Arrange
         HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", TokenMockFactory.GenerateJwtToken(UserMockFactory.CreateMockedAdmin()));
-        Guid guid = Guid.CreateVersion7();
 
-        // Create a unit to delete
-        var createUnitRequest = new
-        {
-            Name = "Test Unit",
-            ShortName = "TU",
-            Group = 1
-        };
-        HttpResponseMessage createResponse = await HttpClient.PostAsJsonAsync("/api/units", createUnitRequest, CancellationToken.None);
-        Assert.Equal(System.Net.HttpStatusCode.Created, createResponse.StatusCode);
+        CreateUnit.Request createUnitRequest = new("Valid Unit 2", "VA 2", 0);
+        StringContent content = new(JsonSerializer.Serialize(createUnitRequest), Encoding.UTF8, "application/json");
+
+        HttpResponseMessage response = await HttpClient.PostAsync("/api/units", content, CancellationToken.None);
+        Assert.Equal(System.Net.HttpStatusCode.Created, response.StatusCode);
+
+        string responseContent = await response.Content.ReadAsStringAsync(CancellationToken.None);
+        CreateUnit.Response? unitId = JsonSerializer.Deserialize<CreateUnit.Response?>(responseContent, JsonOptions);
 
         // Act
-        HttpResponseMessage deleteResponse = await HttpClient.DeleteAsync($"/api/units/{guid}", CancellationToken.None);
+        HttpResponseMessage deleteResponse = await HttpClient.DeleteAsync($"/api/units/{unitId!.Id.Value}", CancellationToken.None);
 
         // Assert
         Assert.Equal(System.Net.HttpStatusCode.NoContent, deleteResponse.StatusCode);

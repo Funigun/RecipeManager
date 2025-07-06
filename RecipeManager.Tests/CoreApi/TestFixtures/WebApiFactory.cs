@@ -1,16 +1,31 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+﻿using DotNet.Testcontainers.Builders;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using RecipeManager.Api;
 using RecipeManager.Api.Persistance;
+using RecipeManager.Api.Presentation;
 using RecipeManager.Integration.Tests.Common.Users;
+using RecipeManager.Integration.Tests.CoreApi.TestFixtures;
+using Testcontainers.MsSql;
+
+[assembly: AssemblyFixture(typeof(WebApiFactory))]
 
 namespace RecipeManager.Integration.Tests.CoreApi.TestFixtures;
 
-public class WebApiFactory(string connectionString) : WebApplicationFactory<Program>
+public sealed class WebApiFactory : WebApplicationFactory<IAssemblyMarker>, IAsyncLifetime
 {
+    private readonly MsSqlContainer _sqlContainer = new MsSqlBuilder().WithImage("mcr.microsoft.com/mssql/server:2022-latest")
+                                                                      .WithPassword("Str0ng_P@ssw0rd4Tests")
+                                                                      .WithPortBinding(1433)
+                                                                      .WithEnvironment("ACCEPT_EULA", "Y")
+                                                                      .WithName("MealsManagerTestDb")
+                                                                      .WithWaitStrategy(Wait.ForUnixContainer().UntilPortIsAvailable(1433))
+                                                                      .Build();
+
+    private AppDbContext _dbContext = default!;
+
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
         builder.ConfigureServices(services =>
@@ -22,7 +37,12 @@ public class WebApiFactory(string connectionString) : WebApplicationFactory<Prog
                 services.Remove(descriptor);
             }
 
-            services.AddDbContext<AppDbContext>(options => options.UseSqlServer(connectionString));
+            services.AddDbContext<AppDbContext>(options =>
+            {
+                options.UseSqlServer(_sqlContainer.GetConnectionString());
+                options.EnableDetailedErrors();
+                options.EnableSensitiveDataLogging();
+            });
 
             services.Configure<JwtBearerOptions>(JwtBearerDefaults.AuthenticationScheme, options =>
             {
@@ -33,5 +53,26 @@ public class WebApiFactory(string connectionString) : WebApplicationFactory<Prog
             });
         })
         .UseEnvironment("Development");
+    }
+
+    async ValueTask IAsyncLifetime.InitializeAsync()
+    {
+        await _sqlContainer.StartAsync();
+
+        DbContextOptions<AppDbContext> options = new DbContextOptionsBuilder<AppDbContext>()
+                                                 .UseSqlServer(_sqlContainer.GetConnectionString())
+                                                 .Options;
+
+        _dbContext = new(options, UserMockFactory.CreateMockedAdmin());
+
+        await _dbContext.Database.MigrateAsync();
+        await _dbContext.SeedAsync();
+    }
+
+    public new async Task DisposeAsync()
+    {
+        await _dbContext.DisposeAsync();
+        await _sqlContainer.StopAsync();
+        await base.DisposeAsync();
     }
 }
