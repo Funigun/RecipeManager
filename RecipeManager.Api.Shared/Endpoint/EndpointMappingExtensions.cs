@@ -50,7 +50,8 @@ public static class EndpointMappingExtensions
         RouteHandlerBuilder routeHandler = builder.MapGet(pattern, handler)
                                                   .Produces<TResponse>(StatusCodes.Status200OK)
                                                   .ProducesProblem(StatusCodes.Status404NotFound)
-                                                  .ProducesProblem(StatusCodes.Status500InternalServerError);
+                                                  .ProducesProblem(StatusCodes.Status500InternalServerError)
+                                                  .WithMetadata(typeof(TResponse).DeclaringType!);
 
         return routeHandler;
     }
