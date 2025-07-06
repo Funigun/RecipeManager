@@ -79,7 +79,7 @@ public static class EndpointMappingExtensions
                       .WithValidationFilter<TRequest>();
     }
 
-    public static RouteHandlerBuilder MaptandardAuthenticatedPut<TRequest>(this IEndpointRouteBuilder builder, string pattern, Delegate handler)
+    public static RouteHandlerBuilder MapStandardAuthenticatedPut<TRequest>(this IEndpointRouteBuilder builder, string pattern, Delegate handler)
     {
         return builder.MapStandardPut<TRequest>(pattern, handler)
                       .WithAuthenticationFilter<TRequest>()

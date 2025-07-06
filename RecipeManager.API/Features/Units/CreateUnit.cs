@@ -53,7 +53,7 @@ public static class CreateUnit
     }
 
     [GroupEndpoint("Units")]
-    public class Enpoint : IEndpoint
+    public sealed class Enpoint : IEndpoint
     {
         public void MapEndpoint(IEndpointRouteBuilder endpoints)
         {

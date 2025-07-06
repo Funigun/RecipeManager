@@ -10,11 +10,8 @@ namespace RecipeManager.Integration.Tests.CoreApi.Units;
 [Trait("Core.Api", "Units")]
 public sealed class CreateUnitTests : BaseIntegrationTest
 {
-    private HttpClient HttpClient { get; }
-
-    public CreateUnitTests(WebApiFactory apiFactory)
+    public CreateUnitTests(WebApiFactory apiFactory) : base(apiFactory)
     {
-        HttpClient = apiFactory.CreateClient();
     }
 
     [Fact]

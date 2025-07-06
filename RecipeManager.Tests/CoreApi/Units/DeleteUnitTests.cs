@@ -1,7 +1,4 @@
 ﻿using System.Net.Http.Headers;
-using System.Text;
-using System.Text.Json;
-using RecipeManager.Api.Features.Units;
 using RecipeManager.Integration.Tests.Common.Users;
 using RecipeManager.Integration.Tests.CoreApi.TestFixtures;
 
@@ -10,11 +7,8 @@ namespace RecipeManager.Integration.Tests.CoreApi.Units;
 [Trait("Core.Api", "Units")]
 public sealed class DeleteUnitTests : BaseIntegrationTest
 {
-    private HttpClient HttpClient { get; }
-
-    public DeleteUnitTests(WebApiFactory apiFactory) : base()
+    public DeleteUnitTests(WebApiFactory apiFactory) : base(apiFactory)
     {
-        HttpClient = apiFactory.CreateClient();
     }
 
     [Fact]
@@ -51,17 +45,10 @@ public sealed class DeleteUnitTests : BaseIntegrationTest
         // Arrange
         HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", TokenMockFactory.GenerateJwtToken(UserMockFactory.CreateMockedAdmin()));
 
-        CreateUnit.Request createUnitRequest = new("Valid Unit 2", "VA 2", 0);
-        StringContent content = new(JsonSerializer.Serialize(createUnitRequest), Encoding.UTF8, "application/json");
-
-        HttpResponseMessage response = await HttpClient.PostAsync("/api/units", content, CancellationToken.None);
-        Assert.Equal(System.Net.HttpStatusCode.Created, response.StatusCode);
-
-        string responseContent = await response.Content.ReadAsStringAsync(CancellationToken.None);
-        CreateUnit.Response? unitId = JsonSerializer.Deserialize<CreateUnit.Response?>(responseContent, JsonOptions);
+        Guid unitId = DbContext.Units.Select(unit => unit.Id).First();
 
         // Act
-        HttpResponseMessage deleteResponse = await HttpClient.DeleteAsync($"/api/units/{unitId!.Id.Value}", CancellationToken.None);
+        HttpResponseMessage deleteResponse = await HttpClient.DeleteAsync($"/api/units/{unitId}", CancellationToken.None);
 
         // Assert
         Assert.Equal(System.Net.HttpStatusCode.NoContent, deleteResponse.StatusCode);

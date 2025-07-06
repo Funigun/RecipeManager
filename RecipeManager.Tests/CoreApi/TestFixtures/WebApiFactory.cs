@@ -24,7 +24,9 @@ public sealed class WebApiFactory : WebApplicationFactory<IAssemblyMarker>, IAsy
                                                                       .WithWaitStrategy(Wait.ForUnixContainer().UntilPortIsAvailable(1433))
                                                                       .Build();
 
-    private AppDbContext _dbContext = default!;
+    public AppDbContext DbContext { get; private set; } = default!;
+
+    public HttpClient HttpClient { get; private set; } = default!;
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
@@ -55,6 +57,8 @@ public sealed class WebApiFactory : WebApplicationFactory<IAssemblyMarker>, IAsy
         .UseEnvironment("Development");
     }
 
+    public string ConnectionString => _sqlContainer.GetConnectionString();
+
     async ValueTask IAsyncLifetime.InitializeAsync()
     {
         await _sqlContainer.StartAsync();
@@ -63,16 +67,19 @@ public sealed class WebApiFactory : WebApplicationFactory<IAssemblyMarker>, IAsy
                                                  .UseSqlServer(_sqlContainer.GetConnectionString())
                                                  .Options;
 
-        _dbContext = new(options, UserMockFactory.CreateMockedAdmin());
+        DbContext = new(options, UserMockFactory.CreateMockedAdmin());
 
-        await _dbContext.Database.MigrateAsync();
-        await _dbContext.SeedAsync();
+        await DbContext.Database.MigrateAsync();
+        await DbContext.SeedAsync();
+
+        HttpClient = CreateClient();
     }
 
     public new async Task DisposeAsync()
     {
-        await _dbContext.DisposeAsync();
+        await DbContext.DisposeAsync();
         await _sqlContainer.StopAsync();
+        await _sqlContainer.DisposeAsync();
         await base.DisposeAsync();
     }
 }
