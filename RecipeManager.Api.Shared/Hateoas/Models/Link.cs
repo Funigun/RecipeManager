@@ -8,6 +8,11 @@ public sealed class Link
 
     public string Method { get; init; }
 
+    public Link()
+    {
+
+    }
+
     private Link(string href, string rel, string method)
     {
         Href = href;

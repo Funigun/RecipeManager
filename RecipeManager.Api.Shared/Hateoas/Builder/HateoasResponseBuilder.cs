@@ -3,7 +3,7 @@ using RecipeManager.Api.Shared.Hateoas.Models;
 
 namespace RecipeManager.Api.Shared.Hateoas.Builder;
 
-public sealed class HateoasResponseBuilder<TItem>(TItem item, HateoasLinkService linkService) : HateoasBuilder(linkService), IHateoasResponseBuilder
+public sealed class HateoasResponseBuilder<TItem>(TItem item, HateoasLinkService linkService) : HateoasBuilder<TItem>(linkService), IHateoasResponseBuilder
 {
     private readonly TItem _item = item;
     private readonly List<Link> _links = [];

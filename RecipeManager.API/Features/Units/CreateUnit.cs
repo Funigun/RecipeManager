@@ -71,7 +71,7 @@ public static class CreateUnit
 
         await dbContext.SaveChangesAsync(cancellationToken);
 
-        return Results.Created($"/api/units/{unit.Id}", unit.ToResponse());
+        return Results.Created($"/api/units/{unit.Id}", unit.ToPostResponse());
     }
 
     private static Unit ToUnit(this Request request)
@@ -79,7 +79,7 @@ public static class CreateUnit
         return Unit.Create(request.Name, request.ShortName, (UnitGroup)request.Group);
     }
 
-    private static Response ToResponse(this Unit unit)
+    private static Response ToPostResponse(this Unit unit)
     {
         return new Response(unit.Id);
     }
