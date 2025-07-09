@@ -1,0 +1,22 @@
+﻿@using RecipeManager.UI.Blazor.Brokers.HateoasModel
+@using RecipeManager.UI.Blazor.Features.Units.GetUnits
+@using RecipeManager.UI.Blazor.Features.Units.Services
+
+@page "/admin/measurement-units"
+
+@inject IUnitService UnitService
+
+<h3>Units</h3>
+
+<UnitListComponent Items="units" ShowLoadingBar=!unitsLoaded/>
+
+@code {
+    private HateoasCollectionResponse<UnitModel> units = new();
+    private bool unitsLoaded = false;
+
+    override protected async Task OnInitializedAsync()
+    {
+        units = await UnitService.GetUnits();
+        unitsLoaded = true;
+    }
+}

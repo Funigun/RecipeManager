@@ -1,7 +1,20 @@
-﻿namespace RecipeManager.UI.Blazor.Brokers;
+﻿using System.Net.Http.Headers;
+using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
+using RecipeManager.UI.Blazor.Features.Account.Login;
 
-public abstract class ApiBroker(HttpClient httpClient)
+namespace RecipeManager.UI.Blazor.Brokers;
+
+public abstract class ApiBroker(HttpClient httpClient, ProtectedLocalStorage localStorage)
 {
+    protected async Task AddAuthorizationHeader()
+    {
+        LoginResponse? sessionModel = (await localStorage.GetAsync<LoginResponse>("sessionState")).Value;
+
+        httpClient.DefaultRequestHeaders.Authorization = sessionModel is not null
+                                                       ? new AuthenticationHeaderValue("Bearer", sessionModel.Token)
+                                                       : null;
+    }
+
     protected async Task<HttpResponseMessage> Get(Uri requestUri)
     {
         return await httpClient.GetAsync(requestUri);

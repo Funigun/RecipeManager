@@ -1,0 +1,28 @@
+﻿@using MudBlazor
+@using RecipeManager.UI.Blazor.Brokers.HateoasModel
+
+<MudTable T="HateoasResponse<UnitModel>" Items="Items.Items" Loading="ShowLoadingBar" LoadingProgressColor="Color.Info">
+    <HeaderContent>
+        <MudTh>Name</MudTh>
+        <MudTh>Short Name</MudTh>
+        <MudTh>Group</MudTh>
+        <MudTh>Actions</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="Name">@context.Item.Name</MudTd>
+        <MudTd DataLabel="Short Name">@context.Item.ShortName</MudTd>
+        <MudTd DataLabel="Group">@context.Item.Group</MudTd>
+        <MudTd DataLabel="Actions">
+            <MudIconButton Variant="Variant.Filled" Color="Color.Primary" Size="Size.Small" Icon="@Icons.Material.Filled.Edit"></MudIconButton>
+            <MudIconButton Variant="Variant.Filled" Color="Color.Error" Size="Size.Small" Icon="@Icons.Material.Filled.Delete"></MudIconButton>
+        </MudTd>
+    </RowTemplate>
+</MudTable>
+
+@code {
+    [Parameter]
+    public HateoasCollectionResponse<UnitModel> Items { get; set; } = new();
+
+    [Parameter]
+    public bool ShowLoadingBar { get; set; } = true;
+}
