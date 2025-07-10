@@ -9,4 +9,9 @@ public class ApiResponseBody
     public IEnumerable<string> Errors { get; set; } = [];
 
     public Dictionary<string, IEnumerable<string>> ValidationErrors { get; init; } = [];
+
+    public IEnumerable<string> GetAllErrors()
+    {
+        return Errors.Concat(ValidationErrors.SelectMany(x => x.Value));
+    }
 }

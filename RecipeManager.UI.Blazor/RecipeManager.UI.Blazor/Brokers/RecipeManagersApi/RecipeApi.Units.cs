@@ -1,11 +1,14 @@
-﻿namespace RecipeManager.UI.Blazor.Brokers.RecipeManagersApi;
+﻿using RecipeManager.UI.Blazor.Features.Units.CreateUnit;
+
+namespace RecipeManager.UI.Blazor.Brokers.RecipeManagersApi;
 
 public sealed partial class RecipeApi
 {
-    public async Task<HttpResponseMessage> CreateUnit()
+    public async Task<HttpResponseMessage> CreateUnit(UnitForCreateModel unit)
     {
         await AddAuthorizationHeader();
-        return await Post(new Uri("api/units", UriKind.Relative), "");
+
+        return await Post(new Uri("api/units", UriKind.Relative), unit);
     }
 
     public async Task<HttpResponseMessage> GetUnits()

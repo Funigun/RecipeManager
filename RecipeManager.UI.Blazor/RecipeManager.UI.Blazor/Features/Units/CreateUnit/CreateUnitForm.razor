@@ -1,0 +1,36 @@
+﻿@using FluentValidation
+@using MudBlazor
+@using RecipeManager.UI.Blazor.Components.Common
+@using RecipeManager.UI.Blazor.Features.Units.Services
+
+@inject IUnitService UnitService
+
+<MudForm Model="@unitModel" Validation="@(validator.ValidateValue)" @bind-IsValid="@isSubmitEnabled">
+    <MudText Typo="Typo.h5" Class="mb-4">Create Unit</MudText>
+
+    <MudTextField Label="Name" For="@(() => unitModel.Name)" @bind-Value="unitModel.Name" Required="true" />
+
+    <MudTextField Label="Short Name" For="@(() => unitModel.ShortName)" @bind-Value="unitModel.ShortName" />
+
+    <MudTextField Label="Group" For="@(() => unitModel.Group)" @bind-Value="unitModel.Group" Required="true" />
+
+    <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="SubmitUnit" Class="mt-4" FullWidth>
+        Create Unit
+    </MudButton>
+
+    <CustomValidationSummary ErrorMessages="@errorMessages" />
+</MudForm>
+
+
+@code {
+    private readonly UnitForCreateModel unitModel = new();
+    private readonly UnitForCreateValidator validator = new();
+    private bool isSubmitEnabled = false;
+    private IEnumerable<string> errorMessages = [];
+
+    private async Task SubmitUnit()
+    {
+        await UnitService.CreateUnit(unitModel);
+        errorMessages = UnitService.ResponseBody.GetAllErrors();
+    }
+}

@@ -6,7 +6,7 @@ namespace RecipeManager.UI.Blazor.Services.Authentication;
 
 public interface IAuthenticationService
 {
-    public ApiResponseBody ResponseBody { get; }
+    ApiResponseBody ResponseBody { get; }
 
     Task<bool> Authenticate(LoginRequest loginRequest);
 

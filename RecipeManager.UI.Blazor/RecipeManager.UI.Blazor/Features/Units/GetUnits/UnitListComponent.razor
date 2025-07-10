@@ -1,6 +1,9 @@
 ﻿@using MudBlazor
 @using RecipeManager.UI.Blazor.Brokers.HateoasModel
 
+@inject ISnackbar Snackbar
+@inject NavigationManager NavigationManager
+
 <MudTable T="HateoasResponse<UnitModel>" Items="Items.Items" Loading="ShowLoadingBar" LoadingProgressColor="Color.Info">
     <HeaderContent>
         <MudTh>Name</MudTh>
@@ -13,8 +16,8 @@
         <MudTd DataLabel="Short Name">@context.Item.ShortName</MudTd>
         <MudTd DataLabel="Group">@context.Item.Group</MudTd>
         <MudTd DataLabel="Actions">
-            <MudIconButton Variant="Variant.Filled" Color="Color.Primary" Size="Size.Small" Icon="@Icons.Material.Filled.Edit"></MudIconButton>
-            <MudIconButton Variant="Variant.Filled" Color="Color.Error" Size="Size.Small" Icon="@Icons.Material.Filled.Delete"></MudIconButton>
+            <MudIconButton Variant="Variant.Filled" Color="Color.Primary" Size="Size.Small" Icon="@Icons.Material.Filled.Edit" OnClick="() => UpdateUnit(context)"></MudIconButton>
+            <MudIconButton Variant="Variant.Filled" Color="Color.Error" Size="Size.Small" Icon="@Icons.Material.Filled.Delete" OnClick="() => DeleteUnit(context)"></MudIconButton>
         </MudTd>
     </RowTemplate>
 </MudTable>
@@ -25,4 +28,22 @@
 
     [Parameter]
     public bool ShowLoadingBar { get; set; } = true;
+
+    private async Task DeleteUnit(HateoasResponse<UnitModel> selectedItem)
+    {
+        Snackbar.Add("Selected unit: " + selectedItem.Item.Name, Severity.Info);
+        await Task.Delay(1000);
+    }
+
+    private Task UpdateUnit(HateoasResponse<UnitModel> selectedItem)
+    {
+        string? updateLink = selectedItem.Links.FirstOrDefault(link => link.Rel == "update")?.Href;
+
+        if (updateLink is not null)
+        {
+            NavigationManager.NavigateTo(updateLink);
+        }
+
+        return Task.CompletedTask;
+    }
 }

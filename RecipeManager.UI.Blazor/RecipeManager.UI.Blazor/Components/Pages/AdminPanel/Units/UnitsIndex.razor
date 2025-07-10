@@ -6,9 +6,15 @@
 
 @inject IUnitService UnitService
 
-<h3>Units</h3>
+<MudPaper Class="mt-2" Align="Align.Center">
+    <MudText Typo="Typo.h6" Align="Align.Center">Units</MudText>
 
-<UnitListComponent Items="units" ShowLoadingBar=!unitsLoaded/>
+    <div class="d-flex justify-end">
+        <MudIconButton Icon="@Icons.Material.Filled.Add" Color="Color.Primary" Edge="Edge.End" OnClick="OpenCreateView"/>
+    </div>
+
+    <UnitListComponent Items="units" ShowLoadingBar=!unitsLoaded/>
+</MudPaper>
 
 @code {
     private HateoasCollectionResponse<UnitModel> units = new();
@@ -18,5 +24,10 @@
     {
         units = await UnitService.GetUnits();
         unitsLoaded = true;
+    }
+
+    private void OpenCreateView()
+    {
+        UnitService.OpenCreateUnitPage();
     }
 }

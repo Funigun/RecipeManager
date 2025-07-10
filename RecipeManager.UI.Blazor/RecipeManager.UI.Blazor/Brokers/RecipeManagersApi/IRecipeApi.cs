@@ -1,8 +1,10 @@
-﻿namespace RecipeManager.UI.Blazor.Brokers.RecipeManagersApi;
+﻿using RecipeManager.UI.Blazor.Features.Units.CreateUnit;
+
+namespace RecipeManager.UI.Blazor.Brokers.RecipeManagersApi;
 
 public interface IRecipeApi
 {
-    Task<HttpResponseMessage> CreateUnit();
+    Task<HttpResponseMessage> CreateUnit(UnitForCreateModel unit);
 
     Task<HttpResponseMessage> GetUnits();
 
