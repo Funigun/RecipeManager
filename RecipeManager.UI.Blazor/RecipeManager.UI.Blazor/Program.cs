@@ -4,6 +4,7 @@ using RecipeManager.ServiceDefaults;
 using RecipeManager.UI.Blazor.Brokers.IdentityApi;
 using RecipeManager.UI.Blazor.Brokers.RecipeManagersApi;
 using RecipeManager.UI.Blazor.Components;
+using RecipeManager.UI.Blazor.Components.Common.DialogMessage;
 using RecipeManager.UI.Blazor.Features.Units.Services;
 using RecipeManager.UI.Blazor.Services.Authentication;
 using RecipeManager.UI.Blazor.Services.Authorization;
@@ -50,6 +51,7 @@ try
     });
 
     builder.Services.AddScoped<IAuthenticationService, AuthenticationService>()
+                    .AddScoped<IDialogMessageService, DialogMessageService>()
                     .AddScoped<IUnitService, UnitService>();
 
     WebApplication app = builder.Build();

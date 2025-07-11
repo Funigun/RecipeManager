@@ -8,7 +8,7 @@ public abstract class ApiBroker(HttpClient httpClient, ProtectedLocalStorage loc
 {
     protected async Task AddAuthorizationHeader()
     {
-        LoginResponse? sessionModel = (await localStorage.GetAsync<LoginResponse>("sessionState")).Value;
+        LoginResponse? sessionModel = (await localStorage.GetAsync<LoginResponse?>("sessionState")).Value;
 
         httpClient.DefaultRequestHeaders.Authorization = sessionModel is not null
                                                        ? new AuthenticationHeaderValue("Bearer", sessionModel.Token)

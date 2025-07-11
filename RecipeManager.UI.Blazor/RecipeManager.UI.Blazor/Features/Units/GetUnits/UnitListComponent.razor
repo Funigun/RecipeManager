@@ -1,8 +1,14 @@
 ﻿@using MudBlazor
 @using RecipeManager.UI.Blazor.Brokers.HateoasModel
+@using RecipeManager.UI.Blazor.Components.Common
+@using RecipeManager.UI.Blazor.Components.Common.DialogMessage
+@using RecipeManager.UI.Blazor.Features.Units.Services
+@using RecipeManager.UI.Blazor.Features.Units.UpdateUnit
 
 @inject ISnackbar Snackbar
+@inject IUnitService UnitService
 @inject NavigationManager NavigationManager
+@inject IDialogMessageService DialogService
 
 <MudTable T="HateoasResponse<UnitModel>" Items="Items.Items" Loading="ShowLoadingBar" LoadingProgressColor="Color.Info">
     <HeaderContent>
@@ -31,8 +37,10 @@
 
     private async Task DeleteUnit(HateoasResponse<UnitModel> selectedItem)
     {
-        Snackbar.Add("Selected unit: " + selectedItem.Item.Name, Severity.Info);
-        await Task.Delay(1000);
+        if (await DialogService.ShowDeleteConfirmationMessage())
+        {
+            await UnitService.DeleteUnit(selectedItem);
+        }
     }
 
     private Task UpdateUnit(HateoasResponse<UnitModel> selectedItem)
@@ -41,7 +49,7 @@
 
         if (updateLink is not null)
         {
-            NavigationManager.NavigateTo(updateLink);
+            UnitService.OpenUpdateUnitPage(selectedItem.Item.UnitId);
         }
 
         return Task.CompletedTask;

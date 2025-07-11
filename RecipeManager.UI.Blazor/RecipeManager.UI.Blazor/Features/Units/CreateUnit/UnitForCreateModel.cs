@@ -1,6 +1,6 @@
 ﻿namespace RecipeManager.UI.Blazor.Features.Units.CreateUnit;
 
-public class UnitForCreateModel
+public sealed class UnitForCreateModel
 {
     public string Name { get; set; } = string.Empty;
 

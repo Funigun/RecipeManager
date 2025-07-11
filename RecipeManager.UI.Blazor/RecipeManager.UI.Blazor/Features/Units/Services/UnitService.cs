@@ -4,6 +4,7 @@ using RecipeManager.UI.Blazor.Brokers.RecipeManagersApi;
 using RecipeManager.UI.Blazor.Components.Common;
 using RecipeManager.UI.Blazor.Features.Units.CreateUnit;
 using RecipeManager.UI.Blazor.Features.Units.GetUnits;
+using RecipeManager.UI.Blazor.Features.Units.UpdateUnit;
 
 namespace RecipeManager.UI.Blazor.Features.Units.Services;
 
@@ -14,6 +15,32 @@ public class UnitService(IRecipeApi recipeApi, NavigationManager navigationManag
     private const string UpdateUnitsEndpoint = "/admin/measurement-units/update";
 
     public ApiResponseBody ResponseBody { get; private set; } = new();
+
+    public async Task CreateUnit(UnitForCreateModel unit)
+    {
+        HttpResponseMessage response = await recipeApi.CreateUnit(unit);
+
+        if (response.IsSuccessStatusCode)
+        {
+            navigationManager.NavigateTo(UnitsEndpoint);
+        }
+
+        ResponseBody = (await response.Content.ReadFromJsonAsync<ApiResponseBody>())!;
+    }
+
+    public async Task<HateoasResponse<UnitForUpdateModel>> GetUnitById(Guid unitId)
+    {
+        HttpResponseMessage response = await recipeApi.GetUnitById(unitId);
+
+        if (response.IsSuccessStatusCode)
+        {
+            return (await response.Content.ReadFromJsonAsync<HateoasResponse<UnitForUpdateModel>>())!;
+        }
+
+        ResponseBody = (await response.Content.ReadFromJsonAsync<ApiResponseBody>())!;
+
+        return new HateoasResponse<UnitForUpdateModel>();
+    }
 
     public async Task<HateoasCollectionResponse<UnitModel>> GetUnits()
     {
@@ -27,14 +54,9 @@ public class UnitService(IRecipeApi recipeApi, NavigationManager navigationManag
         return new();
     }
 
-    public void OpenCreateUnitPage()
+    public async Task UpdateUnit(Guid unitId, UnitForUpdateModel unit)
     {
-        navigationManager.NavigateTo(CreateUnitsEndpoint);
-    }
-
-    public async Task CreateUnit(UnitForCreateModel unit)
-    {
-        HttpResponseMessage response = await recipeApi.CreateUnit(unit);
+        HttpResponseMessage response = await recipeApi.UpdateUnit(unitId, unit);
 
         if (response.IsSuccessStatusCode)
         {
@@ -42,5 +64,30 @@ public class UnitService(IRecipeApi recipeApi, NavigationManager navigationManag
         }
 
         ResponseBody = (await response.Content.ReadFromJsonAsync<ApiResponseBody>())!;
+    }
+
+    public async Task DeleteUnit(HateoasResponse<UnitModel> unit)
+    {
+        Link? deleteLink = unit.Links.FirstOrDefault(x => x.Rel == "delete");
+
+        if (deleteLink is not null)
+        {
+            HttpResponseMessage response = await recipeApi.DeleteUnit(unit.Item.UnitId);
+
+            if (response.IsSuccessStatusCode)
+            {
+                navigationManager.NavigateTo(UnitsEndpoint);
+            }
+        }
+    }
+
+    public void OpenCreateUnitPage()
+    {
+        navigationManager.NavigateTo(CreateUnitsEndpoint);
+    }
+
+    public void OpenUpdateUnitPage(Guid unitId)
+    {
+        navigationManager.NavigateTo($"{UpdateUnitsEndpoint}/{unitId}");
     }
 }

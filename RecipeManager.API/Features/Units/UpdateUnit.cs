@@ -65,7 +65,7 @@ public static class UpdateUnit
 
     internal static async Task<Results<NoContent, NotFound, BadRequest>> Handler(Guid unitId, Request request, IAppDbContext dbContext, CancellationToken cancellationToken)
     {
-        UnitId id = unitId;
+        UnitId id = new(unitId);
         Unit? unit = await dbContext.Units.FindAsync([id], cancellationToken) ?? throw new EntityNotFoundException<Unit, UnitId>(id);
 
         unit.Name = request.Name;

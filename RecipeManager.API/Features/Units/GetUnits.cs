@@ -37,8 +37,9 @@ public static class GetUnits
 
         hateoasBuilder.ForCollection(responses)
                       .WithCollectionLink()
-                        .WithDelete(LinkOptions.Create("DeleteMeasurementUnit", HateoasRelConstants.Delete, isActionAllowed), unit => new { unitId = unit.UnitId })
+                        .WithGet(LinkOptions.Create("GetMeasurementUnit", HateoasRelConstants.Self, isActionAllowed), unit => new { unitId = unit.UnitId })
                         .WithPut(LinkOptions.Create("UpdateMeasurementUnit", HateoasRelConstants.Update, isActionAllowed), unit => new { unitId = unit.UnitId })
+                        .WithDelete(LinkOptions.Create("DeleteMeasurementUnit", HateoasRelConstants.Delete, isActionAllowed), unit => new { unitId = unit.UnitId })
                       .AddPost(LinkOptions.Create("GetMeasurementUnits", HateoasRelConstants.Create, isActionAllowed), null);
 
         return TypedResults.Ok(hateoasBuilder.BuildResults());

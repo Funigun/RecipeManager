@@ -2,7 +2,7 @@
 
 public sealed class UnitModel
 {
-    public Guid Id { get; set; } = Guid.Empty;
+    public Guid UnitId { get; set; } = Guid.Empty;
 
     public string Name { get; set; } = string.Empty;
 

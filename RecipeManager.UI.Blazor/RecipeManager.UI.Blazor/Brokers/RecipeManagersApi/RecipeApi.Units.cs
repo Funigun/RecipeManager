@@ -1,4 +1,5 @@
 ﻿using RecipeManager.UI.Blazor.Features.Units.CreateUnit;
+using RecipeManager.UI.Blazor.Features.Units.UpdateUnit;
 
 namespace RecipeManager.UI.Blazor.Brokers.RecipeManagersApi;
 
@@ -7,8 +8,13 @@ public sealed partial class RecipeApi
     public async Task<HttpResponseMessage> CreateUnit(UnitForCreateModel unit)
     {
         await AddAuthorizationHeader();
-
         return await Post(new Uri("api/units", UriKind.Relative), unit);
+    }
+
+    public async Task<HttpResponseMessage> GetUnitById(Guid unitId)
+    {
+        await AddAuthorizationHeader();
+        return await Get(new Uri($"api/units/{unitId}", UriKind.Relative));
     }
 
     public async Task<HttpResponseMessage> GetUnits()
@@ -17,10 +23,10 @@ public sealed partial class RecipeApi
         return await Get(new Uri("api/units", UriKind.Relative));
     }
 
-    public async Task<HttpResponseMessage> UpdateUnit(Guid unitId)
+    public async Task<HttpResponseMessage> UpdateUnit(Guid unitId, UnitForUpdateModel unit)
     {
         await AddAuthorizationHeader();
-        return await Put(new Uri($"api/units/{unitId}", UriKind.Relative), "");
+        return await Put(new Uri($"api/units/{unitId}", UriKind.Relative), unit);
     }
 
     public async Task<HttpResponseMessage> DeleteUnit(Guid unitId)

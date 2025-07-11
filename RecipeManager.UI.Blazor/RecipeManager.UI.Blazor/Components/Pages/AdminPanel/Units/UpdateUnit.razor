@@ -1,7 +1,15 @@
-﻿@page "/admin/measurement-units/update/{UnitId:Guid}"
+﻿@page "/admin/measurement-units/update/{RawGuid}"
 
-<h3>UpdateUnit</h3>
+@using RecipeManager.UI.Blazor.Brokers.HateoasModel
+@using RecipeManager.UI.Blazor.Features.Units.Services
+@using RecipeManager.UI.Blazor.Features.Units.UpdateUnit
+
+@inject IUnitService UnitService
+
+
+<UpdateUnitForm UnitId="@RawGuid" />
 
 @code {
-
+    [Parameter]
+    public string RawGuid { get; set; } = "";
 }

@@ -32,7 +32,7 @@ public static class DeleteUnit
 
     public static async Task<Results<NoContent, NotFound>> Handler(Guid unitId, IAppDbContext dbContext, CancellationToken cancellationToken)
     {
-        UnitId id = unitId;
+        UnitId id = new(unitId);
         Unit? unit = await dbContext.Units.FindAsync([id], cancellationToken) ?? throw new EntityNotFoundException<Unit, UnitId>(id);
 
         dbContext.Units.Remove(unit);
