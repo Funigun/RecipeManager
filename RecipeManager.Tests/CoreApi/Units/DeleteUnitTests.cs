@@ -45,7 +45,7 @@ public sealed class DeleteUnitTests : BaseIntegrationTest
         // Arrange
         HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", TokenMockFactory.GenerateJwtToken(UserMockFactory.CreateMockedAdmin()));
 
-        Guid unitId = DbContext.Units.Select(unit => unit.Id).First();
+        Guid unitId = DbContext.Units.Select(unit => unit.Id.Value).First();
 
         // Act
         HttpResponseMessage deleteResponse = await HttpClient.DeleteAsync($"/api/units/{unitId}", CancellationToken.None);

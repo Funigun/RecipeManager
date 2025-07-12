@@ -23,6 +23,8 @@
                 }
             </MudSelect>
 
+            <CustomValidationSummary ErrorMessages="@errorMessages" />
+
             <MudGrid Class="mt-4">
                 <MudItem xs="6">
                     <MudButton Variant="Variant.Outlined" Color="Color.Default" OnClick="GoBack" FullWidth="false">
@@ -36,8 +38,6 @@
                 </MudItem>
             </MudGrid>
         </MudStack>
-
-        <CustomValidationSummary ErrorMessages="@errorMessages" />
     </MudForm>
 }
 

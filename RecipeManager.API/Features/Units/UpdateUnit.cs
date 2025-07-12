@@ -18,13 +18,15 @@ public static class UpdateUnit
 
     public sealed class Validator : AbstractValidator<Request>
     {
-        public Validator(IAppDbContext dbContext)
+        public Validator(IAppDbContext dbContext, IHttpContextAccessor context)
         {
             RuleFor(x => x.Name)
                 .SetValidator(new UnitNameValidator())
                 .MustAsync(async (name, cancellationToken) =>
                 {
-                    return await dbContext.Units.CountAsync(unit => unit.Name == name, CancellationToken.None) == 0;
+                    string id = context.HttpContext!.GetRouteData().Values["unitId"]!.ToString()!;
+                    UnitId unitId = new(Guid.Parse(id));
+                    return await dbContext.Units.CountAsync(unit => unit.Name == name && unit.Id != unitId, CancellationToken.None) == 0;
                 }).WithMessage("Unit Name must be unique");
 
             When(x => x.ShortName is not null, () =>
@@ -33,7 +35,9 @@ public static class UpdateUnit
                     .SetValidator(new UnitShortNameValidator())
                     .MustAsync(async (shortName, cancellationToken) =>
                     {
-                        return await dbContext.Units.CountAsync(unit => unit.ShortName == shortName, CancellationToken.None) == 0;
+                        string id = context.HttpContext!.GetRouteData().Values["unitId"]!.ToString()!;
+                        UnitId unitId = new(Guid.Parse(id));
+                        return await dbContext.Units.CountAsync(unit => unit.ShortName == shortName && unit.Id != unitId, CancellationToken.None) == 0;
                     }).WithMessage("Unit Short Name must be unique");
             });
 

@@ -10,6 +10,7 @@
 @inject NavigationManager NavigationManager
 @inject IDialogMessageService DialogService
 
+<MudPaper Class="mt-2">
 <MudTable T="HateoasResponse<UnitModel>" Items="Items.Items" Loading="ShowLoadingBar" LoadingProgressColor="Color.Info">
     <HeaderContent>
         <MudTh>Name</MudTh>
@@ -27,7 +28,7 @@
         </MudTd>
     </RowTemplate>
 </MudTable>
-
+</MudPaper>
 @code {
     [Parameter]
     public HateoasCollectionResponse<UnitModel> Items { get; set; } = new();

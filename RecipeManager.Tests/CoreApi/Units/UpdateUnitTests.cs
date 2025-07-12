@@ -42,7 +42,7 @@ public sealed class UpdateUnitTests : BaseIntegrationTest
         // Arrange
         HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", TokenMockFactory.GenerateJwtToken(UserMockFactory.CreateMockedAdmin()));
 
-        Guid unitId = DbContext.Units.Select(unit => unit.Id).First();
+        Guid unitId = DbContext.Units.Select(unit => unit.Id.Value).First();
         UpdateUnit.Request updateUnitRequest = new(unitName, shortName, group);
         StringContent content = new(JsonSerializer.Serialize(updateUnitRequest), Encoding.UTF8, "application/json");
 
@@ -59,7 +59,7 @@ public sealed class UpdateUnitTests : BaseIntegrationTest
         // Arrange
         HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", TokenMockFactory.GenerateJwtToken(UserMockFactory.CreateMockedAdmin()));
 
-        Guid unitId = DbContext.Units.Select(unit => unit.Id).First();
+        Guid unitId = DbContext.Units.Select(unit => unit.Id.Value).First();
         UpdateUnit.Request updateUnitRequest = new("Updated Unit", "UU", 0);
         StringContent content = new(JsonSerializer.Serialize(updateUnitRequest), Encoding.UTF8, "application/json");
 
