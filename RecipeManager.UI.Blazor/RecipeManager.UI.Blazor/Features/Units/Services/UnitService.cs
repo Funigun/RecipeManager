@@ -62,8 +62,10 @@ public class UnitService(IRecipeApi recipeApi, NavigationManager navigationManag
         {
             navigationManager.NavigateTo(UnitsEndpoint);
         }
-
-        ResponseBody = (await response.Content.ReadFromJsonAsync<ApiResponseBody>())!;
+        else
+        {
+            ResponseBody = (await response.Content.ReadFromJsonAsync<ApiResponseBody>())!;
+        }
     }
 
     public async Task DeleteUnit(HateoasResponse<UnitModel> unit)
@@ -79,6 +81,11 @@ public class UnitService(IRecipeApi recipeApi, NavigationManager navigationManag
                 navigationManager.NavigateTo(UnitsEndpoint);
             }
         }
+    }
+
+    public void OpenIndexPage()
+    {
+        navigationManager.NavigateTo(UnitsEndpoint);
     }
 
     public void OpenCreateUnitPage()

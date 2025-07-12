@@ -23,31 +23,24 @@
         <MudSpacer />
         @if (isUserAuthenticated)
         {
-
             <MudText Typo="Typo.h5" Class="ml-3" Style="margin-right: 15px">@user</MudText>
             <MudIconButton Icon="@Icons.Material.Filled.Settings" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => ShowSettings())" />
             <MudIconButton Icon="@Icons.Material.Filled.Logout" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => Logout())"/>
         }
     </MudAppBar>
-    <div style="width: 20%">
-        @if (isUserAuthenticated)
-        {
-            <MudDrawer @bind-Open="showSideMenu" ClipMode="DrawerClipMode.Always" Elevation="1">
-                <NavMenu />
-            </MudDrawer>
-        }
-    </div>
 
-    <div style="width: 80%">
-        <div class="d-flex justify-center">
-    <MudMainContent>
-        <MudContainer MaxWidth="MaxWidth.Medium">
+    @if (isUserAuthenticated)
+    {
+        <MudDrawer Breakpoint="Breakpoint.Lg" @bind-Open="showSideMenu" ClipMode="DrawerClipMode.Always" Elevation="1" Variant="@DrawerVariant.Responsive">
+            <NavMenu />
+        </MudDrawer>
+    }
+
+    <MudMainContent Class="pt-16 px-16">
+            <MudContainer Class="mt-6" MaxWidth="MaxWidth.Medium">
             @Body
         </MudContainer>
     </MudMainContent>
-    </div>
-        
-    </div>
 </MudLayout>
 
 @code {

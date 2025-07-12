@@ -8,5 +8,5 @@ public sealed class UnitForUpdateModel
 
     public string? ShortName { get; set; }
 
-    public string Group { get; set; }
+    public UnitGroup Group { get; set; }
 }

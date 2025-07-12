@@ -6,8 +6,9 @@
 
 @inject IUnitService UnitService
 
-
-<UpdateUnitForm UnitId="@RawGuid" />
+<MudPaper Class="pa-6 mx-auto" MaxWidth="400px">
+    <UpdateUnitForm UnitId="@RawGuid" />
+</MudPaper>
 
 @code {
     [Parameter]

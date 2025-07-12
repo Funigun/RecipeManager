@@ -20,6 +20,8 @@ public interface IUnitService
 
     Task DeleteUnit(HateoasResponse<UnitModel> unit);
 
+    void OpenIndexPage();
+
     void OpenCreateUnitPage();
 
     void OpenUpdateUnitPage(Guid unitId);

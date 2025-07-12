@@ -6,5 +6,5 @@ public sealed class UnitForCreateModel
 
     public string? ShortName { get; set; }
 
-    public int Group { get; set; }
+    public UnitGroup Group { get; set; }
 }

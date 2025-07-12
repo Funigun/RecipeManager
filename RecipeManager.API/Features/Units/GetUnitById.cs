@@ -3,7 +3,6 @@ using Microsoft.EntityFrameworkCore;
 using RecipeManager.Api.Application.Abstractions;
 using RecipeManager.Api.Application.Exceptions;
 using RecipeManager.Api.Domain.Units;
-using RecipeManager.Api.Domain.Units.Enums;
 using RecipeManager.Api.Shared.Contracts.Authorization;
 using RecipeManager.Api.Shared.Endpoint;
 using RecipeManager.Api.Shared.Hateoas.Builder;
@@ -16,7 +15,7 @@ namespace RecipeManager.Api.Features.Units;
 
 public static class GetUnitById
 {
-    public sealed record Response(Guid UnitId, string Name, string? ShortName, string Group);
+    public sealed record Response(Guid UnitId, string Name, string? ShortName, int Group);
 
     [GroupEndpoint("Units")]
     public class Enpoint : IEndpoint
@@ -55,7 +54,7 @@ public static class GetUnitById
             unit.Id.Value,
             unit.Name,
             unit.ShortName,
-            unit.Group.ToFriendlyString()
+            (int)unit.Group
         );
     }
 }

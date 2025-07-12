@@ -11,15 +11,31 @@
     <MudForm Model="@unitModel.Item" Validation="@(validator.ValidateValue)" @bind-IsValid="@isSubmitEnabled">
         <MudText Typo="Typo.h5" Class="mb-4">Update Unit</MudText>
 
-        <MudTextField Label="Name" For="@(() => unitModel.Item.Name)" @bind-Value="unitModel.Item.Name" Required="true" />
+        <MudStack Spacing="3">
+            <MudTextField Label="Name" For="@(() => unitModel.Item.Name)" @bind-Value="unitModel.Item.Name" Required="true" />
 
-        <MudTextField Label="Short Name" For="@(() => unitModel.Item.ShortName)" @bind-Value="unitModel.Item.ShortName" />
+            <MudTextField Label="Short Name" For="@(() => unitModel.Item.ShortName)" @bind-Value="unitModel.Item.ShortName" />
 
-        <MudTextField Label="Group" For="@(() => unitModel.Item.Group)" @bind-Value="unitModel.Item.Group" Required="true" />
+            <MudSelect T="UnitGroup" Label="Group" @bind-Value="unitModel.Item.Group" Required="true">
+                @foreach (var key in unitGroups)
+                {
+                    <MudSelectItem Value="@key.Key">@key.Value</MudSelectItem>
+                }
+            </MudSelect>
 
-        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="SubmitUnit" Class="mt-4" FullWidth>
-            Update Unit
-        </MudButton>
+            <MudGrid Class="mt-4">
+                <MudItem xs="6">
+                    <MudButton Variant="Variant.Outlined" Color="Color.Default" OnClick="GoBack" FullWidth="false">
+                        Back
+                    </MudButton>
+                </MudItem>
+                <MudItem xs="6" Class="d-flex justify-end">
+                    <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="SubmitUnit">
+                        Save
+                    </MudButton>
+                </MudItem>
+            </MudGrid>
+        </MudStack>
 
         <CustomValidationSummary ErrorMessages="@errorMessages" />
     </MudForm>
@@ -29,6 +45,7 @@
     [Parameter]
     public string UnitId { get; set; }
 
+    private readonly Dictionary<UnitGroup, string> unitGroups = UnitExtensions.GetUnitGroups();
     private HateoasResponse<UnitForUpdateModel> unitModel = new();
     private readonly UnitForUpdateValidator validator = new();
     private bool isSubmitEnabled = false;
@@ -46,6 +63,11 @@
             isLoaded = true;
             StateHasChanged();
         }
+    }
+
+    private void GoBack()
+    {
+        UnitService.OpenIndexPage();
     }
 
     private async Task SubmitUnit()
