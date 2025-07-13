@@ -2,6 +2,7 @@
 using RecipeManager.UI.Blazor.Brokers.HateoasModel;
 using RecipeManager.UI.Blazor.Brokers.RecipeManagersApi;
 using RecipeManager.UI.Blazor.Components.Common;
+using RecipeManager.UI.Blazor.Components.Extensions;
 using RecipeManager.UI.Blazor.Features.Units.CreateUnit;
 using RecipeManager.UI.Blazor.Features.Units.GetUnits;
 using RecipeManager.UI.Blazor.Features.Units.UpdateUnit;
@@ -37,7 +38,9 @@ public class UnitService(IRecipeApi recipeApi, NavigationManager navigationManag
             return (await response.Content.ReadFromJsonAsync<HateoasResponse<UnitForUpdateModel>>())!;
         }
 
+        throw new Exception(response.ToStringArray());
         ResponseBody = (await response.Content.ReadFromJsonAsync<ApiResponseBody>())!;
+
 
         return new HateoasResponse<UnitForUpdateModel>();
     }

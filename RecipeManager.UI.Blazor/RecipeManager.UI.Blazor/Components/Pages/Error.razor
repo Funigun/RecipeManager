@@ -1,7 +1,7 @@
-﻿@page "/Error/"
+﻿@page "/Error/{ErrorCode:int}"
 @using System.Diagnostics
 
-<PageTitle>Error</PageTitle>
+<PageTitle>Error @ErrorCode</PageTitle>
 
 <h1 class="text-danger">Error.</h1>
 <h2 class="text-danger">An error occurred while processing your request.</h2>
@@ -27,6 +27,9 @@
 @code{
     [CascadingParameter]
     private HttpContext? HttpContext { get; set; }
+
+    [Parameter]
+    public int ErrorCode { get; set; }
 
     private string? RequestId { get; set; }
     private bool ShowRequestId => !string.IsNullOrEmpty(RequestId);

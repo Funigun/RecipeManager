@@ -1,0 +1,30 @@
+﻿@using System.Text.Json
+@inherits ErrorBoundary
+
+@inject NavigationManager NavigationManager
+
+@if (CurrentException is null)
+{
+    @ChildContent
+}
+else
+{
+    @ErrorContent?.Invoke(CurrentException)
+}
+
+
+@code {
+    protected override Task OnErrorAsync(Exception exception)
+    {
+        ApiResponseBody apiResponse = JsonSerializer.Deserialize<ApiResponseBody>(exception.Message) 
+                                   ?? new ApiResponseBody
+                                   {
+                                       StatusCode = 500,
+                                       Message = "An unexpected error occurred."
+                                   };
+
+        NavigationManager.NavigateTo($"/Error/{apiResponse.StatusCode}");
+
+        return Task.CompletedTask;
+    }
+}
