@@ -31,24 +31,17 @@
 
     @if (isUserAuthenticated)
     {
-        <MudDrawer @bind-Open="showSideMenu" Overlay="false" ClipMode="DrawerClipMode.Always" Elevation="0" Variant="@DrawerVariant.Temporary">
+        <MudDrawer @bind-Open="showSideMenu" Overlay="false" ClipMode="DrawerClipMode.Always" Elevation="0" Variant="@DrawerVariant.Persistent">
             <NavMenu />
         </MudDrawer>
     }
 
     <MudMainContent>
-        <RecipeManager.UI.Blazor.Components.Common.CustomErrorBoundaryComponent>
-            <ChildContent>
-                <MudContainer Class="mt-6">
-                    <div style="justify-self:center; justify-items: center; align-items: center; min-width:25%">
-                        @Body
-                    </div>
-                </MudContainer>
-            </ChildContent>
-            @* <ErrorContent> *@
-            @*     <MudText Typo="Typo.h6" Color="Color.Error">An error has occurred while loading the page.</MudText> *@
-            @* </ErrorContent> *@
-        </RecipeManager.UI.Blazor.Components.Common.CustomErrorBoundaryComponent>
+         <MudContainer Class="mt-6">
+             <div style="justify-self:center; justify-items: center; align-items: center; min-width:25%">
+                 @Body
+             </div>
+         </MudContainer>
     </MudMainContent>
 </MudLayout>
 

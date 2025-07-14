@@ -2,7 +2,6 @@
 using RecipeManager.UI.Blazor.Brokers.HateoasModel;
 using RecipeManager.UI.Blazor.Brokers.RecipeManagersApi;
 using RecipeManager.UI.Blazor.Components.Common;
-using RecipeManager.UI.Blazor.Components.Extensions;
 using RecipeManager.UI.Blazor.Features.Units.CreateUnit;
 using RecipeManager.UI.Blazor.Features.Units.GetUnits;
 using RecipeManager.UI.Blazor.Features.Units.UpdateUnit;
@@ -38,9 +37,7 @@ public class UnitService(IRecipeApi recipeApi, NavigationManager navigationManag
             return (await response.Content.ReadFromJsonAsync<HateoasResponse<UnitForUpdateModel>>())!;
         }
 
-        throw new Exception(response.ToStringArray());
         ResponseBody = (await response.Content.ReadFromJsonAsync<ApiResponseBody>())!;
-
 
         return new HateoasResponse<UnitForUpdateModel>();
     }
@@ -49,12 +46,9 @@ public class UnitService(IRecipeApi recipeApi, NavigationManager navigationManag
     {
         HttpResponseMessage response = await recipeApi.GetUnits();
 
-        if (response.IsSuccessStatusCode)
-        {
-            return (await response.Content.ReadFromJsonAsync<HateoasCollectionResponse<UnitModel>>())!;
-        }
-
-        return new();
+        return response.IsSuccessStatusCode
+             ? (await response.Content.ReadFromJsonAsync<HateoasCollectionResponse<UnitModel>>())!
+             : new HateoasCollectionResponse<UnitModel>();
     }
 
     public async Task UpdateUnit(Guid unitId, UnitForUpdateModel unit)
@@ -81,7 +75,7 @@ public class UnitService(IRecipeApi recipeApi, NavigationManager navigationManag
 
             if (response.IsSuccessStatusCode)
             {
-                navigationManager.NavigateTo(UnitsEndpoint);
+                navigationManager.Refresh(true);
             }
         }
     }
