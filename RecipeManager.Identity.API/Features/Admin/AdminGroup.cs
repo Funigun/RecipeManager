@@ -1,6 +1,6 @@
 ﻿using RecipeManager.Api.Shared.Endpoint;
 
-namespace RecipeManager.Identity.API.Features.Admin;
+namespace RecipeManager.Identity.Api.Features.Admin;
 
 public sealed class AdminGroup : IGroupEndpoint
 {

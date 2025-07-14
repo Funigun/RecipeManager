@@ -28,13 +28,14 @@
 	</ItemGroup>
 	
 	<!-- Web API Exclusive -->
-	<ItemGroup Condition="'$(MSBuildProjectName.EndsWith(`API`))'">
+	<ItemGroup Condition="'$(MSBuildProjectName.EndsWith(`Api`))'">
 		<PackageReference Include="Scalar.AspNetCore" />
 		<PackageReference Include="Microsoft.AspNetCore.OpenApi" />
 		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" />
 		<PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Tools" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.InMemory"/>
 		<PackageReference Include="FluentValidation.DependencyInjectionExtensions" />
 		<PackageReference Include="Serilog"/>
 		<PackageReference Include="Serilog.AspNetCore" />
@@ -72,6 +73,10 @@
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
 		<PackageReference Include="NetArchTest.Rules" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Tools" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" />
+		<PackageReference Include="Testcontainers.MsSql" />
+		<PackageReference Include="Respawn" />
 	</ItemGroup>
 
 	<!-- All except Aspire projects-->

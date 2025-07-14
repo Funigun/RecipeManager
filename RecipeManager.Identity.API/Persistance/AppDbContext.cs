@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using RecipeManager.Identity.API.Domain;
+using RecipeManager.Identity.Api.Domain;
 
-namespace RecipeManager.Identity.API.Persistance;
+namespace RecipeManager.Identity.Api.Persistance;
 
 public sealed class AppDbContext : IdentityDbContext<User, Role, int>
 {

@@ -44,7 +44,7 @@ public sealed class ExceptionHandlingMiddleware(RequestDelegate next, ILogger<Ex
 
         UnauthorizedAccessException => new ResponseBody
         {
-            StatusCode = (int)HttpStatusCode.Unauthorized,
+            StatusCode = (int)HttpStatusCode.Forbidden,
             Message = "You are not authorized to perform this action",
         },
 

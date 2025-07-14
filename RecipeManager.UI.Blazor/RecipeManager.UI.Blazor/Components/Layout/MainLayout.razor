@@ -27,17 +27,21 @@
             <MudIconButton Icon="@Icons.Material.Filled.Settings" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => ShowSettings())" />
             <MudIconButton Icon="@Icons.Material.Filled.Logout" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => Logout())"/>
         }
-        <MudSpacer />
     </MudAppBar>
 
     @if (isUserAuthenticated)
     {
-        <MudDrawer @bind-Open="showSideMenu" ClipMode="DrawerClipMode.Always" Elevation="2">
-            <NavMenu/>
+        <MudDrawer @bind-Open="showSideMenu" Overlay="false" ClipMode="DrawerClipMode.Always" Elevation="0" Variant="@DrawerVariant.Persistent">
+            <NavMenu />
         </MudDrawer>
     }
+
     <MudMainContent>
-        @Body
+         <MudContainer Class="mt-6">
+             <div style="justify-self:center; justify-items: center; align-items: center; min-width:25%">
+                 @Body
+             </div>
+         </MudContainer>
     </MudMainContent>
 </MudLayout>
 
@@ -45,7 +49,6 @@
     bool showSideMenu = false;
     bool isUserAuthenticated = false;
     string user = "";
-
 
     protected override async Task OnInitializedAsync()
     {

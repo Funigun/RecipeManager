@@ -18,8 +18,9 @@ public static class DependencyInjection
     public static IServiceCollection AddSharedServices(this IServiceCollection services)
     {
         services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
-        services.AddScoped<HateoasBuilder>();
+        services.AddScoped(typeof(HateoasBuilder<>), typeof(HateoasBuilder<>));
         services.AddScoped<HateoasLinkService>();
+        services.AddScoped<ICurrentUser, CurrentUser>();
 
         return services;
     }

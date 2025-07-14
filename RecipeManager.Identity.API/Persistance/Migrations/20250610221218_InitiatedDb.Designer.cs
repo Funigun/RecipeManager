@@ -5,11 +5,11 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using RecipeManager.Identity.API.Persistance;
+using RecipeManager.Identity.Api.Persistance;
 
 #nullable disable
 
-namespace RecipeManager.Identity.API.Persistance.Migrations
+namespace RecipeManager.Identity.Api.Persistance.Migrations
 {
     [DbContext(typeof(AppDbContext))]
     [Migration("20250610221218_InitiatedDb")]
@@ -128,7 +128,7 @@ namespace RecipeManager.Identity.API.Persistance.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("RecipeManager.Identity.API.Domain.Permission", b =>
+            modelBuilder.Entity("RecipeManager.Identity.Api.Domain.Permission", b =>
                 {
                     b.Property<int>("Id")
                         .HasColumnType("int");
@@ -146,7 +146,7 @@ namespace RecipeManager.Identity.API.Persistance.Migrations
                     b.ToTable("Permissions");
                 });
 
-            modelBuilder.Entity("RecipeManager.Identity.API.Domain.Role", b =>
+            modelBuilder.Entity("RecipeManager.Identity.Api.Domain.Role", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -176,7 +176,7 @@ namespace RecipeManager.Identity.API.Persistance.Migrations
                     b.ToTable("Roles", (string)null);
                 });
 
-            modelBuilder.Entity("RecipeManager.Identity.API.Domain.User", b =>
+            modelBuilder.Entity("RecipeManager.Identity.Api.Domain.User", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -276,7 +276,7 @@ namespace RecipeManager.Identity.API.Persistance.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<int>", b =>
                 {
-                    b.HasOne("RecipeManager.Identity.API.Domain.Role", null)
+                    b.HasOne("RecipeManager.Identity.Api.Domain.Role", null)
                         .WithMany()
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -285,7 +285,7 @@ namespace RecipeManager.Identity.API.Persistance.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<int>", b =>
                 {
-                    b.HasOne("RecipeManager.Identity.API.Domain.User", null)
+                    b.HasOne("RecipeManager.Identity.Api.Domain.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -294,7 +294,7 @@ namespace RecipeManager.Identity.API.Persistance.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<int>", b =>
                 {
-                    b.HasOne("RecipeManager.Identity.API.Domain.User", null)
+                    b.HasOne("RecipeManager.Identity.Api.Domain.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -303,13 +303,13 @@ namespace RecipeManager.Identity.API.Persistance.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<int>", b =>
                 {
-                    b.HasOne("RecipeManager.Identity.API.Domain.Role", null)
+                    b.HasOne("RecipeManager.Identity.Api.Domain.Role", null)
                         .WithMany()
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("RecipeManager.Identity.API.Domain.User", null)
+                    b.HasOne("RecipeManager.Identity.Api.Domain.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -318,7 +318,7 @@ namespace RecipeManager.Identity.API.Persistance.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<int>", b =>
                 {
-                    b.HasOne("RecipeManager.Identity.API.Domain.User", null)
+                    b.HasOne("RecipeManager.Identity.Api.Domain.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -327,13 +327,13 @@ namespace RecipeManager.Identity.API.Persistance.Migrations
 
             modelBuilder.Entity("RolePermissions", b =>
                 {
-                    b.HasOne("RecipeManager.Identity.API.Domain.Permission", null)
+                    b.HasOne("RecipeManager.Identity.Api.Domain.Permission", null)
                         .WithMany()
                         .HasForeignKey("PermissionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("RecipeManager.Identity.API.Domain.Role", null)
+                    b.HasOne("RecipeManager.Identity.Api.Domain.Role", null)
                         .WithMany()
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -342,13 +342,13 @@ namespace RecipeManager.Identity.API.Persistance.Migrations
 
             modelBuilder.Entity("UserPermissions", b =>
                 {
-                    b.HasOne("RecipeManager.Identity.API.Domain.Permission", null)
+                    b.HasOne("RecipeManager.Identity.Api.Domain.Permission", null)
                         .WithMany()
                         .HasForeignKey("PermissionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("RecipeManager.Identity.API.Domain.User", null)
+                    b.HasOne("RecipeManager.Identity.Api.Domain.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)

@@ -3,7 +3,7 @@ using RecipeManager.Api.Shared.Hateoas.Models;
 
 namespace RecipeManager.Api.Shared.Hateoas.Builder;
 
-public class HateoasCollectionResponseBuilder<TItem> : HateoasBuilder, IHateoasResponseBuilder
+public class HateoasCollectionResponseBuilder<TItem> : HateoasBuilder<TItem>, IHateoasResponseBuilder
 {
     private readonly HateoasCollectionListBuilder<TItem> _collectionListBuilder = default!;
 
@@ -70,6 +70,6 @@ public class HateoasCollectionResponseBuilder<TItem> : HateoasBuilder, IHateoasR
 
     public object Build()
     {
-        return new HateoasLinkCollectionWrapper<TItem>(Items) { Links = Links };
+        return new HateoasCollectionResponse<TItem>(Items) { Links = Links };
     }
 }

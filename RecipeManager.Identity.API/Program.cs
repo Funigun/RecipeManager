@@ -1,7 +1,7 @@
 using System.Reflection;
 using FluentValidation;
 using RecipeManager.Api.Shared;
-using RecipeManager.Identity.API.Presentation;
+using RecipeManager.Identity.Api.Presentation;
 using RecipeManager.ServiceDefaults;
 using Scalar.AspNetCore;
 using Serilog;

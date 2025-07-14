@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http.HttpResults;
 using RecipeManager.Api.Shared.Endpoint;
 
-namespace RecipeManager.Identity.API.Features.Account;
+namespace RecipeManager.Identity.Api.Features.Account;
 
 public static class ChangePassword
 {

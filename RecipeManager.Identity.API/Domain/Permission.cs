@@ -1,6 +1,6 @@
 ﻿using RecipeManager.Shared.Contracts.Authorization;
 
-namespace RecipeManager.Identity.API.Domain;
+namespace RecipeManager.Identity.Api.Domain;
 
 public sealed class Permission
 {

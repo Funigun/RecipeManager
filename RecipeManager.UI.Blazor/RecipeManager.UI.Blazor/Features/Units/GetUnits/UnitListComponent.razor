@@ -1,0 +1,58 @@
+﻿@using MudBlazor
+@using RecipeManager.UI.Blazor.Brokers.HateoasModel
+@using RecipeManager.UI.Blazor.Components.Common
+@using RecipeManager.UI.Blazor.Components.Common.DialogMessage
+@using RecipeManager.UI.Blazor.Features.Units.Services
+@using RecipeManager.UI.Blazor.Features.Units.UpdateUnit
+
+@inject ISnackbar Snackbar
+@inject IUnitService UnitService
+@inject NavigationManager NavigationManager
+@inject IDialogMessageService DialogService
+
+
+<MudTable T="HateoasResponse<UnitModel>" Items="Items.Items" Loading="ShowLoadingBar" LoadingProgressColor="Color.Info">
+    <HeaderContent>
+        <MudTh>Name</MudTh>
+        <MudTh>Short Name</MudTh>
+        <MudTh>Group</MudTh>
+        <MudTh>Actions</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="Name">@context.Item.Name</MudTd>
+        <MudTd DataLabel="Short Name">@context.Item.ShortName</MudTd>
+        <MudTd DataLabel="Group">@context.Item.Group</MudTd>
+        <MudTd DataLabel="Actions">
+            <MudIconButton Variant="Variant.Filled" Color="Color.Primary" Size="Size.Small" Icon="@Icons.Material.Filled.Edit" OnClick="() => UpdateUnit(context)"></MudIconButton>
+            <MudIconButton Variant="Variant.Filled" Color="Color.Error" Size="Size.Small" Icon="@Icons.Material.Filled.Delete" OnClick="() => DeleteUnit(context)"></MudIconButton>
+        </MudTd>
+    </RowTemplate>
+</MudTable>
+
+@code {
+    [Parameter]
+    public HateoasCollectionResponse<UnitModel> Items { get; set; } = new();
+
+    [Parameter]
+    public bool ShowLoadingBar { get; set; } = true;
+
+    private async Task DeleteUnit(HateoasResponse<UnitModel> selectedItem)
+    {
+        if (await DialogService.ShowDeleteConfirmationMessage())
+        {
+            await UnitService.DeleteUnit(selectedItem);
+        }
+    }
+
+    private Task UpdateUnit(HateoasResponse<UnitModel> selectedItem)
+    {
+        string? updateLink = selectedItem.Links.FirstOrDefault(link => link.Rel == "update")?.Href;
+
+        if (updateLink is not null)
+        {
+            UnitService.OpenUpdateUnitPage(selectedItem.Item.UnitId);
+        }
+
+        return Task.CompletedTask;
+    }
+}

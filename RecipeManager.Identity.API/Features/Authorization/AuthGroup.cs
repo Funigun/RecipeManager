@@ -1,6 +1,6 @@
 ﻿using RecipeManager.Api.Shared.Endpoint;
 
-namespace RecipeManager.Identity.API.Features.Authorization;
+namespace RecipeManager.Identity.Api.Features.Authorization;
 
 public class AuthGroup : IGroupEndpoint
 {

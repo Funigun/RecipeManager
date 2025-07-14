@@ -2,7 +2,10 @@ using Microsoft.AspNetCore.Components.Authorization;
 using MudBlazor.Services;
 using RecipeManager.ServiceDefaults;
 using RecipeManager.UI.Blazor.Brokers.IdentityApi;
+using RecipeManager.UI.Blazor.Brokers.RecipeManagersApi;
 using RecipeManager.UI.Blazor.Components;
+using RecipeManager.UI.Blazor.Components.Common.DialogMessage;
+using RecipeManager.UI.Blazor.Features.Units.Services;
 using RecipeManager.UI.Blazor.Services.Authentication;
 using RecipeManager.UI.Blazor.Services.Authorization;
 using Serilog;
@@ -42,7 +45,14 @@ try
         option.BaseAddress = new Uri(builder.Configuration["IdentityApi:BaseUrl"]!);
     });
 
-    builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
+    builder.Services.AddHttpClient<IRecipeApi, RecipeApi>(option =>
+    {
+        option.BaseAddress = new Uri(builder.Configuration["RecipesApi:BaseUrl"]!);
+    });
+
+    builder.Services.AddScoped<IAuthenticationService, AuthenticationService>()
+                    .AddScoped<IDialogMessageService, DialogMessageService>()
+                    .AddScoped<IUnitService, UnitService>();
 
     WebApplication app = builder.Build();
 

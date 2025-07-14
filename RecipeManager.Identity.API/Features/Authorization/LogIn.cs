@@ -7,9 +7,9 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using RecipeManager.Api.Shared.Endpoint;
-using RecipeManager.Identity.API.Domain;
+using RecipeManager.Identity.Api.Domain;
 
-namespace RecipeManager.Identity.API.Features.Authorization;
+namespace RecipeManager.Identity.Api.Features.Authorization;
 
 public static class LogIn
 {
@@ -85,7 +85,7 @@ public static class LogIn
         List<Claim> claims =
         [
             new(ClaimTypes.Name, user.UserName!),
-            new("Id", user.Id.ToString("/d")),
+            new("Id", user.Id.ToString()),
             new(JwtRegisteredClaimNames.Nickname, user.UserName!),
         ];
 

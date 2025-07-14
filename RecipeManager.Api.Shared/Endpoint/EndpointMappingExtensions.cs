@@ -13,7 +13,8 @@ public static class EndpointMappingExtensions
                                                   .Produces<TResponse>(StatusCodes.Status201Created)
                                                   .ProducesProblem(StatusCodes.Status400BadRequest)
                                                   .ProducesProblem(StatusCodes.Status404NotFound)
-                                                  .ProducesProblem(StatusCodes.Status500InternalServerError);
+                                                  .ProducesProblem(StatusCodes.Status500InternalServerError)
+                                                  .WithMetadata(typeof(TRequest).DeclaringType!);
 
         return routeHandler;
     }
@@ -33,13 +34,15 @@ public static class EndpointMappingExtensions
 
     public static RouteHandlerBuilder WithValidationFilter<TRequest>(this RouteHandlerBuilder builder)
     {
-        return builder.AddEndpointFilter<ValidationFilter<TRequest>>();
+        return builder.AddEndpointFilter<ValidationFilter<TRequest>>()
+                      .WithMetadata("Uses validation filter");
     }
 
     public static RouteHandlerBuilder WithAuthenticationFilter<TRequest>(this RouteHandlerBuilder builder)
     {
         return builder.ProducesProblem(StatusCodes.Status403Forbidden)
-                      .AddEndpointFilter<AuthorizationFilter<TRequest>>();
+                      .AddEndpointFilter<AuthorizationFilter<TRequest>>()
+                      .WithMetadata("Uses authentication filter");
     }
 
     public static RouteHandlerBuilder MapStandardGet<TResponse>(this IEndpointRouteBuilder builder, string pattern, Delegate handler)
@@ -47,7 +50,8 @@ public static class EndpointMappingExtensions
         RouteHandlerBuilder routeHandler = builder.MapGet(pattern, handler)
                                                   .Produces<TResponse>(StatusCodes.Status200OK)
                                                   .ProducesProblem(StatusCodes.Status404NotFound)
-                                                  .ProducesProblem(StatusCodes.Status500InternalServerError);
+                                                  .ProducesProblem(StatusCodes.Status500InternalServerError)
+                                                  .WithMetadata(typeof(TResponse).DeclaringType!);
 
         return routeHandler;
     }
@@ -64,7 +68,8 @@ public static class EndpointMappingExtensions
                                                   .Produces(StatusCodes.Status204NoContent)
                                                   .ProducesProblem(StatusCodes.Status400BadRequest)
                                                   .ProducesProblem(StatusCodes.Status404NotFound)
-                                                  .ProducesProblem(StatusCodes.Status500InternalServerError);
+                                                  .ProducesProblem(StatusCodes.Status500InternalServerError)
+                                                  .WithMetadata(typeof(TRequest).DeclaringType!);
 
         return routeHandler;
     }
@@ -75,7 +80,7 @@ public static class EndpointMappingExtensions
                       .WithValidationFilter<TRequest>();
     }
 
-    public static RouteHandlerBuilder MaptandardAuthenticatedPut<TRequest>(this IEndpointRouteBuilder builder, string pattern, Delegate handler)
+    public static RouteHandlerBuilder MapStandardAuthenticatedPut<TRequest>(this IEndpointRouteBuilder builder, string pattern, Delegate handler)
     {
         return builder.MapStandardPut<TRequest>(pattern, handler)
                       .WithAuthenticationFilter<TRequest>()
@@ -87,14 +92,15 @@ public static class EndpointMappingExtensions
         RouteHandlerBuilder routeHandler = builder.MapDelete(pattern, handler)
                                                   .Produces(StatusCodes.Status204NoContent)
                                                   .ProducesProblem(StatusCodes.Status404NotFound)
-                                                  .ProducesProblem(StatusCodes.Status500InternalServerError);
+                                                  .ProducesProblem(StatusCodes.Status500InternalServerError)
+                                                  .WithMetadata(typeof(TRequest).DeclaringType!);
 
         return routeHandler;
     }
 
-    public static RouteHandlerBuilder MapStandardAuthenticatedDelete<TRequest>(this IEndpointRouteBuilder builder, string pattern, Delegate handler)
+    public static RouteHandlerBuilder MapStandardAuthenticatedDelete<TMarker, TRequest>(this IEndpointRouteBuilder builder, string pattern, Delegate handler)
     {
-        return builder.MapStandardDelete<TRequest>(pattern, handler)
+        return builder.MapStandardDelete<TMarker>(pattern, handler)
                       .WithAuthenticationFilter<TRequest>();
     }
 }

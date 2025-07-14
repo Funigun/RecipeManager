@@ -1,0 +1,28 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\RecipeManager.Api.Shared\RecipeManager.Api.Shared.csproj" />
+    <ProjectReference Include="..\RecipeManager.API\RecipeManager.Api.csproj" />
+    <ProjectReference Include="..\RecipeManager.Identity.API\RecipeManager.Identity.Api.csproj" />
+    <ProjectReference Include="..\RecipeManager.Shared.Contracts\RecipeManager.Shared.Contracts.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Xunit" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Update="StyleCop.Analyzers">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+</Project>

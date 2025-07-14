@@ -2,16 +2,18 @@
 
 namespace RecipeManager.Api.Shared.Hateoas.Builder;
 
-public class HateoasBuilder(HateoasLinkService linkService)
+public class HateoasBuilder<TType>(HateoasLinkService linkService)
 {
     public HateoasLinkService LinkService { get; protected set; } = linkService;
 
     public ICollection<IHateoasResponseBuilder> Builders { get; protected set; } = [];
 
+    private IHateoasResponseBuilder _currentBuilder = default!;
+
     public HateoasResponseBuilder<TItem> ForItem<TItem>(TItem dto)
     {
         HateoasResponseBuilder<TItem> builder = new(dto, LinkService);
-
+        _currentBuilder = builder;
         Builders.Add(builder);
 
         return builder;
@@ -20,10 +22,15 @@ public class HateoasBuilder(HateoasLinkService linkService)
     public HateoasCollectionResponseBuilder<TItem> ForCollection<TItem>(IEnumerable<TItem> collection)
     {
         HateoasCollectionResponseBuilder<TItem> builder = new(collection, LinkService);
-
+        _currentBuilder = builder;
         Builders.Add(builder);
 
         return builder;
+    }
+
+    public TType BuildResults()
+    {
+        return (TType)_currentBuilder.Build();
     }
 
     public object BuildResponses()

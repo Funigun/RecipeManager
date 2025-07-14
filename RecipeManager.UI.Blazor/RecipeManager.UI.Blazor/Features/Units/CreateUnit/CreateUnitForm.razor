@@ -1,0 +1,59 @@
+﻿@using FluentValidation
+@using MudBlazor
+@using RecipeManager.UI.Blazor.Components.Common
+@using RecipeManager.UI.Blazor.Features.Units.Services
+
+@inject IUnitService UnitService
+
+<MudForm Model="@unitModel" Validation="@(validator.ValidateValue)" @bind-IsValid="@isSubmitEnabled">
+    <MudText Typo="Typo.h5" Class="mb-4">Create Unit</MudText>
+
+    <MudStack Spacing="3">
+        <MudTextField Label="Name" For="@(() => unitModel.Name)" @bind-Value="unitModel.Name" Required="true" />
+
+        <MudTextField Label="Short Name" For="@(() => unitModel.ShortName)" @bind-Value="unitModel.ShortName" />
+
+        <MudSelect T="UnitGroup" Label="Group" @bind-Value="unitModel.Group" Required="true">
+            @foreach (var key in unitGroups)
+            {
+                <MudSelectItem Value="@key.Key">@key.Value</MudSelectItem>
+            }
+        </MudSelect>
+
+        <MudGrid Class="mt-4">
+            <MudItem xs="6">
+                <MudButton Variant="Variant.Outlined" Color="Color.Default" OnClick="GoBack" FullWidth="false">
+                    Back
+                </MudButton>
+            </MudItem>
+            <MudItem xs="6" Class="d-flex justify-end">
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="SubmitUnit">
+                    Save
+                </MudButton>
+            </MudItem>
+        </MudGrid>
+
+        <CustomValidationSummary ErrorMessages="@errorMessages" />
+    </MudStack>
+
+</MudForm>
+
+
+@code {
+    private readonly Dictionary<UnitGroup, string> unitGroups = UnitExtensions.GetUnitGroups();
+    private readonly UnitForCreateModel unitModel = new();
+    private readonly UnitForCreateValidator validator = new();
+    private bool isSubmitEnabled = false;
+    private IEnumerable<string> errorMessages = [];
+
+    private void GoBack()
+    {
+        UnitService.OpenIndexPage();
+    }
+
+    private async Task SubmitUnit()
+    {
+        await UnitService.CreateUnit(unitModel);
+        errorMessages = UnitService.ResponseBody.GetAllErrors();
+    }
+}

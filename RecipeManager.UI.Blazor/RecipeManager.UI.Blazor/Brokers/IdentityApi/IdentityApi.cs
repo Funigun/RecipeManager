@@ -1,9 +1,10 @@
-﻿using RecipeManager.UI.Blazor.Features.Account.Login;
+﻿using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
+using RecipeManager.UI.Blazor.Features.Account.Login;
 using RecipeManager.UI.Blazor.Features.Account.Register;
 
 namespace RecipeManager.UI.Blazor.Brokers.IdentityApi;
 
-public class IdentityApi(HttpClient httpClient) : ApiBroker(httpClient), IIdentityApi
+public class IdentityApi(HttpClient httpClient, ProtectedLocalStorage localStorage) : ApiBroker(httpClient, localStorage), IIdentityApi
 {
     public async Task<HttpResponseMessage> LoginUser(LoginRequest userLoginModel)
     {

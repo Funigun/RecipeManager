@@ -1,0 +1,16 @@
+﻿@page "/admin/measurement-units/update/{RawGuid}"
+
+@using RecipeManager.UI.Blazor.Brokers.HateoasModel
+@using RecipeManager.UI.Blazor.Features.Units.Services
+@using RecipeManager.UI.Blazor.Features.Units.UpdateUnit
+
+@inject IUnitService UnitService
+
+<MudPaper Class="pa-6 mx-auto">
+    <UpdateUnitForm UnitId="@RawGuid" />
+</MudPaper>
+
+@code {
+    [Parameter]
+    public string RawGuid { get; set; } = "";
+}
