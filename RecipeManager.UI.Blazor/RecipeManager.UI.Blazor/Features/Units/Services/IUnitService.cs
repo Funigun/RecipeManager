@@ -12,13 +12,13 @@ public interface IUnitService
 
     Task CreateUnit(UnitForCreateModel unit);
 
-    Task<HateoasResponse<UnitForUpdateModel>> GetUnitById(Guid unitId);
+    Task<HateoasResponse<UnitForUpdateModel>> GetUnitById(Guid id);
 
     Task<HateoasCollectionResponse<UnitModel>> GetUnits();
 
-    Task UpdateUnit(Guid unitId, UnitForUpdateModel unit);
+    Task UpdateUnit(string relativeUri, UnitForUpdateModel unit);
 
-    Task DeleteUnit(HateoasResponse<UnitModel> unit);
+    Task DeleteUnit(string relativeUri);
 
     void OpenIndexPage();
 

@@ -43,7 +43,7 @@
 
 @code {
     [Parameter]
-    public string UnitId { get; set; }
+    public string UnitId { get; set; } = string.Empty;
 
     private readonly Dictionary<UnitGroup, string> unitGroups = UnitExtensions.GetUnitGroups();
     private HateoasResponse<UnitForUpdateModel> unitModel = new();
@@ -72,7 +72,7 @@
 
     private async Task SubmitUnit()
     {
-        await UnitService.UpdateUnit(Guid.Parse(UnitId), unitModel.Item);
+        await UnitService.UpdateUnit(unitModel.Links.First(link => link.Rel == HateoasConstants.Update).Href, unitModel.Item);
         errorMessages = UnitService.ResponseBody.GetAllErrors();
     }
 }

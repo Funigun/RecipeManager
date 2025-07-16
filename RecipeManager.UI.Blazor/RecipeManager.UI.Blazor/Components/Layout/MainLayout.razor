@@ -31,17 +31,17 @@
 
     @if (isUserAuthenticated)
     {
-        <MudDrawer @bind-Open="showSideMenu" Overlay="false" ClipMode="DrawerClipMode.Always" Elevation="0" Variant="@DrawerVariant.Persistent">
+        <MudDrawer @bind-Open="showSideMenu" Overlay="false" ClipMode="DrawerClipMode.Always" Elevation="0" Variant="@DrawerVariant.Temporary">
             <NavMenu />
         </MudDrawer>
     }
 
     <MudMainContent>
-         <MudContainer Class="mt-6">
+        
              <div style="justify-self:center; justify-items: center; align-items: center; min-width:25%">
                  @Body
              </div>
-         </MudContainer>
+      
     </MudMainContent>
 </MudLayout>
 

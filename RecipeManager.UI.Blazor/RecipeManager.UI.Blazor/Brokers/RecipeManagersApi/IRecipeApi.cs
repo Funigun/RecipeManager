@@ -1,17 +1,14 @@
-﻿using RecipeManager.UI.Blazor.Features.Units.CreateUnit;
-using RecipeManager.UI.Blazor.Features.Units.UpdateUnit;
-
-namespace RecipeManager.UI.Blazor.Brokers.RecipeManagersApi;
+﻿namespace RecipeManager.UI.Blazor.Brokers.RecipeManagersApi;
 
 public interface IRecipeApi
 {
-    Task<HttpResponseMessage> CreateUnit(UnitForCreateModel unit);
+    Task<HttpResponseMessage> Create<TItem>(string relativeUri, TItem item);
 
-    Task<HttpResponseMessage> GetUnitById(Guid unitId);
+    Task<HttpResponseMessage> GetById(string relativeUri);
 
-    Task<HttpResponseMessage> GetUnits();
+    Task<HttpResponseMessage> GetAll(string relativeUri);
 
-    Task<HttpResponseMessage> UpdateUnit(Guid unitId, UnitForUpdateModel unit);
+    Task<HttpResponseMessage> Update<TItem>(string relativeUri, TItem item);
 
-    Task<HttpResponseMessage> DeleteUnit(Guid unitId);
+    Task<HttpResponseMessage> Delete(string relativeUri);
 }
