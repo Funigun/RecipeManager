@@ -11,7 +11,8 @@ internal static class DatabaseSeeder
         dbContext.Units.AddRange
         (
             Unit.Create("Duplicated Name", "TU", UnitGroup.Weight),
-            Unit.Create("Test", "Duplicated Short Name", UnitGroup.Weight)
+            Unit.Create("Test", "Duplicated Short Name", UnitGroup.Weight),
+            Unit.Create("To Delete", null, UnitGroup.Weight)
         );
 
         await dbContext.SaveChangesAsync();

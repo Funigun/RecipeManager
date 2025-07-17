@@ -1,4 +1,5 @@
-﻿using DotNet.Testcontainers.Builders;
+﻿using System.Net.Http.Headers;
+using DotNet.Testcontainers.Builders;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
@@ -11,7 +12,6 @@ using RecipeManager.Integration.Tests.CoreApi.TestFixtures;
 using Testcontainers.MsSql;
 
 [assembly: AssemblyFixture(typeof(WebApiFactory))]
-
 namespace RecipeManager.Integration.Tests.CoreApi.TestFixtures;
 
 public sealed class WebApiFactory : WebApplicationFactory<IAssemblyMarker>, IAsyncLifetime
@@ -70,9 +70,13 @@ public sealed class WebApiFactory : WebApplicationFactory<IAssemblyMarker>, IAsy
         DbContext = new(options, UserMockFactory.CreateMockedAdmin());
 
         await DbContext.Database.MigrateAsync();
-        await DbContext.SeedAsync();
 
         HttpClient = CreateClient();
+
+        HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", TokenMockFactory.GenerateJwtToken(UserMockFactory.CreateMockedAdmin()));
+        _ = await HttpClient.GetAsync("/api/units", CancellationToken.None);
+
+        await DbContext.SeedAsync();
     }
 
     public new async Task DisposeAsync()

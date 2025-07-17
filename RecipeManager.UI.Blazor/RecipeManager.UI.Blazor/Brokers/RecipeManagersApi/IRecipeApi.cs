@@ -2,13 +2,13 @@
 
 public interface IRecipeApi
 {
-    Task<HttpResponseMessage> Create<TItem>(string relativeUri, TItem item);
+    Task<HttpResponseMessage> Create<TItem>(Uri uri, TItem item);
 
-    Task<HttpResponseMessage> GetById(string relativeUri);
+    Task<HttpResponseMessage> GetById(Uri uri);
 
-    Task<HttpResponseMessage> GetAll(string relativeUri);
+    Task<HttpResponseMessage> GetAll(Uri uri);
 
-    Task<HttpResponseMessage> Update<TItem>(string relativeUri, TItem item);
+    Task<HttpResponseMessage> Update<TItem>(Uri uri, TItem item);
 
-    Task<HttpResponseMessage> Delete(string relativeUri);
+    Task<HttpResponseMessage> DeleteItem(Uri uri);
 }

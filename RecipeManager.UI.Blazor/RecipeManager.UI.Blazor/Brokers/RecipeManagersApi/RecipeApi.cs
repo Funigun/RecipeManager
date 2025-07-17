@@ -2,35 +2,35 @@
 
 namespace RecipeManager.UI.Blazor.Brokers.RecipeManagersApi;
 
-public sealed partial class RecipeApi(HttpClient httpClient, ProtectedLocalStorage localStorage) : ApiBroker(httpClient, localStorage), IRecipeApi
+public sealed class RecipeApi(HttpClient httpClient, ProtectedLocalStorage localStorage) : ApiBroker(httpClient, localStorage), IRecipeApi
 {
-    public async Task<HttpResponseMessage> Create<TItem>(string uri, TItem item)
+    public async Task<HttpResponseMessage> Create<TItem>(Uri uri, TItem item)
     {
         await AddAuthorizationHeader();
-        return await Post(new Uri(uri, UriKind.Relative), item);
+        return await Post(uri, item);
     }
 
-    public async Task<HttpResponseMessage> GetById(string uri)
+    public async Task<HttpResponseMessage> GetById(Uri uri)
     {
         await AddAuthorizationHeader();
-        return await Get(new Uri(uri, UriKind.Relative));
+        return await Get(uri);
     }
 
-    public async Task<HttpResponseMessage> GetAll(string uri)
+    public async Task<HttpResponseMessage> GetAll(Uri uri)
     {
         await AddAuthorizationHeader();
-        return await Get(new Uri(uri, UriKind.Relative));
+        return await Get(uri);
     }
 
-    public async Task<HttpResponseMessage> Update<TItem>(string relativeUri, TItem item)
+    public async Task<HttpResponseMessage> Update<TItem>(Uri uri, TItem item)
     {
         await AddAuthorizationHeader();
-        return await Put(new Uri(relativeUri), item);
+        return await Put(uri, item);
     }
 
-    public async Task<HttpResponseMessage> Delete(string uri)
+    public async Task<HttpResponseMessage> DeleteItem(Uri uri)
     {
         await AddAuthorizationHeader();
-        return await Delete(new Uri(uri));
+        return await Delete(uri);
     }
 }

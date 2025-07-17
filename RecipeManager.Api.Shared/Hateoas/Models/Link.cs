@@ -2,11 +2,11 @@
 
 public sealed class Link
 {
-    public string Href { get; init; }
+    public string Href { get; init; } = default!;
 
-    public string Rel { get; init; }
+    public string Rel { get; init; } = default!;
 
-    public string Method { get; init; }
+    public string Method { get; init; } = default!;
 
     public Link()
     {

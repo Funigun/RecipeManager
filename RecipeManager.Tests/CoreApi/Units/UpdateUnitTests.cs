@@ -1,6 +1,7 @@
 ﻿using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
+using Microsoft.EntityFrameworkCore;
 using RecipeManager.Api.Features.Units;
 using RecipeManager.Integration.Tests.Common.Users;
 using RecipeManager.Integration.Tests.CoreApi.TestFixtures;
@@ -35,15 +36,47 @@ public sealed class UpdateUnitTests : BaseIntegrationTest
     [InlineData("", "TU", 1, "Missing Unit Name")]
     [InlineData("Test", "", 1, "Missing Short Name")]
     [InlineData("Another Unit", "AU", 100, "Invalid Unit Group")]
-    [InlineData("Duplicated Name", null, 1, "Duplicate Unit Name")]
-    [InlineData("Test", "Duplicated Short Name", 1, "Duplicate Unit Short Name")]
     public async Task UpdateUnit_ShouldReturn_BadRequest_ForInvalidInput(string unitName, string? shortName, int group, string justification)
     {
         // Arrange
         HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", TokenMockFactory.GenerateJwtToken(UserMockFactory.CreateMockedAdmin()));
 
-        Guid unitId = DbContext.Units.Select(unit => unit.Id.Value).First();
+        Guid unitId = DbContext.Units.AsNoTracking().Select(unit => unit.Id.Value).First();
         UpdateUnit.Request updateUnitRequest = new(unitName, shortName, group);
+        StringContent content = new(JsonSerializer.Serialize(updateUnitRequest), Encoding.UTF8, "application/json");
+
+        // Act
+        HttpResponseMessage response = await HttpClient.PutAsync($"/api/units/{unitId}", content, CancellationToken.None);
+
+        // Assert
+        Assert.Equal(System.Net.HttpStatusCode.BadRequest, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task UpdateUnit_ShouldReturn_BadRequest_ForDuplicatedName()
+    {
+        // Arrange
+        HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", TokenMockFactory.GenerateJwtToken(UserMockFactory.CreateMockedAdmin()));
+
+        Guid unitId = (await DbContext.Units.AsNoTracking().FirstAsync(unit => unit.Name != "Duplicated Name", CancellationToken.None)).Id.Value;
+        UpdateUnit.Request updateUnitRequest = new("Duplicated Name", "shortName", 1);
+        StringContent content = new(JsonSerializer.Serialize(updateUnitRequest), Encoding.UTF8, "application/json");
+
+        // Act
+        HttpResponseMessage response = await HttpClient.PutAsync($"/api/units/{unitId}", content, CancellationToken.None);
+
+        // Assert
+        Assert.Equal(System.Net.HttpStatusCode.BadRequest, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task UpdateUnit_ShouldReturn_BadRequest_ForDuplicatedShortName()
+    {
+        // Arrange
+        HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", TokenMockFactory.GenerateJwtToken(UserMockFactory.CreateMockedAdmin()));
+
+        Guid unitId = (await DbContext.Units.AsNoTracking().FirstAsync(unit => unit.ShortName != "Duplicated Short Name", CancellationToken.None)).Id.Value;
+        UpdateUnit.Request updateUnitRequest = new("Duplicated", "Duplicated Short Name", 1);
         StringContent content = new(JsonSerializer.Serialize(updateUnitRequest), Encoding.UTF8, "application/json");
 
         // Act
@@ -59,7 +92,7 @@ public sealed class UpdateUnitTests : BaseIntegrationTest
         // Arrange
         HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", TokenMockFactory.GenerateJwtToken(UserMockFactory.CreateMockedAdmin()));
 
-        Guid unitId = DbContext.Units.Select(unit => unit.Id.Value).First();
+        Guid unitId = DbContext.Units.AsNoTracking().Select(unit => unit.Id.Value).First();
         UpdateUnit.Request updateUnitRequest = new("Updated Unit", "UU", 0);
         StringContent content = new(JsonSerializer.Serialize(updateUnitRequest), Encoding.UTF8, "application/json");
 
