@@ -261,6 +261,9 @@ dotnet_diagnostic.CA1031.severity = none
 # CA1032: Add constructor to exception types
 dotnet_diagnostic.CA1032.severity = none
 
+# CA1034 Do not nest Types
+dotnet_diagnostic.CA1034.severity = none
+
 # CA1040: Avoid empty interfaces
 dotnet_diagnostic.CA1040.severity = none
 

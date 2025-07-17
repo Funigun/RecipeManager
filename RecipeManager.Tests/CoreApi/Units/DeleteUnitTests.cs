@@ -1,4 +1,5 @@
 ﻿using System.Net.Http.Headers;
+using Microsoft.EntityFrameworkCore;
 using RecipeManager.Integration.Tests.Common.Users;
 using RecipeManager.Integration.Tests.CoreApi.TestFixtures;
 
@@ -45,7 +46,7 @@ public sealed class DeleteUnitTests : BaseIntegrationTest
         // Arrange
         HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", TokenMockFactory.GenerateJwtToken(UserMockFactory.CreateMockedAdmin()));
 
-        Guid unitId = DbContext.Units.Select(unit => unit.Id.Value).First();
+        Guid unitId = (await DbContext.Units.AsNoTracking().FirstAsync(unit => unit.Name == "To Delete", CancellationToken.None)).Id.Value;
 
         // Act
         HttpResponseMessage deleteResponse = await HttpClient.DeleteAsync($"/api/units/{unitId}", CancellationToken.None);

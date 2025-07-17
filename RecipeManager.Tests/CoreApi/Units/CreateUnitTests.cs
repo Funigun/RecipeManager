@@ -12,6 +12,7 @@ public sealed class CreateUnitTests : BaseIntegrationTest
 {
     public CreateUnitTests(WebApiFactory apiFactory) : base(apiFactory)
     {
+
     }
 
     [Fact]

@@ -22,7 +22,7 @@ public class UnitService(IRecipeApi recipeApi, ISnackbar snackbar, NavigationMan
 
     public async Task CreateUnit(UnitForCreateModel unit)
     {
-        HttpResponseMessage response = await recipeApi.Create(UnitsApiUrl, unit);
+        HttpResponseMessage response = await recipeApi.Create(new Uri(UnitsApiUrl, UriKind.Relative), unit);
 
         if (response.IsSuccessStatusCode)
         {
@@ -33,9 +33,9 @@ public class UnitService(IRecipeApi recipeApi, ISnackbar snackbar, NavigationMan
         ResponseBody = (await response.Content.ReadFromJsonAsync<ApiResponseBody>())!;
     }
 
-    public async Task<HateoasResponse<UnitForUpdateModel>> GetUnitById(Guid id)
+    public async Task<HateoasResponse<UnitForUpdateModel>> GetUnitById(Guid unitId)
     {
-        HttpResponseMessage response = await recipeApi.GetById($"{UnitsApiUrl}/{id}");
+        HttpResponseMessage response = await recipeApi.GetById(new Uri($"{UnitsApiUrl}/{unitId}", UriKind.Relative));
 
         if (response.IsSuccessStatusCode)
         {
@@ -49,7 +49,7 @@ public class UnitService(IRecipeApi recipeApi, ISnackbar snackbar, NavigationMan
 
     public async Task<HateoasCollectionResponse<UnitModel>> GetUnits()
     {
-        HttpResponseMessage response = await recipeApi.GetAll(UnitsApiUrl);
+        HttpResponseMessage response = await recipeApi.GetAll(new Uri(UnitsApiUrl, UriKind.Relative));
 
         return response.IsSuccessStatusCode
              ? (await response.Content.ReadFromJsonAsync<HateoasCollectionResponse<UnitModel>>())!
@@ -58,7 +58,7 @@ public class UnitService(IRecipeApi recipeApi, ISnackbar snackbar, NavigationMan
 
     public async Task UpdateUnit(string relativeUri, UnitForUpdateModel unit)
     {
-        HttpResponseMessage response = await recipeApi.Update(relativeUri, unit);
+        HttpResponseMessage response = await recipeApi.Update(new Uri(relativeUri), unit);
 
         if (response.IsSuccessStatusCode)
         {
@@ -73,7 +73,7 @@ public class UnitService(IRecipeApi recipeApi, ISnackbar snackbar, NavigationMan
 
     public async Task DeleteUnit(string relativeUri)
     {
-        HttpResponseMessage response = await recipeApi.Delete(relativeUri);
+        HttpResponseMessage response = await recipeApi.DeleteItem(new Uri(relativeUri));
 
         if (response.IsSuccessStatusCode)
         {
