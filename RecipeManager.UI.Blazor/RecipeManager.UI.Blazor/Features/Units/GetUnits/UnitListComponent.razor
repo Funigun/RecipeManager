@@ -23,8 +23,8 @@
         <MudTd DataLabel="Short Name">@context.Item.ShortName</MudTd>
         <MudTd DataLabel="Group">@context.Item.Group</MudTd>
         <MudTd DataLabel="Actions">
-            <MudIconButton Variant="Variant.Filled" Color="Color.Primary" Size="Size.Small" Icon="@Icons.Material.Filled.Edit" OnClick="() => UpdateUnit(context)"></MudIconButton>
-            <MudIconButton Variant="Variant.Filled" Color="Color.Error" Size="Size.Small" Icon="@Icons.Material.Filled.Delete" OnClick="() => DeleteUnit(context)"></MudIconButton>
+            <MudIconButton Disabled="@context.Links.Any(link => link.Rel == HateoasConstants.Delete)" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Small" Icon="@Icons.Material.Filled.Edit" OnClick="() => UpdateUnit(context)"></MudIconButton>
+            <MudIconButton Disabled="@context.Links.Any(link => link.Rel == HateoasConstants.Update)" Variant="Variant.Filled" Color="Color.Error" Size="Size.Small" Icon="@Icons.Material.Filled.Delete" OnClick="() => DeleteUnit(context)"></MudIconButton>
         </MudTd>
     </RowTemplate>
 </MudTable>
@@ -40,19 +40,16 @@
     {
         if (await DialogService.ShowDeleteConfirmationMessage())
         {
-            await UnitService.DeleteUnit(selectedItem);
+            await UnitService.DeleteUnit(selectedItem.Links.First(link => link.Rel == HateoasConstants.Delete).Href);
         }
     }
 
     private Task UpdateUnit(HateoasResponse<UnitModel> selectedItem)
     {
-        string? updateLink = selectedItem.Links.FirstOrDefault(link => link.Rel == "update")?.Href;
+        string updateLink = selectedItem.Links.First(link => link.Rel == HateoasConstants.Update).Href;
 
-        if (updateLink is not null)
-        {
-            UnitService.OpenUpdateUnitPage(selectedItem.Item.UnitId);
-        }
-
+        UnitService.OpenUpdateUnitPage(selectedItem.Item.UnitId);
+        
         return Task.CompletedTask;
     }
 }

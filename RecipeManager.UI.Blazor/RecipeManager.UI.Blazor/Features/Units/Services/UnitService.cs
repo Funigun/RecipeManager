@@ -1,36 +1,41 @@
 ﻿using Microsoft.AspNetCore.Components;
+using MudBlazor;
 using RecipeManager.UI.Blazor.Brokers.HateoasModel;
 using RecipeManager.UI.Blazor.Brokers.RecipeManagersApi;
 using RecipeManager.UI.Blazor.Components.Common;
+using RecipeManager.UI.Blazor.Components.Extensions;
 using RecipeManager.UI.Blazor.Features.Units.CreateUnit;
 using RecipeManager.UI.Blazor.Features.Units.GetUnits;
 using RecipeManager.UI.Blazor.Features.Units.UpdateUnit;
 
 namespace RecipeManager.UI.Blazor.Features.Units.Services;
 
-public class UnitService(IRecipeApi recipeApi, NavigationManager navigationManager) : IUnitService
+public class UnitService(IRecipeApi recipeApi, ISnackbar snackbar, NavigationManager navigationManager) : IUnitService
 {
-    private const string UnitsEndpoint = "/admin/measurement-units";
-    private const string CreateUnitsEndpoint = "/admin/measurement-units/create";
-    private const string UpdateUnitsEndpoint = "/admin/measurement-units/update";
+    private const string UnitsPageUrl = "/admin/measurement-units";
+    private const string CreateUnitPageUrl = "/admin/measurement-units/create";
+    private const string UpdateUnitPageUrl = "/admin/measurement-units/update";
+
+    private const string UnitsApiUrl = "api/units";
 
     public ApiResponseBody ResponseBody { get; private set; } = new();
 
     public async Task CreateUnit(UnitForCreateModel unit)
     {
-        HttpResponseMessage response = await recipeApi.CreateUnit(unit);
+        HttpResponseMessage response = await recipeApi.Create(UnitsApiUrl, unit);
 
         if (response.IsSuccessStatusCode)
         {
-            navigationManager.NavigateTo(UnitsEndpoint);
+            navigationManager.NavigateTo(UnitsPageUrl);
+            snackbar.ShowSuccess("Unit added sucessfully");
         }
 
         ResponseBody = (await response.Content.ReadFromJsonAsync<ApiResponseBody>())!;
     }
 
-    public async Task<HateoasResponse<UnitForUpdateModel>> GetUnitById(Guid unitId)
+    public async Task<HateoasResponse<UnitForUpdateModel>> GetUnitById(Guid id)
     {
-        HttpResponseMessage response = await recipeApi.GetUnitById(unitId);
+        HttpResponseMessage response = await recipeApi.GetById($"{UnitsApiUrl}/{id}");
 
         if (response.IsSuccessStatusCode)
         {
@@ -44,20 +49,21 @@ public class UnitService(IRecipeApi recipeApi, NavigationManager navigationManag
 
     public async Task<HateoasCollectionResponse<UnitModel>> GetUnits()
     {
-        HttpResponseMessage response = await recipeApi.GetUnits();
+        HttpResponseMessage response = await recipeApi.GetAll(UnitsApiUrl);
 
         return response.IsSuccessStatusCode
              ? (await response.Content.ReadFromJsonAsync<HateoasCollectionResponse<UnitModel>>())!
              : new HateoasCollectionResponse<UnitModel>();
     }
 
-    public async Task UpdateUnit(Guid unitId, UnitForUpdateModel unit)
+    public async Task UpdateUnit(string relativeUri, UnitForUpdateModel unit)
     {
-        HttpResponseMessage response = await recipeApi.UpdateUnit(unitId, unit);
+        HttpResponseMessage response = await recipeApi.Update(relativeUri, unit);
 
         if (response.IsSuccessStatusCode)
         {
-            navigationManager.NavigateTo(UnitsEndpoint);
+            navigationManager.NavigateTo(UnitsPageUrl);
+            snackbar.ShowSuccess("Unit updated sucessfully");
         }
         else
         {
@@ -65,33 +71,29 @@ public class UnitService(IRecipeApi recipeApi, NavigationManager navigationManag
         }
     }
 
-    public async Task DeleteUnit(HateoasResponse<UnitModel> unit)
+    public async Task DeleteUnit(string relativeUri)
     {
-        Link? deleteLink = unit.Links.FirstOrDefault(x => x.Rel == "delete");
+        HttpResponseMessage response = await recipeApi.Delete(relativeUri);
 
-        if (deleteLink is not null)
+        if (response.IsSuccessStatusCode)
         {
-            HttpResponseMessage response = await recipeApi.DeleteUnit(unit.Item.UnitId);
-
-            if (response.IsSuccessStatusCode)
-            {
-                navigationManager.Refresh(true);
-            }
+            navigationManager.Refresh(true);
+            snackbar.ShowSuccess("Unit deleted sucessfully");
         }
     }
 
     public void OpenIndexPage()
     {
-        navigationManager.NavigateTo(UnitsEndpoint);
+        navigationManager.NavigateTo(UnitsPageUrl);
     }
 
     public void OpenCreateUnitPage()
     {
-        navigationManager.NavigateTo(CreateUnitsEndpoint);
+        navigationManager.NavigateTo(CreateUnitPageUrl);
     }
 
     public void OpenUpdateUnitPage(Guid unitId)
     {
-        navigationManager.NavigateTo($"{UpdateUnitsEndpoint}/{unitId}");
+        navigationManager.NavigateTo($"{UpdateUnitPageUrl}/{unitId}");
     }
 }
