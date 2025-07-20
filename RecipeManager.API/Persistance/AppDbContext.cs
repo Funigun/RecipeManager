@@ -3,10 +3,14 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using RecipeManager.Api.Application.Abstractions;
 using RecipeManager.Api.Domain.Common.Abstractions;
+using RecipeManager.Api.Domain.Cookbooks;
 using RecipeManager.Api.Domain.Ingredients;
+using RecipeManager.Api.Domain.Recipes;
 using RecipeManager.Api.Domain.Units;
+using RecipeManager.Api.Persistance.Configuration.Cookbooks;
 using RecipeManager.Api.Persistance.Configuration.Id;
 using RecipeManager.Api.Persistance.Configuration.Ingredients.Converters;
+using RecipeManager.Api.Persistance.Configuration.Recipes.Converters;
 using RecipeManager.Api.Persistance.Configuration.Units;
 using RecipeManager.Api.Shared.Contracts.Authorization;
 
@@ -59,6 +63,11 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
 
         configurationBuilder.Properties<IngredientCategoryId>().HaveConversion<IngredientCategoryIdConverter>();
         configurationBuilder.Properties<IngredientId>().HaveConversion<IngredientIdConverter>();
+
+        configurationBuilder.Properties<RecipeCategoryId>().HaveConversion<RecipeCategoryIdConverter>();
+        configurationBuilder.Properties<RecipeId>().HaveConversion<RecipeIdConverter>();
+
+        configurationBuilder.Properties<CookbookId>().HaveConversion<CookbookIdConverter>();
     }
 
     private void UpdateEntities()
