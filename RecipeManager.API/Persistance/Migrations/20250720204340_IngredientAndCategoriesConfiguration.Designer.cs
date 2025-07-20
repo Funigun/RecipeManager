@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using RecipeManager.Api.Persistance;
 
@@ -11,9 +12,11 @@ using RecipeManager.Api.Persistance;
 namespace RecipeManager.Api.Persistance.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250720204340_IngredientAndCategoriesConfiguration")]
+    partial class IngredientAndCategoriesConfiguration
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -145,31 +148,7 @@ namespace RecipeManager.Api.Persistance.Migrations
                                 .HasForeignKey("IngredientId");
                         });
 
-                    b.OwnsMany("RecipeManager.Api.Domain.Recipes.RecipeId", "Recipes", b1 =>
-                        {
-                            b1.Property<Guid>("IngredientId")
-                                .HasColumnType("uniqueidentifier");
-
-                            b1.Property<int>("Id")
-                                .ValueGeneratedOnAdd()
-                                .HasColumnType("int");
-
-                            SqlServerPropertyBuilderExtensions.UseIdentityColumn(b1.Property<int>("Id"));
-
-                            b1.Property<Guid>("Value")
-                                .HasColumnType("uniqueidentifier");
-
-                            b1.HasKey("IngredientId", "Id");
-
-                            b1.ToTable("IngredientToRecipe", (string)null);
-
-                            b1.WithOwner()
-                                .HasForeignKey("IngredientId");
-                        });
-
                     b.Navigation("Categories");
-
-                    b.Navigation("Recipes");
                 });
 
             modelBuilder.Entity("RecipeManager.Api.Domain.Ingredients.IngredientCategory", b =>

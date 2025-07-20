@@ -1,6 +1,10 @@
 ﻿namespace RecipeManager.Api.Domain.Ingredients;
 
-public record struct IngredientCategoryId(Guid Value)
+public record IngredientCategoryId(Guid Value)
 {
-    public override readonly string ToString() => Value.ToString();
+    public static implicit operator Guid(IngredientCategoryId id) => id.Value;
+
+    public static implicit operator IngredientCategoryId(Guid value) => new(value);
+
+    public override string ToString() => Value.ToString();
 }

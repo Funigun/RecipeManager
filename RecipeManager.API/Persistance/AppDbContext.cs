@@ -3,8 +3,11 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using RecipeManager.Api.Application.Abstractions;
 using RecipeManager.Api.Domain.Common.Abstractions;
+using RecipeManager.Api.Domain.Ingredients;
 using RecipeManager.Api.Domain.Units;
 using RecipeManager.Api.Persistance.Configuration.Id;
+using RecipeManager.Api.Persistance.Configuration.Ingredients.Converters;
+using RecipeManager.Api.Persistance.Configuration.Units;
 using RecipeManager.Api.Shared.Contracts.Authorization;
 
 namespace RecipeManager.Api.Persistance;
@@ -49,7 +52,13 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
     {
         base.ConfigureConventions(configurationBuilder);
+
         configurationBuilder.Conventions.Add(_ => new GuidFinalizingConvention());
+
+        configurationBuilder.Properties<UnitId>().HaveConversion<UnitIdConverter>();
+
+        configurationBuilder.Properties<IngredientCategoryId>().HaveConversion<IngredientCategoryIdConverter>();
+        configurationBuilder.Properties<IngredientId>().HaveConversion<IngredientIdConverter>();
     }
 
     private void UpdateEntities()

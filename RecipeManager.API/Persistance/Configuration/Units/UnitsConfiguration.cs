@@ -2,14 +2,15 @@
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using RecipeManager.Api.Domain.Units;
 
-namespace RecipeManager.Api.Persistance.Configuration;
+namespace RecipeManager.Api.Persistance.Configuration.Units;
 
 public class UnitsConfiguration : IEntityTypeConfiguration<Unit>
 {
     public void Configure(EntityTypeBuilder<Unit> builder)
     {
+        builder.ToTable("Unit");
+
         builder.Property(unit => unit.Id)
-               .HasConversion(id => id.Value, value => new UnitId(value))
                .ValueGeneratedOnAdd();
 
         builder.Property(unit => unit.Name)
