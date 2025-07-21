@@ -294,6 +294,9 @@ dotnet_diagnostic.CA1848.severity = none
 # CA2007: Consider calling ConfigureAwait on the awaited task
 dotnet_diagnostic.CA2007.severity = none
 
+# CA2225: Operator overloads have named alternates
+dotnet_diagnostic.CA2225.severity = none
+
 # CA2227: Collection properties should be read only ToDo: TBC
 dotnet_diagnostic.CA2007.severity = none
 
@@ -346,3 +349,6 @@ dotnet_diagnostic.SA1200.severity = none
 
 # CA1707: Identifiers should not contain underscores
 dotnet_diagnostic.CA1707.severity = none
+
+# S2365 Property should not return copy of Collection
+dotnet_diagnostic.S2365.severity = none

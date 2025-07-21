@@ -9,7 +9,7 @@ public sealed class Ingredient : AuditableEntity, IEntity<IngredientId>
 
     private List<IngredientCategoryId> _categories = [];
 
-    public IngredientId Id { get; set; }
+    public IngredientId Id { get; set; } = default!;
 
     public string Name { get; set; } = string.Empty;
 

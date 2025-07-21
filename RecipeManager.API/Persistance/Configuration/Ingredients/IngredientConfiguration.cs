@@ -22,7 +22,7 @@ public sealed class IngredientConfiguration : IEntityTypeConfiguration<Ingredien
             categories.ToTable("IngredientToIngredientCategory");
         });
 
-        builder.OwnsMany(Ingredient => Ingredient.Recipes, recipes =>
+        builder.OwnsMany(ingredient => ingredient.Recipes, recipes =>
         {
             recipes.ToTable("IngredientToRecipe");
         });
