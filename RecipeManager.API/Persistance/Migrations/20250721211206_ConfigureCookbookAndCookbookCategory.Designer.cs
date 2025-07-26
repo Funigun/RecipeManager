@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using RecipeManager.Api.Persistance;
 
@@ -11,9 +12,11 @@ using RecipeManager.Api.Persistance;
 namespace RecipeManager.Api.Persistance.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250721211206_ConfigureCookbookAndCookbookCategory")]
+    partial class ConfigureCookbookAndCookbookCategory
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -171,59 +174,6 @@ namespace RecipeManager.Api.Persistance.Migrations
             modelBuilder.Entity("RecipeManager.Api.Domain.Recipes.Recipe", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("CreatedBy")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("CreatedOn")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Description")
-                        .HasMaxLength(1500)
-                        .HasColumnType("nvarchar(1500)");
-
-                    b.Property<int>("Difficulty")
-                        .HasColumnType("int");
-
-                    b.Property<string>("ImageURL")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid?>("IngredientId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("ModifiedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("ModifiedOn")
-                        .HasColumnType("datetime2");
-
-                    b.Property<byte>("NumberOfServings")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("tinyint")
-                        .HasDefaultValue((byte)1);
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasMaxLength(150)
-                        .HasColumnType("nvarchar(150)");
-
-                    b.Property<string>("VideoURL")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("IngredientId");
-
-                    b.ToTable("Recipe", (string)null);
-                });
-
-            modelBuilder.Entity("RecipeManager.Api.Domain.Recipes.RecipeCategory", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("CreatedBy")
@@ -241,53 +191,11 @@ namespace RecipeManager.Api.Persistance.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<Guid?>("ParentId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid?>("RecipeId")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ParentId");
-
-                    b.HasIndex("RecipeId");
-
-                    b.ToTable("RecipeCategory", (string)null);
-                });
-
-            modelBuilder.Entity("RecipeManager.Api.Domain.Recipes.RecipeIngredient", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<decimal>("Amount")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<Guid>("IngredientId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("RecipeId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("UnitId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("IngredientId");
-
-                    b.HasIndex("RecipeId");
-
-                    b.HasIndex("UnitId");
-
-                    b.ToTable("RecipeIngredient", (string)null);
+                    b.ToTable("Recipe");
                 });
 
             modelBuilder.Entity("RecipeManager.Api.Domain.Units.Unit", b =>
@@ -416,138 +324,6 @@ namespace RecipeManager.Api.Persistance.Migrations
                         .OnDelete(DeleteBehavior.NoAction);
                 });
 
-            modelBuilder.Entity("RecipeManager.Api.Domain.Recipes.Recipe", b =>
-                {
-                    b.HasOne("RecipeManager.Api.Domain.Ingredients.Ingredient", null)
-                        .WithMany()
-                        .HasForeignKey("IngredientId")
-                        .OnDelete(DeleteBehavior.SetNull);
-
-                    b.OwnsOne("RecipeManager.Api.Domain.Recipes.ValueObjects.RecipeAmount", "Amount", b1 =>
-                        {
-                            b1.Property<Guid>("RecipeId")
-                                .HasColumnType("uniqueidentifier");
-
-                            b1.Property<double>("Amount")
-                                .HasColumnType("float")
-                                .HasColumnName("Amount");
-
-                            b1.Property<Guid?>("UnitId")
-                                .HasColumnType("uniqueidentifier");
-
-                            b1.HasKey("RecipeId");
-
-                            b1.HasIndex("UnitId");
-
-                            b1.ToTable("Recipe");
-
-                            b1.WithOwner()
-                                .HasForeignKey("RecipeId");
-
-                            b1.HasOne("RecipeManager.Api.Domain.Units.Unit", "Unit")
-                                .WithMany()
-                                .HasForeignKey("UnitId");
-
-                            b1.Navigation("Unit");
-                        });
-
-                    b.OwnsMany("RecipeManager.Api.Domain.Recipes.ValueObjects.RecipeSection", "Sections", b1 =>
-                        {
-                            b1.Property<int>("Id")
-                                .ValueGeneratedOnAdd()
-                                .HasColumnType("int");
-
-                            SqlServerPropertyBuilderExtensions.UseIdentityColumn(b1.Property<int>("Id"));
-
-                            b1.Property<Guid>("RecipeId")
-                                .HasColumnType("uniqueidentifier");
-
-                            b1.Property<int>("Type")
-                                .HasColumnType("int");
-
-                            b1.HasKey("Id");
-
-                            b1.HasIndex("RecipeId");
-
-                            b1.ToTable("RecipeSection", (string)null);
-
-                            b1.WithOwner()
-                                .HasForeignKey("RecipeId");
-
-                            b1.OwnsMany("RecipeManager.Api.Domain.Recipes.ValueObjects.RecipeStep", "Steps", b2 =>
-                                {
-                                    b2.Property<int>("RecipeSectionId")
-                                        .HasColumnType("int");
-
-                                    b2.Property<int>("Id")
-                                        .ValueGeneratedOnAdd()
-                                        .HasColumnType("int");
-
-                                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b2.Property<int>("Id"));
-
-                                    b2.Property<string>("Description")
-                                        .IsRequired()
-                                        .HasMaxLength(500)
-                                        .HasColumnType("nvarchar(500)")
-                                        .HasColumnName("StepDescription");
-
-                                    b2.Property<string>("ImageUrl")
-                                        .HasColumnType("nvarchar(max)")
-                                        .HasColumnName("StepImage");
-
-                                    b2.Property<int>("Order")
-                                        .HasColumnType("int")
-                                        .HasColumnName("StepOrder");
-
-                                    b2.HasKey("RecipeSectionId", "Id");
-
-                                    b2.ToTable("RecipeSectionStep", (string)null);
-
-                                    b2.WithOwner()
-                                        .HasForeignKey("RecipeSectionId");
-                                });
-
-                            b1.Navigation("Steps");
-                        });
-
-                    b.Navigation("Amount")
-                        .IsRequired();
-
-                    b.Navigation("Sections");
-                });
-
-            modelBuilder.Entity("RecipeManager.Api.Domain.Recipes.RecipeCategory", b =>
-                {
-                    b.HasOne("RecipeManager.Api.Domain.Recipes.RecipeCategory", null)
-                        .WithMany("Subcategories")
-                        .HasForeignKey("ParentId");
-
-                    b.HasOne("RecipeManager.Api.Domain.Recipes.Recipe", null)
-                        .WithMany("Categories")
-                        .HasForeignKey("RecipeId");
-                });
-
-            modelBuilder.Entity("RecipeManager.Api.Domain.Recipes.RecipeIngredient", b =>
-                {
-                    b.HasOne("RecipeManager.Api.Domain.Ingredients.Ingredient", null)
-                        .WithMany()
-                        .HasForeignKey("IngredientId")
-                        .OnDelete(DeleteBehavior.ClientCascade)
-                        .IsRequired();
-
-                    b.HasOne("RecipeManager.Api.Domain.Recipes.Recipe", null)
-                        .WithMany("Ingredients")
-                        .HasForeignKey("RecipeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("RecipeManager.Api.Domain.Units.Unit", null)
-                        .WithMany()
-                        .HasForeignKey("UnitId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("RecipeManager.Api.Domain.Cookbooks.Cookbook", b =>
                 {
                     b.Navigation("Categories");
@@ -559,18 +335,6 @@ namespace RecipeManager.Api.Persistance.Migrations
                 });
 
             modelBuilder.Entity("RecipeManager.Api.Domain.Ingredients.IngredientCategory", b =>
-                {
-                    b.Navigation("Subcategories");
-                });
-
-            modelBuilder.Entity("RecipeManager.Api.Domain.Recipes.Recipe", b =>
-                {
-                    b.Navigation("Categories");
-
-                    b.Navigation("Ingredients");
-                });
-
-            modelBuilder.Entity("RecipeManager.Api.Domain.Recipes.RecipeCategory", b =>
                 {
                     b.Navigation("Subcategories");
                 });

@@ -4,7 +4,24 @@ namespace RecipeManager.Api.Domain.Cookbooks;
 
 public sealed class Cookbook : AuditableEntity, IEntity<CookbookId>
 {
-    public CookbookId Id { get; set; }
+    private List<CookbookCategory> _categories = [];
 
-    public string Name { get; set; } = string.Empty;
+    public CookbookId Id { get; set; } = default!;
+
+    public string Title { get; set; } = string.Empty;
+
+    public IReadOnlyList<CookbookCategory> Categories => _categories.ToList();
+
+    private Cookbook()
+    {
+    }
+
+    public static Cookbook Create(string title, IEnumerable<CookbookCategory> categories)
+    {
+        return new()
+        {
+            Title = title,
+            _categories = categories.ToList()
+        };
+    }
 }
