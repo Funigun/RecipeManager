@@ -9,7 +9,7 @@ public class UnitsGroup : IGroupEndpoint
     public void Configure(RouteGroupBuilder groupBuilder)
     {
         groupBuilder.WithDescription("Measurement units features")
-                    .WithTags("units")
+                    .WithTags("Measurement Units")
                     .RequireAuthorization("RecipeManagerPolicy")
                     .ProducesProblem(StatusCodes.Status401Unauthorized);
     }
