@@ -19,7 +19,8 @@ internal static class DatabaseSeeder
 
         dbContext.RecipeCategories.AddRange
         (
-            RecipeCategory.Create("Existing Category")
+            RecipeCategory.Create("Existing Category"),
+            RecipeCategory.Create("To Delete")
         );
 
         await dbContext.SaveChangesAsync();

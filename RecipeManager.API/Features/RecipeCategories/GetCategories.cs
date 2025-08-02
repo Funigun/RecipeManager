@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RecipeManager.Api.Application.Abstractions;
 using RecipeManager.Api.Shared.Contracts.Authorization;
@@ -26,7 +27,7 @@ public static class GetCategories
         }
     }
 
-    internal static async Task<Results<Ok<HateoasCollectionResponse<Response>>, NotFound>> Handler(ICurrentUser currentUser, IAppDbContext dbContext, HateoasBuilder<HateoasCollectionResponse<Response>> hateoasBuilder, CancellationToken cancellationToken)
+    internal static async Task<Results<Ok<HateoasCollectionResponse<Response>>, NotFound>> Handler([FromServices] ICurrentUser currentUser, IAppDbContext dbContext, [FromServices] HateoasBuilder<HateoasCollectionResponse<Response>> hateoasBuilder, CancellationToken cancellationToken)
     {
         IEnumerable<Response> results = await dbContext.RecipeCategories.AsNoTracking()
                                                                         .OrderBy(category => category.Name)

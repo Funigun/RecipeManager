@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RecipeManager.Api.Application.Abstractions;
 using RecipeManager.Api.Domain.Recipes;
@@ -47,7 +48,7 @@ public static class CreateCategory
         }
     }
 
-    public static async Task<IResult> Handler(Request request, IAppDbContext dbContext, CancellationToken cancellationToken)
+    public static async Task<IResult> Handler([FromBody] Request request, IAppDbContext dbContext, CancellationToken cancellationToken)
     {
         RecipeCategory category = RecipeCategory.Create(request.Name);
 

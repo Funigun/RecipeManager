@@ -11,9 +11,13 @@ namespace RecipeManager.Api.Features.RecipeCategories;
 
 public static class DeleteCategory
 {
-    public sealed class AuthorizationPolicy(ICurrentUser currentUser) : IAuthorizationPolicy<Guid>
+    public record struct Request(Guid Value) : IRequestId<Request>
     {
-        public Task<bool> IsAuthorized(Guid request)
+    }
+
+    public sealed class AuthorizationPolicy(ICurrentUser currentUser) : IAuthorizationPolicy<Request>
+    {
+        public Task<bool> IsAuthorized(Request request)
         {
             return Task.FromResult(currentUser.HasRole(UserRoles.Admin));
         }
@@ -24,15 +28,15 @@ public static class DeleteCategory
     {
         public void MapEndpoint(IEndpointRouteBuilder endpoints)
         {
-            endpoints.MapStandardAuthenticatedDelete<AuthorizationPolicy, Guid>("/{categoryId}", Handler)
+            endpoints.MapStandardAuthenticatedDelete<AuthorizationPolicy, Request>("/{categoryId}", Handler)
                      .WithName("DeleteRecipeCategory")
                      .WithDescription("Deletes a recipe category");
         }
     }
 
-    public static async Task<Results<NoContent, NotFound>> Handler(Guid unitId, IAppDbContext dbContext, CancellationToken cancellationToken)
+    public static async Task<Results<NoContent, NotFound>> Handler(Request categoryId, IAppDbContext dbContext, CancellationToken cancellationToken)
     {
-        RecipeCategoryId id = new(unitId);
+        RecipeCategoryId id = new(categoryId.Value);
 
         RecipeCategory? category = await dbContext.RecipeCategories.FirstOrDefaultAsync(category => category.Id == id, cancellationToken)
                                 ?? throw new EntityNotFoundException<RecipeCategory, RecipeCategoryId>(id);

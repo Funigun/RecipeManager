@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RecipeManager.Api.Application.Abstractions;
 using RecipeManager.Api.Domain.Units;
@@ -28,7 +29,7 @@ public static class GetUnits
         }
     }
 
-    internal static async Task<Results<Ok<HateoasCollectionResponse<Response>>, NotFound>> Handler(ICurrentUser currentUser, IAppDbContext dbContext, HateoasBuilder<HateoasCollectionResponse<Response>> hateoasBuilder, CancellationToken cancellationToken)
+    internal static async Task<Results<Ok<HateoasCollectionResponse<Response>>, NotFound>> Handler([FromServices] ICurrentUser currentUser, IAppDbContext dbContext, [FromServices] HateoasBuilder<HateoasCollectionResponse<Response>> hateoasBuilder, CancellationToken cancellationToken)
     {
         IEnumerable<Unit> units = await dbContext.Units.AsNoTracking().ToListAsync(cancellationToken);
         IEnumerable<Response> responses = units.Select(ToGetResponse);

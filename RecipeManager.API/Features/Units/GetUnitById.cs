@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RecipeManager.Api.Application.Abstractions;
 using RecipeManager.Api.Application.Exceptions;
@@ -28,7 +29,7 @@ public static class GetUnitById
         }
     }
 
-    internal static async Task<Results<Ok<HateoasResponse<Response>>, NotFound>> Handler(Guid unitId, ICurrentUser currentUser, IAppDbContext dbContext, HateoasBuilder<HateoasResponse<Response>> hateoasBuilder, CancellationToken cancellationToken)
+    internal static async Task<Results<Ok<HateoasResponse<Response>>, NotFound>> Handler(Guid unitId, [FromServices] ICurrentUser currentUser, IAppDbContext dbContext, [FromServices] HateoasBuilder<HateoasResponse<Response>> hateoasBuilder, CancellationToken cancellationToken)
     {
         UnitId id = new(unitId);
         Unit? unit = await dbContext.Units.AsNoTracking().FirstOrDefaultAsync(unit => unit.Id == id, cancellationToken);
