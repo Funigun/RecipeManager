@@ -26,7 +26,7 @@ public static class UpdateUnit
                 {
                     string id = context.HttpContext!.GetRouteData().Values["unitId"]!.ToString()!;
                     UnitId unitId = new(Guid.Parse(id));
-                    return await dbContext.Units.AnyAsync(unit => unit.Name == name && unit.Id != unitId, cancellationToken);
+                    return !await dbContext.Units.AnyAsync(unit => unit.Name == name && unit.Id != unitId, cancellationToken);
                 }).WithMessage("Unit Name must be unique");
 
             When(x => x.ShortName is not null, () =>
@@ -37,7 +37,7 @@ public static class UpdateUnit
                     {
                         string id = context.HttpContext!.GetRouteData().Values["unitId"]!.ToString()!;
                         UnitId unitId = new(Guid.Parse(id));
-                        return await dbContext.Units.AnyAsync(unit => unit.ShortName == shortName && unit.Id != unitId, cancellationToken);
+                        return !await dbContext.Units.AnyAsync(unit => unit.ShortName == shortName && unit.Id != unitId, cancellationToken);
                     }).WithMessage("Unit Short Name must be unique");
             });
 

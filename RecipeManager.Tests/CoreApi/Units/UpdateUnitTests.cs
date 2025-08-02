@@ -92,7 +92,7 @@ public sealed class UpdateUnitTests : BaseIntegrationTest
         // Arrange
         HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", TokenMockFactory.GenerateJwtToken(UserMockFactory.CreateMockedAdmin()));
 
-        Guid unitId = DbContext.Units.AsNoTracking().Select(unit => unit.Id.Value).First();
+        Guid unitId = DbContext.Units.AsNoTracking().Where(unit => unit.Name == "To Update").Select(unit => unit.Id.Value).First();
         UpdateUnit.Request updateUnitRequest = new("Updated Unit", "UU", 0);
         StringContent content = new(JsonSerializer.Serialize(updateUnitRequest), Encoding.UTF8, "application/json");
 

@@ -13,6 +13,7 @@ internal static class DatabaseSeeder
         (
             Unit.Create("Duplicated Name", "TU", UnitGroup.Weight),
             Unit.Create("Test", "Duplicated Short Name", UnitGroup.Weight),
+            Unit.Create("To Update", null, UnitGroup.Weight),
             Unit.Create("To Delete", null, UnitGroup.Weight)
         );
 
