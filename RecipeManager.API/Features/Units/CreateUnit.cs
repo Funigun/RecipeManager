@@ -24,7 +24,7 @@ public static class CreateUnit
                 .SetValidator(new UnitNameValidator())
                 .MustAsync(async (name, cancellationToken) =>
                 {
-                    return await dbContext.Units.AnyAsync(unit => unit.Name == name, cancellationToken);
+                    return !await dbContext.Units.AnyAsync(unit => unit.Name == name, cancellationToken);
                 }).WithMessage("Unit Name must be unique");
 
             When(x => x.ShortName is not null, () =>
@@ -33,7 +33,7 @@ public static class CreateUnit
                     .SetValidator(new UnitShortNameValidator())
                     .MustAsync(async (shortName, cancellationToken) =>
                     {
-                        return await dbContext.Units.AnyAsync(unit => unit.ShortName == shortName, cancellationToken);
+                        return !await dbContext.Units.AnyAsync(unit => unit.ShortName == shortName, cancellationToken);
                     }).WithMessage("Unit Short Name must be unique");
             });
 

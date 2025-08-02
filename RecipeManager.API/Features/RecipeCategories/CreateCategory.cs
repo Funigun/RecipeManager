@@ -23,7 +23,7 @@ public static class CreateCategory
                 .SetValidator(new RecipeCategoryNameValidator())
                 .MustAsync(async (name, cancellationToken) =>
                 {
-                    return await dbContext.RecipeCategories.AnyAsync(category => category.Name == name, cancellationToken);
+                    return !await dbContext.RecipeCategories.AnyAsync(category => category.Name == name, cancellationToken);
                 }).WithMessage("Recipe category must be unique");
         }
     }

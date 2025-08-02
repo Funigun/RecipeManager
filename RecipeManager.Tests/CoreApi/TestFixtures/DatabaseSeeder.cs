@@ -1,4 +1,5 @@
-﻿using RecipeManager.Api.Domain.Units;
+﻿using RecipeManager.Api.Domain.Recipes;
+using RecipeManager.Api.Domain.Units;
 using RecipeManager.Api.Domain.Units.Enums;
 using RecipeManager.Api.Persistance;
 
@@ -13,6 +14,11 @@ internal static class DatabaseSeeder
             Unit.Create("Duplicated Name", "TU", UnitGroup.Weight),
             Unit.Create("Test", "Duplicated Short Name", UnitGroup.Weight),
             Unit.Create("To Delete", null, UnitGroup.Weight)
+        );
+
+        dbContext.RecipeCategories.AddRange
+        (
+            RecipeCategory.Create("Existing Category")
         );
 
         await dbContext.SaveChangesAsync();
