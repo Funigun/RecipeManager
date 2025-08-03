@@ -11,9 +11,13 @@ namespace RecipeManager.Api.Features.Units;
 
 public static class DeleteUnit
 {
-    public sealed class AuthorizationPolicy(ICurrentUser currentUser) : IAuthorizationPolicy<Guid>
+    public record struct Request(Guid Value) : IRequestId<Request>
     {
-        public Task<bool> IsAuthorized(Guid request)
+    }
+
+    public sealed class AuthorizationPolicy(ICurrentUser currentUser) : IAuthorizationPolicy<Request>
+    {
+        public Task<bool> IsAuthorized(Request request)
         {
             return Task.FromResult(currentUser.HasRole(UserRoles.Admin));
         }
@@ -24,19 +28,20 @@ public static class DeleteUnit
     {
         public void MapEndpoint(IEndpointRouteBuilder endpoints)
         {
-            endpoints.MapStandardAuthenticatedDelete<AuthorizationPolicy, Guid>("/{unitId}", Handler)
+            endpoints.MapStandardAuthenticatedDelete<AuthorizationPolicy, Request>("/{unitId}", Handler)
                      .WithName("DeleteMeasurementUnit")
                      .WithDescription("Deletes a measurement unit");
         }
     }
 
-    public static async Task<Results<NoContent, NotFound>> Handler(Guid unitId, IAppDbContext dbContext, CancellationToken cancellationToken)
+    public static async Task<Results<NoContent, NotFound>> Handler(Request unitId, IAppDbContext dbContext, CancellationToken cancellationToken)
     {
-        UnitId id = new(unitId);
-        Unit? unit = await dbContext.Units.FindAsync([id], cancellationToken) ?? throw new EntityNotFoundException<Unit, UnitId>(id);
+        UnitId id = new(unitId.Value);
+
+        Unit? unit = await dbContext.Units.FindAsync([id], cancellationToken)
+                  ?? throw new EntityNotFoundException<Unit, UnitId>(id);
 
         dbContext.Units.Remove(unit);
-
         await dbContext.SaveChangesAsync(cancellationToken);
 
         return TypedResults.NoContent();

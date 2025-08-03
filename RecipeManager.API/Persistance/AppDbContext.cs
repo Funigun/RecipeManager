@@ -20,19 +20,19 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
 {
     private readonly ICurrentUser _currentUser = default!;
 
-    public DbSet<Unit> Units { get; set; } = default!;
+    public DbSet<Unit> Units { get; set; }
 
-    public DbSet<IngredientCategory> IngredientCategories { get; set; } = default!;
+    public DbSet<RecipeCategory> RecipeCategories { get; set; }
 
-    public DbSet<Ingredient> Ingredients { get; set; } = default!;
+    public DbSet<Recipe> Recipes { get; set; }
 
-    //public DbSet<RecipeCategory> RecipeCategories { get; set; } = default!;
+    public DbSet<IngredientCategory> IngredientCategories { get; set; }
 
-    //public DbSet<Recipe> Recipes { get; set; } = default!;
+    public DbSet<Ingredient> Ingredients { get; set; }
 
-    public DbSet<CookbookCategory> CookbookCategories { get; set; } = default!;
+    public DbSet<CookbookCategory> CookbookCategories { get; set; }
 
-    public DbSet<Cookbook> Cookbooks { get; set; } = default!;
+    public DbSet<Cookbook> Cookbooks { get; set; }
 
     public AppDbContext(DbContextOptions<AppDbContext> options, ICurrentUser currentUser) : this(options)
     {
