@@ -20,6 +20,8 @@ internal static class DatabaseSeeder
         dbContext.RecipeCategories.AddRange
         (
             RecipeCategory.Create("Existing Category"),
+            RecipeCategory.Create("Fake category 1"),
+            RecipeCategory.Create("Fake category 2"),
             RecipeCategory.Create("To Delete")
         );
 

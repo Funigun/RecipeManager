@@ -14,7 +14,7 @@ public sealed class GetUnitsTests : BaseIntegrationTest
     }
 
     [Fact]
-    public async Task GetUnits_ShouldReturn_NotAuthorized_WhenUserIsNotAdmin()
+    public async Task GetUnits_ShouldReturn_NotAuthorized_WhenUserIsNotLoggedIn()
     {
         // Act
         HttpResponseMessage response = await HttpClient.GetAsync("/api/units", CancellationToken.None);
@@ -63,11 +63,12 @@ public sealed class GetUnitsTests : BaseIntegrationTest
 
         HateoasCollectionResponse<GetUnit.Response>? units = JsonSerializer.Deserialize<HateoasCollectionResponse<GetUnit.Response>>(content, JsonOptions);
         Assert.NotNull(units);
+        Assert.NotEmpty(units.Links);
         Assert.NotEmpty(units.Items);
+
         Assert.All(units.Items, unit =>
         {
             Assert.NotEmpty(unit.Links);
         });
-        Assert.NotEmpty(units.Links);
     }
 }

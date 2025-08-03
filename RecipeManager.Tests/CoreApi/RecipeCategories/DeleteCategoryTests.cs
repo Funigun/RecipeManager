@@ -5,6 +5,7 @@ using RecipeManager.Integration.Tests.CoreApi.TestFixtures;
 
 namespace RecipeManager.Integration.Tests.CoreApi.RecipeCategories;
 
+[Trait("Core.Api", "RecipeCategories")]
 public sealed class DeleteCategoryTests : BaseIntegrationTest
 {
     public DeleteCategoryTests(WebApiFactory webApiFactory) : base(webApiFactory)
