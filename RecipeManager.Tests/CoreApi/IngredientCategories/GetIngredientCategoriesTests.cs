@@ -1,0 +1,76 @@
+﻿using System.Net.Http.Headers;
+using System.Text.Json;
+using RecipeManager.Api.Features.IngredientCategories;
+using RecipeManager.Api.Features.RecipeCategories;
+using RecipeManager.Api.Shared.Hateoas.Models;
+using RecipeManager.Integration.Tests.Common.Users;
+using RecipeManager.Integration.Tests.CoreApi.TestFixtures;
+
+namespace RecipeManager.Integration.Tests.CoreApi.IngredientCategories;
+
+[Trait("Core.Api", "IngredientCategories")]
+public sealed class GetIngredientCategoriesTests : BaseIntegrationTest
+{
+    public GetIngredientCategoriesTests(WebApiFactory webApiFactory) : base(webApiFactory)
+    {
+    }
+
+    [Fact]
+    public async Task GetRecipeCategories_ShouldReturn_NotAuthorized_WhenUserIsNotLoggedIn()
+    {
+        // Act
+        HttpResponseMessage response = await HttpClient.GetAsync("/api/ingredientCategories", CancellationToken.None);
+
+        // Assert
+        Assert.Equal(System.Net.HttpStatusCode.Unauthorized, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task GetRecipeCategories_ShouldReturn_Categories_WithoutLinks_ForNonAdminUser()
+    {
+        // Arrange
+        HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", TokenMockFactory.GenerateJwtToken(UserMockFactory.CreateMockedUser()));
+
+        // Act
+        HttpResponseMessage response = await HttpClient.GetAsync("/api/ingredientCategories", CancellationToken.None);
+
+        // Assert
+        Assert.Equal(System.Net.HttpStatusCode.OK, response.StatusCode);
+        string content = await response.Content.ReadAsStringAsync(CancellationToken.None);
+        Assert.NotNull(content);
+
+        HateoasCollectionResponse<GetRecipeCategories.Response>? categories = JsonSerializer.Deserialize<HateoasCollectionResponse<GetRecipeCategories.Response>>(content, JsonOptions);
+        Assert.NotNull(categories);
+        Assert.NotEmpty(categories.Items);
+        Assert.All(categories.Items, category =>
+        {
+            Assert.Empty(category.Links);
+        });
+        Assert.Empty(categories.Links);
+    }
+
+    [Fact]
+    public async Task GetRecipeCategories_ShouldReturn_Categories_WithLinks_ForAdminUser()
+    {
+        // Arrange
+        HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", TokenMockFactory.GenerateJwtToken(UserMockFactory.CreateMockedAdmin()));
+
+        // Act
+        HttpResponseMessage response = await HttpClient.GetAsync("/api/ingredientCategories", CancellationToken.None);
+
+        // Assert
+        Assert.Equal(System.Net.HttpStatusCode.OK, response.StatusCode);
+        string content = await response.Content.ReadAsStringAsync(CancellationToken.None);
+        Assert.NotNull(content);
+
+        HateoasCollectionResponse<GetIngredientCategories.Response>? categories = JsonSerializer.Deserialize<HateoasCollectionResponse<GetIngredientCategories.Response>>(content, JsonOptions);
+        Assert.NotNull(categories);
+        Assert.NotEmpty(categories.Links);
+        Assert.NotEmpty(categories.Items);
+
+        Assert.All(categories.Items, category =>
+        {
+            Assert.NotEmpty(category.Links);
+        });
+    }
+}

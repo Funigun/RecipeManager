@@ -16,10 +16,5 @@ public sealed class IngredientCategoryConfiguration : IEntityTypeConfiguration<I
         builder.Property(builder => builder.Name)
                .HasMaxLength(IngredientCategoryDomainValidator.CategoryNameMaxLength)
                .IsRequired(true);
-
-        builder.HasMany(category => category.Subcategories)
-               .WithOne()
-               .HasForeignKey(category => category.ParentId)
-               .OnDelete(DeleteBehavior.NoAction);
     }
 }

@@ -1,16 +1,17 @@
 ﻿using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
+using RecipeManager.Api.Features.IngredientCategories;
 using RecipeManager.Api.Features.RecipeCategories;
 using RecipeManager.Integration.Tests.Common.Users;
 using RecipeManager.Integration.Tests.CoreApi.TestFixtures;
 
-namespace RecipeManager.Integration.Tests.CoreApi.RecipeCategories;
+namespace RecipeManager.Integration.Tests.CoreApi.IngredientCategories;
 
-[Trait("Core.Api", "RecipeCategories")]
-public sealed class CreateCategoryTests : BaseIntegrationTest
+[Trait("Core.Api", "IngredientCategories")]
+public sealed class CreateIngredientCategoryTests : BaseIntegrationTest
 {
-    public CreateCategoryTests(WebApiFactory webApiFactory) : base(webApiFactory)
+    public CreateIngredientCategoryTests(WebApiFactory webApiFactory) : base(webApiFactory)
     {
     }
 
@@ -20,29 +21,29 @@ public sealed class CreateCategoryTests : BaseIntegrationTest
         // Arrange
         HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", TokenMockFactory.GenerateJwtToken(UserMockFactory.CreateMockedUser()));
 
-        CreateRecipeCategory.Request createUnitRequest = new("Recipe category");
-        StringContent content = new(JsonSerializer.Serialize(createUnitRequest), Encoding.UTF8, "application/json");
+        CreateIngredientCategory.Request createCategoryRequest = new("Ingredient category");
+        StringContent content = new(JsonSerializer.Serialize(createCategoryRequest), Encoding.UTF8, "application/json");
 
         // Act
-        HttpResponseMessage response = await HttpClient.PostAsync("/api/recipeCategories", content, CancellationToken.None);
+        HttpResponseMessage response = await HttpClient.PostAsync("/api/ingredientCategories", content, CancellationToken.None);
 
         // Assert
         Assert.Equal(System.Net.HttpStatusCode.Forbidden, response.StatusCode);
     }
 
     [Theory]
-    [InlineData("", "Recipe category name must be between 1 and 100 characters long.")]
-    [InlineData("Existing Category", "Recipe category must be unique")]
+    [InlineData("", "Ingredient category name must be between 1 and 100 characters long.")]
+    [InlineData("Existing Category", "Ingredient category must be unique")]
     public async Task CreateRecipeCategory_ShouldReturn_BadRequest_ForInvalidInput(string categoryName, string justification)
     {
         // Arrange
         HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", TokenMockFactory.GenerateJwtToken(UserMockFactory.CreateMockedAdmin()));
 
-        CreateRecipeCategory.Request createCategoryRequest = new(categoryName);
+        CreateIngredientCategory.Request createCategoryRequest = new(categoryName);
         StringContent content = new(JsonSerializer.Serialize(createCategoryRequest), Encoding.UTF8, "application/json");
 
         // Act
-        HttpResponseMessage response = await HttpClient.PostAsync("/api/recipeCategories", content, CancellationToken.None);
+        HttpResponseMessage response = await HttpClient.PostAsync("/api/ingredientCategories", content, CancellationToken.None);
 
         // Assert
         Assert.Equal(System.Net.HttpStatusCode.BadRequest, response.StatusCode);
@@ -54,11 +55,11 @@ public sealed class CreateCategoryTests : BaseIntegrationTest
         // Arrange
         HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", TokenMockFactory.GenerateJwtToken(UserMockFactory.CreateMockedAdmin()));
 
-        CreateRecipeCategory.Request createCategoryRequest = new("New Recipe Category");
+        CreateIngredientCategory.Request createCategoryRequest = new("New Recipe Category");
         StringContent content = new(JsonSerializer.Serialize(createCategoryRequest), Encoding.UTF8, "application/json");
 
         // Act
-        HttpResponseMessage response = await HttpClient.PostAsync("/api/recipeCategories", content, CancellationToken.None);
+        HttpResponseMessage response = await HttpClient.PostAsync("/api/ingredientCategories", content, CancellationToken.None);
         string responseBody = await response.Content.ReadAsStringAsync();
         CreateRecipeCategory.Response? categoryId = JsonSerializer.Deserialize<CreateRecipeCategory.Response>(responseBody, JsonOptions);
 
@@ -67,6 +68,6 @@ public sealed class CreateCategoryTests : BaseIntegrationTest
         Assert.NotNull(categoryId);
         Assert.Equal(System.Net.HttpStatusCode.Created, response.StatusCode);
         Assert.NotNull(response.Headers.Location);
-        Assert.Contains($"/api/recipeCategories/{categoryId.Id}", response.Headers.Location!.ToString(), StringComparison.OrdinalIgnoreCase);
+        Assert.Contains($"/api/ingredientCategories/{categoryId.Id}", response.Headers.Location!.ToString(), StringComparison.OrdinalIgnoreCase);
     }
 }
