@@ -1,5 +1,6 @@
 ﻿using System.Net.Http.Headers;
 using System.Text.Json;
+using RecipeManager.Api.Features.Units;
 using RecipeManager.Api.Shared.Hateoas.Models;
 using RecipeManager.Integration.Tests.Common.Users;
 using RecipeManager.Integration.Tests.CoreApi.TestFixtures;
@@ -37,7 +38,7 @@ public sealed class GetUnitsTests : BaseIntegrationTest
         string content = await response.Content.ReadAsStringAsync(CancellationToken.None);
         Assert.NotNull(content);
 
-        HateoasCollectionResponse<GetUnit.Response>? units = JsonSerializer.Deserialize<HateoasCollectionResponse<GetUnit.Response>>(content, JsonOptions);
+        HateoasCollectionResponse<GetUnits.Response>? units = JsonSerializer.Deserialize<HateoasCollectionResponse<GetUnits.Response>>(content, JsonOptions);
         Assert.NotNull(units);
         Assert.NotEmpty(units.Items);
         Assert.All(units.Items, unit =>
@@ -61,7 +62,7 @@ public sealed class GetUnitsTests : BaseIntegrationTest
         string content = await response.Content.ReadAsStringAsync(CancellationToken.None);
         Assert.NotNull(content);
 
-        HateoasCollectionResponse<GetUnit.Response>? units = JsonSerializer.Deserialize<HateoasCollectionResponse<GetUnit.Response>>(content, JsonOptions);
+        HateoasCollectionResponse<GetUnits.Response>? units = JsonSerializer.Deserialize<HateoasCollectionResponse<GetUnits.Response>>(content, JsonOptions);
         Assert.NotNull(units);
         Assert.NotEmpty(units.Links);
         Assert.NotEmpty(units.Items);
