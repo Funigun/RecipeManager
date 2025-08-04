@@ -37,6 +37,7 @@ public static class CreateIngredientCategory
         }
     }
 
+    [GroupEndpoint("IngredientCategories")]
     public sealed class Endpoint : IEndpoint
     {
         public void MapEndpoint(IEndpointRouteBuilder endpoints)

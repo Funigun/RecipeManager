@@ -1,4 +1,5 @@
-﻿using RecipeManager.Api.Domain.Recipes;
+﻿using RecipeManager.Api.Domain.Ingredients;
+using RecipeManager.Api.Domain.Recipes;
 using RecipeManager.Api.Domain.Units;
 using RecipeManager.Api.Domain.Units.Enums;
 using RecipeManager.Api.Persistance;
@@ -23,6 +24,14 @@ internal static class DatabaseSeeder
             RecipeCategory.Create("Fake category 1"),
             RecipeCategory.Create("Fake category 2"),
             RecipeCategory.Create("To Delete")
+        );
+
+        dbContext.IngredientCategories.AddRange
+        (
+            IngredientCategory.Create("Existing Category"),
+            IngredientCategory.Create("Fake category 1"),
+            IngredientCategory.Create("Fake category 2"),
+            IngredientCategory.Create("To Delete")
         );
 
         await dbContext.SaveChangesAsync();

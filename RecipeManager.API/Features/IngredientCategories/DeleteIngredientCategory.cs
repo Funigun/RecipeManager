@@ -27,15 +27,15 @@ public static class DeleteIngredientCategory
     {
         public void MapEndpoint(IEndpointRouteBuilder endpoints)
         {
-            endpoints.MapStandardAuthenticatedDelete<AuthorizationPolicy, Request>(string.Empty, Handler)
+            endpoints.MapStandardAuthenticatedDelete<AuthorizationPolicy, Request>("/{categoryId}", Handler)
                      .WithName("DeleteIngredientCategory")
                      .WithDescription("Deletes an ingredient category");
         }
     }
 
-    public static async Task<IResult> Handler(Request request, IAppDbContext dbContext, CancellationToken cancellationToken)
+    public static async Task<IResult> Handler(Request categoryId, IAppDbContext dbContext, CancellationToken cancellationToken)
     {
-        IngredientCategoryId id = new(request.Value);
+        IngredientCategoryId id = new(categoryId.Value);
 
         IngredientCategory? category = await dbContext.IngredientCategories.FirstOrDefaultAsync(category => category.Id == id, cancellationToken)
                                   ?? throw new EntityNotFoundException<IngredientCategory, IngredientCategoryId>(id);
