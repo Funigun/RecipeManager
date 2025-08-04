@@ -20,7 +20,7 @@ public sealed class CreateCategoryTests : BaseIntegrationTest
         // Arrange
         HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", TokenMockFactory.GenerateJwtToken(UserMockFactory.CreateMockedUser()));
 
-        CreateCategory.Request createUnitRequest = new("Recipe category");
+        CreateRecipeCategory.Request createUnitRequest = new("Recipe category");
         StringContent content = new(JsonSerializer.Serialize(createUnitRequest), Encoding.UTF8, "application/json");
 
         // Act
@@ -38,7 +38,7 @@ public sealed class CreateCategoryTests : BaseIntegrationTest
         // Arrange
         HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", TokenMockFactory.GenerateJwtToken(UserMockFactory.CreateMockedAdmin()));
 
-        CreateCategory.Request createCategoryRequest = new(categoryName);
+        CreateRecipeCategory.Request createCategoryRequest = new(categoryName);
         StringContent content = new(JsonSerializer.Serialize(createCategoryRequest), Encoding.UTF8, "application/json");
 
         // Act
@@ -54,13 +54,13 @@ public sealed class CreateCategoryTests : BaseIntegrationTest
         // Arrange
         HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", TokenMockFactory.GenerateJwtToken(UserMockFactory.CreateMockedAdmin()));
 
-        CreateCategory.Request createCategoryRequest = new("New Recipe Category");
+        CreateRecipeCategory.Request createCategoryRequest = new("New Recipe Category");
         StringContent content = new(JsonSerializer.Serialize(createCategoryRequest), Encoding.UTF8, "application/json");
 
         // Act
         HttpResponseMessage response = await HttpClient.PostAsync("/api/recipeCategories", content, CancellationToken.None);
         string responseBody = await response.Content.ReadAsStringAsync();
-        CreateCategory.Response? categoryId = JsonSerializer.Deserialize<CreateCategory.Response>(responseBody, JsonOptions);
+        CreateRecipeCategory.Response? categoryId = JsonSerializer.Deserialize<CreateRecipeCategory.Response>(responseBody, JsonOptions);
 
         // Assert
         response.EnsureSuccessStatusCode();

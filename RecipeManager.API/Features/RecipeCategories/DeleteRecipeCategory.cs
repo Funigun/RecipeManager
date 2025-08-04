@@ -9,7 +9,7 @@ using RecipeManager.Shared.Contracts.Authorization;
 
 namespace RecipeManager.Api.Features.RecipeCategories;
 
-public static class DeleteCategory
+public static class DeleteRecipeCategory
 {
     public record struct Request(Guid Value) : IRequestId<Request>
     {

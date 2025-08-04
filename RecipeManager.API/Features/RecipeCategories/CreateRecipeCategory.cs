@@ -10,7 +10,7 @@ using RecipeManager.Shared.Contracts.RecipeCategories;
 
 namespace RecipeManager.Api.Features.RecipeCategories;
 
-public static class CreateCategory
+public static class CreateRecipeCategory
 {
     public sealed record Request(string Name);
 

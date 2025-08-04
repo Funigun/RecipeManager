@@ -12,7 +12,7 @@ using LinkOptions = RecipeManager.Api.Shared.Hateoas.Models.LinkOptions;
 
 namespace RecipeManager.Api.Features.RecipeCategories;
 
-public static class GetCategories
+public static class GetRecipeCategories
 {
     public sealed record Response(Guid Id, string Name);
 
