@@ -1,5 +1,46 @@
-﻿namespace RecipeManager.Api.Features.Ingredients;
+﻿using Microsoft.EntityFrameworkCore;
+using RecipeManager.Api.Application.Abstractions;
+using RecipeManager.Api.Application.Exceptions;
+using RecipeManager.Api.Domain.Ingredients;
+using RecipeManager.Api.Shared.Contracts.Authorization;
+using RecipeManager.Api.Shared.Endpoint;
 
-public class DeleteIngredient
+namespace RecipeManager.Api.Features.Ingredients;
+
+public static class DeleteIngredient
 {
+    public record struct Request(Guid Value) : IRequestId<Request>;
+
+    public sealed class AuthorizationPolicy(IAppDbContext dbContext, ICurrentUser currentUser) : IAuthorizationPolicy<Request>
+    {
+        public async Task<bool> IsAuthorized(Request request)
+        {
+            return await dbContext.Ingredients.AnyAsync(ingredient => ingredient.Id == new IngredientId(request.Value) &&
+                                                        ingredient.CreatedBy == currentUser.Id);
+        }
+    }
+
+    [GroupEndpoint("Ingredients")]
+    public sealed class Endpoint : IEndpoint
+    {
+        public void MapEndpoint(IEndpointRouteBuilder endpoints)
+        {
+            endpoints.MapStandardAuthenticatedDelete<AuthorizationPolicy, Request>("/{ingredientId}", Handler)
+                     .WithName("DeleteIngredient")
+                     .WithDescription("Deletes an ingredient");
+        }
+    }
+
+    public static async Task<IResult> Handler(Request ingredientId, IAppDbContext dbContext, CancellationToken cancellationToken)
+    {
+        IngredientId id = new(ingredientId.Value);
+
+        Ingredient? ingredient = await dbContext.Ingredients.FirstOrDefaultAsync(ingredient => ingredient.Id == id, cancellationToken)
+                              ?? throw new EntityNotFoundException<Ingredient, IngredientId>(id);
+
+        dbContext.Ingredients.Remove(ingredient);
+        await dbContext.SaveChangesAsync(cancellationToken);
+
+        return Results.NoContent();
+    }
 }
