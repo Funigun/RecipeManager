@@ -24,7 +24,7 @@ internal static class UserMockFactory
     private static FakeCurrentUser CreateMock(string role)
     {
         Mock<FakeCurrentUser> currentUserMock = new() { CallBase = true };
-        currentUserMock.Setup(m => m.Id).Returns(1);
+        currentUserMock.Setup(m => m.Id).Returns("Fake _User_Id");
         currentUserMock.Setup(m => m.Roles).Returns([role]);
 
         return currentUserMock.Object;
