@@ -50,6 +50,40 @@ public sealed class HateoasResponseBuilder<TItem>(TItem item, HateoasLinkService
         return this;
     }
 
+    public HateoasResponseBuilder<TItem> AddPagedNavigation(string endpoint, object? baseRouteValues = null)
+    {
+        if (_item is not PagedResult paged)
+        {
+            throw new InvalidOperationException("Paged navigation links can only be added to items that implement PagedResult.");
+        }
+
+        // Helper to merge base route values with page and pageSize
+        Dictionary<string, object> MergeRouteValues(int page)
+        {
+            Dictionary<string, object> dict = baseRouteValues is not null
+                                            ? new Dictionary<string, object>(baseRouteValues as IDictionary<string, object> ?? baseRouteValues.GetType().GetProperties().ToDictionary(p => p.Name, p => p.GetValue(baseRouteValues)!))
+                                            : [];
+
+            dict["page"] = page;
+            dict["pageSize"] = paged.PageSize;
+            return dict;
+        }
+
+        if (paged.Page > 1)
+        {
+            AddGet(LinkOptions.Create(endpoint, HateoasRelConstants.FirstPage, true), MergeRouteValues(1));
+            AddGet(LinkOptions.Create(endpoint, HateoasRelConstants.PreviousPage, true), MergeRouteValues(paged.Page - 1));
+        }
+
+        if (paged.Page < paged.TotalPages)
+        {
+            AddGet(LinkOptions.Create(endpoint, HateoasRelConstants.NextPage, true), MergeRouteValues(paged.Page + 1));
+            AddGet(LinkOptions.Create(endpoint, HateoasRelConstants.LastPage, true), MergeRouteValues(paged.TotalPages));
+        }
+
+        return this;
+    }
+
     public HateoasResponse<TItem> Build()
     {
         return new HateoasResponse<TItem>(_item, _links);

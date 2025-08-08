@@ -5,7 +5,7 @@ namespace RecipeManager.Api.Shared.Hateoas.Builder;
 
 public class HateoasCollectionResponseBuilder<TItem>
 {
-    private readonly HateoasLinkService _linkService = default!;
+    private readonly HateoasLinkService _linkService;
     private readonly HateoasCollectionListBuilder<TItem> _collectionListBuilder = default!;
 
     public ICollection<HateoasResponse<TItem>> Items { get; protected set; }

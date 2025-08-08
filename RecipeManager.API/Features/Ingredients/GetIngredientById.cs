@@ -45,7 +45,6 @@ public static class GetIngredientById
                               ?? throw new EntityNotFoundException<Ingredient, IngredientId>(id);
 
         IEnumerable<IngredientRecipeDto> recipes = await GetIngredientRecipes(dbContext, ingredient, cancellationToken);
-
         IEnumerable<IngredientCategoryDto> categories = await GetIngredientCategories(dbContext, ingredient, cancellationToken);
 
         IngredientDto ingredientDto = MapToIngredientDto(ingredient, recipes, categories);
@@ -100,7 +99,8 @@ public static class GetIngredientById
         HateoasResponseBuilder<Response> responseBuilder = hateoasBuilderFactory.ForItem(response);
 
         responseBuilder.AddGet(LinkOptions.Create("GetIngredientById", HateoasRelConstants.Self, true), new { ingredientId = ingredientDto.Id })
-                       .AddPost(LinkOptions.Create("CreateIngredient", HateoasRelConstants.Create, true), null);
+                       .AddPut(LinkOptions.Create("UpdateIngredient", HateoasRelConstants.Create, true), new { ingredientId = ingredientDto.Id })
+                       .AddDelete(LinkOptions.Create("UpdateIngredient", HateoasRelConstants.Delete, true), new { ingredientId = ingredientDto.Id });
 
         return responseBuilder.Build();
     }
