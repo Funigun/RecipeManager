@@ -30,4 +30,11 @@ public sealed class Ingredient : AuditableEntity, IEntity<IngredientId>
             _recipes = recipeIds.ToList()
         };
     }
+
+    public void Update(string name, IEnumerable<IngredientCategoryId> categoryIds, IEnumerable<RecipeId> recipeIds)
+    {
+        Name = name;
+        _categories = categoryIds.ToList();
+        _recipes = recipeIds.ToList();
+    }
 }

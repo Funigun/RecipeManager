@@ -31,11 +31,11 @@ public static class DeleteIngredient
         }
     }
 
-    public static async Task<IResult> Handler(Request ingredientId, IAppDbContext dbContext, CancellationToken cancellationToken)
+    public static async Task<IResult> Handler(Request ingredientId, IAppDbContext dbContext, ICurrentUser currentUser, CancellationToken cancellationToken)
     {
         IngredientId id = new(ingredientId.Value);
 
-        Ingredient? ingredient = await dbContext.Ingredients.FirstOrDefaultAsync(ingredient => ingredient.Id == id, cancellationToken)
+        Ingredient? ingredient = await dbContext.Ingredients.FirstAsync(ingredient => ingredient.Id == id && ingredient.CreatedBy == currentUser.Id, cancellationToken)
                               ?? throw new EntityNotFoundException<Ingredient, IngredientId>(id);
 
         dbContext.Ingredients.Remove(ingredient);

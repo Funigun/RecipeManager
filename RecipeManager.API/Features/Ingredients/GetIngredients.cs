@@ -27,15 +27,9 @@ public static class GetIngredients
     {
         public void MapEndpoint(IEndpointRouteBuilder endpoints)
         {
-            endpoints.MapStandardAuthenticatedGet<Response>("/", Handler)
+            endpoints.MapStandardGet<Response>("/", Handler)
                      .WithName("GetIngredients")
-                     .WithDescription("Gets a paginated list of ingredients")
-                     .WithOpenApi(operation =>
-                     {
-                         operation.Description = "Filter query parameter allows to filter ingredients based on categoryname  (starts with)\nYou can also specify Page (default is 1) and Page Size (default is 50)";
-                         return operation;
-                     })
-                     .CodeSample("A", ScalarTarget.CSharp);
+                     .WithDescription("Gets a paginated list of ingredients");
         }
     }
 

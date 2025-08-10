@@ -30,6 +30,7 @@ internal static class TokenMockFactory
     public static string GenerateJwtToken(ICurrentUser mockedUser)
     {
         List<Claim> claims = mockedUser.Roles.Select(role => new Claim(ClaimTypes.Role, role)).ToList();
+        claims.Add(new("Id", mockedUser.Id));
 
         return TokenHandler.WriteToken(new JwtSecurityToken(Issuer, Audience, claims, null, DateTime.UtcNow.AddMinutes(20), SigningCredentials));
     }

@@ -31,7 +31,7 @@ public static class GetIngredientById
     {
         public void MapEndpoint(IEndpointRouteBuilder endpoints)
         {
-            endpoints.MapStandardAuthenticatedGet<Response>("/{ingredientId}", Handler)
+            endpoints.MapStandardGet<Response>("/{ingredientId}", Handler)
                      .WithName("GetIngredientById")
                      .WithDescription("Gets an ingredient by its ID");
         }
