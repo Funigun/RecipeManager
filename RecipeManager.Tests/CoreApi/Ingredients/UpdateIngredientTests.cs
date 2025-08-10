@@ -22,7 +22,7 @@ public sealed class UpdateIngredientTests : BaseIntegrationTest
         HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", TokenMockFactory.GenerateJwtToken(UserMockFactory.CreateMockedAdmin()));
         Guid ingredientId = (await DbContext.Ingredients.AsNoTracking().FirstAsync(ingredient => ingredient.Name == "Existing Ingredient", CancellationToken.None)).Id.Value;
 
-        UpdateIngredient.Request request = new("Update Name", [], []);
+        UpdateIngredient.IngredientDto request = new("Update Name", [], []);
         StringContent content = new(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json");
 
         // Act

@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using RecipeManager.Api.Application.Abstractions;
 using RecipeManager.Api.Application.Exceptions;
 using RecipeManager.Api.Domain.Ingredients;
+using RecipeManager.Api.Shared.Contracts.Authorization;
 using RecipeManager.Api.Shared.Endpoint;
 using RecipeManager.Api.Shared.Hateoas.Builder;
 using RecipeManager.Api.Shared.Hateoas.Common;
@@ -37,11 +38,11 @@ public static class GetIngredientById
         }
     }
 
-    public static async Task<Results<Ok<HateoasResponse<Response>>, NotFound>> Handler(Request ingredientId, [FromServices] IHateoasBuilderFactory hateoasBuilderFactory, IAppDbContext dbContext, CancellationToken cancellationToken)
+    public static async Task<Results<Ok<HateoasResponse<Response>>, NotFound>> Handler(Request ingredientId, [FromServices] IHateoasBuilderFactory hateoasBuilderFactory, ICurrentUser currentUser, IAppDbContext dbContext, CancellationToken cancellationToken)
     {
         IngredientId id = new(ingredientId.Value);
 
-        Ingredient? ingredient = await GetIngredient(dbContext, id, cancellationToken)
+        Ingredient? ingredient = await GetIngredient(id, dbContext, cancellationToken)
                               ?? throw new EntityNotFoundException<Ingredient, IngredientId>(id);
 
         IEnumerable<IngredientRecipeDto> recipes = await GetIngredientRecipes(dbContext, ingredient, cancellationToken);
@@ -49,12 +50,13 @@ public static class GetIngredientById
 
         IngredientDto ingredientDto = MapToIngredientDto(ingredient, recipes, categories);
 
-        HateoasResponse<Response> hateoasResponse = MapToHateoasResponse(ingredientDto, hateoasBuilderFactory);
+        bool isIngredientCreator = ingredient.CreatedBy == currentUser.Id;
+        HateoasResponse<Response> hateoasResponse = MapToHateoasResponse(ingredientDto, hateoasBuilderFactory, isIngredientCreator);
 
         return TypedResults.Ok(hateoasResponse);
     }
 
-    private static async Task<Ingredient?> GetIngredient(IAppDbContext dbContext, IngredientId ingredientId, CancellationToken cancellationToken)
+    private static async Task<Ingredient?> GetIngredient(IngredientId ingredientId, IAppDbContext dbContext, CancellationToken cancellationToken)
     {
         return await dbContext.Ingredients.AsNoTracking()
                                           .Include(i => i.Categories)
@@ -87,7 +89,7 @@ public static class GetIngredientById
         return new IngredientDto(ingredient.Id.Value, ingredient.Name, recipes, categories);
     }
 
-    private static HateoasResponse<Response> MapToHateoasResponse(IngredientDto ingredientDto, IHateoasBuilderFactory hateoasBuilderFactory)
+    private static HateoasResponse<Response> MapToHateoasResponse(IngredientDto ingredientDto, IHateoasBuilderFactory hateoasBuilderFactory, bool isIngredientCreator)
     {
         HateoasCollectionResponseBuilder<IngredientRecipeDto> recipesBuilder = hateoasBuilderFactory.ForCollection(ingredientDto.Recipes);
 
@@ -99,8 +101,8 @@ public static class GetIngredientById
         HateoasResponseBuilder<Response> responseBuilder = hateoasBuilderFactory.ForItem(response);
 
         responseBuilder.AddGet(LinkOptions.Create("GetIngredientById", HateoasRelConstants.Self, true), new { ingredientId = ingredientDto.Id })
-                       .AddPut(LinkOptions.Create("UpdateIngredient", HateoasRelConstants.Create, true), new { ingredientId = ingredientDto.Id })
-                       .AddDelete(LinkOptions.Create("UpdateIngredient", HateoasRelConstants.Delete, true), new { ingredientId = ingredientDto.Id });
+                       .AddPut(LinkOptions.Create("UpdateIngredient", HateoasRelConstants.Create, isIngredientCreator), new { ingredientId = ingredientDto.Id })
+                       .AddDelete(LinkOptions.Create("UpdateIngredient", HateoasRelConstants.Delete, isIngredientCreator), new { ingredientId = ingredientDto.Id });
 
         return responseBuilder.Build();
     }

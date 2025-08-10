@@ -12,9 +12,23 @@ namespace RecipeManager.Api.Features.Ingredients;
 
 public static class UpdateIngredient
 {
-    public sealed record Request(string Name, IEnumerable<Guid> Categories, IEnumerable<Guid> Recipes);
+    public record struct Request(Guid Value) : IRequestId<Request>
+    {
+    }
 
-    public sealed class Validator : AbstractValidator<Request>
+    public sealed record IngredientDto(string Name, IEnumerable<Guid> Categories, IEnumerable<Guid> Recipes);
+
+    public sealed class AuthorizationPolicy(IAppDbContext appDbContext, ICurrentUser currentUser) : IAuthorizationPolicy<Request>
+    {
+        public async Task<bool> IsAuthorized(Request request)
+        {
+            return await appDbContext.Ingredients.AsNoTracking()
+                                                 .AnyAsync(ingredient => ingredient.Id == new IngredientId(request.Value) &&
+                                                           ingredient.CreatedBy == currentUser.Id);
+        }
+    }
+
+    public sealed class Validator : AbstractValidator<IngredientDto>
     {
         public Validator(IAppDbContext dbContext)
         {
@@ -49,13 +63,13 @@ public static class UpdateIngredient
     {
         public void MapEndpoint(IEndpointRouteBuilder endpoints)
         {
-            endpoints.MapStandardValidatedPut<Request>("/{ingredientId}", Handler)
+            endpoints.MapStandardAuthenticatedPut<IngredientDto>("/{ingredientId}", Handler)
                      .WithName("UpdateIngredient")
                      .WithDescription("Updates an existing ingredient");
         }
     }
 
-    public static async Task<IResult> Handler(Guid ingredientId, Request request, IAppDbContext dbContext, ICurrentUser currentUser, CancellationToken cancellationToken)
+    public static async Task<IResult> Handler(Guid ingredientId, IngredientDto request, IAppDbContext dbContext, ICurrentUser currentUser, CancellationToken cancellationToken)
     {
         IngredientId id = new(ingredientId);
 

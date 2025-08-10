@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using RecipeManager.Api.Application.Abstractions;
 using RecipeManager.Api.Domain.Ingredients;
 using RecipeManager.Api.Persistance.Extensions;
+using RecipeManager.Api.Shared.Contracts.Authorization;
 using RecipeManager.Api.Shared.Endpoint;
 using RecipeManager.Api.Shared.Hateoas.Builder;
 using RecipeManager.Api.Shared.Hateoas.Common;
@@ -33,11 +34,11 @@ public static class GetIngredients
         }
     }
 
-    public static async Task<Results<Ok<HateoasResponse<Response>>, BadRequest>> Handler([AsParameters] GetIngredientsFilterParameters filter, IHateoasBuilderFactory hateoasBuilderFactory, IAppDbContext dbContext, CancellationToken cancellationToken)
+    public static async Task<Results<Ok<HateoasResponse<Response>>, BadRequest>> Handler([AsParameters] GetIngredientsFilterParameters filter, IHateoasBuilderFactory hateoasBuilderFactory, ICurrentUser currentUser, IAppDbContext dbContext, CancellationToken cancellationToken)
     {
         IEnumerable<IngredientCategoryId> categoryIds = await GetFilteredCategories(filter.Category, dbContext, cancellationToken);
 
-        IQueryable<Ingredient> query = PrepareIngredientsQuery(dbContext, categoryIds);
+        IQueryable<Ingredient> query = PrepareIngredientsQuery(dbContext, categoryIds, currentUser.Id);
 
         int totalCount = await query.CountAsync(cancellationToken);
 
@@ -59,9 +60,9 @@ public static class GetIngredients
                                                    .ToListAsync(cancellationToken);
     }
 
-    private static IQueryable<Ingredient> PrepareIngredientsQuery(IAppDbContext dbContext, IEnumerable<IngredientCategoryId> categoryIds)
+    private static IQueryable<Ingredient> PrepareIngredientsQuery(IAppDbContext dbContext, IEnumerable<IngredientCategoryId> categoryIds, string userId)
     {
-        IQueryable<Ingredient> query = dbContext.Ingredients.AsNoTracking();
+        IQueryable<Ingredient> query = dbContext.Ingredients.AsNoTracking().Where(ingredient => ingredient.CreatedBy == userId);
 
         if (categoryIds.Any())
         {
