@@ -2,7 +2,7 @@
 
 public interface ICurrentUser
 {
-    int Id { get; set; }
+    string Id { get; set; }
 
     IEnumerable<string> Roles { get; set; }
 

@@ -29,21 +29,22 @@ public static class GetUnits
         }
     }
 
-    internal static async Task<Results<Ok<HateoasCollectionResponse<Response>>, NotFound>> Handler([FromServices] ICurrentUser currentUser, IAppDbContext dbContext, [FromServices] HateoasBuilder<HateoasCollectionResponse<Response>> hateoasBuilder, CancellationToken cancellationToken)
+    internal static async Task<Results<Ok<HateoasCollectionResponse<Response>>, NotFound>> Handler([FromServices] ICurrentUser currentUser, IAppDbContext dbContext, [FromServices] IHateoasBuilderFactory hateoasBuilderFactory, CancellationToken cancellationToken)
     {
         IEnumerable<Unit> units = await dbContext.Units.AsNoTracking().ToListAsync(cancellationToken);
         IEnumerable<Response> responses = units.Select(ToGetResponse);
 
         bool isActionAllowed = currentUser.HasRole(UserRoles.Admin);
 
-        hateoasBuilder.ForCollection(responses)
-                      .WithCollectionLink()
+        HateoasCollectionResponseBuilder<Response>? responseBuilder = hateoasBuilderFactory.ForCollection(responses);
+
+        responseBuilder.WithCollectionLink()
                         .WithGet(LinkOptions.Create("GetMeasurementUnit", HateoasRelConstants.Self, isActionAllowed), unit => new { unitId = unit.UnitId })
                         .WithPut(LinkOptions.Create("UpdateMeasurementUnit", HateoasRelConstants.Update, isActionAllowed), unit => new { unitId = unit.UnitId })
                         .WithDelete(LinkOptions.Create("DeleteMeasurementUnit", HateoasRelConstants.Delete, isActionAllowed), unit => new { unitId = unit.UnitId })
                       .AddPost(LinkOptions.Create("GetMeasurementUnits", HateoasRelConstants.Create, isActionAllowed), null);
 
-        return TypedResults.Ok(hateoasBuilder.BuildResults());
+        return TypedResults.Ok(responseBuilder.Build());
     }
 
     internal static Response ToGetResponse(this Unit unit)

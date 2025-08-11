@@ -27,7 +27,7 @@ public static class GetRecipeCategories
         }
     }
 
-    internal static async Task<Results<Ok<HateoasCollectionResponse<Response>>, NotFound>> Handler([FromServices] ICurrentUser currentUser, IAppDbContext dbContext, [FromServices] HateoasBuilder<HateoasCollectionResponse<Response>> hateoasBuilder, CancellationToken cancellationToken)
+    internal static async Task<Results<Ok<HateoasCollectionResponse<Response>>, NotFound>> Handler([FromServices] ICurrentUser currentUser, IAppDbContext dbContext, [FromServices] IHateoasBuilderFactory hateoasBuilderFactory, CancellationToken cancellationToken)
     {
         IEnumerable<Response> results = await dbContext.RecipeCategories.AsNoTracking()
                                                                         .OrderBy(category => category.Name)
@@ -36,7 +36,7 @@ public static class GetRecipeCategories
 
         bool isActionAllowed = currentUser.HasRole(UserRoles.Admin);
 
-        HateoasCollectionResponseBuilder<Response> collectionBuilder = hateoasBuilder.ForCollection(results);
+        HateoasCollectionResponseBuilder<Response> collectionBuilder = hateoasBuilderFactory.ForCollection(results);
 
         if (isActionAllowed)
         {
@@ -46,6 +46,6 @@ public static class GetRecipeCategories
                 .AddPost(LinkOptions.Create("CreateRecipeCategoryUnits", HateoasRelConstants.Create, isActionAllowed), null);
         }
 
-        return TypedResults.Ok(hateoasBuilder.BuildResults());
+        return TypedResults.Ok(collectionBuilder.Build());
     }
 }

@@ -4,7 +4,7 @@ namespace RecipeManager.Integration.Tests.Common.Users;
 
 public class FakeCurrentUser : ICurrentUser
 {
-    public virtual int Id { get; set; }
+    public virtual string Id { get; set; } = default!;
 
     public virtual IEnumerable<string> Roles { get; set; } = [];
 
@@ -12,7 +12,7 @@ public class FakeCurrentUser : ICurrentUser
     {
     }
 
-    public FakeCurrentUser(int id, IEnumerable<string> roles)
+    public FakeCurrentUser(string id, IEnumerable<string> roles)
     {
         Id = id;
         Roles = roles ?? [];
