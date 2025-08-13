@@ -13,17 +13,16 @@ public sealed class RecipeIngredient
 
     public UnitId UnitId { get; set; } = default!;
 
-    public decimal Amount { get; set; }
+    public double Amount { get; set; }
 
     private RecipeIngredient()
     {
     }
 
-    public static RecipeIngredient Create(RecipeId recipeId, IngredientId ingredientId, UnitId unitId, decimal amount)
+    public static RecipeIngredient Create(IngredientId ingredientId, UnitId unitId, double amount)
     {
         return new()
         {
-            RecipeId = recipeId,
             IngredientId = ingredientId,
             UnitId = unitId,
             Amount = amount
