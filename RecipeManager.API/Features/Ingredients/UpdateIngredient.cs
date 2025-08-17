@@ -12,7 +12,7 @@ namespace RecipeManager.Api.Features.Ingredients;
 
 public static class UpdateIngredient
 {
-    public record struct Request(Guid Value) : IRequestId<Request>
+    public record struct Request(Guid Id) : IRequestId<Request>
     {
     }
 
@@ -23,7 +23,7 @@ public static class UpdateIngredient
         public async Task<bool> IsAuthorized(Request request)
         {
             return await appDbContext.Ingredients.AsNoTracking()
-                                                 .AnyAsync(ingredient => ingredient.Id == new IngredientId(request.Value) &&
+                                                 .AnyAsync(ingredient => ingredient.Id == new IngredientId(request.Id) &&
                                                            ingredient.CreatedBy == currentUser.Id);
         }
     }

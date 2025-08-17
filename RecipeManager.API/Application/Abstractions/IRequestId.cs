@@ -3,14 +3,14 @@
 public interface IRequestId<TRequest>
            where TRequest : IRequestId<TRequest>, new()
 {
-    Guid Value { get; set; }
+    Guid Id { get; set; }
 
     static bool TryParse(string? input, out TRequest id)
     {
         if (Guid.TryParse(input, out Guid guid))
         {
             id = new TRequest();
-            id.Value = guid;
+            id.Id = guid;
             return true;
         }
 

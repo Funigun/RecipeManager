@@ -52,4 +52,16 @@ public sealed class Recipe : AuditableEntity, IEntity<RecipeId>
             VideoURL = videoUrl
         };
     }
+
+    public IEnumerable<IngredientId> GetIngredientIds()
+    {
+        List<IngredientId> results = Ingredients.Select(ri => ri.IngredientId).ToList();
+
+        if (IngredientId is not null)
+        {
+            results.Add(IngredientId);
+        }
+
+        return results;
+    }
 }

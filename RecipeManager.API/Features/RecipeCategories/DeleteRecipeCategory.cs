@@ -11,7 +11,7 @@ namespace RecipeManager.Api.Features.RecipeCategories;
 
 public static class DeleteRecipeCategory
 {
-    public record struct Request(Guid Value) : IRequestId<Request>
+    public record struct Request(Guid Id) : IRequestId<Request>
     {
     }
 
@@ -36,7 +36,7 @@ public static class DeleteRecipeCategory
 
     public static async Task<Results<NoContent, NotFound>> Handler(Request categoryId, IAppDbContext dbContext, CancellationToken cancellationToken)
     {
-        RecipeCategoryId id = new(categoryId.Value);
+        RecipeCategoryId id = new(categoryId.Id);
 
         RecipeCategory? category = await dbContext.RecipeCategories.FirstOrDefaultAsync(category => category.Id == id, cancellationToken)
                                 ?? throw new EntityNotFoundException<RecipeCategory, RecipeCategoryId>(id);
