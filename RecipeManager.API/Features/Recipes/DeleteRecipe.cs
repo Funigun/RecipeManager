@@ -20,6 +20,7 @@ public static class DeleteRecipe
         }
     }
 
+    [GroupEndpoint("Recipes")]
     public sealed class Endpoint : IEndpoint
     {
         public void MapEndpoint(IEndpointRouteBuilder endpoints)
