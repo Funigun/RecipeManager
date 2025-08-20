@@ -29,13 +29,13 @@ public sealed class Recipe : AuditableEntity, IEntity<RecipeId>
 
     public ICollection<RecipeSection> Sections { get; set; } = [];
 
-    public ICollection<RecipeCategory> Categories { get; set; } = [];
+    public ICollection<RecipeCategoryId> Categories { get; set; } = [];
 
     private Recipe()
     {
     }
 
-    public static Recipe Create(string title, RecipeAmount amount, byte numberOfServings, RecipeDifficulty difficulty, IEnumerable<RecipeIngredient> ingredients, IEnumerable<RecipeSection> sections, IEnumerable<RecipeCategory> categories, IngredientId ingredientId, string? description = null, string? imageUrl = null, string? videoUrl = null)
+    public static Recipe Create(string title, RecipeAmount amount, byte numberOfServings, RecipeDifficulty difficulty, IEnumerable<RecipeIngredient> ingredients, IEnumerable<RecipeSection> sections, IEnumerable<RecipeCategoryId> categories, IngredientId ingredientId, string? description = null, string? imageUrl = null, string? videoUrl = null)
     {
         return new()
         {

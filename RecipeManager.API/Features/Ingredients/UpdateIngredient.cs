@@ -12,9 +12,7 @@ namespace RecipeManager.Api.Features.Ingredients;
 
 public static class UpdateIngredient
 {
-    public record struct Request(Guid Id) : IRequestId<Request>
-    {
-    }
+    public record struct Request(Guid Id) : IRequestId<Request>;
 
     public sealed record IngredientDto(string Name, IEnumerable<Guid> Categories, IEnumerable<Guid> Recipes);
 

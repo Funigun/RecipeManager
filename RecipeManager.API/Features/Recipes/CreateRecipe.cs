@@ -216,7 +216,7 @@ public static class CreateRecipe
             (RecipeDifficulty)request.Difficulty,
             request.Ingredients.Select(ToDomain),
             request.Sections.Select(ToDomain),
-            [], //ToDO: change RecipeCategory to Ids
+            request.CategoryIds.Select(c => new RecipeCategoryId(c)),
             request.IngredientId is Guid id ? new IngredientId(id) : null!,
             request.Description,
             request.ImageUrl,
