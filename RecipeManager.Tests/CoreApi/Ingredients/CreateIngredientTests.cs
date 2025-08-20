@@ -14,6 +14,8 @@ public sealed class CreateIngredientTests : BaseIntegrationTest
     {
     }
 
+    //ToDo: Add tests for unhappy paths (auth, validation) in all Ingredient tests
+
     [Fact]
     public async Task CreateIngredient_ShouldReturn_CategoryId_ForValidInput()
     {
