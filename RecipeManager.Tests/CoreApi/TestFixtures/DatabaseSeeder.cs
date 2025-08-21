@@ -1,5 +1,7 @@
 ﻿using RecipeManager.Api.Domain.Ingredients;
 using RecipeManager.Api.Domain.Recipes;
+using RecipeManager.Api.Domain.Recipes.Enums;
+using RecipeManager.Api.Domain.Recipes.ValueObjects;
 using RecipeManager.Api.Domain.Units;
 using RecipeManager.Api.Domain.Units.Enums;
 using RecipeManager.Api.Persistance;
@@ -49,6 +51,61 @@ internal static class DatabaseSeeder
         ];
 
         dbContext.Ingredients.AddRange(ingredients);
+        await dbContext.SaveChangesAsync();
+
+        IEnumerable<Recipe> recipes =
+        [
+            Recipe.Create
+            (
+                "Existing recipe",
+                RecipeAmount.Create(10d, units.First().Id.Value),
+                2,
+                RecipeDifficulty.Easy,
+                [
+                    RecipeIngredient.Create(ingredients.First().Id.Value, units.First().Id.Value, 10d)
+                ],
+                [
+                    RecipeSection.Create(0, [RecipeStep.Create(1, "Test", null)]),
+                    RecipeSection.Create(1, [RecipeStep.Create(2, "Test 2", null)])
+                ],
+                [],
+                null!
+            ),
+            Recipe.Create
+            (
+                "To Delete",
+                RecipeAmount.Create(10d, units.First().Id.Value),
+                2,
+                RecipeDifficulty.Easy,
+                [
+                    RecipeIngredient.Create(ingredients.First().Id.Value, units.First().Id.Value, 10d)
+                ],
+                [
+                    RecipeSection.Create(0, [RecipeStep.Create(1, "Test", null)]),
+                    RecipeSection.Create(1, [RecipeStep.Create(2, "Test 2", null)])
+                ],
+                [],
+                null!
+            ),
+            Recipe.Create
+            (
+                "To Update",
+                RecipeAmount.Create(10d, units.First().Id.Value),
+                2,
+                RecipeDifficulty.Easy,
+                [
+                    RecipeIngredient.Create(ingredients.First().Id.Value, units.First().Id.Value, 10d)
+                ],
+                [
+                    RecipeSection.Create(0, [RecipeStep.Create(1, "Test", null)]),
+                    RecipeSection.Create(1, [RecipeStep.Create(2, "Test 2", null)])
+                ],
+                [],
+                null!
+            ),
+        ];
+
+        dbContext.Recipes.AddRange(recipes);
         await dbContext.SaveChangesAsync();
     }
 }
