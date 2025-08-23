@@ -38,7 +38,7 @@ public static class GetIngredientById
         }
     }
 
-    public static async Task<Results<Ok<HateoasResponse<Response>>, NotFound>> Handler(Request ingredientId, [FromServices] IHateoasBuilderFactory hateoasBuilderFactory, ICurrentUser currentUser, IAppDbContext dbContext, CancellationToken cancellationToken)
+    public static async Task<Results<Ok<HateoasResponse<Response>>, NotFound>> Handler(Request ingredientId, [FromServices] IHateoasBuilderFactory hateoasBuilderFactory, [FromServices] ICurrentUser currentUser, [FromServices] IAppDbContext dbContext, CancellationToken cancellationToken)
     {
         IngredientId id = new(ingredientId.Id);
 
@@ -101,7 +101,7 @@ public static class GetIngredientById
         HateoasResponseBuilder<Response> responseBuilder = hateoasBuilderFactory.ForItem(response);
 
         responseBuilder.AddGet(LinkOptions.Create("GetIngredientById", HateoasRelConstants.Self, true), new { ingredientId = ingredientDto.Id })
-                       .AddPut(LinkOptions.Create("UpdateIngredient", HateoasRelConstants.Create, isIngredientCreator), new { ingredientId = ingredientDto.Id })
+                       .AddPut(LinkOptions.Create("UpdateIngredient", HateoasRelConstants.Update, isIngredientCreator), new { ingredientId = ingredientDto.Id })
                        .AddDelete(LinkOptions.Create("UpdateIngredient", HateoasRelConstants.Delete, isIngredientCreator), new { ingredientId = ingredientDto.Id });
 
         return responseBuilder.Build();

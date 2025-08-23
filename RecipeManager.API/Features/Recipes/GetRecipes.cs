@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RecipeManager.Api.Application.Abstractions;
 using RecipeManager.Api.Domain.Recipes;
@@ -30,7 +31,7 @@ public static class GetRecipes
         }
     }
 
-    public static async Task<Ok<HateoasResponse<Response>>> Handler([AsParameters] GetRecipesParameters parameters, IAppDbContext dbContext, IHateoasBuilderFactory hateoasBuilderFactory, CancellationToken cancellationToken)
+    public static async Task<Ok<HateoasResponse<Response>>> Handler([AsParameters] GetRecipesParameters parameters, [FromServices] IAppDbContext dbContext, [FromServices] IHateoasBuilderFactory hateoasBuilderFactory, CancellationToken cancellationToken)
     {
         IQueryable<Recipe> recipesQuery = dbContext.Recipes.AsNoTracking();
 

@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RecipeManager.Api.Application.Abstractions;
 using RecipeManager.Api.Application.Exceptions;
@@ -31,7 +32,7 @@ public static class DeleteRecipe
         }
     }
 
-    public static async Task<Results<NoContent, NotFound>> Handler(Request recipeId, IAppDbContext dbContext, ICurrentUser currentUser, CancellationToken cancellationToken)
+    public static async Task<Results<NoContent, NotFound>> Handler(Request recipeId, [FromServices] IAppDbContext dbContext, [FromServices] ICurrentUser currentUser, CancellationToken cancellationToken)
     {
         RecipeId id = new(recipeId.Id);
         Recipe? recipe = await dbContext.Recipes.FirstAsync(recipe => recipe.Id == id && recipe.CreatedBy == currentUser.Id, cancellationToken);

@@ -208,7 +208,7 @@ public static class UpdateRecipe
         }
     }
 
-    public static async Task<IResult> Handler(Request recipeId, [FromBody] RecipeDto recipeDto, IAppDbContext dbContext, ICurrentUser currentUser, CancellationToken cancellationToken)
+    public static async Task<IResult> Handler(Request recipeId, [FromBody] RecipeDto recipeDto, [FromServices] IAppDbContext dbContext, [FromServices] ICurrentUser currentUser, CancellationToken cancellationToken)
     {
         RecipeId id = new(recipeId.Id);
         Recipe recipe = await dbContext.Recipes.AsNoTracking()

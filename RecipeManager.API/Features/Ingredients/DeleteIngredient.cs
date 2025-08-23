@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using RecipeManager.Api.Application.Abstractions;
 using RecipeManager.Api.Application.Exceptions;
 using RecipeManager.Api.Domain.Ingredients;
@@ -31,7 +32,7 @@ public static class DeleteIngredient
         }
     }
 
-    public static async Task<IResult> Handler(Request ingredientId, IAppDbContext dbContext, ICurrentUser currentUser, CancellationToken cancellationToken)
+    public static async Task<IResult> Handler(Request ingredientId, [FromServices] IAppDbContext dbContext, [FromServices] ICurrentUser currentUser, CancellationToken cancellationToken)
     {
         IngredientId id = new(ingredientId.Id);
 

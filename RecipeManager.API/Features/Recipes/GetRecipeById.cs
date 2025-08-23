@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RecipeManager.Api.Application.Abstractions;
 using RecipeManager.Api.Application.Exceptions;
@@ -6,7 +7,12 @@ using RecipeManager.Api.Domain.Ingredients;
 using RecipeManager.Api.Domain.Recipes;
 using RecipeManager.Api.Domain.Recipes.ValueObjects;
 using RecipeManager.Api.Domain.Units;
+using RecipeManager.Api.Shared.Contracts.Authorization;
 using RecipeManager.Api.Shared.Endpoint;
+using RecipeManager.Api.Shared.Hateoas.Builder;
+using RecipeManager.Api.Shared.Hateoas.Common;
+using RecipeManager.Api.Shared.Hateoas.Models;
+using LinkOptions = RecipeManager.Api.Shared.Hateoas.Models.LinkOptions;
 
 namespace RecipeManager.Api.Features.Recipes;
 
@@ -38,7 +44,7 @@ public static class GetRecipeById
         }
     }
 
-    public static async Task<Results<Ok<Response>, BadRequest>> Handler(Request id, IAppDbContext dbContext, CancellationToken cancellationToken)
+    public static async Task<Results<Ok<HateoasResponse<Response>>, BadRequest>> Handler(Request id, [FromServices] ICurrentUser currentUser, [FromServices] IAppDbContext dbContext, [FromServices] IHateoasBuilderFactory hateoasBuilderFactory, CancellationToken cancellationToken)
     {
         Recipe? recipe = await GetRecipe(new RecipeId(id.Id), dbContext, cancellationToken);
 
@@ -51,8 +57,14 @@ public static class GetRecipeById
                                                : [];
 
         Response response = MapToResponse(recipe, recipeIngredients, units, categories);
+        HateoasResponseBuilder<Response> responseBuilder = hateoasBuilderFactory.ForItem(response);
 
-        return TypedResults.Ok(response);
+        bool isRecipeCreator = recipe.CreatedBy == currentUser.Id;
+
+        responseBuilder.AddDelete(LinkOptions.Create("DeleteRecipe", HateoasRelConstants.Delete, isRecipeCreator), new { recipe.Id })
+                       .AddPut(LinkOptions.Create("UpdateRecipe", HateoasRelConstants.Delete, isRecipeCreator), new { recipe.Id });
+
+        return TypedResults.Ok(responseBuilder.Build());
     }
 
     private static async Task<Recipe?> GetRecipe(RecipeId recipeId, IAppDbContext dbContext, CancellationToken cancellationToken)

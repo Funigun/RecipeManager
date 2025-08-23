@@ -68,7 +68,7 @@ public static class UpdateIngredient
         }
     }
 
-    public static async Task<IResult> Handler(Request ingredientId, [FromBody] IngredientDto request, IAppDbContext dbContext, ICurrentUser currentUser, CancellationToken cancellationToken)
+    public static async Task<IResult> Handler(Request ingredientId, [FromBody] IngredientDto request, [FromServices] IAppDbContext dbContext, [FromServices] ICurrentUser currentUser, CancellationToken cancellationToken)
     {
         IngredientId id = new(ingredientId.Id);
 
