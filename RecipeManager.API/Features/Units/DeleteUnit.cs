@@ -11,7 +11,7 @@ namespace RecipeManager.Api.Features.Units;
 
 public static class DeleteUnit
 {
-    public record struct Request(Guid Value) : IRequestId<Request>
+    public record struct Request(Guid Id) : IRequestId<Request>
     {
     }
 
@@ -36,7 +36,7 @@ public static class DeleteUnit
 
     public static async Task<Results<NoContent, NotFound>> Handler(Request unitId, IAppDbContext dbContext, CancellationToken cancellationToken)
     {
-        UnitId id = new(unitId.Value);
+        UnitId id = new(unitId.Id);
 
         Unit? unit = await dbContext.Units.FindAsync([id], cancellationToken)
                   ?? throw new EntityNotFoundException<Unit, UnitId>(id);

@@ -15,7 +15,7 @@ namespace RecipeManager.Api.Features.Ingredients;
 
 public static class GetIngredientById
 {
-    public record struct Request(Guid Value) : IRequestId<Request>
+    public record struct Request(Guid Id) : IRequestId<Request>
     {
     }
 
@@ -40,7 +40,7 @@ public static class GetIngredientById
 
     public static async Task<Results<Ok<HateoasResponse<Response>>, NotFound>> Handler(Request ingredientId, [FromServices] IHateoasBuilderFactory hateoasBuilderFactory, ICurrentUser currentUser, IAppDbContext dbContext, CancellationToken cancellationToken)
     {
-        IngredientId id = new(ingredientId.Value);
+        IngredientId id = new(ingredientId.Id);
 
         Ingredient? ingredient = await GetIngredient(id, dbContext, cancellationToken)
                               ?? throw new EntityNotFoundException<Ingredient, IngredientId>(id);

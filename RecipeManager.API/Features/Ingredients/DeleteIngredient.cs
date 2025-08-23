@@ -9,13 +9,13 @@ namespace RecipeManager.Api.Features.Ingredients;
 
 public static class DeleteIngredient
 {
-    public record struct Request(Guid Value) : IRequestId<Request>;
+    public record struct Request(Guid Id) : IRequestId<Request>;
 
     public sealed class AuthorizationPolicy(IAppDbContext dbContext, ICurrentUser currentUser) : IAuthorizationPolicy<Request>
     {
         public async Task<bool> IsAuthorized(Request request)
         {
-            return await dbContext.Ingredients.AnyAsync(ingredient => ingredient.Id == new IngredientId(request.Value) &&
+            return await dbContext.Ingredients.AnyAsync(ingredient => ingredient.Id == new IngredientId(request.Id) &&
                                                         ingredient.CreatedBy == currentUser.Id);
         }
     }
@@ -33,7 +33,7 @@ public static class DeleteIngredient
 
     public static async Task<IResult> Handler(Request ingredientId, IAppDbContext dbContext, ICurrentUser currentUser, CancellationToken cancellationToken)
     {
-        IngredientId id = new(ingredientId.Value);
+        IngredientId id = new(ingredientId.Id);
 
         Ingredient? ingredient = await dbContext.Ingredients.FirstAsync(ingredient => ingredient.Id == id && ingredient.CreatedBy == currentUser.Id, cancellationToken)
                               ?? throw new EntityNotFoundException<Ingredient, IngredientId>(id);

@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RecipeManager.Api.Application.Abstractions;
 using RecipeManager.Api.Application.Exceptions;
@@ -12,9 +13,7 @@ namespace RecipeManager.Api.Features.Ingredients;
 
 public static class UpdateIngredient
 {
-    public record struct Request(Guid Value) : IRequestId<Request>
-    {
-    }
+    public record struct Request(Guid Id) : IRequestId<Request>;
 
     public sealed record IngredientDto(string Name, IEnumerable<Guid> Categories, IEnumerable<Guid> Recipes);
 
@@ -23,7 +22,7 @@ public static class UpdateIngredient
         public async Task<bool> IsAuthorized(Request request)
         {
             return await appDbContext.Ingredients.AsNoTracking()
-                                                 .AnyAsync(ingredient => ingredient.Id == new IngredientId(request.Value) &&
+                                                 .AnyAsync(ingredient => ingredient.Id == new IngredientId(request.Id) &&
                                                            ingredient.CreatedBy == currentUser.Id);
         }
     }
@@ -63,15 +62,15 @@ public static class UpdateIngredient
     {
         public void MapEndpoint(IEndpointRouteBuilder endpoints)
         {
-            endpoints.MapStandardAuthenticatedPut<IngredientDto>("/{ingredientId}", Handler)
+            endpoints.MapStandardAuthenticatedPut<Request, IngredientDto>("/{ingredientId}", Handler)
                      .WithName("UpdateIngredient")
                      .WithDescription("Updates an existing ingredient");
         }
     }
 
-    public static async Task<IResult> Handler(Guid ingredientId, IngredientDto request, IAppDbContext dbContext, ICurrentUser currentUser, CancellationToken cancellationToken)
+    public static async Task<IResult> Handler(Request ingredientId, [FromBody] IngredientDto request, IAppDbContext dbContext, ICurrentUser currentUser, CancellationToken cancellationToken)
     {
-        IngredientId id = new(ingredientId);
+        IngredientId id = new(ingredientId.Id);
 
         Ingredient? ingredient = await dbContext.Ingredients.FirstOrDefaultAsync(i => i.Id == id && i.CreatedBy == currentUser.Id, cancellationToken)
                               ?? throw new EntityNotFoundException<Ingredient, IngredientId>(id);

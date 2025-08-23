@@ -77,5 +77,10 @@ public sealed class RecipeConfiguration : IEntityTypeConfiguration<Recipe>
                           .IsRequired(false);
             });
         });
+
+        builder.OwnsMany(recipe => recipe.Categories, categories =>
+        {
+            categories.ToTable("RecipeToRecipeCategory");
+        });
     }
 }

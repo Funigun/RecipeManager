@@ -7,6 +7,8 @@ namespace RecipeManager.Api.Domain.Recipes;
 
 public sealed class Recipe : AuditableEntity, IEntity<RecipeId>
 {
+    private List<RecipeCategoryId> _categories = [];
+
     public RecipeId Id { get; set; } = default!;
 
     public string Title { get; set; } = string.Empty;
@@ -29,13 +31,13 @@ public sealed class Recipe : AuditableEntity, IEntity<RecipeId>
 
     public ICollection<RecipeSection> Sections { get; set; } = [];
 
-    public ICollection<RecipeCategory> Categories { get; set; } = [];
+    public IReadOnlyList<RecipeCategoryId> Categories => _categories.ToList();
 
     private Recipe()
     {
     }
 
-    public static Recipe Create(string title, RecipeAmount amount, byte numberOfServings, RecipeDifficulty difficulty, IEnumerable<RecipeIngredient> ingredients, IEnumerable<RecipeSection> sections, IEnumerable<RecipeCategory> categories, IngredientId ingredientId, string? description = null, string? imageUrl = null, string? videoUrl = null)
+    public static Recipe Create(string title, RecipeAmount amount, byte numberOfServings, RecipeDifficulty difficulty, IEnumerable<RecipeIngredient> ingredients, IEnumerable<RecipeSection> sections, IEnumerable<RecipeCategoryId> categories, IngredientId ingredientId, string? description = null, string? imageUrl = null, string? videoUrl = null)
     {
         return new()
         {
@@ -46,10 +48,27 @@ public sealed class Recipe : AuditableEntity, IEntity<RecipeId>
             IngredientId = ingredientId,
             Ingredients = ingredients.ToList(),
             Sections = sections.ToList(),
-            Categories = categories.ToList(),
+            _categories = categories.ToList(),
             Description = description,
             ImageURL = imageUrl,
             VideoURL = videoUrl
         };
+    }
+
+    public IEnumerable<IngredientId> GetIngredientIds()
+    {
+        List<IngredientId> results = Ingredients.Select(ri => ri.IngredientId).ToList();
+
+        if (IngredientId is not null)
+        {
+            results.Add(IngredientId);
+        }
+
+        return results;
+    }
+
+    public void UpdateCategories(IEnumerable<RecipeCategoryId> categoryIds)
+    {
+        _categories = categoryIds.ToList();
     }
 }
