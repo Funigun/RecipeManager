@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RecipeManager.Api.Application.Abstractions;
 using RecipeManager.Api.Application.Exceptions;
@@ -61,15 +62,15 @@ public static class UpdateIngredient
     {
         public void MapEndpoint(IEndpointRouteBuilder endpoints)
         {
-            endpoints.MapStandardAuthenticatedPut<IngredientDto>("/{ingredientId}", Handler)
+            endpoints.MapStandardAuthenticatedPut<Request, IngredientDto>("/{ingredientId}", Handler)
                      .WithName("UpdateIngredient")
                      .WithDescription("Updates an existing ingredient");
         }
     }
 
-    public static async Task<IResult> Handler(Guid ingredientId, IngredientDto request, IAppDbContext dbContext, ICurrentUser currentUser, CancellationToken cancellationToken)
+    public static async Task<IResult> Handler(Request ingredientId, [FromBody] IngredientDto request, IAppDbContext dbContext, ICurrentUser currentUser, CancellationToken cancellationToken)
     {
-        IngredientId id = new(ingredientId);
+        IngredientId id = new(ingredientId.Id);
 
         Ingredient? ingredient = await dbContext.Ingredients.FirstOrDefaultAsync(i => i.Id == id && i.CreatedBy == currentUser.Id, cancellationToken)
                               ?? throw new EntityNotFoundException<Ingredient, IngredientId>(id);

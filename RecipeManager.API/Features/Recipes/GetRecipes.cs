@@ -13,7 +13,7 @@ namespace RecipeManager.Api.Features.Recipes;
 
 public static class GetRecipes
 {
-    public sealed record GetRecipesParameters(int PageNumber, int PageSize) : PagedParameters(PageNumber, PageSize);
+    public sealed record GetRecipesParameters(int PageNumber = 1, int PageSize = 10) : PagedParameters(PageNumber, PageSize);
 
     public sealed record RecipeDto(Guid Id, string Title, string? ImageUrl, int Difficulty, byte NumberOfServings);
 
@@ -30,7 +30,7 @@ public static class GetRecipes
         }
     }
 
-    public static async Task<Ok<HateoasResponse<Response>>> Handler(GetRecipesParameters parameters, IAppDbContext dbContext, IHateoasBuilderFactory hateoasBuilderFactory, CancellationToken cancellationToken)
+    public static async Task<Ok<HateoasResponse<Response>>> Handler([AsParameters] GetRecipesParameters parameters, IAppDbContext dbContext, IHateoasBuilderFactory hateoasBuilderFactory, CancellationToken cancellationToken)
     {
         IQueryable<Recipe> recipesQuery = dbContext.Recipes.AsNoTracking();
 

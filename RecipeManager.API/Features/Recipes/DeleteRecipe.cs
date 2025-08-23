@@ -25,25 +25,25 @@ public static class DeleteRecipe
     {
         public void MapEndpoint(IEndpointRouteBuilder endpoints)
         {
-            endpoints.MapStandardAuthenticatedDelete<AuthorizationPolicy, Request>("{id}", Handler)
+            endpoints.MapStandardAuthenticatedDelete<AuthorizationPolicy, Request>("{recipeId}", Handler)
                      .WithName("DeleteRecipe")
                      .WithDescription("Delete a recipe by id");
         }
     }
 
-    public static async Task<Results<Ok, NotFound>> Handler(Request request, IAppDbContext dbContext, ICurrentUser currentUser, CancellationToken cancellationToken)
+    public static async Task<Results<NoContent, NotFound>> Handler(Request recipeId, IAppDbContext dbContext, ICurrentUser currentUser, CancellationToken cancellationToken)
     {
-        RecipeId recipeId = new(request.Id);
-        Recipe? recipe = await dbContext.Recipes.FirstAsync(recipe => recipe.Id == recipeId && recipe.CreatedBy == currentUser.Id, cancellationToken);
+        RecipeId id = new(recipeId.Id);
+        Recipe? recipe = await dbContext.Recipes.FirstAsync(recipe => recipe.Id == id && recipe.CreatedBy == currentUser.Id, cancellationToken);
 
         if (recipe == null)
         {
-            throw new EntityNotFoundException<Recipe, RecipeId>(new RecipeId(request.Id));
+            throw new EntityNotFoundException<Recipe, RecipeId>(new RecipeId(id));
         }
 
         dbContext.Recipes.Remove(recipe);
         await dbContext.SaveChangesAsync(cancellationToken);
 
-        return TypedResults.Ok();
+        return TypedResults.NoContent();
     }
 }

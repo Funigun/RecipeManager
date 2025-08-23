@@ -65,8 +65,8 @@ internal static class DatabaseSeeder
                     RecipeIngredient.Create(ingredients.First().Id.Value, units.First().Id.Value, 10d)
                 ],
                 [
-                    RecipeSection.Create(0, [RecipeStep.Create(1, "Test", null)]),
-                    RecipeSection.Create(1, [RecipeStep.Create(2, "Test 2", null)])
+                    RecipeSection.Create(1, [RecipeStep.Create(1, "Test", null)]),
+                    RecipeSection.Create(2, [RecipeStep.Create(2, "Test 2", null)])
                 ],
                 [],
                 null!
@@ -81,8 +81,8 @@ internal static class DatabaseSeeder
                     RecipeIngredient.Create(ingredients.First().Id.Value, units.First().Id.Value, 10d)
                 ],
                 [
-                    RecipeSection.Create(0, [RecipeStep.Create(1, "Test", null)]),
-                    RecipeSection.Create(1, [RecipeStep.Create(2, "Test 2", null)])
+                    RecipeSection.Create(1, [RecipeStep.Create(1, "Test", null)]),
+                    RecipeSection.Create(2, [RecipeStep.Create(2, "Test 2", null)])
                 ],
                 [],
                 null!
@@ -97,8 +97,8 @@ internal static class DatabaseSeeder
                     RecipeIngredient.Create(ingredients.First().Id.Value, units.First().Id.Value, 10d)
                 ],
                 [
-                    RecipeSection.Create(0, [RecipeStep.Create(1, "Test", null)]),
-                    RecipeSection.Create(1, [RecipeStep.Create(2, "Test 2", null)])
+                    RecipeSection.Create(1, [RecipeStep.Create(1, "Test", null)]),
+                    RecipeSection.Create(2, [RecipeStep.Create(1, "Test 2", null)])
                 ],
                 [],
                 null!

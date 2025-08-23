@@ -80,11 +80,11 @@ public static class EndpointMappingExtensions
                       .WithValidationFilter<TRequest>();
     }
 
-    public static RouteHandlerBuilder MapStandardAuthenticatedPut<TRequest>(this IEndpointRouteBuilder builder, string pattern, Delegate handler)
+    public static RouteHandlerBuilder MapStandardAuthenticatedPut<TRequest, TDto>(this IEndpointRouteBuilder builder, string pattern, Delegate handler)
     {
         return builder.MapStandardPut<TRequest>(pattern, handler)
                       .WithAuthenticationFilter<TRequest>()
-                      .WithValidationFilter<TRequest>();
+                      .WithValidationFilter<TDto>();
     }
 
     public static RouteHandlerBuilder MapStandardDelete<TRequest>(this IEndpointRouteBuilder builder, string pattern, Delegate handler)

@@ -44,8 +44,13 @@ public static class GetRecipeById
 
         IEnumerable<Ingredient> recipeIngredients = await GetRecipeIngredients(recipe, dbContext, cancellationToken);
         IEnumerable<Unit> units = await dbContext.Units.AsNoTracking().ToListAsync(cancellationToken);
+        IEnumerable<RecipeCategory> categories = recipe.Categories.Count > 0
+                                               ? await dbContext.RecipeCategories.Where(category => recipe.Categories.Contains(category.Id))
+                                                                                 .AsNoTracking()
+                                                                                 .ToListAsync(cancellationToken)
+                                               : [];
 
-        Response response = MapToResponse(recipe, recipeIngredients, units);
+        Response response = MapToResponse(recipe, recipeIngredients, units, categories);
 
         return TypedResults.Ok(response);
     }
@@ -71,11 +76,11 @@ public static class GetRecipeById
                                           .ToListAsync(cancellationToken);
     }
 
-    private static Response MapToResponse(Recipe recipe, IEnumerable<Ingredient> recipeIngredients, IEnumerable<Unit> units)
+    private static Response MapToResponse(Recipe recipe, IEnumerable<Ingredient> recipeIngredients, IEnumerable<Unit> units, IEnumerable<RecipeCategory> recipeCategories)
     {
         IEnumerable<RecipeIngredientDto> ingredients = recipe.Ingredients.Select(ingredient => MapToIngredientDto(ingredient, recipeIngredients, units));
         IEnumerable<RecipeSectionDto> sections = recipe.Sections.Select(MapRecipeSectionDto);
-        IEnumerable<RecipeCategoryDto> categories = recipe.Categories.Select(c => new RecipeCategoryDto(c.Id.Value, c.Name));
+        IEnumerable<RecipeCategoryDto> categories = recipeCategories.Select(c => new RecipeCategoryDto(c.Id.Value, c.Name));
 
         return new Response
         (
@@ -83,7 +88,7 @@ public static class GetRecipeById
             recipe.Description ?? string.Empty,
             recipe.ImageURL,
             recipe.VideoURL,
-            MapToRecipeAmountDto(recipe.Amount),
+            MapToRecipeAmountDto(recipe.Amount, units),
             recipe.NumberOfServings,
             (int)recipe.Difficulty,
             ingredients,
@@ -109,13 +114,13 @@ public static class GetRecipeById
         );
     }
 
-    private static RecipeAmountDto MapToRecipeAmountDto(RecipeAmount recipeAmount)
+    private static RecipeAmountDto MapToRecipeAmountDto(RecipeAmount recipeAmount, IEnumerable<Unit> units)
     {
         return new RecipeAmountDto
         (
             recipeAmount.Amount,
             recipeAmount.UnitId.Value,
-            recipeAmount.Unit.Name
+            units.First(unit => unit.Id == recipeAmount.UnitId)?.ShortName ?? string.Empty
         );
     }
 

@@ -7,6 +7,8 @@ namespace RecipeManager.Api.Domain.Recipes;
 
 public sealed class Recipe : AuditableEntity, IEntity<RecipeId>
 {
+    private List<RecipeCategoryId> _categories = [];
+
     public RecipeId Id { get; set; } = default!;
 
     public string Title { get; set; } = string.Empty;
@@ -29,7 +31,7 @@ public sealed class Recipe : AuditableEntity, IEntity<RecipeId>
 
     public ICollection<RecipeSection> Sections { get; set; } = [];
 
-    public ICollection<RecipeCategoryId> Categories { get; set; } = [];
+    public IReadOnlyList<RecipeCategoryId> Categories => _categories.ToList();
 
     private Recipe()
     {
@@ -46,7 +48,7 @@ public sealed class Recipe : AuditableEntity, IEntity<RecipeId>
             IngredientId = ingredientId,
             Ingredients = ingredients.ToList(),
             Sections = sections.ToList(),
-            Categories = categories.ToList(),
+            _categories = categories.ToList(),
             Description = description,
             ImageURL = imageUrl,
             VideoURL = videoUrl
@@ -63,5 +65,10 @@ public sealed class Recipe : AuditableEntity, IEntity<RecipeId>
         }
 
         return results;
+    }
+
+    public void UpdateCategories(IEnumerable<RecipeCategoryId> categoryIds)
+    {
+        _categories = categoryIds.ToList();
     }
 }

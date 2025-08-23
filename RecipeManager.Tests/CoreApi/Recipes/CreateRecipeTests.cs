@@ -47,7 +47,7 @@ public sealed class CreateRecipeTests : BaseIntegrationTest
         CreateRecipe.RecipeAmountDto amount = new(10d, unitId.Value);
         CreateRecipe.RecipeIngredientDto ingredientDto = new(ingredientId.Value, unitId.Value, 10d);
         CreateRecipe.RecipeSectionDto ingredientsPreparation = new((int)RecipeSectionType.IngredientsPreparation, [new CreateRecipe.RecipeStepDto(1, "Test", null)]);
-        CreateRecipe.RecipeSectionDto cooking = new((int)RecipeSectionType.Cooking, [new CreateRecipe.RecipeStepDto(2, "Test 2", null)]);
+        CreateRecipe.RecipeSectionDto cooking = new((int)RecipeSectionType.Cooking, [new CreateRecipe.RecipeStepDto(1, "Test 2", null)]);
 
         return new CreateRecipe.Request
         (

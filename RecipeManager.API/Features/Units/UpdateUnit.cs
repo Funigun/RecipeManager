@@ -61,7 +61,7 @@ public static class UpdateUnit
     {
         public void MapEndpoint(IEndpointRouteBuilder endpoints)
         {
-            endpoints.MapStandardAuthenticatedPut<Request>("/{unitId}", Handler)
+            endpoints.MapStandardAuthenticatedPut<Request, Request>("/{unitId}", Handler)
                      .WithName("UpdateMeasurementUnit")
                      .WithDescription("Updates a measurement unit");
         }

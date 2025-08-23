@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RecipeManager.Api.Application.Abstractions;
 using RecipeManager.Api.Application.Exceptions;
@@ -27,6 +28,14 @@ public static class UpdateRecipe
 
     public sealed record RecipeDto(string Title, string Description, string? ImageUrl, string? VideoUrl, RecipeAmountDto Amount, byte NumberOfServings, int Difficulty,
                                    IEnumerable<RecipeIngredientDto> Ingredients, IEnumerable<RecipeSectionDto> Sections, IEnumerable<Guid> CategoryIds, Guid? IngredientId);
+
+    public sealed class AuthorizationPolic : IAuthorizationPolicy<Request>
+    {
+        public async Task<bool> IsAuthorized(Request request)
+        {
+            return true;
+        }
+    }
 
     public sealed class Validator : AbstractValidator<RecipeDto>
     {
@@ -193,20 +202,21 @@ public static class UpdateRecipe
     {
         public void MapEndpoint(IEndpointRouteBuilder endpoints)
         {
-            endpoints.MapStandardValidatedPut<Request>("/{id}", Handler)
+            endpoints.MapStandardAuthenticatedPut<Request, RecipeDto>("/{recipeId}", Handler)
                      .WithName("UpdateRecipe")
                      .WithDescription("Updates existing recipe");
         }
     }
 
-    public static async Task<IResult> Handler(Request request, RecipeDto recipeDto, IAppDbContext dbContext, ICurrentUser currentUser, CancellationToken cancellationToken)
+    public static async Task<IResult> Handler(Request recipeId, [FromBody] RecipeDto recipeDto, IAppDbContext dbContext, ICurrentUser currentUser, CancellationToken cancellationToken)
     {
-        RecipeId recipeId = new(request.Id);
+        RecipeId id = new(recipeId.Id);
         Recipe recipe = await dbContext.Recipes.AsNoTracking()
-                                               .FirstOrDefaultAsync(r => r.Id == recipeId && r.CreatedBy == currentUser.Id, cancellationToken)
-                     ?? throw new EntityNotFoundException<Recipe, RecipeId>(recipeId);
+                                               .FirstOrDefaultAsync(r => r.Id == id && r.CreatedBy == currentUser.Id, cancellationToken)
+                     ?? throw new EntityNotFoundException<Recipe, RecipeId>(id);
 
-
+        UpdateRecipeData(recipe, recipeDto);
+        await dbContext.SaveChangesAsync(cancellationToken);
 
         return TypedResults.Ok();
     }
@@ -223,7 +233,7 @@ public static class UpdateRecipe
         recipe.IngredientId = recipeDto.IngredientId.HasValue ? new IngredientId(recipeDto.IngredientId.Value) : null;
         recipe.Ingredients = recipeDto.Ingredients.Select(i => i.ToDomain()).ToList();
         recipe.Sections = recipeDto.Sections.Select(s => s.ToDomain()).ToList();
-        recipe.Categories = recipeDto.CategoryIds.Select(categoryId => new RecipeCategoryId(categoryId)).ToList();
+        recipe.UpdateCategories(recipeDto.CategoryIds.Select(categoryId => new RecipeCategoryId(categoryId)).ToList());
     }
 
     private static RecipeAmount ToDomain(this RecipeAmountDto dto)

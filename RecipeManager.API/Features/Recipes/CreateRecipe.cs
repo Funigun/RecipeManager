@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RecipeManager.Api.Application.Abstractions;
 using RecipeManager.Api.Domain.Ingredients;
@@ -197,14 +198,14 @@ public static class CreateRecipe
         }
     }
 
-    public static async Task<Response> Handler(Request request, IAppDbContext dbContext, CancellationToken cancellationToken)
+    public static async Task<IResult> Handler([FromBody] Request request, IAppDbContext dbContext, CancellationToken cancellationToken)
     {
         Recipe recipe = request.ToDomain();
 
         dbContext.Recipes.Add(recipe);
         await dbContext.SaveChangesAsync(cancellationToken);
 
-        return new Response(recipe.Id.Value);
+        return Results.Created($"/api/recipes/{recipe.Id.Value}", new Response(recipe.Id.Value));
     }
 
     public static Recipe ToDomain(this Request request)

@@ -34,7 +34,7 @@ public sealed class UpdateRecipeTests : BaseIntegrationTest
             "Updated description",
             null,
             null,
-            new UpdateRecipe.RecipeAmountDto(500d, recipe.Amount.Unit.Id),
+            new UpdateRecipe.RecipeAmountDto(500d, recipe.Amount.UnitId),
             5,
             (int)recipe.Difficulty,
             recipe.Ingredients.Select(ingredient => new UpdateRecipe.RecipeIngredientDto(ingredient.IngredientId, ingredient.UnitId, ingredient.Amount)).ToList(),
@@ -50,6 +50,6 @@ public sealed class UpdateRecipeTests : BaseIntegrationTest
 
         // Assert
         response.EnsureSuccessStatusCode();
-        Assert.Equal(System.Net.HttpStatusCode.NoContent, response.StatusCode);
+        Assert.Equal(System.Net.HttpStatusCode.OK, response.StatusCode);
     }
 }
