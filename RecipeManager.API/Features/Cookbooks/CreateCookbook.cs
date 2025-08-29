@@ -68,6 +68,8 @@ public static class CreateCookbook
         }
     }
 
+    // ToDo: Update CookbookCategory to store recipe Ids
+    // ToDo: Add CookbookCategoryDto mapping to CookbookCategory
     public static async Task<Response> Handler(Request request, [FromServices] IAppDbContext dbContext, CancellationToken cancellationToken)
     {
         Cookbook? cookbook = Cookbook.Create(request.Title, []);

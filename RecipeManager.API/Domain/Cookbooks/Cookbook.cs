@@ -24,4 +24,10 @@ public sealed class Cookbook : AuditableEntity, IEntity<CookbookId>
             _categories = categories.ToList()
         };
     }
+
+    public void Update(string title, IEnumerable<CookbookCategory> categories)
+    {
+        Title = title;
+        _categories = categories.ToList();
+    }
 }
