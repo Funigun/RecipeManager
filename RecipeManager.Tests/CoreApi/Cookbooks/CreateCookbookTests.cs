@@ -17,7 +17,7 @@ public sealed class CreateCookbookTests : BaseIntegrationTest
     {
         // Arrange
         HttpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", TokenMockFactory.GenerateJwtToken(UserMockFactory.CreateMockedAdmin()));
-        CreateCookbook.Request createCookbookRequest = new("New Cookbook", []);
+        CreateCookbook.Request createCookbookRequest = new("New Cookbook", "Desc", []);
         StringContent content = new(System.Text.Json.JsonSerializer.Serialize(createCookbookRequest), System.Text.Encoding.UTF8, "application/json");
 
         // Act

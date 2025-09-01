@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using RecipeManager.Api.Application.Abstractions;
 using RecipeManager.Api.Application.Exceptions;
 using RecipeManager.Api.Domain.Cookbooks;
+using RecipeManager.Api.Domain.Recipes;
 using RecipeManager.Api.Shared.Contracts.Authorization;
 using RecipeManager.Api.Shared.Endpoint;
 using RecipeManager.Shared.Contracts.Cookbooks;
@@ -15,7 +16,7 @@ public static class UpdateCookbook
 
     public record CookbookCategoryDto(string Name, IEnumerable<Guid> Recipes, IEnumerable<CookbookCategoryDto> Subcategories);
 
-    public sealed record CookbookDto(string Title, IEnumerable<CookbookCategoryDto> Categories);
+    public sealed record CookbookDto(string Title, string Description, IEnumerable<CookbookCategoryDto> Categories);
 
     public sealed class AuthorizationPolicy(IAppDbContext dbContext, ICurrentUser currentUser) : IAuthorizationPolicy<Request>
     {
@@ -27,13 +28,12 @@ public static class UpdateCookbook
         }
     }
 
-    // ToDo: validate categories unique name within the same level
-    // ToDo: validate recipe ids within whole cookbook
     public sealed class Validator : AbstractValidator<CookbookDto>
     {
         public Validator(IAppDbContext dbContext)
         {
             RuleFor(x => x.Title).SetValidator(new CookbookTitleValidator());
+            RuleFor(x => x.Description).SetValidator(new CookbookDescriptionValidator());
 
             When(request => request.Categories.Any(), () =>
             {
@@ -80,8 +80,6 @@ public static class UpdateCookbook
         }
     }
 
-    // ToDo: Update CookbookCategory to store recipe Ids
-    // ToDo: Add CookbookCategoryDto mapping to CookbookCategory
     public static async Task<IResult> Handler(Request cookbookId, CookbookDto request, IAppDbContext dbContext, CancellationToken cancellationToken)
     {
         CookbookId id = new(cookbookId.Id);
@@ -90,12 +88,19 @@ public static class UpdateCookbook
                                                       .FirstOrDefaultAsync(c => c.Id == id, cancellationToken)
                           ?? throw new EntityNotFoundException<Cookbook, CookbookId>(id);
 
-        dbContext.CookbookCategories.RemoveRange(cookbook.Categories);
-        await dbContext.SaveChangesAsync(cancellationToken);
+        await dbContext.CookbookCategories.Where(category => category.Cookbook.Id == cookbook.Id)
+                                          .ExecuteDeleteAsync(cancellationToken);
 
-        cookbook.Update(request.Title, []);
+        cookbook.Update(request.Title, request.Description, request.Categories.Select(category => MapToCookbookCategory(category, cookbook)));
         await dbContext.SaveChangesAsync(cancellationToken);
 
         return TypedResults.Ok();
+    }
+
+    private static CookbookCategory MapToCookbookCategory(CookbookCategoryDto categoryDto, Cookbook cookbook)
+    {
+        List<CookbookCategory> subcategories = categoryDto.Subcategories.Select(subcategoryDto => MapToCookbookCategory(subcategoryDto, cookbook)).ToList();
+
+        return CookbookCategory.Create(categoryDto.Name, cookbook, subcategories, categoryDto.Recipes.Select(recipeId => new RecipeId(recipeId)));
     }
 }

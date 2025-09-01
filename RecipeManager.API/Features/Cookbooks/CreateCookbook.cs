@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using RecipeManager.Api.Application.Abstractions;
 using RecipeManager.Api.Domain.Cookbooks;
+using RecipeManager.Api.Domain.Recipes;
 using RecipeManager.Api.Shared.Endpoint;
 using RecipeManager.Shared.Contracts.Cookbooks;
 
@@ -11,7 +12,7 @@ public static class CreateCookbook
 {
     public record CookbookCategoryDto(string Name, IEnumerable<Guid> Recipes, IEnumerable<CookbookCategoryDto> Subcategories);
 
-    public sealed record Request(string Title, IEnumerable<CookbookCategoryDto> Categories);
+    public sealed record Request(string Title, string Description, IEnumerable<CookbookCategoryDto> Categories);
 
     public sealed record Response(Guid Id);
 
@@ -22,6 +23,7 @@ public static class CreateCookbook
         public Validator(IAppDbContext dbContext)
         {
             RuleFor(x => x.Title).SetValidator(new CookbookTitleValidator());
+            RuleFor(x => x.Description).SetValidator(new CookbookDescriptionValidator());
 
             When(request => request.Categories.Any(), () =>
             {
@@ -68,15 +70,22 @@ public static class CreateCookbook
         }
     }
 
-    // ToDo: Update CookbookCategory to store recipe Ids
-    // ToDo: Add CookbookCategoryDto mapping to CookbookCategory
     public static async Task<Response> Handler(Request request, [FromServices] IAppDbContext dbContext, CancellationToken cancellationToken)
     {
-        Cookbook? cookbook = Cookbook.Create(request.Title, []);
+        Cookbook cookbook = Cookbook.Create(request.Title, request.Description, []);
+        List<CookbookCategory> categories = request.Categories.Select(categoryDto => MapToCookbookCategory(categoryDto, cookbook)).ToList();
+        cookbook.Update(request.Title, request.Description, categories);
 
         dbContext.Cookbooks.Add(cookbook);
         await dbContext.SaveChangesAsync(cancellationToken);
 
         return new Response(cookbook.Id.Value);
+    }
+
+    private static CookbookCategory MapToCookbookCategory(CookbookCategoryDto categoryDto, Cookbook cookbook)
+    {
+        List<CookbookCategory> subcategories = categoryDto.Subcategories.Select(subcategoryDto => MapToCookbookCategory(subcategoryDto, cookbook)).ToList();
+
+        return CookbookCategory.Create(categoryDto.Name, cookbook, subcategories, categoryDto.Recipes.Select(recipeId => new RecipeId(recipeId)));
     }
 }

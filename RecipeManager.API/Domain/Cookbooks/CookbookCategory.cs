@@ -7,7 +7,7 @@ public sealed class CookbookCategory : AuditableEntity, IEntity<CookbookCategory
 {
     private List<CookbookCategory> _subcategories = [];
 
-    private List<Recipe> _recipes = [];
+    private List<RecipeId> _recipes = [];
 
     public CookbookCategoryId Id { get; set; } = default!;
 
@@ -19,13 +19,13 @@ public sealed class CookbookCategory : AuditableEntity, IEntity<CookbookCategory
 
     public IReadOnlyList<CookbookCategory> Subcategories => _subcategories.ToList();
 
-    public IReadOnlyList<Recipe> Recipes => _recipes.ToList();
+    public IReadOnlyList<RecipeId> Recipes => _recipes.ToList();
 
     private CookbookCategory()
     {
     }
 
-    public static CookbookCategory Create(string name, Cookbook cookbook, IEnumerable<CookbookCategory> subcategories, IEnumerable<Recipe> recipes)
+    public static CookbookCategory Create(string name, Cookbook cookbook, IEnumerable<CookbookCategory> subcategories, IEnumerable<RecipeId> recipes)
     {
         return new()
         {

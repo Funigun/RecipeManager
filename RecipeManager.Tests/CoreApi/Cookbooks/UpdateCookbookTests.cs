@@ -22,7 +22,7 @@ public sealed class UpdateCookbookTests : BaseIntegrationTest
         HttpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", TokenMockFactory.GenerateJwtToken(UserMockFactory.CreateMockedUser()));
         Cookbook cookbook = await DbContext.Cookbooks.FirstAsync(cookbook => cookbook.Title == "To update", CancellationToken.None);
 
-        UpdateCookbook.CookbookDto dto = new("Updated title", []);
+        UpdateCookbook.CookbookDto dto = new("Updated title", "Updated desc", []);
         StringContent content = new(JsonSerializer.Serialize(dto), Encoding.UTF8, "application/json");
 
         // Act
