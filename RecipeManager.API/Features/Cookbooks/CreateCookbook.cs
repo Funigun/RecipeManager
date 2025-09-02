@@ -59,7 +59,7 @@ public static class CreateCookbook
         }
     }
 
-    [EndpointGroupName("Cookbooks")]
+    [GroupEndpoint("Cookbooks")]
     public sealed class Endpoint : IEndpoint
     {
         public void MapEndpoint(IEndpointRouteBuilder endpoints)

@@ -23,7 +23,7 @@ public static class GetCookbookById
 
     public sealed record Response(Guid Id, string Title, string Description, IEnumerable<CookbookCategoryDto> Categories);
 
-    [EndpointGroupName("Cookbooks")]
+    [GroupEndpoint("Cookbooks")]
     public sealed class Endpoint : IEndpoint
     {
         public void MapEndpoint(IEndpointRouteBuilder endpoints)

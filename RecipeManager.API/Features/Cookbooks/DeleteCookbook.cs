@@ -1,4 +1,5 @@
-﻿using RecipeManager.Api.Application.Abstractions;
+﻿using Microsoft.EntityFrameworkCore;
+using RecipeManager.Api.Application.Abstractions;
 using RecipeManager.Api.Application.Exceptions;
 using RecipeManager.Api.Domain.Cookbooks;
 using RecipeManager.Api.Shared.Contracts.Authorization;
@@ -14,7 +15,7 @@ public static class DeleteCookbook
     {
         public async Task<bool> IsAuthorized(Request request)
         {
-            return dbContext.Cookbooks.Any(cookbook => cookbook.Id.Value == request.Id && cookbook.CreatedBy == currentUser.Id);
+            return await dbContext.Cookbooks.AnyAsync(cookbook => cookbook.Id == new CookbookId(request.Id) && cookbook.CreatedBy == currentUser.Id);
         }
     }
 
@@ -29,10 +30,10 @@ public static class DeleteCookbook
         }
     }
 
-    public static async Task<IResult> Handler(Request cookbookId, IAppDbContext dbContext, CancellationToken cancellationToken)
+    public static async Task<IResult> Handler(Request cookbookId, IAppDbContext dbContext, ICurrentUser currentUser, CancellationToken cancellationToken)
     {
         CookbookId id = new(cookbookId.Id);
-        Cookbook? cookbook = await dbContext.Cookbooks.FindAsync(new object[] { id }, cancellationToken)
+        Cookbook? cookbook = await dbContext.Cookbooks.FirstOrDefaultAsync(cookbook => cookbook.Id == id && cookbook.CreatedBy == currentUser.Id, cancellationToken)
                           ?? throw new EntityNotFoundException<Cookbook, CookbookId>(id);
 
         dbContext.Cookbooks.Remove(cookbook);
