@@ -1,4 +1,5 @@
-﻿using RecipeManager.Api.Domain.Ingredients;
+﻿using RecipeManager.Api.Domain.Cookbooks;
+using RecipeManager.Api.Domain.Ingredients;
 using RecipeManager.Api.Domain.Recipes;
 using RecipeManager.Api.Domain.Recipes.Enums;
 using RecipeManager.Api.Domain.Recipes.ValueObjects;
@@ -106,6 +107,36 @@ internal static class DatabaseSeeder
         ];
 
         dbContext.Recipes.AddRange(recipes);
+        await dbContext.SaveChangesAsync();
+
+        IEnumerable<RecipeId> recipeIds = recipes.Where(recipe => recipe.Title != "To Delete").Select(r => r.Id);
+
+        IEnumerable<Cookbook> cookbooks =
+        [
+            Cookbook.Create("Test book", "This is a test book", []),
+            Cookbook.Create("To Delete", "This is a test book to delete", []),
+            Cookbook.Create("To Update", "This is a test book to update", [])
+        ];
+
+        dbContext.Cookbooks.AddRange(cookbooks);
+        await dbContext.SaveChangesAsync();
+
+        IEnumerable<CookbookCategory> cookbookCategories =
+        [
+            CookbookCategory.Create
+            (
+                "Existing Category",
+                cookbooks.First(),
+                [
+                      CookbookCategory.Create("Subcategory 1", cookbooks.First(), [], recipeIds.Skip(1)),
+                ],
+                [recipeIds.First()]
+            ),
+        ];
+
+        Cookbook cookbook = cookbooks.First();
+        cookbook.Update(cookbook.Title, cookbook.Description, cookbookCategories.ToList());
+        dbContext.Cookbooks.Update(cookbook);
         await dbContext.SaveChangesAsync();
     }
 }

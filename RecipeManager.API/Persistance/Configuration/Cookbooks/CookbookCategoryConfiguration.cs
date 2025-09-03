@@ -22,8 +22,9 @@ public sealed class CookbookCategoryConfiguration : IEntityTypeConfiguration<Coo
                .HasForeignKey(category => category.ParentId)
                .OnDelete(DeleteBehavior.NoAction);
 
-        builder.HasMany(category => category.Recipes)
-               .WithMany()
-               .UsingEntity("CookbookCategoryToRecipe");
+        builder.OwnsMany(category => category.Recipes, configuration =>
+        {
+            configuration.ToTable("CookbookCategoryToRecipe");
+        });
     }
 }

@@ -17,6 +17,10 @@ public sealed class CookbookConfiguration : IEntityTypeConfiguration<Cookbook>
                .HasMaxLength(CookbookDomainValidator.CookbookTitleMaxLength)
                .IsRequired(true);
 
+        builder.Property(cookbook => cookbook.Description)
+               .HasMaxLength(CookbookDomainValidator.CookbookDescriptionMaxLength)
+               .IsRequired(false);
+
         builder.HasMany(cookbook => cookbook.Categories)
                .WithOne(category => category.Cookbook);
     }
