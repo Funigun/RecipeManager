@@ -29,11 +29,11 @@ public static class UpdateRecipe
     public sealed record RecipeDto(string Title, string Description, string? ImageUrl, string? VideoUrl, RecipeAmountDto Amount, byte NumberOfServings, int Difficulty,
                                    IEnumerable<RecipeIngredientDto> Ingredients, IEnumerable<RecipeSectionDto> Sections, IEnumerable<Guid> CategoryIds, Guid? IngredientId);
 
-    public sealed class AuthorizationPolic : IAuthorizationPolicy<Request>
+    public sealed class AuthorizationPolicy(IAppDbContext dbContext, ICurrentUser currentUser) : IAuthorizationPolicy<Request>
     {
         public async Task<bool> IsAuthorized(Request request)
         {
-            return true;
+            return await dbContext.Recipes.AnyAsync(recipe => recipe.Id == new RecipeId(request.Id) && recipe.CreatedBy == currentUser.Id);
         }
     }
 

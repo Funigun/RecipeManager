@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RecipeManager.Api.Application.Abstractions;
 using RecipeManager.Api.Application.Exceptions;
@@ -26,7 +27,7 @@ public static class GetCookbookById
     [GroupEndpoint("Cookbooks")]
     public sealed class Endpoint : IEndpoint
     {
-        public void MapEndpoint(IEndpointRouteBuilder endpoints)
+        public void MapEndpoint([FromServices] IEndpointRouteBuilder endpoints)
         {
             endpoints.MapStandardGet<Response>("/{cookbookId}", Handler)
                      .WithName("GetCookbookById")
@@ -34,7 +35,7 @@ public static class GetCookbookById
         }
     }
 
-    public static async Task<Results<Ok<HateoasResponse<Response>>, NotFound>> Handler(Request cookbookId, IAppDbContext dbContext, ICurrentUser currentUser, IHateoasBuilderFactory hateoasBuilderFactory, CancellationToken cancellationToken)
+    public static async Task<Results<Ok<HateoasResponse<Response>>, NotFound>> Handler(Request cookbookId, [FromServices] IAppDbContext dbContext, [FromServices] ICurrentUser currentUser, [FromServices] IHateoasBuilderFactory hateoasBuilderFactory, CancellationToken cancellationToken)
     {
         Cookbook? cookbook = await GetCookbook(cookbookId, dbContext, cancellationToken);
         IEnumerable<CookbookCategory> categories = await GetCookbookCategories(cookbook.Id, dbContext, cancellationToken);

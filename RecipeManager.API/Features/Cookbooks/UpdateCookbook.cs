@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RecipeManager.Api.Application.Abstractions;
 using RecipeManager.Api.Application.Exceptions;
@@ -80,7 +81,7 @@ public static class UpdateCookbook
         }
     }
 
-    public static async Task<IResult> Handler(Request cookbookId, CookbookDto request, IAppDbContext dbContext, CancellationToken cancellationToken)
+    public static async Task<IResult> Handler(Request cookbookId, [FromBody] CookbookDto request, [FromServices] IAppDbContext dbContext, CancellationToken cancellationToken)
     {
         CookbookId id = new(cookbookId.Id);
 

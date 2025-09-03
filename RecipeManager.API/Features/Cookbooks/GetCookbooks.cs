@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RecipeManager.Api.Application.Abstractions;
 using RecipeManager.Api.Shared.Contracts.Authorization;
@@ -27,7 +28,7 @@ public static class GetCookbooks
         }
     }
 
-    public static async Task<Results<Ok<HateoasResponse<Response>>, BadRequest>> Handler(IAppDbContext dbContext, ICurrentUser currentUser, IHateoasBuilderFactory hateoasBuilderFactory, CancellationToken cancellationToken)
+    public static async Task<Results<Ok<HateoasResponse<Response>>, BadRequest>> Handler([FromServices] IAppDbContext dbContext, [FromServices] ICurrentUser currentUser, [FromServices] IHateoasBuilderFactory hateoasBuilderFactory, CancellationToken cancellationToken)
     {
         List<CoookbookDto> cookbooks = await dbContext.Cookbooks
                                                       .Where(cookbook => cookbook.CreatedBy == currentUser.Id)

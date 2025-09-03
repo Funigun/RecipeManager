@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using RecipeManager.Api.Application.Abstractions;
 using RecipeManager.Api.Application.Exceptions;
 using RecipeManager.Api.Domain.Cookbooks;
@@ -30,7 +31,7 @@ public static class DeleteCookbook
         }
     }
 
-    public static async Task<IResult> Handler(Request cookbookId, IAppDbContext dbContext, ICurrentUser currentUser, CancellationToken cancellationToken)
+    public static async Task<IResult> Handler(Request cookbookId, [FromServices] IAppDbContext dbContext, [FromServices] ICurrentUser currentUser, CancellationToken cancellationToken)
     {
         CookbookId id = new(cookbookId.Id);
         Cookbook? cookbook = await dbContext.Cookbooks.FirstOrDefaultAsync(cookbook => cookbook.Id == id && cookbook.CreatedBy == currentUser.Id, cancellationToken)
