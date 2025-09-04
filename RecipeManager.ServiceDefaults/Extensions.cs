@@ -58,15 +58,17 @@ public static class Extensions
             .WithMetrics(metrics =>
             {
                 metrics.AddAspNetCoreInstrumentation()
-                    .AddHttpClientInstrumentation()
-                    .AddRuntimeInstrumentation();
+                       .AddHttpClientInstrumentation()
+                       .AddRuntimeInstrumentation();
             })
             .WithTracing(tracing =>
             {
                 tracing.AddSource(builder.Environment.ApplicationName)
-                    .AddAspNetCoreInstrumentation()
-                    .AddHttpClientInstrumentation()
-                    .AddEntityFrameworkCoreInstrumentation();
+                       .AddAspNetCoreInstrumentation()
+                       .AddHttpClientInstrumentation()
+                       .AddEntityFrameworkCoreInstrumentation()
+                       .AddSqlClientInstrumentation()
+                       .AddRedisInstrumentation();
             });
 
         builder.AddOpenTelemetryExporters(sourceName);

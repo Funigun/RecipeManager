@@ -1,5 +1,7 @@
 using System.Reflection;
 using FluentValidation;
+using RecipeManager.Api.Application.Abstractions;
+using RecipeManager.Api.Application.Services;
 using RecipeManager.Api.Persistance;
 using RecipeManager.Api.Presentation;
 using RecipeManager.Api.Shared;
@@ -48,7 +50,8 @@ try
                     .AddEndpoints(assembly)
                     .AddAuthorizationPolicies(assembly)
                     .AddValidatorsFromAssembly(assembly)
-                    .AddValidatorsFromAssembly(contractsAssembly);
+                    .AddValidatorsFromAssembly(contractsAssembly)
+                    .AddScoped<IRedisService, RedisService>();
 
     builder.Services.AddPersistance(builder.Configuration);
 
@@ -58,6 +61,8 @@ try
                     {
                         policy.RequireAuthenticatedUser();
                     });
+
+    builder.AddRedisClient("Cache");
 
     WebApplication app = builder.Build();
 
