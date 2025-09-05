@@ -9,4 +9,6 @@ public sealed class UnitModel
     public string? ShortName { get; set; }
 
     public string Group { get; set; } = string.Empty;
+
+    public PrimaryUnitModel? PrimaryUnit { get; set; }
 }

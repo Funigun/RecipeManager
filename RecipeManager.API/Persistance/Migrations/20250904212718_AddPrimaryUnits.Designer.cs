@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using RecipeManager.Api.Persistance;
 
@@ -11,9 +12,11 @@ using RecipeManager.Api.Persistance;
 namespace RecipeManager.Api.Persistance.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250904212718_AddPrimaryUnits")]
+    partial class AddPrimaryUnits
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -350,28 +353,6 @@ namespace RecipeManager.Api.Persistance.Migrations
 
             modelBuilder.Entity("RecipeManager.Api.Domain.Ingredients.Ingredient", b =>
                 {
-                    b.OwnsMany("RecipeManager.Api.Domain.Ingredients.IngredientCategoryId", "Categories", b1 =>
-                        {
-                            b1.Property<Guid>("IngredientId")
-                                .HasColumnType("uniqueidentifier");
-
-                            b1.Property<int>("Id")
-                                .ValueGeneratedOnAdd()
-                                .HasColumnType("int");
-
-                            SqlServerPropertyBuilderExtensions.UseIdentityColumn(b1.Property<int>("Id"));
-
-                            b1.Property<Guid>("Value")
-                                .HasColumnType("uniqueidentifier");
-
-                            b1.HasKey("IngredientId", "Id");
-
-                            b1.ToTable("IngredientToIngredientCategory", (string)null);
-
-                            b1.WithOwner()
-                                .HasForeignKey("IngredientId");
-                        });
-
                     b.OwnsMany("RecipeManager.Api.Domain.Recipes.RecipeId", "Recipes", b1 =>
                         {
                             b1.Property<Guid>("IngredientId")
@@ -394,6 +375,28 @@ namespace RecipeManager.Api.Persistance.Migrations
                                 .HasForeignKey("IngredientId");
                         });
 
+                    b.OwnsMany("RecipeManager.Api.Domain.Ingredients.IngredientCategoryId", "Categories", b1 =>
+                        {
+                            b1.Property<Guid>("IngredientId")
+                                .HasColumnType("uniqueidentifier");
+
+                            b1.Property<int>("Id")
+                                .ValueGeneratedOnAdd()
+                                .HasColumnType("int");
+
+                            SqlServerPropertyBuilderExtensions.UseIdentityColumn(b1.Property<int>("Id"));
+
+                            b1.Property<Guid>("Value")
+                                .HasColumnType("uniqueidentifier");
+
+                            b1.HasKey("IngredientId", "Id");
+
+                            b1.ToTable("IngredientToIngredientCategory", (string)null);
+
+                            b1.WithOwner()
+                                .HasForeignKey("IngredientId");
+                        });
+
                     b.Navigation("Categories");
 
                     b.Navigation("Recipes");
@@ -405,34 +408,6 @@ namespace RecipeManager.Api.Persistance.Migrations
                         .WithMany()
                         .HasForeignKey("IngredientId")
                         .OnDelete(DeleteBehavior.SetNull);
-
-                    b.OwnsOne("RecipeManager.Api.Domain.Recipes.ValueObjects.RecipeAmount", "Amount", b1 =>
-                        {
-                            b1.Property<Guid>("RecipeId")
-                                .HasColumnType("uniqueidentifier");
-
-                            b1.Property<double>("Amount")
-                                .HasColumnType("float")
-                                .HasColumnName("Amount");
-
-                            b1.Property<Guid?>("UnitId")
-                                .HasColumnType("uniqueidentifier");
-
-                            b1.HasKey("RecipeId");
-
-                            b1.HasIndex("UnitId");
-
-                            b1.ToTable("Recipe", (string)null);
-
-                            b1.WithOwner()
-                                .HasForeignKey("RecipeId");
-
-                            b1.HasOne("RecipeManager.Api.Domain.Units.Unit", "Unit")
-                                .WithMany()
-                                .HasForeignKey("UnitId");
-
-                            b1.Navigation("Unit");
-                        });
 
                     b.OwnsMany("RecipeManager.Api.Domain.Recipes.RecipeCategoryId", "Categories", b1 =>
                         {
@@ -454,6 +429,34 @@ namespace RecipeManager.Api.Persistance.Migrations
 
                             b1.WithOwner()
                                 .HasForeignKey("RecipeId");
+                        });
+
+                    b.OwnsOne("RecipeManager.Api.Domain.Recipes.ValueObjects.RecipeAmount", "Amount", b1 =>
+                        {
+                            b1.Property<Guid>("RecipeId")
+                                .HasColumnType("uniqueidentifier");
+
+                            b1.Property<double>("Amount")
+                                .HasColumnType("float")
+                                .HasColumnName("Amount");
+
+                            b1.Property<Guid?>("UnitId")
+                                .HasColumnType("uniqueidentifier");
+
+                            b1.HasKey("RecipeId");
+
+                            b1.HasIndex("UnitId");
+
+                            b1.ToTable("Recipe");
+
+                            b1.WithOwner()
+                                .HasForeignKey("RecipeId");
+
+                            b1.HasOne("RecipeManager.Api.Domain.Units.Unit", "Unit")
+                                .WithMany()
+                                .HasForeignKey("UnitId");
+
+                            b1.Navigation("Unit");
                         });
 
                     b.OwnsMany("RecipeManager.Api.Domain.Recipes.ValueObjects.RecipeSection", "Sections", b1 =>

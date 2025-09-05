@@ -21,7 +21,7 @@ public sealed class CreateUnitTests : BaseIntegrationTest
         // Arrange
         HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", TokenMockFactory.GenerateJwtToken(UserMockFactory.CreateMockedUser()));
 
-        CreateUnit.Request createUnitRequest = new("Valid Unit", "VA", 0);
+        CreateUnit.Request createUnitRequest = new("Valid Unit", "VA", 0, null);
         StringContent content = new(JsonSerializer.Serialize(createUnitRequest), Encoding.UTF8, "application/json");
 
         // Act
@@ -42,7 +42,7 @@ public sealed class CreateUnitTests : BaseIntegrationTest
         // Arrange
         HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", TokenMockFactory.GenerateJwtToken(UserMockFactory.CreateMockedAdmin()));
 
-        CreateUnit.Request createUnitRequest = new(unitName, shortName, group);
+        CreateUnit.Request createUnitRequest = new(unitName, shortName, group, null);
         StringContent content = new(JsonSerializer.Serialize(createUnitRequest), Encoding.UTF8, "application/json");
 
         // Act
@@ -58,7 +58,7 @@ public sealed class CreateUnitTests : BaseIntegrationTest
         // Arrange
         HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", TokenMockFactory.GenerateJwtToken(UserMockFactory.CreateMockedAdmin()));
 
-        CreateUnit.Request createUnitRequest = new("Valid Unit", "VA", 0);
+        CreateUnit.Request createUnitRequest = new("Valid Unit", "VA", 0, null);
         StringContent content = new(JsonSerializer.Serialize(createUnitRequest), Encoding.UTF8, "application/json");
 
         // Act

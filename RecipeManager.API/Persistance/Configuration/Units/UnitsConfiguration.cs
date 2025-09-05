@@ -20,5 +20,10 @@ public class UnitsConfiguration : IEntityTypeConfiguration<Unit>
         builder.Property(unit => unit.ShortName)
                .HasMaxLength(UnitDomainValidator.UnitShortNameMaxLength)
                .IsRequired(false);
+
+        builder.HasOne<Unit>()
+               .WithMany()
+               .HasForeignKey(unit => unit.PrimaryUnit)
+               .OnDelete(DeleteBehavior.Restrict);
     }
 }

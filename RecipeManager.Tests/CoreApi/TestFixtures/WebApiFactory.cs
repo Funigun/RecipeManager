@@ -12,6 +12,7 @@ using RecipeManager.Integration.Tests.CoreApi.TestFixtures;
 using Testcontainers.MsSql;
 
 [assembly: AssemblyFixture(typeof(WebApiFactory))]
+
 namespace RecipeManager.Integration.Tests.CoreApi.TestFixtures;
 
 public sealed class WebApiFactory : WebApplicationFactory<IAssemblyMarker>, IAsyncLifetime

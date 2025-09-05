@@ -16,6 +16,8 @@ public interface IUnitService
 
     Task<HateoasCollectionResponse<UnitModel>> GetUnits();
 
+    Task<IEnumerable<PrimaryUnitDto>> GetPrimaryUnits();
+
     Task UpdateUnit(string relativeUri, UnitForUpdateModel unit);
 
     Task DeleteUnit(string relativeUri);

@@ -14,7 +14,7 @@ namespace RecipeManager.Api.Features.Units;
 
 public static class UpdateUnit
 {
-    public sealed record Request(string Name, string? ShortName, int Group);
+    public sealed record Request(string Name, string? ShortName, int Group, Guid? PrimaryUnit, int ConversionFactor);
 
     public sealed class Validator : AbstractValidator<Request>
     {
@@ -45,6 +45,20 @@ public static class UpdateUnit
                 .Must(group => group.IsUnitGroup())
                     .WithMessage("Invalid unit group")
                     .WithName("Unit Group");
+
+            When(x => x.PrimaryUnit is not null, () =>
+            {
+                RuleFor(x => x.PrimaryUnit)
+                    .MustAsync(async (primaryUnitId, cancellationToken) =>
+                    {
+                        UnitId id = new(primaryUnitId!.Value);
+                        return await dbContext.Units.AnyAsync(unit => unit.Id == id, cancellationToken);
+                    }).WithMessage("Primary Unit must reference an existing unit");
+
+                RuleFor(x => x.ConversionFactor)
+                    .GreaterThan(1)
+                    .WithMessage("Conversion Factor must be greater than 1 when Primary Unit is specified");
+            });
         }
     }
 
@@ -70,11 +84,11 @@ public static class UpdateUnit
     internal static async Task<Results<NoContent, NotFound, BadRequest>> Handler(Guid unitId, Request request, IAppDbContext dbContext, CancellationToken cancellationToken)
     {
         UnitId id = new(unitId);
-        Unit? unit = await dbContext.Units.FindAsync([id], cancellationToken) ?? throw new EntityNotFoundException<Unit, UnitId>(id);
 
-        unit.Name = request.Name;
-        unit.ShortName = request.ShortName;
-        unit.Group = (UnitGroup)request.Group;
+        Unit? unit = await dbContext.Units.FindAsync([id], cancellationToken)
+                  ?? throw new EntityNotFoundException<Unit, UnitId>(id);
+
+        unit.Update(request.Name, request.ShortName, (UnitGroup)request.Group, request.PrimaryUnit, request.ConversionFactor);
 
         await dbContext.SaveChangesAsync(cancellationToken);
 

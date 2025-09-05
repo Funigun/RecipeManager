@@ -23,6 +23,15 @@
                 }
             </MudSelect>
 
+            <MudSelect T="Guid?" Label="Primary Unit" Required="false" @bind-Value="unitModel.Item.PrimaryUnit">
+                @foreach (var unit in primaryUnits)
+                {
+                    <MudSelectItem Value="@unit.UnitId">@unit.Name</MudSelectItem>
+                }
+            </MudSelect>
+
+            <MudInput T="int" Label="Conversion Factor" @bind-Value="unitModel.Item.ConversionFactor" Required="false" />
+
             <CustomValidationSummary ErrorMessages="@errorMessages" />
 
             <MudGrid Class="mt-4">
@@ -51,6 +60,7 @@
     private bool isSubmitEnabled = false;
     private IEnumerable<string> errorMessages = [];
     private bool isLoaded = false;
+    private IEnumerable<PrimaryUnitDto> primaryUnits { get; set; } = [];
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -59,6 +69,7 @@
             if (Guid.TryParse(UnitId, out Guid a))
             {
                 unitModel = await UnitService.GetUnitById(a);
+                primaryUnits = await UnitService.GetPrimaryUnits();
             }
             isLoaded = true;
             StateHasChanged();

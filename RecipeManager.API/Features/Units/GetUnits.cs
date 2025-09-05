@@ -16,7 +16,9 @@ namespace RecipeManager.Api.Features.Units;
 
 public static class GetUnits
 {
-    public sealed record Response(Guid UnitId, string Name, string? ShortName, string Group);
+    public sealed record PrimaryUnitDto(Guid Id, string Name, int ConversionFactory);
+
+    public sealed record Response(Guid UnitId, string Name, string? ShortName, string Group, PrimaryUnitDto? PrimaryUnit);
 
     [GroupEndpoint("Units")]
     public class Enpoint : IEndpoint
@@ -29,9 +31,16 @@ public static class GetUnits
         }
     }
 
-    internal static async Task<Results<Ok<HateoasCollectionResponse<Response>>, NotFound>> Handler([FromServices] ICurrentUser currentUser, IAppDbContext dbContext, [FromServices] IHateoasBuilderFactory hateoasBuilderFactory, CancellationToken cancellationToken)
+    internal static async Task<Results<Ok<HateoasCollectionResponse<Response>>, NotFound>> Handler([FromServices] ICurrentUser currentUser, [FromServices] IAppDbContext dbContext, [FromServices] IHateoasBuilderFactory hateoasBuilderFactory, CancellationToken cancellationToken)
     {
-        IEnumerable<Unit> units = await dbContext.Units.AsNoTracking().ToListAsync(cancellationToken);
+        IEnumerable<Unit> units = await dbContext.Units.AsNoTracking()
+                                                       .OrderBy(unit => unit.Group)
+                                                         .ThenBy(unit => unit.PrimaryUnit == null ? 1 : 2)
+                                                         .ThenBy(unit => unit.PrimaryUnit != null ? unit.ConversionFactor : 1000)
+                                                         .ThenBy(unit => unit.Name)
+                                                       .ToListAsync(cancellationToken);
+
+
         IEnumerable<Response> responses = units.Select(ToGetResponse);
 
         bool isActionAllowed = currentUser.HasRole(UserRoles.Admin);
@@ -54,7 +63,8 @@ public static class GetUnits
             unit.Id.Value,
             unit.Name,
             unit.ShortName,
-            unit.Group.ToFriendlyString()
+            unit.Group.ToFriendlyString(),
+            unit.PrimaryUnit is not null ? new PrimaryUnitDto(unit.PrimaryUnit.Value, unit.Name, unit.ConversionFactor) : null
         );
     }
 }

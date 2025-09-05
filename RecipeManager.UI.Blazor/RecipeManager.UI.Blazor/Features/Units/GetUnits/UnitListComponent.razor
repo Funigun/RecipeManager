@@ -16,12 +16,16 @@
         <MudTh>Name</MudTh>
         <MudTh>Short Name</MudTh>
         <MudTh>Group</MudTh>
+        <MudTh>Primary Unit</MudTh>
+        <MudTh>Conversion Factor</MudTh>
         <MudTh>Actions</MudTh>
     </HeaderContent>
     <RowTemplate>
         <MudTd DataLabel="Name">@context.Item.Name</MudTd>
         <MudTd DataLabel="Short Name">@context.Item.ShortName</MudTd>
         <MudTd DataLabel="Group">@context.Item.Group</MudTd>
+        <MudTd DataLabel="Primary Unit">@context.Item.PrimaryUnit?.Name</MudTd>
+        <MudTd DataLabel="Conversion Factor">@(GetConversionFactorDisplay(context.Item))</MudTd>
         <MudTd DataLabel="Actions">
             <MudIconButton Disabled="@(!context.Links.Any(link => link.Rel == HateoasConstants.Delete))" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Small" Icon="@Icons.Material.Filled.Edit" OnClick="() => UpdateUnit(context)"></MudIconButton>
             <MudIconButton Disabled="@(!context.Links.Any(link => link.Rel == HateoasConstants.Update))" Variant="Variant.Filled" Color="Color.Error" Size="Size.Small" Icon="@Icons.Material.Filled.Delete" OnClick="() => DeleteUnit(context)"></MudIconButton>
@@ -36,6 +40,8 @@
     [Parameter]
     public bool ShowLoadingBar { get; set; } = true;
 
+    private string previousGroup = string.Empty;
+
     private async Task DeleteUnit(HateoasResponse<UnitModel> selectedItem)
     {
         if (await DialogService.ShowDeleteConfirmationMessage())
@@ -49,7 +55,9 @@
         string updateLink = selectedItem.Links.First(link => link.Rel == HateoasConstants.Update).Href;
 
         UnitService.OpenUpdateUnitPage(selectedItem.Item.UnitId);
-        
+
         return Task.CompletedTask;
     }
+
+    private string GetConversionFactorDisplay(UnitModel model) => model.PrimaryUnit is not null ? model.PrimaryUnit.ConversionFactory.ToString() : "";
 }

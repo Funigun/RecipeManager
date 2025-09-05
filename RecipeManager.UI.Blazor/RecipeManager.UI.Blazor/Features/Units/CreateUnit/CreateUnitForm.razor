@@ -20,6 +20,15 @@
             }
         </MudSelect>
 
+        <MudSelect T="Guid?" Label="Primary Unit" Required="false" @bind-Value="unitModel.PrimaryUnit">
+            @foreach (var unit in primaryUnits)
+            {
+                <MudSelectItem Value="@unit.UnitId">@unit.Name</MudSelectItem>
+            }
+        </MudSelect>
+
+        <MudInput T="int" Label="Conversion Factor" @bind-Value="unitModel.ConversionFactor" Required="false" />
+
         <MudGrid Class="mt-4">
             <MudItem xs="6">
                 <MudButton Variant="Variant.Outlined" Color="Color.Default" OnClick="GoBack" FullWidth="false">
@@ -45,6 +54,12 @@
     private readonly UnitForCreateValidator validator = new();
     private bool isSubmitEnabled = false;
     private IEnumerable<string> errorMessages = [];
+    private IEnumerable<PrimaryUnitDto> primaryUnits { get; set; } = [];
+
+    override protected async Task OnInitializedAsync()
+    {
+        primaryUnits = await UnitService.GetPrimaryUnits();
+    }
 
     private void GoBack()
     {

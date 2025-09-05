@@ -13,24 +13,32 @@ public sealed class Unit : AuditableEntity, IEntity<UnitId>
 
     public UnitGroup Group { get; set; }
 
+    public UnitId? PrimaryUnit { get; set; }
+
+    public int ConversionFactor { get; set; }
+
     private Unit()
     {
     }
 
-    public static Unit Create(string name, string? shortName, UnitGroup group)
+    public static Unit Create(string name, string? shortName, UnitGroup group, UnitId? primaryUnitId, int conversionFactory)
     {
         return new()
         {
             Name = name,
             ShortName = shortName,
             Group = group,
+            PrimaryUnit = primaryUnitId,
+            ConversionFactor = conversionFactory
         };
     }
 
-    public void Update(string name, string? shortName, UnitGroup group)
+    public void Update(string name, string? shortName, UnitGroup group, UnitId? primaryUnitId, int conversionFactory)
     {
         Name = name;
         ShortName = shortName;
         Group = group;
+        PrimaryUnit = primaryUnitId;
+        ConversionFactor = conversionFactory;
     }
 }

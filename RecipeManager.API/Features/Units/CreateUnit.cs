@@ -12,7 +12,7 @@ namespace RecipeManager.Api.Features.Units;
 
 public static class CreateUnit
 {
-    public sealed record Request(string Name, string? ShortName, int Group);
+    public sealed record Request(string Name, string? ShortName, int Group, Guid? PrimaryUnit, int ConversionFactor = 1);
 
     public sealed record Response(UnitId Id);
 
@@ -41,6 +41,20 @@ public static class CreateUnit
                 .Must(group => group.IsUnitGroup())
                     .WithMessage("Invalid unit group")
                     .WithName("Unit Group");
+
+            When(x => x.PrimaryUnit is not null, () =>
+            {
+                RuleFor(x => x.PrimaryUnit)
+                    .MustAsync(async (primaryUnitId, cancellationToken) =>
+                    {
+                        UnitId id = new(primaryUnitId!.Value);
+                        return await dbContext.Units.AnyAsync(unit => unit.Id == id, cancellationToken);
+                    }).WithMessage("Primary Unit must reference an existing unit");
+
+                RuleFor(x => x.ConversionFactor)
+                    .GreaterThan(1)
+                    .WithMessage("Conversion Factor must be greater than 1 when Primary Unit is specified");
+            });
         }
     }
 
@@ -76,7 +90,7 @@ public static class CreateUnit
 
     private static Unit ToUnit(this Request request)
     {
-        return Unit.Create(request.Name, request.ShortName, (UnitGroup)request.Group);
+        return Unit.Create(request.Name, request.ShortName, (UnitGroup)request.Group, request.PrimaryUnit, request.ConversionFactor);
     }
 
     private static Response ToPostResponse(this Unit unit)

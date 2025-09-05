@@ -9,4 +9,8 @@ public sealed class UnitForUpdateModel
     public string? ShortName { get; set; }
 
     public UnitGroup Group { get; set; }
+
+    public Guid? PrimaryUnit { get; set; }
+
+    public int ConversionFactor { get; set; }
 }

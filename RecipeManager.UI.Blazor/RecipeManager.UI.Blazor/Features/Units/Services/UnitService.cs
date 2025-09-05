@@ -56,6 +56,15 @@ public class UnitService(IRecipeApi recipeApi, ISnackbar snackbar, NavigationMan
              : new HateoasCollectionResponse<UnitModel>();
     }
 
+    public async Task<IEnumerable<PrimaryUnitDto>> GetPrimaryUnits()
+    {
+        HttpResponseMessage response = await recipeApi.GetAll(new Uri($"{UnitsApiUrl}/primary-units", UriKind.Relative));
+
+        return response.IsSuccessStatusCode
+             ? (await response.Content.ReadFromJsonAsync<IEnumerable<PrimaryUnitDto>>())!
+             : [];
+    }
+
     public async Task UpdateUnit(string relativeUri, UnitForUpdateModel unit)
     {
         HttpResponseMessage response = await recipeApi.Update(new Uri(relativeUri), unit);

@@ -1,0 +1,36 @@
+﻿using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using RecipeManager.Api.Application.Abstractions;
+using RecipeManager.Api.Domain.Units;
+using RecipeManager.Api.Shared.Endpoint;
+
+namespace RecipeManager.Api.Features.Units;
+
+public static class GetPrimaryUnits
+{
+    public sealed record Response(Guid UnitId, string Name);
+
+    [GroupEndpoint("Units")]
+    public sealed class Endpoint : IEndpoint
+    {
+        public void MapEndpoint(IEndpointRouteBuilder endpoints)
+        {
+            endpoints.MapStandardGet<Response>("/primary-units", Handler)
+                     .WithName("GetPrimaryUnits")
+                     .WithDescription("Returns list of primary measurement units");
+
+        }
+    }
+
+    internal static async Task<Results<Ok<IEnumerable<Response>>, BadRequest>> Handler([FromServices] IAppDbContext dbContext, IRedisService redisService, CancellationToken cancellationToken)
+    {
+        IEnumerable<Unit> primaryUnits = await dbContext.Units.AsNoTracking()
+                                                              .Where(unit => unit.PrimaryUnit == null)
+                                                              .ToListAsync(cancellationToken);
+
+        IEnumerable<Response> response = primaryUnits.Select(u => new Response(u.Id, u.Name));
+
+        return TypedResults.Ok(response);
+    }
+}
