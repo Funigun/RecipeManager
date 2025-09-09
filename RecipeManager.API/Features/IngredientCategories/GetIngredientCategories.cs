@@ -42,8 +42,8 @@ public static class GetIngredientCategories
         {
             collectionBuilder
                 .WithCollectionLink()
-                    .WithDelete(LinkOptions.Create("DeleteRecipeCategoryUnit", HateoasRelConstants.Delete, isActionAllowed), unit => new { unitId = unit.Id })
-                .AddPost(LinkOptions.Create("CreateRecipeCategoryUnits", HateoasRelConstants.Create, isActionAllowed), null);
+                    .WithDelete(LinkOptions.Create("DeleteIngredientCategory", HateoasRelConstants.Delete, isActionAllowed), category => new { categoryId = category.Id })
+                .AddPost(LinkOptions.Create("CreateIngredientCategory", HateoasRelConstants.Create, isActionAllowed), null);
         }
 
         return TypedResults.Ok(collectionBuilder.Build());

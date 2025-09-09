@@ -1,0 +1,37 @@
+﻿@using RecipeManager.UI.Blazor.Brokers.HateoasModel
+@using RecipeManager.UI.Blazor.Features.IngredientCategories;
+@using RecipeManager.UI.Blazor.Features.IngredientCategories.Models
+@using RecipeManager.UI.Blazor.Features.IngredientCategories.Services
+
+@page "/admin/ingredient-categories"
+
+@inject IIngredientCategoryService IngredientCategoryService
+
+<MudPaper Class="mt-6" Width="750px">
+    <MudText Typo="Typo.h6" Align="Align.Center">Ingredient categories</MudText>
+
+    <div class="d-flex justify-end">
+        <MudTextField Label="Name" For="@(() => newCategoryModel.Name)" @bind-Value="newCategoryModel.Name" Variant="Variant.Outlined" />
+        <MudIconButton Icon="@Icons.Material.Filled.Add" Color="Color.Primary" Edge="Edge.End" OnClick="CreateCategory"/>
+    </div>
+
+    <IngredientCategoryListComponent Categories="categories" ShowLoadingBar="!categoriesLoaded"/>
+</MudPaper>
+
+@code {
+    private HateoasCollectionResponse<IngredientCategoryModel> categories = new();
+    private IngredientCategoryForCreateModel newCategoryModel = new();
+    private bool categoriesLoaded = false;
+
+    override protected async Task OnInitializedAsync()
+    {
+        categories = await IngredientCategoryService.GetCategories();
+        categoriesLoaded = true;
+    }
+
+    private async Task CreateCategory()
+    {
+        await IngredientCategoryService.CreateCategory(newCategoryModel);
+        categories = await IngredientCategoryService.GetCategories();
+    }
+}

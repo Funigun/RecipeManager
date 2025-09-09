@@ -27,8 +27,8 @@
         <MudTd DataLabel="Primary Unit">@context.Item.PrimaryUnit?.Name</MudTd>
         <MudTd DataLabel="Conversion Factor">@(GetConversionFactorDisplay(context.Item))</MudTd>
         <MudTd DataLabel="Actions">
-            <MudIconButton Disabled="@(!context.Links.Any(link => link.Rel == HateoasConstants.Delete))" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Small" Icon="@Icons.Material.Filled.Edit" OnClick="() => UpdateUnit(context)"></MudIconButton>
-            <MudIconButton Disabled="@(!context.Links.Any(link => link.Rel == HateoasConstants.Update))" Variant="Variant.Filled" Color="Color.Error" Size="Size.Small" Icon="@Icons.Material.Filled.Delete" OnClick="() => DeleteUnit(context)"></MudIconButton>
+            <MudIconButton Disabled="@(!context.Links.Any(link => link.Rel == HateoasConstants.Update))" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Small" Icon="@Icons.Material.Filled.Edit" OnClick="() => UpdateUnit(context)"></MudIconButton>
+            <MudIconButton Disabled="@(!context.Links.Any(link => link.Rel == HateoasConstants.Delete))" Variant="Variant.Filled" Color="Color.Error" Size="Size.Small" Icon="@Icons.Material.Filled.Delete" OnClick="() => DeleteUnit(context)"></MudIconButton>
         </MudTd>
     </RowTemplate>
 </MudTable>
