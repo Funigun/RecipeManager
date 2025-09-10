@@ -1,13 +1,13 @@
 ﻿@using MudBlazor
 @using RecipeManager.UI.Blazor.Brokers.HateoasModel
+@using RecipeManager.UI.Blazor.Features.RecipeCategories.Models
 @using RecipeManager.UI.Blazor.Components.Common.DialogMessage
-@using RecipeManager.UI.Blazor.Features.IngredientCategories.Models
-@using RecipeManager.UI.Blazor.Features.IngredientCategories.Services
+@using RecipeManager.UI.Blazor.Features.RecipeCategories.Services
 
-@inject IIngredientCategoryService IngredientCategoryService
+@inject IRecipeCategoryService RecipeCategoryService
 @inject IDialogMessageService DialogService
 
-<MudTable T="HateoasResponse<IngredientCategoryModel>" Items="Categories.Items" Loading="ShowLoadingBar" LoadingProgressColor="Color.Info">
+<MudTable T="HateoasResponse<RecipeCategoryModel>" Items="Categories.Items" Loading="ShowLoadingBar" LoadingProgressColor="Color.Info">
     <ColGroup>
         <col style="width: 80%;" />
         <col style="width: 20%;" />
@@ -26,16 +26,16 @@
 
 @code {
     [Parameter]
-    public HateoasCollectionResponse<IngredientCategoryModel> Categories { get; set; } = new();
+    public HateoasCollectionResponse<RecipeCategoryModel> Categories { get; set; } = new();
 
     [Parameter]
     public bool ShowLoadingBar { get; set; } = true;
 
-    private async Task DeleteCategory(HateoasResponse<IngredientCategoryModel> selectedItem)
+    private async Task DeleteCategory(HateoasResponse<RecipeCategoryModel> selectedItem)
     {
         if (await DialogService.ShowDeleteConfirmationMessage())
         {
-            await IngredientCategoryService.DeleteCategory(selectedItem.Links.First(link => link.Rel == HateoasConstants.Delete).Href);
+            await RecipeCategoryService.DeleteCategory(selectedItem.Links.First(link => link.Rel == HateoasConstants.Delete).Href);
         }
     }
 }

@@ -42,8 +42,8 @@ public static class GetRecipeCategories
         {
             collectionBuilder
                 .WithCollectionLink()
-                    .WithDelete(LinkOptions.Create("DeleteRecipeCategoryUnit", HateoasRelConstants.Delete, isActionAllowed), unit => new { unitId = unit.Id })
-                .AddPost(LinkOptions.Create("CreateRecipeCategoryUnits", HateoasRelConstants.Create, isActionAllowed), null);
+                    .WithDelete(LinkOptions.Create("DeleteRecipeCategory", HateoasRelConstants.Delete, isActionAllowed), unit => new { categoryId = unit.Id })
+                .AddPost(LinkOptions.Create("CreateRecipeCategory", HateoasRelConstants.Create, isActionAllowed), null);
         }
 
         return TypedResults.Ok(collectionBuilder.Build());

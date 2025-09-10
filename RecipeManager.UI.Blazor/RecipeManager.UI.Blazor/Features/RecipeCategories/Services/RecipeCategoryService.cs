@@ -4,31 +4,31 @@ using RecipeManager.UI.Blazor.Brokers.HateoasModel;
 using RecipeManager.UI.Blazor.Brokers.RecipeManagersApi;
 using RecipeManager.UI.Blazor.Components.Common;
 using RecipeManager.UI.Blazor.Components.Extensions;
-using RecipeManager.UI.Blazor.Features.IngredientCategories.Models;
+using RecipeManager.UI.Blazor.Features.RecipeCategories.Models;
 
-namespace RecipeManager.UI.Blazor.Features.IngredientCategories.Services;
+namespace RecipeManager.UI.Blazor.Features.RecipeCategories.Services;
 
-public sealed class IngredientCategoryService(IRecipeApi recipeApi, ISnackbar snackbar, NavigationManager navigationManager) : IIngredientCategoryService
+public sealed class RecipeCategoryService(IRecipeApi recipeApi, ISnackbar snackbar, NavigationManager navigationManager) : IRecipeCategoryService
 {
-    private const string CategoriesApiUrl = "api/ingredientcategories";
+    private const string CategoriesApiUrl = "api/recipecategories";
 
     public ApiResponseBody ResponseBody { get; private set; } = new();
 
-    public async Task<HateoasCollectionResponse<IngredientCategoryModel>> GetCategories()
+    public async Task<HateoasCollectionResponse<RecipeCategoryModel>> GetCategories()
     {
         HttpResponseMessage response = await recipeApi.GetAll(new Uri(CategoriesApiUrl, UriKind.Relative));
 
         if (response.IsSuccessStatusCode)
         {
-            return (await response.Content.ReadFromJsonAsync<HateoasCollectionResponse<IngredientCategoryModel>>())!;
+            return (await response.Content.ReadFromJsonAsync<HateoasCollectionResponse<RecipeCategoryModel>>())!;
         }
 
         ResponseBody = (await response.Content.ReadFromJsonAsync<ApiResponseBody>())!;
 
-        return new HateoasCollectionResponse<IngredientCategoryModel>();
+        return new HateoasCollectionResponse<RecipeCategoryModel>();
     }
 
-    public async Task CreateCategory(IngredientCategoryForCreateModel category)
+    public async Task CreateCategory(RecipeCategoryForCreateModel category)
     {
         HttpResponseMessage response = await recipeApi.Create(new Uri(CategoriesApiUrl, UriKind.Relative), category);
 
@@ -52,6 +52,10 @@ public sealed class IngredientCategoryService(IRecipeApi recipeApi, ISnackbar sn
         {
             navigationManager.Refresh(true);
             snackbar.ShowSuccess("Category deleted sucessfully");
+        }
+        else
+        {
+            ResponseBody = (await response.Content.ReadFromJsonAsync<ApiResponseBody>())!;
         }
     }
 }
