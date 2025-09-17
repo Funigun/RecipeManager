@@ -1,0 +1,35 @@
+﻿@using RecipeManager.UI.Blazor.Brokers.HateoasModel
+@using RecipeManager.UI.Blazor.Features.Ingredients.GetIngredients
+@using RecipeManager.UI.Blazor.Features.Ingredients.Services
+
+@page "/ingredients"
+
+@inject IIngredientService IngredientService
+
+<MudPaper Class="mt-6" Width="750px">
+    <MudText Typo="Typo.h6" Align="Align.Center">Ingredients</MudText>
+
+    <div class="d-flex justify-end">
+        <MudIconButton Disabled="@isAddDisabled" Icon="@Icons.Material.Filled.Add" Color="Color.Primary" Edge="Edge.End" OnClick="OpenCreateView" />
+    </div>
+
+    <IngredientListComponent IngredientsPage=ingredientsPage ShowLoadingBar=!ingredientsLoaded />
+</MudPaper>
+
+@code {
+    private HateoasResponse<IngredientsPageModel> ingredientsPage = new();
+    private bool ingredientsLoaded = false;
+    private bool isAddDisabled = false;
+
+    override protected async Task OnInitializedAsync()
+    {
+        ingredientsPage = await IngredientService.GetIngredientsPage(1, 10, "");
+        ingredientsLoaded = true;
+        isAddDisabled = !ingredientsPage.Links.Any(link => link.Rel == HateoasConstants.Create);
+    }
+
+    private void OpenCreateView()
+    {
+        
+    }
+}

@@ -1,8 +1,9 @@
 ﻿namespace RecipeManager.UI.Blazor.Brokers.HateoasModel;
 
 public sealed class HateoasResponse<TItem>
+              where TItem : class, new()
 {
-    public TItem Item { get; init; }
+    public TItem Item { get; init; } = new();
 
     public ICollection<Link> Links { get; set; } = [];
 
