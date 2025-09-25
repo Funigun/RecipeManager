@@ -10,6 +10,10 @@
         <MudIconButton Variant="Variant.Filled" Color="Color.Primary" Size="Size.Small" Icon="@Icons.Material.Filled.Search" OnClick="() => RefreshTable()"></MudIconButton>
         <MudTextField @bind-Value="categoryToSearch" Placeholder="Search" Class="mt-0"></MudTextField>
     </ToolBarContent>
+    <ColGroup>
+        <col style="width: 80%;" />
+        <col style="width: 20%;" />
+    </ColGroup>
     <HeaderContent>
         <MudTh>Name</MudTh>
         <MudTh>Actions</MudTh>
@@ -29,7 +33,7 @@
     </LoadingContent>
     <PagerContent>
         <div class="d-flex flex-column align-center">
-            <MudPagination ShowFirstButton=true ShowLastButton=true BoundaryCount="1" MiddleCount="0" SelectedChanged="RefreshTable" Selected="IngredientsPage.Item.Page" Count="IngredientsPage.Item.TotalCount" />
+            <MudTablePager />
         </div>
     </PagerContent>
 </MudTable>

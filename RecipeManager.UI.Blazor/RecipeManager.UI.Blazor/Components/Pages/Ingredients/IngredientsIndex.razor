@@ -4,7 +4,7 @@
 
 @page "/ingredients"
 
-@inject IIngredientService IngredientService
+@inject IIngredientService IngredientService;
 
 <MudPaper Class="mt-6" Width="750px">
     <MudText Typo="Typo.h6" Align="Align.Center">Ingredients</MudText>
@@ -30,6 +30,6 @@
 
     private void OpenCreateView()
     {
-        
+        IngredientService.OpenCreatePage();
     }
 }

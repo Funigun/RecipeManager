@@ -1,6 +1,6 @@
 ﻿namespace RecipeManager.UI.Blazor.Features.IngredientCategories.Models;
 
-public sealed class IngredientCategoryModel
+public sealed class IngredientCategoryForManageModel
 {
     public Guid Id { get; set; }
 

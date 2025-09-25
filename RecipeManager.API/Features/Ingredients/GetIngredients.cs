@@ -82,7 +82,8 @@ public static class GetIngredients
         HateoasCollectionResponseBuilder<IngredientDto> ingredientsBuilder = hateoasBuilderFactory.ForCollection(ingredients);
 
         ingredientsBuilder.WithCollectionLink()
-                          .WithGet(LinkOptions.Create("GetIngredientById", HateoasRelConstants.Self, true), ingredient => new { id = ingredient.Id });
+                            .WithGet(LinkOptions.Create("GetIngredientById", HateoasRelConstants.Update, true), ingredient => new { ingredientId = ingredient.Id })
+                            .WithDelete(LinkOptions.Create("DeleteIngredient", HateoasRelConstants.Delete, true), ingredient => new { ingredientId = ingredient.Id });
 
         return ingredientsBuilder.Build().Items;
     }
