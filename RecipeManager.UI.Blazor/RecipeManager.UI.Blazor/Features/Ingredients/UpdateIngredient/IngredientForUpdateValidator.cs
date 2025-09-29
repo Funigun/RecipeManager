@@ -1,5 +1,12 @@
-﻿namespace RecipeManager.UI.Blazor.Features.Ingredients.UpdateIngredient;
+﻿using RecipeManager.Shared.Contracts.Ingredients;
+using RecipeManager.UI.Blazor.Components.Common;
 
-public class IngredientForUpdateValidator
+namespace RecipeManager.UI.Blazor.Features.Ingredients.UpdateIngredient;
+
+public sealed class IngredientForUpdateValidator : BaseAbstractValidator<IngredientForUpdateModel>
 {
+    public IngredientForUpdateValidator()
+    {
+        RuleFor(x => x.Name).SetValidator(new IngredientNameValidator());
+    }
 }

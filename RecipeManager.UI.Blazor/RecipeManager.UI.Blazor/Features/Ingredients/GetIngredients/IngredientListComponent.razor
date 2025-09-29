@@ -1,13 +1,17 @@
 ﻿@using MudBlazor
 @using RecipeManager.UI.Blazor.Brokers.HateoasModel
+@using RecipeManager.UI.Blazor.Components.Common.DialogMessage
 @using RecipeManager.UI.Blazor.Features.Ingredients.GetIngredients
 @using RecipeManager.UI.Blazor.Features.Ingredients.Services
 
 @inject IIngredientService IngredientService;
+@inject IDialogMessageService DialogService;
     
 <MudTable T="HateoasResponse<IngredientModel>" Items="IngredientsPage.Item.Ingredients" Loading="ShowLoadingBar" Virtualize="true" FixedHeader="true" @ref="@table">
     <ToolBarContent>
-        <MudIconButton Variant="Variant.Filled" Color="Color.Primary" Size="Size.Small" Icon="@Icons.Material.Filled.Search" OnClick="() => RefreshTable()"></MudIconButton>
+        <div style="margin-right: 10px">
+            <MudIconButton Variant="Variant.Filled" Color="Color.Primary" Size="Size.Small" Icon="@Icons.Material.Filled.Search" OnClick="() => RefreshTable()"></MudIconButton>
+        </div>
         <MudTextField @bind-Value="categoryToSearch" Placeholder="Search" Class="mt-0"></MudTextField>
     </ToolBarContent>
     <ColGroup>
@@ -33,7 +37,7 @@
     </LoadingContent>
     <PagerContent>
         <div class="d-flex flex-column align-center">
-            <MudTablePager />
+            <MudTablePager  />
         </div>
     </PagerContent>
 </MudTable>
@@ -50,14 +54,15 @@
 
     public async Task UpdateIngredient(HateoasResponse<IngredientModel> selectedItem)
     {
-        // Implement update logic here
-        await Task.CompletedTask;
+        IngredientService.OpenUpdateIngredientPage(selectedItem.Item.Id);
     }
 
     private async Task DeleteIngredient(HateoasResponse<IngredientModel> selectedItem)
     {
-        // Implement delete logic here
-        await Task.CompletedTask;
+        if (await DialogService.ShowDeleteConfirmationMessage())
+        {
+            await IngredientService.DeleteIngredient(selectedItem.Links.First(link => link.Rel == HateoasConstants.Delete).Href);
+        }
     }
 
     private async Task RefreshTable()

@@ -1,5 +1,12 @@
-﻿<h3>UpdateIngredient</h3>
+﻿@page "/ingredients/update/{RawGuid}"
+
+@using RecipeManager.UI.Blazor.Features.Ingredients.UpdateIngredient
+
+<MudPaper Class="pa-6 mx-auto">
+    <UpdateIngredientForm IngredientId="@RawGuid" />
+</MudPaper>
 
 @code {
-
+    [Parameter]
+    public string RawGuid { get; set; } = "";
 }

@@ -55,7 +55,7 @@ public static class GetIngredients
     {
         return string.IsNullOrEmpty(category)
              ? []
-             : await dbContext.IngredientCategories.Where(c => c.Name.Contains(category, StringComparison.OrdinalIgnoreCase))
+             : await dbContext.IngredientCategories.Where(c => c.Name.ToLower().Contains(category.ToLower()))
                                                    .Select(c => c.Id)
                                                    .ToListAsync(cancellationToken);
     }
@@ -66,7 +66,7 @@ public static class GetIngredients
 
         if (categoryIds.Any())
         {
-            query = query.Where(ingredient => ingredient.Categories.Any(categoryId => categoryIds.Contains(categoryId)));
+            query = query.Where(ingredient => ingredient.Categories.Any(categoryId => categoryIds.Select(c => c.Value).Contains(categoryId.Value)));
         }
 
         return query.OrderBy(ingredient => ingredient.Name);

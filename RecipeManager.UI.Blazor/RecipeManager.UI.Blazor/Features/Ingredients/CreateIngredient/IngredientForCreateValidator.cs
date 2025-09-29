@@ -1,4 +1,4 @@
-﻿using FluentValidation;
+﻿using RecipeManager.Shared.Contracts.Ingredients;
 using RecipeManager.UI.Blazor.Components.Common;
 
 namespace RecipeManager.UI.Blazor.Features.Ingredients.CreateIngredient;
@@ -7,10 +7,6 @@ public sealed class IngredientForCreateValidator : BaseAbstractValidator<Ingredi
 {
     public IngredientForCreateValidator()
     {
-        RuleFor(x => x.Name)
-            .NotEmpty()
-                .WithMessage("Name is required.")
-            .MaximumLength(100)
-                .WithMessage("Name must not exceed 100 characters.");
+        RuleFor(x => x.Name).SetValidator(new IngredientNameValidator());
     }
 }
