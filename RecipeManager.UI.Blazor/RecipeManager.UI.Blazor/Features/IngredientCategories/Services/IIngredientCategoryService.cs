@@ -5,7 +5,9 @@ namespace RecipeManager.UI.Blazor.Features.IngredientCategories.Services;
 
 public interface IIngredientCategoryService
 {
-    Task<HateoasCollectionResponse<IngredientCategoryModel>> GetCategories();
+    Task<HateoasCollectionResponse<IngredientCategoryForManageModel>> GetCategories();
+
+    Task<IEnumerable<IngredientCategoryForDropdownModel>> GetCategoriesForDropdown(string? categoryName = null);
 
     Task CreateCategory(IngredientCategoryForCreateModel category);
 

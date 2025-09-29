@@ -11,21 +11,38 @@ namespace RecipeManager.UI.Blazor.Features.IngredientCategories.Services;
 public sealed class IngredientCategoryService(IRecipeApi recipeApi, ISnackbar snackbar, NavigationManager navigationManager) : IIngredientCategoryService
 {
     private const string CategoriesApiUrl = "api/ingredientcategories";
+    private const string CategoriesDropdownApiUrl = $"{CategoriesApiUrl}/dropdown";
 
     public ApiResponseBody ResponseBody { get; private set; } = new();
 
-    public async Task<HateoasCollectionResponse<IngredientCategoryModel>> GetCategories()
+    public async Task<HateoasCollectionResponse<IngredientCategoryForManageModel>> GetCategories()
     {
         HttpResponseMessage response = await recipeApi.GetAll(new Uri(CategoriesApiUrl, UriKind.Relative));
 
         if (response.IsSuccessStatusCode)
         {
-            return (await response.Content.ReadFromJsonAsync<HateoasCollectionResponse<IngredientCategoryModel>>())!;
+            return (await response.Content.ReadFromJsonAsync<HateoasCollectionResponse<IngredientCategoryForManageModel>>())!;
         }
 
         ResponseBody = (await response.Content.ReadFromJsonAsync<ApiResponseBody>())!;
 
-        return new HateoasCollectionResponse<IngredientCategoryModel>();
+        return new HateoasCollectionResponse<IngredientCategoryForManageModel>();
+    }
+
+    public async Task<IEnumerable<IngredientCategoryForDropdownModel>> GetCategoriesForDropdown(string? categoryName = null)
+    {
+        string url = string.IsNullOrEmpty(categoryName) ? CategoriesDropdownApiUrl : $"{CategoriesDropdownApiUrl}?categoryName={categoryName}";
+
+        HttpResponseMessage response = await recipeApi.GetAll(new Uri(url, UriKind.Relative));
+
+        if (response.IsSuccessStatusCode)
+        {
+            return (await response.Content.ReadFromJsonAsync<IEnumerable<IngredientCategoryForDropdownModel>>())!;
+        }
+
+        ResponseBody = (await response.Content.ReadFromJsonAsync<ApiResponseBody>())!;
+
+        return [];
     }
 
     public async Task CreateCategory(IngredientCategoryForCreateModel category)

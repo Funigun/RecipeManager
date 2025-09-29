@@ -7,6 +7,7 @@ using RecipeManager.UI.Blazor.Brokers.RecipeManagersApi;
 using RecipeManager.UI.Blazor.Components;
 using RecipeManager.UI.Blazor.Components.Common.DialogMessage;
 using RecipeManager.UI.Blazor.Features.IngredientCategories.Services;
+using RecipeManager.UI.Blazor.Features.Ingredients.Services;
 using RecipeManager.UI.Blazor.Features.RecipeCategories.Services;
 using RecipeManager.UI.Blazor.Features.Units.Services;
 using RecipeManager.UI.Blazor.Services.Authentication;
@@ -68,7 +69,8 @@ try
                     .AddScoped<IDialogMessageService, DialogMessageService>()
                     .AddScoped<IUnitService, UnitService>()
                     .AddScoped<IIngredientCategoryService, IngredientCategoryService>()
-                    .AddScoped<IRecipeCategoryService, RecipeCategoryService>();
+                    .AddScoped<IRecipeCategoryService, RecipeCategoryService>()
+                    .AddScoped<IIngredientService, IngredientService>();
 
     WebApplication app = builder.Build();
 

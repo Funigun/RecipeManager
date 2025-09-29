@@ -55,7 +55,7 @@ public static class GetIngredients
     {
         return string.IsNullOrEmpty(category)
              ? []
-             : await dbContext.IngredientCategories.Where(c => c.Name.Contains(category, StringComparison.OrdinalIgnoreCase))
+             : await dbContext.IngredientCategories.Where(c => c.Name.ToLower().Contains(category.ToLower()))
                                                    .Select(c => c.Id)
                                                    .ToListAsync(cancellationToken);
     }
@@ -66,7 +66,7 @@ public static class GetIngredients
 
         if (categoryIds.Any())
         {
-            query = query.Where(ingredient => ingredient.Categories.Any(categoryId => categoryIds.Contains(categoryId)));
+            query = query.Where(ingredient => ingredient.Categories.Any(categoryId => categoryIds.Select(c => c.Value).Contains(categoryId.Value)));
         }
 
         return query.OrderBy(ingredient => ingredient.Name);
@@ -82,7 +82,8 @@ public static class GetIngredients
         HateoasCollectionResponseBuilder<IngredientDto> ingredientsBuilder = hateoasBuilderFactory.ForCollection(ingredients);
 
         ingredientsBuilder.WithCollectionLink()
-                          .WithGet(LinkOptions.Create("GetIngredientById", HateoasRelConstants.Self, true), ingredient => new { id = ingredient.Id });
+                            .WithGet(LinkOptions.Create("GetIngredientById", HateoasRelConstants.Update, true), ingredient => new { ingredientId = ingredient.Id })
+                            .WithDelete(LinkOptions.Create("DeleteIngredient", HateoasRelConstants.Delete, true), ingredient => new { ingredientId = ingredient.Id });
 
         return ingredientsBuilder.Build().Items;
     }
