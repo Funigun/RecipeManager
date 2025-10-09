@@ -7,7 +7,10 @@ public interface IRecipeCategoryService
 {
     Task<HateoasCollectionResponse<RecipeCategoryModel>> GetCategories();
 
+    Task<IEnumerable<RecipeCategoryForDropdownModel>> GetCategoriesForDropdown(string? categoryName = null);
+
     Task CreateCategory(RecipeCategoryForCreateModel category);
 
     Task DeleteCategory(string relativeUri);
+
 }

@@ -11,6 +11,7 @@ namespace RecipeManager.UI.Blazor.Features.RecipeCategories.Services;
 public sealed class RecipeCategoryService(IRecipeApi recipeApi, ISnackbar snackbar, NavigationManager navigationManager) : IRecipeCategoryService
 {
     private const string CategoriesApiUrl = "api/recipecategories";
+    private const string CategoriesDropdownApiUrl = $"{CategoriesApiUrl}/dropdown";
 
     public ApiResponseBody ResponseBody { get; private set; } = new();
 
@@ -26,6 +27,21 @@ public sealed class RecipeCategoryService(IRecipeApi recipeApi, ISnackbar snackb
         ResponseBody = (await response.Content.ReadFromJsonAsync<ApiResponseBody>())!;
 
         return new HateoasCollectionResponse<RecipeCategoryModel>();
+    }
+
+    public async Task<IEnumerable<RecipeCategoryForDropdownModel>> GetCategoriesForDropdown(string? categoryName = null)
+    {
+        string url = string.IsNullOrEmpty(categoryName) ? CategoriesDropdownApiUrl : $"{CategoriesDropdownApiUrl}?categoryName={categoryName}";
+        HttpResponseMessage response = await recipeApi.GetAll(new Uri(url, UriKind.Relative));
+
+        if (response.IsSuccessStatusCode)
+        {
+            return (await response.Content.ReadFromJsonAsync<IEnumerable<RecipeCategoryForDropdownModel>>())!;
+        }
+
+        ResponseBody = (await response.Content.ReadFromJsonAsync<ApiResponseBody>())!;
+
+        return [];
     }
 
     public async Task CreateCategory(RecipeCategoryForCreateModel category)

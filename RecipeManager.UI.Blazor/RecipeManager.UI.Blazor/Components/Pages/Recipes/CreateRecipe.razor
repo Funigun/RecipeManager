@@ -1,0 +1,15 @@
+﻿@using RecipeManager.UI.Blazor.Brokers.HateoasModel
+@using RecipeManager.UI.Blazor.Features.Recipes
+@using RecipeManager.UI.Blazor.Features.Recipes.Components
+@using RecipeManager.UI.Blazor.Features.Recipes.Models
+
+@page "/recipes/create"
+
+@inject ISnackbar Snackbar
+
+<MudPaper Class="pa-6 mx-auto" Style="width:1000px">
+    <RecipeForm RecipeModel="new HateoasResponse<RecipeModel>()"></RecipeForm>
+</MudPaper>
+
+@code {
+}

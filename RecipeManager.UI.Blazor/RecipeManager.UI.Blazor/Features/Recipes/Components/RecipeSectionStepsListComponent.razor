@@ -1,0 +1,78 @@
+﻿@using MudBlazor
+@using RecipeManager.UI.Blazor.Components.Common
+@using RecipeManager.UI.Blazor.Features.Recipes.Models
+@using RecipeManager.UI.Blazor.Features.Recipes.Validators
+
+<MudForm T="RecipeSectionModel" Model="RecipeSection">
+     <MudStack Row=true Spacing="3">
+        <div style="margin-right: 10px; margin-left: 50px; width: 620px !important">
+            <MudTextField T="string" Label="Step Description*" @bind-Value="newStep.Description" style="width: 620px"></MudTextField>
+        </div>
+
+        <MudIconButton Icon="@Icons.Material.Filled.Add" Color="Color.Primary" OnClick="AddStep" Disabled="@(string.IsNullOrEmpty(newStep.Description))" style="margin-right: 10px"></MudIconButton>
+        <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Error" OnClick="RemoveSelectedSteps" Disabled="!selectedSteps.Any()" style="margin-right: 10px"></MudIconButton>
+    </MudStack>
+    <MudTable T="RecipeStepModel" Items="RecipeSection.Steps" @bind-selectedItems="selectedSteps" FixedHeader="true" MultiSelection="true" SelectionChangeable="true">
+        <HeaderContent>
+            <MudTh Style="width:850px">Details</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd>
+                <div style="display: flex; gap: 1rem;">
+                    <span><strong>@context.Order.</strong></span>
+                    <span>@context.Description</span>
+                </div>
+
+                @if (@context.ImageUrl != null)
+                {
+                    <div style="width: 500px; height: 500px; border: 3px solid red; justify-self:center; margin-top: 15px;">
+                        @* <MudImage Src="@context.ImageUrl" Alt="Image" /> *@
+                    </div>
+                }
+            </MudTd>
+        </RowTemplate>
+    </MudTable>
+</MudForm>
+
+
+@code {
+    [Parameter]
+    public RecipeSectionModel RecipeSection { get; set; } = null;
+
+    [Parameter]
+    public EventCallback<RecipeSectionModel> OnDataChanged { get; set; }
+
+    private HashSet<RecipeStepModel> selectedSteps = new();
+    private RecipeStepModel newStep = new();
+
+    private async Task AddStep()
+    {
+        RecipeSection.Steps.Add(new()
+        {
+            Order = RecipeSection.Steps.Count + 1,
+            Description = newStep.Description
+        });
+
+        newStep.Description = string.Empty;
+
+        await OnDataChanged.InvokeAsync(RecipeSection);
+    }
+
+    private async Task RemoveSelectedSteps()
+    {
+        foreach (RecipeStepModel stepModel in selectedSteps)
+        {
+            RecipeSection.Steps.Remove(stepModel);
+        }
+
+        int stepOrder = 1;
+
+        foreach (RecipeStepModel step in RecipeSection.Steps)
+        {
+            step.Order = stepOrder;
+            stepOrder++;
+        }
+
+        await OnDataChanged.InvokeAsync(RecipeSection);
+    }
+}

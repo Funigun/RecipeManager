@@ -1,0 +1,249 @@
+﻿@using Markdig
+@using Microsoft.AspNetCore.Components.Forms
+@using Microsoft.AspNetCore.Components.Web
+@using MudBlazor
+@using RecipeManager.UI.Blazor.Brokers.HateoasModel
+@using RecipeManager.UI.Blazor.Components.Common
+@using RecipeManager.UI.Blazor.Features.Ingredients
+@using RecipeManager.UI.Blazor.Features.Ingredients.Services
+@using RecipeManager.UI.Blazor.Features.RecipeCategories.Models
+@using RecipeManager.UI.Blazor.Features.RecipeCategories.Services
+@using RecipeManager.UI.Blazor.Features.Recipes.Models
+@using RecipeManager.UI.Blazor.Features.Recipes.Services
+@using RecipeManager.UI.Blazor.Features.Recipes.Validators
+@using RecipeManager.UI.Blazor.Features.Units
+@using RecipeManager.UI.Blazor.Features.Units.Services
+
+@inject IUnitService UnitService
+@inject IRecipeService RecipeService
+@inject IIngredientService IngredientService
+@inject IRecipeCategoryService RecipeCategoryService
+
+<MudForm @ref="Form" Model="RecipeModel" Validation="@(validator.ValidateValue)" @bind-IsValid="@isSubmitEnabled" @rendermode="RenderMode.InteractiveAuto">
+    <MudStack Spacing="5">
+        <div style="align-self: center; width: 75%">
+            <MudTextField Required Label="Title" For="@(() => RecipeModel.Item.Title)" @bind-Value="RecipeModel.Item.Title" />
+        </div>
+       
+        <MudExpansionPanels Multiexpansion="true">
+            <MudExpansionPanel Text="Details" Expanded=false>
+                <MudTextField AutoGrow Style="margin-top: 25px;" Label="Description" For="@(() => RecipeModel.Item.Description)" @bind-Value="RecipeModel.Item.Description" />
+                <MudStack Row="true" Spacing="3" Style="margin-top: 25px">                    
+                    <MudTextField T="double" Required Label="Amount" Style="width: 200px" For="@(() => RecipeModel.Item.Amount.Amount)" @bind-Value="RecipeModel.Item.Amount.Amount" />
+                    
+                    <MudSelect T="UnitForDropdownModel" Required Label="Unit" Style="width: 200px" For="@(() => RecipeModel.Item.Amount.Unit)" @bind-value="RecipeModel.Item.Amount.Unit">
+                        @foreach (var unit in units)
+                        {
+                            <MudSelectItem Value="@unit">@unit.Name</MudSelectItem>
+                        }
+                    </MudSelect>
+                    
+                    <MudTextField T="byte" Required Label="Number of servings" Style="width: 200px" For="@(() => RecipeModel.Item.NumberOfServings)" @bind-Value="RecipeModel.Item.NumberOfServings" />
+                    
+                    <MudSelect Required T="RecipeDifficulty" Label="Difficulty" Style="width: 200px" For="@(() => RecipeModel.Item.Difficulty)" @bind-Value="RecipeModel.Item.Difficulty">
+                        @foreach (var difficulty in Difficulties)
+                        {
+                            <MudSelectItem Value="@difficulty.Key">@difficulty.Value</MudSelectItem>
+                        }
+                    </MudSelect>
+                </MudStack>
+
+               
+                 <MudAutocomplete T="IngredientForDropdownModel" Label="Assigned ingredient" @bind-Value="RecipeModel.Item.IngredientId" ShowProgressIndicator="true"
+                                  SearchFunc="SearchIngredients" ToStringFunc="@(e => e == null ? null : e.Name)" style="width: 300px" Clearable=true/>
+            </MudExpansionPanel>
+
+            <MudExpansionPanel Style="margin-top: 20px">
+                <TitleContent>
+                    <MudText Color="@(categoriesMessages != null && categoriesMessages.Any() ? Color.Error : Color.Default)">Categories*</MudText>
+                </TitleContent>
+                <ChildContent>
+                    <MudStack Spacing="5">
+                        <MudGrid>
+                            <MudItem xs="9">
+                                <MudAutocomplete T="RecipeCategoryForDropdownModel" Label="Categories" ResetValueOnEmptyText="true" ShowProgressIndicator="true"
+                                                 SearchFunc="SearchCategories" ToStringFunc="@(e => e == null ? null : e.Name)" ValueChanged="OnSelectedCategoryChanged" />
+                            </MudItem>
+                            <MudItem xs="3">
+                                <MudIconButton Disabled="@isAddCategoryDisabled" Icon="@Icons.Material.Filled.Add" Color="Color.Primary" Edge="Edge.End" OnClick="AddCategory" />
+                            </MudItem>
+                        </MudGrid>
+
+                        <div style="max-height: 80px; overflow-y:auto">
+                            <MudChipSet T="RecipeCategoryForDropdownModel" AllClosable OnClose="RemoveCategory">
+                                @foreach (var category in selectedCategories)
+                                {
+                                    <MudChip Text="@category.Name" Value="category" Color="Color.Primary" />
+                                }
+                            </MudChipSet>
+                        </div>
+
+                        <CustomValidationSummary ErrorMessages="@categoriesMessages" />
+                    </MudStack>
+                </ChildContent>
+            </MudExpansionPanel>
+
+            <MudExpansionPanel Style="margin-top: 20px">
+                <TitleContent>
+                    <MudText Color="@(ingredientsMessages != null && ingredientsMessages.Any() ? Color.Error : Color.Default)">Ingredients*</MudText>
+                </TitleContent>
+                <ChildContent>
+                    <RecipeIngredientsListComponent Ingredients="RecipeModel.Item.Ingredients" Units="units" OnDataChanged="HandleIngredientsChanged" />
+                    <CustomValidationSummary ErrorMessages="@ingredientsMessages" />
+                </ChildContent>
+            </MudExpansionPanel>
+
+            @foreach (RecipeSectionModel recipeSection in RecipeModel.Item.Sections)
+            {
+                <MudExpansionPanel Text="@recipeSection.SectionHeader" Style="margin-top: 20px">
+                    <TitleContent>
+                        <MudText Color="@(RecipeSectionErrors != null && RecipeSectionErrors[@recipeSection.SectionType].Any() ? Color.Error : Color.Default)">@recipeSection.SectionHeader</MudText>
+                    </TitleContent>
+                    <ChildContent>
+                        <RecipeSectionStepsListComponent RecipeSection="recipeSection" OnDataChanged="HandleSectionChanged" />
+                        <CustomValidationSummary ErrorMessages="@(RecipeSectionErrors != null ? RecipeSectionErrors[@recipeSection.SectionType] : [])" />
+                    </ChildContent>
+                </MudExpansionPanel>
+            }
+        </MudExpansionPanels>
+
+        <MudGrid Class="mt-4">
+            <MudItem xs="6">
+                <MudButton Variant="Variant.Outlined" Color="Color.Default" FullWidth="false">
+                    Back
+                </MudButton>
+            </MudItem>
+            <MudItem xs="6" Class="d-flex justify-end">
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="SaveRecipe">
+                    Save
+                </MudButton>
+            </MudItem>
+        </MudGrid>
+
+        <CustomValidationSummary ErrorMessages="@errorMessages" /> 
+     </MudStack>
+</MudForm>
+
+@code {
+    [Parameter]
+    public HateoasResponse<RecipeModel> RecipeModel { get; set; } = new HateoasResponse<RecipeModel>();
+
+    [Parameter]
+    public EventCallback<HateoasResponse<RecipeModel>> OnValidSubmit { get; set; }
+
+    private MudForm Form { get; set; }
+
+    private IEnumerable<IngredientForDropdownModel> ingredients = [];
+    private ICollection<UnitForDropdownModel> units { get; set; } = [];
+
+    private Dictionary<RecipeSectionType, List<string>> RecipeSectionErrors;
+    private Dictionary<RecipeDifficulty, string> Difficulties { get; set; } = RecipeDifficultyExtensions.GetRecipeDifficulties();
+    private readonly RecipeModelValidator validator = new();
+    private readonly RecipeSectionValidator sectionValidator = new();
+    private readonly RecipeIngredientsValidator ingredientsValidator = new();
+
+    private bool isSubmitEnabled = false;
+    private IEnumerable<string> errorMessages = [];
+    private IEnumerable<string> ingredientsMessages = [];
+    private IEnumerable<string> categoriesMessages = [];
+
+    private IEnumerable<RecipeCategoryForDropdownModel> categories = [];
+    private List<RecipeCategoryForDropdownModel> selectedCategories = [];
+    private RecipeCategoryForDropdownModel selectedCategory = new();
+    private string toggleCategoriesIcon = Icons.Material.Filled.KeyboardArrowDown;
+    private bool showCategories = false;
+    private bool isAddCategoryDisabled = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        units = (await UnitService.GetUnitsForDropdown()).ToList();
+        RecipeSectionErrors = RecipeModel.Item.Sections.ToDictionary(section => section.SectionType, section => new List<string>());
+        StateHasChanged();
+    }
+
+    private async Task HandleIngredientsChanged(ICollection<RecipeIngredientModel> ingredients)
+    {
+        RecipeModel.Item.Ingredients = ingredients;
+        ingredientsMessages = (await ingredientsValidator.ValidateAsync(ingredients)).Errors.Select(e => e.ErrorMessage);
+    }
+
+    private async Task HandleSectionChanged(RecipeSectionModel section)
+    {
+        RecipeSectionModel existingSection = RecipeModel.Item.Sections.First(s => s.SectionType == section.SectionType);
+        existingSection.Steps = section.Steps;
+        RecipeSectionErrors[section.SectionType] = (await sectionValidator.ValidateAsync(section)).Errors.Select(e => e.ErrorMessage).ToList();
+    }
+
+    private async Task<IEnumerable<IngredientForDropdownModel>> SearchIngredients(string value, CancellationToken cancellationToken)
+    {
+        if (string.IsNullOrEmpty(value) || !string.IsNullOrEmpty(value) && value != RecipeModel.Item.IngredientId?.Name)
+        {
+            ingredients = await IngredientService.GetIngredientsForDropdownModel(value, cancellationToken);
+        }
+
+        return ingredients;
+    }
+
+    private async Task<IEnumerable<RecipeCategoryForDropdownModel>> SearchCategories(string value, CancellationToken cancellationToken)
+    {
+        if (string.IsNullOrEmpty(value) || !string.IsNullOrEmpty(value) && value != selectedCategory?.Name)
+        {
+            categories = await RecipeCategoryService.GetCategoriesForDropdown(value);
+        }
+
+        return categories;
+    }
+
+    private void AddCategory()
+    {
+        selectedCategories.Add(selectedCategory);
+        RecipeModel.Item.Categories.Add(selectedCategory.Id);
+        isAddCategoryDisabled = true;
+    }
+
+    private void RemoveCategory(MudChip<RecipeCategoryForDropdownModel> chip)
+    {
+        RecipeModel.Item.Categories.Remove(chip.Value!.Id);
+        selectedCategories.Remove(chip.Value!);
+        isAddCategoryDisabled = selectedCategory is null || RecipeModel.Item.Categories.Any(category => category == selectedCategory.Id);
+        categoriesMessages = selectedCategories.Any() ? [] : ["Recipe requires at least one category"];
+    }
+
+    private void ToggleCategories()
+    {
+        showCategories = !showCategories;
+        toggleCategoriesIcon = showCategories
+                             ? Icons.Material.Filled.KeyboardArrowUp
+                             : Icons.Material.Filled.KeyboardArrowDown;
+    }
+
+    private void OnSelectedCategoryChanged(RecipeCategoryForDropdownModel value)
+    {
+        selectedCategory = value;
+        isAddCategoryDisabled = selectedCategory is null || RecipeModel.Item.Categories.Any(category => category == selectedCategory.Id);
+    }
+
+    private async Task SaveRecipe()
+    {
+        if (await ValidateForm())
+        {
+            await RecipeService.CreateRecipe(RecipeModel.Item);
+        }
+    }
+
+    private async Task<bool> ValidateForm()
+    {
+        await Form.Validate();
+
+        foreach(RecipeSectionModel section in RecipeModel.Item.Sections)
+        {
+            RecipeSectionErrors[section.SectionType] = (await sectionValidator.ValidateAsync(section)).Errors.Select(e => e.ErrorMessage).ToList();
+        }
+
+        ingredientsMessages = (await ingredientsValidator.ValidateAsync(RecipeModel.Item.Ingredients)).Errors.Select(e => e.ErrorMessage);
+
+        categoriesMessages = RecipeModel.Item.Categories.Any() ? [] : ["Recipe requires at least one category"];
+
+        return Form.IsValid && RecipeSectionErrors.Values.All(errors => !errors.Any()) && !ingredientsMessages.Any() && !categoriesMessages.Any();
+    }
+}

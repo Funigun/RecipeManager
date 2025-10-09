@@ -16,6 +16,8 @@ public interface IIngredientService
 
     Task<HateoasResponse<IngredientForManageModel>> GetIngredientById(Guid id, CancellationToken cancellationToken = default);
 
+    Task<IEnumerable<IngredientForDropdownModel>> GetIngredientsForDropdownModel(string ingredientName, CancellationToken cancellationToken = default);
+
     Task UpdateIngredient(string relativeUri, IngredientForUpdateModel ingredientForUpdate, CancellationToken cancellationToken = default);
 
     Task DeleteIngredient(string relativeUri);

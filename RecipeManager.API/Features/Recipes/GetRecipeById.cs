@@ -30,8 +30,10 @@ public static class GetRecipeById
 
     public sealed record RecipeCategoryDto(Guid Id, string Name);
 
+    public sealed record IngredientDto(Guid Id, string Name);
+
     public sealed record Response(string Title, string Description, string? ImageUrl, string? VideoUrl, RecipeAmountDto Amount, byte NumberOfServings, int Difficulty,
-                                  IEnumerable<RecipeIngredientDto> Ingredients, IEnumerable<RecipeSectionDto> Sections, IEnumerable<RecipeCategoryDto> CategoryIds, Guid? IngredientId);
+                                  IEnumerable<RecipeIngredientDto> Ingredients, IEnumerable<RecipeSectionDto> Sections, IEnumerable<RecipeCategoryDto> Categories, IngredientDto? IngredientId);
 
     [GroupEndpoint("Recipes")]
     public sealed class Endpoint : IEndpoint
@@ -94,6 +96,9 @@ public static class GetRecipeById
         IEnumerable<RecipeSectionDto> sections = recipe.Sections.Select(MapRecipeSectionDto);
         IEnumerable<RecipeCategoryDto> categories = recipeCategories.Select(c => new RecipeCategoryDto(c.Id.Value, c.Name));
 
+        Ingredient? ingredient = recipeIngredients.FirstOrDefault(i => i.Id == recipe.IngredientId);
+        IngredientDto? ingredientDto = ingredient == null ? null : new IngredientDto(ingredient.Id.Value, ingredient.Name);
+
         return new Response
         (
             recipe.Title,
@@ -106,7 +111,7 @@ public static class GetRecipeById
             ingredients,
             sections,
             categories,
-            recipe.IngredientId?.Value
+            ingredientDto
         );
     }
 

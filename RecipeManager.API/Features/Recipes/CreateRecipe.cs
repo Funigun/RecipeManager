@@ -14,16 +14,20 @@ namespace RecipeManager.Api.Features.Recipes;
 
 public static class CreateRecipe
 {
-    public sealed record RecipeIngredientDto(Guid IngredientId, Guid UnitId, double Amount);
+    public sealed record RecipeIngredientDto(IngredientDto Ingredient, UnitDto Unit, double Amount);
 
-    public sealed record RecipeAmountDto(double Value, Guid UnitId);
+    public sealed record IngredientDto(Guid Id);
+
+    public sealed record UnitDto(Guid Id);
+
+    public sealed record RecipeAmountDto(double Amount, UnitDto Unit);
 
     public sealed record RecipeSectionDto(int SectionType, IEnumerable<RecipeStepDto> Steps);
 
     public sealed record RecipeStepDto(int Order, string Description, string? ImageUrl);
 
     public sealed record Request(string Title, string Description, string? ImageUrl, string? VideoUrl, RecipeAmountDto Amount, byte NumberOfServings, int Difficulty,
-                                 IEnumerable<RecipeIngredientDto> Ingredients, IEnumerable<RecipeSectionDto> Sections, IEnumerable<Guid> CategoryIds, Guid? IngredientId);
+                                 IEnumerable<RecipeIngredientDto> Ingredients, IEnumerable<RecipeSectionDto> Sections, IEnumerable<Guid> Categories, Guid? IngredientId);
 
     public sealed record Response(Guid Id);
 
@@ -35,8 +39,8 @@ public static class CreateRecipe
             RuleFor(x => x.Description).SetValidator(new RecipeDescriptionValidator());
             RuleFor(x => x.ImageUrl).SetValidator(new RecipeImageUrlValidator());
             RuleFor(x => x.VideoUrl).SetValidator(new RecipeVideoUrlValidator());
-            RuleFor(x => x.Amount.Value).SetValidator(new RecipeAmountValidator());
-            RuleFor(x => x.Amount.UnitId).NotEmpty()
+            RuleFor(x => x.Amount.Amount).SetValidator(new RecipeAmountValidator());
+            RuleFor(x => x.Amount.Unit.Id).NotEmpty()
                 .MustAsync(async (unitId, cancellationToken) =>
                 {
                     return await dbContext.Units.AsNoTracking()
@@ -52,7 +56,7 @@ public static class CreateRecipe
             RuleFor(x => x.Ingredients).SetValidator(new RecipeIngredientsValidator(dbContext));
             RuleFor(x => x.Sections).SetValidator(new RecipeSectionsValidator());
 
-            RuleFor(x => x.CategoryIds)
+            RuleFor(x => x.Categories)
                 .Must(ids => ids.Distinct().Count() == ids.Count())
                     .WithMessage("Duplicate categories are not allowed.")
                 .MustAsync(async (categoryIds, cancellationToken) =>
@@ -89,7 +93,7 @@ public static class CreateRecipe
                         return true;
                     }
 
-                    return !request.Ingredients.Any(ingredient => ingredient.IngredientId == ingredientId.Value);
+                    return !request.Ingredients.Any(ingredient => ingredient.Ingredient.Id == ingredientId.Value);
                 })
                 .WithMessage("List of ingredients can not contain an ingredient for which this recipe is designed");
         }
@@ -103,7 +107,7 @@ public static class CreateRecipe
                 .NotEmpty()
                 .MustAsync(async (ingredients, cancellationToken) =>
                 {
-                    IEnumerable<IngredientId> ingredientIds = ingredients.Select(i => new IngredientId(i.IngredientId));
+                    IEnumerable<IngredientId> ingredientIds = ingredients.Select(i => new IngredientId(i.Ingredient.Id));
 
                     return await dbContext.Ingredients.AsNoTracking()
                                                        .Where(ingredient => ingredientIds.Contains(ingredient.Id))
@@ -112,7 +116,7 @@ public static class CreateRecipe
                 .WithMessage("Some of ingredients does not exist")
                 .MustAsync(async (ingredients, cancellationToken) =>
                 {
-                    IEnumerable<UnitId> unitIds = ingredients.Select(i => new UnitId(i.UnitId));
+                    IEnumerable<UnitId> unitIds = ingredients.Select(i => new UnitId(i.Unit.Id));
 
                     return await dbContext.Units.AsNoTracking()
                                                  .Where(unit => unitIds.Contains(unit.Id))
@@ -122,7 +126,7 @@ public static class CreateRecipe
                 .WithMessage("Some of units does not exist")
                 .Must(ingredients =>
                 {
-                    return ingredients.Select(i => i.IngredientId).Distinct().Count() == ingredients.Count();
+                    return ingredients.Select(i => i.Ingredient.Id).Distinct().Count() == ingredients.Count();
                 })
                 .WithMessage("Duplicate ingredients are not allowed");
 
@@ -217,7 +221,7 @@ public static class CreateRecipe
             (RecipeDifficulty)request.Difficulty,
             request.Ingredients.Select(ToDomain),
             request.Sections.Select(ToDomain),
-            request.CategoryIds.Select(c => new RecipeCategoryId(c)),
+            request.Categories.Select(c => new RecipeCategoryId(c)),
             request.IngredientId is Guid id ? new IngredientId(id) : null!,
             request.Description,
             request.ImageUrl,
@@ -227,15 +231,15 @@ public static class CreateRecipe
 
     private static RecipeAmount ToDomain(this RecipeAmountDto dto)
     {
-        return new(dto.Value, new UnitId(dto.UnitId));
+        return new(dto.Amount, new UnitId(dto.Unit.Id));
     }
 
     private static RecipeIngredient ToDomain(this RecipeIngredientDto dto)
     {
         return RecipeIngredient.Create
         (
-            new IngredientId(dto.IngredientId),
-            new UnitId(dto.UnitId),
+            new IngredientId(dto.Ingredient.Id),
+            new UnitId(dto.Unit.Id),
             dto.Amount
         );
     }
