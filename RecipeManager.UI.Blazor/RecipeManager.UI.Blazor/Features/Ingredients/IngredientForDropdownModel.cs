@@ -6,5 +6,5 @@ public sealed class IngredientForDropdownModel
 
     public string Name { get; set; }
 
-    public string? RecipeUrl { get; set; }
+    public string? IngredientRecipe { get; set; }
 }

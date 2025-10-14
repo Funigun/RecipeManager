@@ -1,4 +1,6 @@
-﻿namespace RecipeManager.UI.Blazor.Features.Recipes.Models;
+﻿using System.Text.Json.Serialization;
+
+namespace RecipeManager.UI.Blazor.Features.Recipes.Models;
 
 public sealed class RecipeSectionModel
 {
@@ -8,14 +10,18 @@ public sealed class RecipeSectionModel
 
     public bool IsRequired { get; set; }
 
+    public RecipeSectionModel()
+    {
+
+    }
+
     public RecipeSectionModel(RecipeSectionType recipeSectionType, ICollection<RecipeStepModel> recipeSteps, bool isRequired)
     {
         SectionType = recipeSectionType;
-
         Steps = recipeSteps;
         IsRequired = isRequired;
     }
 
+    [JsonIgnore]
     public string SectionHeader => $"{SectionType.ToString()}{(IsRequired ? "*" : string.Empty)}";
-
-};
+}

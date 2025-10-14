@@ -16,7 +16,7 @@ public static class CreateRecipe
 {
     public sealed record RecipeIngredientDto(IngredientDto Ingredient, UnitDto Unit, double Amount);
 
-    public sealed record IngredientDto(Guid Id);
+    public sealed record IngredientDto(Guid Id, Guid? IngredientRecipe);
 
     public sealed record UnitDto(Guid Id);
 
@@ -26,8 +26,10 @@ public static class CreateRecipe
 
     public sealed record RecipeStepDto(int Order, string Description, string? ImageUrl);
 
+    public sealed record RecipeCategory(Guid Id);
+
     public sealed record Request(string Title, string Description, string? ImageUrl, string? VideoUrl, RecipeAmountDto Amount, byte NumberOfServings, int Difficulty,
-                                 IEnumerable<RecipeIngredientDto> Ingredients, IEnumerable<RecipeSectionDto> Sections, IEnumerable<Guid> Categories, Guid? IngredientId);
+                                 IEnumerable<RecipeIngredientDto> Ingredients, IEnumerable<RecipeSectionDto> Sections, IEnumerable<RecipeCategory> Categories, Guid? IngredientId);
 
     public sealed record Response(Guid Id);
 
@@ -66,7 +68,7 @@ public static class CreateRecipe
                         return true;
                     }
 
-                    IEnumerable<RecipeCategoryId> recipeCategoryIds = categoryIds.Select(c => new RecipeCategoryId(c));
+                    IEnumerable<RecipeCategoryId> recipeCategoryIds = categoryIds.Select(c => new RecipeCategoryId(c.Id));
 
                     return await dbContext.RecipeCategories.AsNoTracking()
                                                             .Where(category => recipeCategoryIds.Contains(category.Id))
@@ -221,7 +223,7 @@ public static class CreateRecipe
             (RecipeDifficulty)request.Difficulty,
             request.Ingredients.Select(ToDomain),
             request.Sections.Select(ToDomain),
-            request.Categories.Select(c => new RecipeCategoryId(c)),
+            request.Categories.Select(c => new RecipeCategoryId(c.Id)),
             request.IngredientId is Guid id ? new IngredientId(id) : null!,
             request.Description,
             request.ImageUrl,

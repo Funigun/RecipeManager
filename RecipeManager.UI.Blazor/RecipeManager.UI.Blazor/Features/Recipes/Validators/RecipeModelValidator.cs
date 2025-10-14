@@ -6,7 +6,7 @@ using RecipeManager.UI.Blazor.Features.Recipes.Models;
 
 namespace RecipeManager.UI.Blazor.Features.Recipes.Validators;
 
-public sealed class RecipeModelValidator : BaseAbstractValidator<HateoasResponse<RecipeModel>>
+public sealed class RecipeModelValidator : BaseAbstractValidator<HateoasResponse<RecipeForManageModel>>
 {
     public RecipeModelValidator()
     {

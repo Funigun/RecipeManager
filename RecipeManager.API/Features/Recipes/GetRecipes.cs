@@ -14,7 +14,7 @@ namespace RecipeManager.Api.Features.Recipes;
 
 public static class GetRecipes
 {
-    public sealed record GetRecipesParameters(int PageNumber = 1, int PageSize = 10) : PagedParameters(PageNumber, PageSize);
+    public sealed record GetRecipesParameters(IEnumerable<Guid> Categories, IEnumerable<Guid> Ingredients, int PageNumber = 1, int PageSize = 10) : PagedParameters(PageNumber, PageSize);
 
     public sealed record RecipeDto(Guid Id, string Title, string? ImageUrl, int Difficulty, byte NumberOfServings);
 
@@ -34,6 +34,16 @@ public static class GetRecipes
     public static async Task<Ok<HateoasResponse<Response>>> Handler([AsParameters] GetRecipesParameters parameters, [FromServices] IAppDbContext dbContext, [FromServices] IHateoasBuilderFactory hateoasBuilderFactory, CancellationToken cancellationToken)
     {
         IQueryable<Recipe> recipesQuery = dbContext.Recipes.AsNoTracking();
+
+        if (parameters.Categories.Any())
+        {
+            recipesQuery = recipesQuery.Where(r => r.Categories.Any(c => parameters.Categories.Contains(c.Value)));
+        }
+
+        if (parameters.Ingredients.Any())
+        {
+            recipesQuery = recipesQuery.Where(r => r.Ingredients.Any(i => parameters.Ingredients.Contains(i.IngredientId.Value)));
+        }
 
         int totalCount = await recipesQuery.CountAsync(cancellationToken);
 
@@ -56,6 +66,7 @@ public static class GetRecipes
         HateoasResponseBuilder<Response> responsebuilder = hateoasBuilderFactory.ForItem(response);
 
         responsebuilder.AddPagedNavigation("GetRecipes", new { page, pageSize });
+        responsebuilder.AddPost(LinkOptions.Create("CreateRecipe", HateoasRelConstants.Create, true), null);
 
         return responsebuilder.Build();
     }

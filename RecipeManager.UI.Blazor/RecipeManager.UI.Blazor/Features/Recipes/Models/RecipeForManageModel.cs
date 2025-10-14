@@ -1,9 +1,12 @@
 ﻿using RecipeManager.UI.Blazor.Features.Ingredients;
+using RecipeManager.UI.Blazor.Features.RecipeCategories.Models;
 
 namespace RecipeManager.UI.Blazor.Features.Recipes.Models;
 
-public sealed class RecipeModel
+public sealed class RecipeForManageModel
 {
+    public Guid Id { get; set; }
+
     public string Title { get; set; }
 
     public string Description { get; set; }
@@ -28,7 +31,7 @@ public sealed class RecipeModel
         new(RecipeSectionType.Serving, [], false)
     ];
 
-    public List<Guid> Categories { get; set; } = [];
+    public List<RecipeCategoryForDropdownModel> Categories { get; set; } = [];
 
-    public IngredientForDropdownModel? IngredientId { get; set; }
+    public IngredientForDropdownModel? Ingredient { get; set; }
 }

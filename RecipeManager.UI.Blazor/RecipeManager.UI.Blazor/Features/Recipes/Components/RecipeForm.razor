@@ -4,6 +4,7 @@
 @using MudBlazor
 @using RecipeManager.UI.Blazor.Brokers.HateoasModel
 @using RecipeManager.UI.Blazor.Components.Common
+@using RecipeManager.UI.Blazor.Components.Common.DialogMessage
 @using RecipeManager.UI.Blazor.Features.Ingredients
 @using RecipeManager.UI.Blazor.Features.Ingredients.Services
 @using RecipeManager.UI.Blazor.Features.RecipeCategories.Models
@@ -18,6 +19,7 @@
 @inject IRecipeService RecipeService
 @inject IIngredientService IngredientService
 @inject IRecipeCategoryService RecipeCategoryService
+@inject IDialogMessageService DialogService
 
 <MudForm @ref="Form" Model="RecipeModel" Validation="@(validator.ValidateValue)" @bind-IsValid="@isSubmitEnabled" @rendermode="RenderMode.InteractiveAuto">
     <MudStack Spacing="5">
@@ -49,7 +51,7 @@
                 </MudStack>
 
                
-                 <MudAutocomplete T="IngredientForDropdownModel" Label="Assigned ingredient" @bind-Value="RecipeModel.Item.IngredientId" ShowProgressIndicator="true"
+                 <MudAutocomplete T="IngredientForDropdownModel" Label="Assigned ingredient" @bind-Value="RecipeModel.Item.Ingredient" ShowProgressIndicator="true"
                                   SearchFunc="SearchIngredients" ToStringFunc="@(e => e == null ? null : e.Name)" style="width: 300px" Clearable=true/>
             </MudExpansionPanel>
 
@@ -71,7 +73,7 @@
 
                         <div style="max-height: 80px; overflow-y:auto">
                             <MudChipSet T="RecipeCategoryForDropdownModel" AllClosable OnClose="RemoveCategory">
-                                @foreach (var category in selectedCategories)
+                                @foreach (var category in RecipeModel.Item.Categories)
                                 {
                                     <MudChip Text="@category.Name" Value="category" Color="Color.Primary" />
                                 }
@@ -107,18 +109,27 @@
             }
         </MudExpansionPanels>
 
-        <MudGrid Class="mt-4">
-            <MudItem xs="6">
-                <MudButton Variant="Variant.Outlined" Color="Color.Default" FullWidth="false">
-                    Back
-                </MudButton>
-            </MudItem>
-            <MudItem xs="6" Class="d-flex justify-end">
-                <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="SaveRecipe">
-                    Save
-                </MudButton>
-            </MudItem>
-        </MudGrid>
+        @if (@isEditMode == false || (@isEditMode && @RecipeModel.Links.FirstOrDefault(link => link.Rel == HateoasConstants.Update) != null))
+        {
+            <MudGrid Class="mt-4">
+                <MudItem xs="6">
+                    <MudButton Variant="Variant.Outlined" Color="Color.Default" FullWidth="false">
+                        Back
+                    </MudButton>
+                </MudItem>
+                <MudItem xs="6" Class="d-flex justify-end">
+                    @if (@RecipeModel.Links.FirstOrDefault(link => link.Rel == HateoasConstants.Delete) != null)
+                    {
+                        <MudButton Variant="Variant.Filled" Color="Color.Error" OnClick="DeleteRecipe" Style="margin-right: 20px">
+                            Delete
+                        </MudButton>
+                    }
+                    <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="SaveRecipe">
+                        Save
+                    </MudButton>
+                </MudItem>
+            </MudGrid>
+        }
 
         <CustomValidationSummary ErrorMessages="@errorMessages" /> 
      </MudStack>
@@ -126,12 +137,13 @@
 
 @code {
     [Parameter]
-    public HateoasResponse<RecipeModel> RecipeModel { get; set; } = new HateoasResponse<RecipeModel>();
+    public HateoasResponse<RecipeForManageModel> RecipeModel { get; set; } = new HateoasResponse<RecipeForManageModel>();
 
     [Parameter]
-    public EventCallback<HateoasResponse<RecipeModel>> OnValidSubmit { get; set; }
+    public EventCallback<HateoasResponse<RecipeForManageModel>> OnValidSubmit { get; set; }
 
     private MudForm Form { get; set; }
+    private bool isEditMode => RecipeModel.Item.Id != Guid.Empty;
 
     private IEnumerable<IngredientForDropdownModel> ingredients = [];
     private ICollection<UnitForDropdownModel> units { get; set; } = [];
@@ -148,7 +160,6 @@
     private IEnumerable<string> categoriesMessages = [];
 
     private IEnumerable<RecipeCategoryForDropdownModel> categories = [];
-    private List<RecipeCategoryForDropdownModel> selectedCategories = [];
     private RecipeCategoryForDropdownModel selectedCategory = new();
     private string toggleCategoriesIcon = Icons.Material.Filled.KeyboardArrowDown;
     private bool showCategories = false;
@@ -176,7 +187,7 @@
 
     private async Task<IEnumerable<IngredientForDropdownModel>> SearchIngredients(string value, CancellationToken cancellationToken)
     {
-        if (string.IsNullOrEmpty(value) || !string.IsNullOrEmpty(value) && value != RecipeModel.Item.IngredientId?.Name)
+        if (string.IsNullOrEmpty(value) || !string.IsNullOrEmpty(value) && value != RecipeModel.Item.Ingredient?.Name)
         {
             ingredients = await IngredientService.GetIngredientsForDropdownModel(value, cancellationToken);
         }
@@ -196,17 +207,15 @@
 
     private void AddCategory()
     {
-        selectedCategories.Add(selectedCategory);
-        RecipeModel.Item.Categories.Add(selectedCategory.Id);
+        RecipeModel.Item.Categories.Add(selectedCategory);
         isAddCategoryDisabled = true;
     }
 
     private void RemoveCategory(MudChip<RecipeCategoryForDropdownModel> chip)
     {
-        RecipeModel.Item.Categories.Remove(chip.Value!.Id);
-        selectedCategories.Remove(chip.Value!);
-        isAddCategoryDisabled = selectedCategory is null || RecipeModel.Item.Categories.Any(category => category == selectedCategory.Id);
-        categoriesMessages = selectedCategories.Any() ? [] : ["Recipe requires at least one category"];
+        RecipeModel.Item.Categories.Remove(chip.Value!);
+        isAddCategoryDisabled = selectedCategory is null || RecipeModel.Item.Categories.Any(category => category.Id == selectedCategory.Id);
+        categoriesMessages = RecipeModel.Item.Categories.Any() ? [] : ["Recipe requires at least one category"];
     }
 
     private void ToggleCategories()
@@ -220,14 +229,21 @@
     private void OnSelectedCategoryChanged(RecipeCategoryForDropdownModel value)
     {
         selectedCategory = value;
-        isAddCategoryDisabled = selectedCategory is null || RecipeModel.Item.Categories.Any(category => category == selectedCategory.Id);
+        isAddCategoryDisabled = selectedCategory is null || RecipeModel.Item.Categories.Any(category => category.Id == selectedCategory.Id);
     }
 
     private async Task SaveRecipe()
     {
         if (await ValidateForm())
         {
-            await RecipeService.CreateRecipe(RecipeModel.Item);
+            if (isEditMode)
+            {
+                await RecipeService.UpdateRecipe(RecipeModel.Links.First(link => link.Rel == HateoasConstants.Update).Href, RecipeModel.Item);
+            }
+            else
+            {
+                await RecipeService.CreateRecipe(RecipeModel.Item);
+            }
         }
     }
 
@@ -245,5 +261,13 @@
         categoriesMessages = RecipeModel.Item.Categories.Any() ? [] : ["Recipe requires at least one category"];
 
         return Form.IsValid && RecipeSectionErrors.Values.All(errors => !errors.Any()) && !ingredientsMessages.Any() && !categoriesMessages.Any();
+    }
+
+    private async Task DeleteRecipe()
+    {
+        if (await DialogService.ShowDeleteConfirmationMessage())
+        {
+            await RecipeService.DeleteRecipe(RecipeModel.Links.First(link => link.Rel == HateoasConstants.Delete).Href);
+        }
     }
 }

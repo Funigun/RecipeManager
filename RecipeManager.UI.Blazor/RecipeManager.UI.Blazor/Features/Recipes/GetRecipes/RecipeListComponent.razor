@@ -1,0 +1,49 @@
+﻿@using MudBlazor
+@using RecipeManager.UI.Blazor.Brokers.HateoasModel
+@using RecipeManager.UI.Blazor.Features.Recipes.Models
+@using RecipeManager.UI.Blazor.Features.Recipes.Services
+
+@inject IRecipeService RecipeService;
+
+<MudGrid @ref="@table" T="HateoasResponse<RecipeModel>" Items="RecipesPage.Item.Recipes" Loading="ShowLoadingBar" Virtualize="true" FixedHeader="true"
+         Style="width: 1300px; min-height: 450px; max-height: 2500px; margin-top: 50px; justify-self:center !important; justify-content: center !important; overflow-y: hidden;">
+
+    @for (int i = 0; i < RecipesPage.Item.Recipes.Count; i++)
+        {
+            HateoasResponse<RecipeModel> recipe = RecipesPage.Item.Recipes[i];
+
+            <MudItem Style="width: 350px; margin-top: 25px; padding: 0px">
+            <MudPaper Class="d-flex align-center justify-center mud-width-full py-8" style="border: none; padding: 0px !important" Outlined=true>
+                    <MudStack Spacing="5">
+                        @if (!string.IsNullOrEmpty(recipe.Item.ImageURL))
+                        {
+                            <MudImage Image="recipe.Item.ImageUrl" Style="width: 300px; height:300px" />
+                        }
+                        else
+                        {
+                            <MudIconButton Icon="@Icons.Material.Filled.QuestionMark" Size="Size.Large" Style="width: 300px; height: 300px" Color="Color.Primary" OnClick="(() => OpenRecipe(recipe))"></MudIconButton>
+                        }
+                    <MudText Style="width: 300px;" Typo="Typo.h6">@recipe.Item.Title</MudText>
+                    </MudStack>
+                </MudPaper>
+            </MudItem>
+        }
+</MudGrid>
+
+<MudPagination Style="justify-self:center !important; justify-content: center !important;" Class="d-flex align-center"></MudPagination>
+
+@code {
+    [Parameter]
+    public HateoasResponse<RecipesPageModel> RecipesPage { get; set; } = new();
+
+    [Parameter]
+    public bool ShowLoadingBar { get; set; } = true;
+
+    private MudGrid table;
+
+
+    private void OpenRecipe(HateoasResponse<RecipeModel> selectedItem)
+    {
+        RecipeService.OpenUpdateRecipePage(selectedItem.Item.Id);
+    }
+}

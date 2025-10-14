@@ -45,7 +45,7 @@ public sealed class CreateRecipeTests : BaseIntegrationTest
         IngredientId ingredientId = (await DbContext.Ingredients.AsNoTracking().FirstAsync(CancellationToken.None)).Id;
 
         CreateRecipe.RecipeAmountDto amount = new(10d, new(unitId.Value));
-        CreateRecipe.RecipeIngredientDto ingredientDto = new(new(ingredientId.Value), new(unitId.Value), 10d);
+        CreateRecipe.RecipeIngredientDto ingredientDto = new(new(ingredientId.Value, null), new(unitId.Value), 10d);
         CreateRecipe.RecipeSectionDto ingredientsPreparation = new((int)RecipeSectionType.IngredientsPreparation, [new CreateRecipe.RecipeStepDto(1, "Test", null)]);
         CreateRecipe.RecipeSectionDto cooking = new((int)RecipeSectionType.Cooking, [new CreateRecipe.RecipeStepDto(1, "Test 2", null)]);
 
