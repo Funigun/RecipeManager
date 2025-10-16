@@ -118,11 +118,11 @@ public static class CreateRecipe
                 .WithMessage("Some of ingredients does not exist")
                 .MustAsync(async (ingredients, cancellationToken) =>
                 {
-                    IEnumerable<UnitId> unitIds = ingredients.Select(i => new UnitId(i.Unit.Id));
+                    IEnumerable<UnitId> unitIds = ingredients.Select(i => new UnitId(i.Unit.Id)).Distinct();
 
                     return await dbContext.Units.AsNoTracking()
-                                                 .Where(unit => unitIds.Contains(unit.Id))
-                                                 .CountAsync(cancellationToken) == ingredients.Count();
+                                                .Where(unit => unitIds.Contains(unit.Id))
+                                                .CountAsync(cancellationToken) == unitIds.Count();
 
                 })
                 .WithMessage("Some of units does not exist")

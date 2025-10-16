@@ -20,4 +20,24 @@ public sealed record RecipeSection
             Steps = steps.ToList()
         };
     }
+
+    public void UpdateSection(RecipeSection recipeSection)
+    {
+        IEnumerable<RecipeStep> stepsToRemove = Steps.Where(step => step.Order > recipeSection.Steps.Count);
+        Steps = Steps.Except(stepsToRemove).ToList();
+
+        foreach (RecipeStep existingStep in Steps)
+        {
+            RecipeStep updatedStep = recipeSection.Steps.First(step => step.Order == existingStep.Order);
+            existingStep.Description = updatedStep.Description;
+            existingStep.ImageUrl = updatedStep.ImageUrl;
+        }
+
+        IEnumerable<RecipeStep> stepsToAdd = recipeSection.Steps.Where(step => step.Order > Steps.Count);
+
+        foreach (RecipeStep newStep in stepsToAdd)
+        {
+            Steps.Add(newStep);
+        }
+    }
 }

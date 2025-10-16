@@ -29,8 +29,10 @@ public sealed class IngredientService(IRecipeApi recipeApi, NavigationManager na
             IngredientCreationResponse createdIngredientId = await response.Content.ReadFromJsonAsync<IngredientCreationResponse>(cancellationToken: cancellationToken);
             return createdIngredientId!.Id;
         }
-
-        ResponseBody = (await response.Content.ReadFromJsonAsync<ApiResponseBody>(cancellationToken: cancellationToken))!;
+        else
+        {
+            ResponseBody = (await response.Content.ReadFromJsonAsync<ApiResponseBody>(cancellationToken: cancellationToken))!;
+        }
 
         return Guid.Empty;
     }

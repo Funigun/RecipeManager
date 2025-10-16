@@ -64,8 +64,8 @@ public sealed class HateoasResponseBuilder<TItem>(TItem item, HateoasLinkService
                                             ? new Dictionary<string, object>(baseRouteValues as IDictionary<string, object> ?? baseRouteValues.GetType().GetProperties().ToDictionary(p => p.Name, p => p.GetValue(baseRouteValues)!))
                                             : [];
 
-            dict["page"] = page;
-            dict["pageSize"] = paged.PageSize;
+            dict["Page"] = page;
+            dict["PageSize"] = paged.PageSize;
             return dict;
         }
 

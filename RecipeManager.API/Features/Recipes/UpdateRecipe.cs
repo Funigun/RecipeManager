@@ -128,11 +128,11 @@ public static class UpdateRecipe
                 .WithMessage("Some of ingredients does not exist")
                 .MustAsync(async (ingredients, cancellationToken) =>
                 {
-                    IEnumerable<UnitId> unitIds = ingredients.Select(i => new UnitId(i.Unit.Id));
+                    IEnumerable<UnitId> unitIds = ingredients.Select(i => new UnitId(i.Unit.Id)).Distinct();
 
                     return await dbContext.Units.AsNoTracking()
-                                                 .Where(unit => unitIds.Contains(unit.Id))
-                                                 .CountAsync(cancellationToken) == ingredients.Count();
+                                                .Where(unit => unitIds.Contains(unit.Id))
+                                                .CountAsync(cancellationToken) == unitIds.Count();
 
                 })
                 .WithMessage("Some of units does not exist")
@@ -217,8 +217,12 @@ public static class UpdateRecipe
     public static async Task<IResult> Handler(Request recipeId, [FromBody] RecipeDto recipeDto, [FromServices] IAppDbContext dbContext, [FromServices] ICurrentUser currentUser, CancellationToken cancellationToken)
     {
         RecipeId id = new(recipeId.Id);
-        Recipe recipe = await dbContext.Recipes.AsNoTracking()
-                                               .FirstOrDefaultAsync(r => r.Id == id && r.CreatedBy == currentUser.Id, cancellationToken)
+        Recipe recipe = await dbContext.Recipes
+                                       .Include(recipe => recipe.Ingredients)
+                                       .Include(recipe => recipe.Sections)
+                                            .ThenInclude(section => section.Steps)
+                                       .Include(recipe => recipe.Categories)
+                                       .FirstOrDefaultAsync(r => r.Id == id && r.CreatedBy == currentUser.Id, cancellationToken)
                      ?? throw new EntityNotFoundException<Recipe, RecipeId>(id);
 
         UpdateRecipeData(recipe, recipeDto);

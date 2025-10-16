@@ -5,6 +5,7 @@
 @using RecipeManager.UI.Blazor.Brokers.HateoasModel
 @using RecipeManager.UI.Blazor.Components.Common
 @using RecipeManager.UI.Blazor.Components.Common.DialogMessage
+@using RecipeManager.UI.Blazor.Components.Extensions
 @using RecipeManager.UI.Blazor.Features.Ingredients
 @using RecipeManager.UI.Blazor.Features.Ingredients.Services
 @using RecipeManager.UI.Blazor.Features.RecipeCategories.Models
@@ -21,10 +22,16 @@
 @inject IRecipeCategoryService RecipeCategoryService
 @inject IDialogMessageService DialogService
 
-<MudForm @ref="Form" Model="RecipeModel" Validation="@(validator.ValidateValue)" @bind-IsValid="@isSubmitEnabled" @rendermode="RenderMode.InteractiveAuto">
+<MudForm @ref="Form" Model="RecipeModel" ReadOnly="@Mode.IsViewMode()" Validation="@(validator.ValidateValue)" @bind-IsValid="@isSubmitEnabled" @rendermode="RenderMode.InteractiveAuto">
     <MudStack Spacing="5">
         <div style="align-self: center; width: 75%">
             <MudTextField Required Label="Title" For="@(() => RecipeModel.Item.Title)" @bind-Value="RecipeModel.Item.Title" />
+            @if (Mode.IsViewMode() && @RecipeModel.Links.FirstOrDefault(link => link.Rel == HateoasConstants.Update) != null)
+            {
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="ToggleEditRecipe">
+                Edit Recipe
+                </MudButton>
+            }
         </div>
        
         <MudExpansionPanels Multiexpansion="true">
@@ -109,7 +116,7 @@
             }
         </MudExpansionPanels>
 
-        @if (@isEditMode == false || (@isEditMode && @RecipeModel.Links.FirstOrDefault(link => link.Rel == HateoasConstants.Update) != null))
+        @if (Mode.IsCreateMode() || (Mode.IsEditMode() && @RecipeModel.Links.FirstOrDefault(link => link.Rel == HateoasConstants.Update) != null))
         {
             <MudGrid Class="mt-4">
                 <MudItem xs="6">
@@ -118,7 +125,7 @@
                     </MudButton>
                 </MudItem>
                 <MudItem xs="6" Class="d-flex justify-end">
-                    @if (@RecipeModel.Links.FirstOrDefault(link => link.Rel == HateoasConstants.Delete) != null)
+                    @if (Mode.IsEditMode() && @RecipeModel.Links.FirstOrDefault(link => link.Rel == HateoasConstants.Delete) != null)
                     {
                         <MudButton Variant="Variant.Filled" Color="Color.Error" OnClick="DeleteRecipe" Style="margin-right: 20px">
                             Delete
@@ -142,8 +149,10 @@
     [Parameter]
     public EventCallback<HateoasResponse<RecipeForManageModel>> OnValidSubmit { get; set; }
 
+    [Parameter]
+    public FormMode Mode { get; set; }
+
     private MudForm Form { get; set; }
-    private bool isEditMode => RecipeModel.Item.Id != Guid.Empty;
 
     private IEnumerable<IngredientForDropdownModel> ingredients = [];
     private ICollection<UnitForDropdownModel> units { get; set; } = [];
@@ -236,7 +245,7 @@
     {
         if (await ValidateForm())
         {
-            if (isEditMode)
+            if (Mode.IsEditMode())
             {
                 await RecipeService.UpdateRecipe(RecipeModel.Links.First(link => link.Rel == HateoasConstants.Update).Href, RecipeModel.Item);
             }
@@ -269,5 +278,11 @@
         {
             await RecipeService.DeleteRecipe(RecipeModel.Links.First(link => link.Rel == HateoasConstants.Delete).Href);
         }
+    }
+
+    private void ToggleEditRecipe(MouseEventArgs args)
+    {
+        Mode = Mode.IsViewMode() ? FormMode.Edit : FormMode.View;
+        StateHasChanged();
     }
 }
