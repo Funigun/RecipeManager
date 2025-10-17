@@ -3,12 +3,18 @@
 @using RecipeManager.UI.Blazor.Features.Recipes.Components
 @using RecipeManager.UI.Blazor.Features.Recipes.Models
 @using RecipeManager.UI.Blazor.Features.Recipes.Services
+@using RecipeManager.UI.Blazor.Features.Units
+@using RecipeManager.UI.Blazor.Features.Units.Services
 
 @inject IRecipeService RecipeService
+@inject IUnitService UnitService
 
-<MudPaper Class="pa-6 mx-auto" Style="width:1000px">
-    <RecipeForm RecipeModel="RecipeModel" Mode="Common.FormMode.View"></RecipeForm>
-</MudPaper>
+
+    <MudPaper Class="pa-6 mx-auto" Style="width:1000px">
+        <RecipeForm RecipeModel="RecipeModel" Mode="Common.FormMode.View"></RecipeForm>
+    </MudPaper>
+
+
 
 @code {
     [Parameter]

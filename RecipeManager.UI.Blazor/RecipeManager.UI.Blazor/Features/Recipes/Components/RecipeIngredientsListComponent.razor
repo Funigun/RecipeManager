@@ -1,4 +1,5 @@
 ﻿@using MudBlazor
+@using RecipeManager.UI.Blazor.Components.Common
 @using RecipeManager.UI.Blazor.Components.Common.DialogMessage
 @using RecipeManager.UI.Blazor.Components.Extensions;
 @using RecipeManager.UI.Blazor.Features.Ingredients
@@ -10,20 +11,22 @@
 @inject ISnackbar Snackbar
 @inject IDialogMessageService DialogService
 
-<MudTable T="RecipeIngredientModel" Items="Ingredients" @bind-selectedItems="selectedIngredients" FixedHeader="true" MultiSelection="true" SelectionChangeable="true">
-    <ToolBarContent>
-        <div style="margin-right: 10px; margin-left: 50px; width: 300px">
+
+@if (Mode.IsCreateOrEditMode())
+{
+    <MudStack Row=true Spacing="3" Style="margin-bottom: 25px; width: 800px; justify-self: end; margin-left: 20px">
+        <div style="margin-right: 10px; width: 350px">
             <MudAutocomplete T="IngredientForDropdownModel" Label="Ingredient" @bind-Value="newIngredient.Ingredient" ShowProgressIndicator="true"
                              SearchFunc="SearchIngredients" ToStringFunc="@(e => e == null ? null : e.Name)" style="width: 300px" />
         </div>
-        
+
         <div style="margin-right: 10px; width: 150px !important">
             <MudTextField T="double" Label="Amount" @bind-Value="newIngredient.Amount" Required="true"></MudTextField>
         </div>
 
         <div style="margin-right: 10px; width: 150px !important">
             <MudSelect T="UnitForDropdownModel" Label="Unit*" @bind-Value="newIngredient.Unit">
-                @foreach(var unit in Units)
+                @foreach (var unit in Units)
                 {
                     <MudSelectItem Value="@unit">@unit.Name</MudSelectItem>
                 }
@@ -32,7 +35,11 @@
 
         <MudIconButton Icon="@Icons.Material.Filled.Add" Color="Color.Primary" OnClick="AddIngredient" Disabled="@isAddIngredientDisabled" style="margin-right: 10px"></MudIconButton>
         <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Error" OnClick="RemoveSelectedIngredients" Disabled="!selectedIngredients.Any()" style="margin-right: 10px"></MudIconButton>
-    </ToolBarContent>
+    </MudStack>
+}
+
+<MudTable T="RecipeIngredientModel" Items="Ingredients" @bind-selectedItems="selectedIngredients" FixedHeader="true" 
+          MultiSelection="Mode.IsCreateOrEditMode()" SelectionChangeable="Mode.IsCreateOrEditMode()">
     <HeaderContent>
         <MudTh>Name</MudTh>
         <MudTh>Amount</MudTh>
@@ -53,7 +60,10 @@
     public EventCallback<ICollection<RecipeIngredientModel>> OnDataChanged { get; set; }
 
     [Parameter]
-    public ICollection<UnitForDropdownModel> Units { get; set; } = [];
+    public IEnumerable<UnitForDropdownModel> Units { get; set; } = [];
+
+    [CascadingParameter]
+    public FormMode Mode { get; set; }
 
     private IngredientForDropdownModel selectedIngredient = new();
     private RecipeIngredientModel newIngredient = new();

@@ -1,20 +1,31 @@
 ﻿@using MudBlazor
 @using RecipeManager.UI.Blazor.Components.Common
+@using RecipeManager.UI.Blazor.Components.Extensions
 @using RecipeManager.UI.Blazor.Features.Recipes.Models
 @using RecipeManager.UI.Blazor.Features.Recipes.Validators
 
 <MudForm T="RecipeSectionModel" Model="RecipeSection">
-     <MudStack Row=true Spacing="3">
-        <div style="margin-right: 10px; margin-left: 50px; width: 620px !important">
-            <MudTextField T="string" Label="Step Description*" @bind-Value="newStep.Description" style="width: 620px"></MudTextField>
-        </div>
-
-        <MudIconButton Icon="@Icons.Material.Filled.Add" Color="Color.Primary" OnClick="AddStep" Disabled="@(string.IsNullOrEmpty(newStep.Description))" style="margin-right: 10px"></MudIconButton>
-        <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Error" OnClick="RemoveSelectedSteps" Disabled="!selectedSteps.Any()" style="margin-right: 10px"></MudIconButton>
-    </MudStack>
-    <MudTable T="RecipeStepModel" Items="RecipeSection.Steps" @bind-selectedItems="selectedSteps" FixedHeader="true" MultiSelection="true" SelectionChangeable="true">
+    @if (Mode.IsCreateOrEditMode())
+    {
+        <MudStack Row=true Spacing="3">
+            <div style="margin-right: 10px; margin-left: 50px; width: 620px !important">
+                <MudTextField T="string" Label="Step Description*" @bind-Value="newStep.Description" style="width: 620px"></MudTextField>
+            </div>
+        
+            <MudIconButton Icon="@Icons.Material.Filled.Add" Color="Color.Primary" OnClick="AddStep" Disabled="@(string.IsNullOrEmpty(newStep.Description))" style="margin-right: 10px"></MudIconButton>
+            <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Error" OnClick="RemoveSelectedSteps" Disabled="!selectedSteps.Any()" style="margin-right: 10px"></MudIconButton>
+        </MudStack>
+    }
+    <MudTable T="RecipeStepModel" Items="RecipeSection.Steps" @bind-selectedItems="selectedSteps" FixedHeader="true" MultiSelection="@Mode.IsCreateOrEditMode()" SelectionChangeable="@Mode.IsCreateOrEditMode()">
         <HeaderContent>
-            <MudTh Style="width:850px">Details</MudTh>
+            @if(Mode.IsCreateOrEditMode())
+            {
+                <MudTh Style="width:850px">Details</MudTh>
+            }
+            else
+            {
+                <MudTh Style="width:850px; border: none; height: 0px;"></MudTh>
+            }
         </HeaderContent>
         <RowTemplate>
             <MudTd>
@@ -23,12 +34,16 @@
                     <span>@context.Description</span>
                 </div>
 
-                @if (@context.ImageUrl != null)
-                {
-                    <div style="width: 500px; height: 500px; border: 3px solid red; justify-self:center; margin-top: 15px;">
+                <div style="width: 500px; height: 500px; justify-self:center; margin-top: 15px;">
+                    @if (!string.IsNullOrEmpty(@context.ImageUrl))
+                    {
                         @* <MudImage Src="@context.ImageUrl" Alt="Image" /> *@
-                    </div>
-                }
+                    }
+                    else
+                    {
+                        <MudIcon Icon="@Icons.Material.Filled.QuestionMark" Style="width:500px; height: 500px; border: 1px solid; margin-top: 15px;" />
+                    }
+                </div>
             </MudTd>
         </RowTemplate>
     </MudTable>
@@ -37,10 +52,13 @@
 
 @code {
     [Parameter]
-    public RecipeSectionModel RecipeSection { get; set; } = null;
+    public RecipeSectionModel RecipeSection { get; set; }
 
     [Parameter]
     public EventCallback<RecipeSectionModel> OnDataChanged { get; set; }
+
+    [CascadingParameter]
+    public FormMode Mode { get; set; }
 
     private HashSet<RecipeStepModel> selectedSteps = new();
     private RecipeStepModel newStep = new();

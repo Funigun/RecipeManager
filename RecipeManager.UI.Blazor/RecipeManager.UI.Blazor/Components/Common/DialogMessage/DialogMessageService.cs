@@ -39,4 +39,22 @@ public sealed class DialogMessageService(IDialogService dialogService) : IDialog
 
         return result is not null && !result.Canceled;
     }
+
+    public async Task<bool> CancelOperationConfirmed()
+    {
+        DialogParameters<DialogMessageComponent> parameters = new()
+        {
+            { x => x.ContentText, "Are you sure you want to cancel operation? All changes will be lost." },
+            { x => x.ButtonText, "Ok" },
+            { x => x.Color, Color.Warning }
+        };
+
+        DialogOptions options = new() { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall };
+
+        IDialogReference dialog = await dialogService.ShowAsync<DialogMessageComponent>("Cancelling operation confirmation", parameters, options);
+
+        DialogResult result = (await dialog.Result)!;
+
+        return result is not null && !result.Canceled;
+    }
 }
