@@ -9,6 +9,7 @@
   	<ProjectReference Include="..\RecipeManager.API\RecipeManager.API.csproj" />
   	<ProjectReference Include="..\RecipeManager.Identity.API\RecipeManager.Identity.API.csproj" />
   	<ProjectReference Include="..\RecipeManager.Shared.Contracts\RecipeManager.Shared.Contracts.csproj" />
+  	<ProjectReference Include="..\RecipeManager.UI.Blazor\RecipeManager.UI.Blazor\RecipeManager.UI.Blazor.csproj" />
   </ItemGroup>
   
   <ItemGroup>

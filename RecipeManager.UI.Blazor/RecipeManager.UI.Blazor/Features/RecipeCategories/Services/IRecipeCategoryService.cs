@@ -5,7 +5,7 @@ namespace RecipeManager.UI.Blazor.Features.RecipeCategories.Services;
 
 public interface IRecipeCategoryService
 {
-    Task<HateoasCollectionResponse<RecipeCategoryModel>> GetCategories();
+    Task<HateoasResponse<RecipeCategoryPageModel>> GetCategories(int pageNumber, int pageSie, int? categoryType);
 
     Task<IEnumerable<RecipeCategoryForDropdownModel>> GetCategoriesForDropdown(string? categoryName = null);
 

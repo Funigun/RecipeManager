@@ -23,10 +23,10 @@ internal static class DatabaseSeeder
 
         IEnumerable<RecipeCategory> recipeCategories =
         [
-            RecipeCategory.Create("Existing Category"),
-            RecipeCategory.Create("Fake category 1"),
-            RecipeCategory.Create("Fake category 2"),
-            RecipeCategory.Create("To Delete")
+            RecipeCategory.Create("Existing Category", RecipeCategoryType.Events),
+            RecipeCategory.Create("Fake category 1", RecipeCategoryType.Events),
+            RecipeCategory.Create("Fake category 2", RecipeCategoryType.Events),
+            RecipeCategory.Create("To Delete", RecipeCategoryType.Events)
         ];
 
         IEnumerable<IngredientCategory> ingredientCategories =

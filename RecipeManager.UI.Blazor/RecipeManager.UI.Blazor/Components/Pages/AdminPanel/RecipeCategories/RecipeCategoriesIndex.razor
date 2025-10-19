@@ -10,28 +10,36 @@
 <MudPaper Class="mt-6" Width="750px">
     <MudText Typo="Typo.h6" Align="Align.Center">Recipe categories</MudText>
 
-    <div class="d-flex justify-end">
-        <MudTextField Label="Name" For="@(() => newCategoryModel.Name)" @bind-Value="newCategoryModel.Name" Variant="Variant.Outlined" />
-        <MudIconButton Icon="@Icons.Material.Filled.Add" Color="Color.Primary" Edge="Edge.End" OnClick="CreateCategory"/>
-    </div>
+    <MudStack Row=true Spacing="3" Style="margin-left: 15px; margin-right: 15px">
+        <MudTextField Label="Name" For="@(() => newCategoryModel.Name)" @bind-Value="newCategoryModel.Name"/>
+        <MudSelect T="RecipeCategoryType" Label="Category" @bind-Value="newCategoryModel.CategoryType" Required="true">
+            @foreach (var key in categoryTypes)
+            {
+                <MudSelectItem Value="@key.Key">@key.Value</MudSelectItem>
+            }
+        </MudSelect>
 
-    <RecipeCategoryListComponent Categories="categories" ShowLoadingBar="!categoriesLoaded"/>
+        <MudIconButton Icon="@Icons.Material.Filled.Add" Color="Color.Primary" Edge="Edge.End" OnClick="CreateCategory"/>
+    </MudStack>
+
+    <RecipeCategoryListComponent CategoriesPage="categoriesPage" ShowLoadingBar="!categoriesLoaded"/>
 </MudPaper>
 
 @code {
-    private HateoasCollectionResponse<RecipeCategoryModel> categories = new();
+    private HateoasResponse<RecipeCategoryPageModel> categoriesPage = new();
     private RecipeCategoryForCreateModel newCategoryModel = new();
     private bool categoriesLoaded = false;
+    private readonly Dictionary<RecipeCategoryType, string> categoryTypes = RecipeCategoryTypeExtensions.GetCategoryTypes();
 
     override protected async Task OnInitializedAsync()
     {
-        categories = await RecipeCategoryService.GetCategories();
+        categoriesPage = await RecipeCategoryService.GetCategories(1, 10, null);
         categoriesLoaded = true;
     }
 
     private async Task CreateCategory()
     {
         await RecipeCategoryService.CreateCategory(newCategoryModel);
-        categories = await RecipeCategoryService.GetCategories();
+        categoriesPage = await RecipeCategoryService.GetCategories(1, 10, null);
     }
 }

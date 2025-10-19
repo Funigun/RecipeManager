@@ -38,7 +38,7 @@ public sealed class GetCategoriesTests : BaseIntegrationTest
         string content = await response.Content.ReadAsStringAsync(CancellationToken.None);
         Assert.NotNull(content);
 
-        HateoasCollectionResponse<GetRecipeCategories.Response>? categories = JsonSerializer.Deserialize<HateoasCollectionResponse<GetRecipeCategories.Response>>(content, JsonOptions);
+        HateoasCollectionResponse<GetRecipeCategories.CategoryDto>? categories = JsonSerializer.Deserialize<HateoasCollectionResponse<GetRecipeCategories.CategoryDto>>(content, JsonOptions);
         Assert.NotNull(categories);
         Assert.NotEmpty(categories.Items);
         Assert.All(categories.Items, category =>
@@ -62,7 +62,7 @@ public sealed class GetCategoriesTests : BaseIntegrationTest
         string content = await response.Content.ReadAsStringAsync(CancellationToken.None);
         Assert.NotNull(content);
 
-        HateoasCollectionResponse<GetRecipeCategories.Response>? categories = JsonSerializer.Deserialize<HateoasCollectionResponse<GetRecipeCategories.Response>>(content, JsonOptions);
+        HateoasCollectionResponse<GetRecipeCategories.CategoryDto>? categories = JsonSerializer.Deserialize<HateoasCollectionResponse<GetRecipeCategories.CategoryDto>>(content, JsonOptions);
         Assert.NotNull(categories);
         Assert.NotEmpty(categories.Links);
         Assert.NotEmpty(categories.Items);

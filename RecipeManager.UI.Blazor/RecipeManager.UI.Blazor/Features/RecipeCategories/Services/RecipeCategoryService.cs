@@ -15,18 +15,26 @@ public sealed class RecipeCategoryService(IRecipeApi recipeApi, ISnackbar snackb
 
     public ApiResponseBody ResponseBody { get; private set; } = new();
 
-    public async Task<HateoasCollectionResponse<RecipeCategoryModel>> GetCategories()
+    public async Task<HateoasResponse<RecipeCategoryPageModel>> GetCategories(int pageNumber, int pageSie, int? categoryType)
     {
-        HttpResponseMessage response = await recipeApi.GetAll(new Uri(CategoriesApiUrl, UriKind.Relative));
+        string url = $"{CategoriesApiUrl}?page={pageNumber}&pageSize={pageSie}";
+
+        if (categoryType is not null)
+        {
+            url += $"&categoryType={categoryType}";
+        }
+
+        HttpResponseMessage response = await recipeApi.GetAll(new Uri(url, UriKind.Relative));
 
         if (response.IsSuccessStatusCode)
         {
-            return (await response.Content.ReadFromJsonAsync<HateoasCollectionResponse<RecipeCategoryModel>>())!;
+            string resp = await response.Content.ReadAsStringAsync();
+            return (await response.Content.ReadFromJsonAsync<HateoasResponse<RecipeCategoryPageModel>>())!;
         }
 
         ResponseBody = (await response.Content.ReadFromJsonAsync<ApiResponseBody>())!;
 
-        return new HateoasCollectionResponse<RecipeCategoryModel>();
+        return new HateoasResponse<RecipeCategoryPageModel>();
     }
 
     public async Task<IEnumerable<RecipeCategoryForDropdownModel>> GetCategoriesForDropdown(string? categoryName = null)

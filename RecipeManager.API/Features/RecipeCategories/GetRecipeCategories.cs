@@ -2,6 +2,9 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RecipeManager.Api.Application.Abstractions;
+using RecipeManager.Api.Domain.Recipes;
+using RecipeManager.Api.Domain.Recipes.Enums;
+using RecipeManager.Api.Persistance.Extensions;
 using RecipeManager.Api.Shared.Contracts.Authorization;
 using RecipeManager.Api.Shared.Endpoint;
 using RecipeManager.Api.Shared.Hateoas.Builder;
@@ -14,38 +17,72 @@ namespace RecipeManager.Api.Features.RecipeCategories;
 
 public static class GetRecipeCategories
 {
-    public sealed record Response(Guid Id, string Name);
+    public sealed record Request(int Page, int PageSize, int? CategoryType) : PagedParameters(Page, PageSize);
+
+    public sealed record CategoryDto(Guid Id, string Name, string Type);
+
+    public sealed record Response(int Page, int PageSize, int TotalCount, IEnumerable<HateoasResponse<CategoryDto>> Categories) : PagedResult(Page, PageSize, TotalCount);
 
     [GroupEndpoint("RecipeCategories")]
     public sealed class Endpoint : IEndpoint
     {
         public void MapEndpoint(IEndpointRouteBuilder endpoints)
         {
-            endpoints.MapStandardGet<Response>(string.Empty, Handler)
+            endpoints.MapStandardGet<CategoryDto>(string.Empty, Handler)
                      .WithName("GetRecipeCategories")
                      .WithDescription("Gets all recipe categories");
         }
     }
 
-    internal static async Task<Results<Ok<HateoasCollectionResponse<Response>>, NotFound>> Handler([FromServices] ICurrentUser currentUser, IAppDbContext dbContext, [FromServices] IHateoasBuilderFactory hateoasBuilderFactory, CancellationToken cancellationToken)
+    internal static async Task<Results<Ok<HateoasResponse<Response>>, NotFound>> Handler([AsParameters] Request request, [FromServices] ICurrentUser currentUser, IAppDbContext dbContext, [FromServices] IHateoasBuilderFactory hateoasBuilderFactory, CancellationToken cancellationToken)
     {
-        IEnumerable<Response> results = await dbContext.RecipeCategories.AsNoTracking()
-                                                                        .OrderBy(category => category.Name)
-                                                                        .Select(category => new Response(category.Id, category.Name))
-                                                                        .ToListAsync(cancellationToken);
+        IQueryable<RecipeCategory> categories = dbContext.RecipeCategories.AsNoTracking();
 
+        if (request.CategoryType is not null)
+        {
+            categories = categories.Where(category => category.Type == (RecipeCategoryType)request.CategoryType);
+        }
+
+        int totalCount = await categories.CountAsync(cancellationToken);
+
+        List<RecipeCategory> results = await categories//.OrderBy(category => (int)category.Type)
+                                                       .OrderBy(category => category.Name)
+                                                       .SetPage(request)
+                                                       .ToListAsync(cancellationToken);
+
+        HateoasResponse<Response> response = MapToResponse(results, request.Page, request.PageSize, totalCount, currentUser, hateoasBuilderFactory);
+
+
+        return TypedResults.Ok(response);
+    }
+
+    private static HateoasResponse<Response> MapToResponse(IEnumerable<RecipeCategory> categories, int page, int pageSize, int totalCount, ICurrentUser currentUser, IHateoasBuilderFactory hateoasBuilderFactory)
+    {
         bool isActionAllowed = currentUser.HasRole(UserRoles.Admin);
 
-        HateoasCollectionResponseBuilder<Response> collectionBuilder = hateoasBuilderFactory.ForCollection(results);
+        HateoasCollectionResponseBuilder<CategoryDto> categoriesBuilder = hateoasBuilderFactory.ForCollection(categories.Select(ToGetResponse));
 
         if (isActionAllowed)
         {
-            collectionBuilder
+            categoriesBuilder
                 .WithCollectionLink()
                     .WithDelete(LinkOptions.Create("DeleteRecipeCategory", HateoasRelConstants.Delete, isActionAllowed), unit => new { categoryId = unit.Id })
                 .AddPost(LinkOptions.Create("CreateRecipeCategory", HateoasRelConstants.Create, isActionAllowed), null);
         }
 
-        return TypedResults.Ok(collectionBuilder.Build());
+        Response response = new Response(page, pageSize, totalCount, categoriesBuilder.Build().Items);
+        HateoasResponseBuilder<Response> responsebuilder = hateoasBuilderFactory.ForItem(response);
+
+        responsebuilder.AddPagedNavigation("GetRecipeCategories", new { page, pageSize });
+        return responsebuilder.Build();
+    }
+
+    private static CategoryDto ToGetResponse(this RecipeCategory category)
+    {
+        return new CategoryDto(
+            category.Id,
+            category.Name,
+            category.Type.ToFriendlyString()
+        );
     }
 }

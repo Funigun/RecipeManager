@@ -69,17 +69,17 @@ public sealed class HateoasResponseBuilder<TItem>(TItem item, HateoasLinkService
             return dict;
         }
 
-        if (paged.Page > 1)
-        {
-            AddGet(LinkOptions.Create(endpoint, HateoasRelConstants.FirstPage, true), MergeRouteValues(1));
-            AddGet(LinkOptions.Create(endpoint, HateoasRelConstants.PreviousPage, true), MergeRouteValues(paged.Page - 1));
-        }
-
-        if (paged.Page < paged.TotalPages)
-        {
-            AddGet(LinkOptions.Create(endpoint, HateoasRelConstants.NextPage, true), MergeRouteValues(paged.Page + 1));
-            AddGet(LinkOptions.Create(endpoint, HateoasRelConstants.LastPage, true), MergeRouteValues(paged.TotalPages));
-        }
+        //if (paged.Page > 1)
+        //{
+        //    AddGet(LinkOptions.Create(endpoint, HateoasRelConstants.FirstPage, true), MergeRouteValues(1));
+        //    AddGet(LinkOptions.Create(endpoint, HateoasRelConstants.PreviousPage, true), MergeRouteValues(paged.Page - 1));
+        //}
+        //
+        //if (paged.Page < paged.TotalPages)
+        //{
+        //    AddGet(LinkOptions.Create(endpoint, HateoasRelConstants.NextPage, true), MergeRouteValues(paged.Page + 1));
+        //    AddGet(LinkOptions.Create(endpoint, HateoasRelConstants.LastPage, true), MergeRouteValues(paged.TotalPages));
+        //}
 
         return this;
     }
