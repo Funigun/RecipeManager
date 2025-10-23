@@ -9,6 +9,8 @@ public interface IRecipeCategoryService
 
     Task<IEnumerable<RecipeCategoryForDropdownModel>> GetCategoriesForDropdown(string? categoryName = null);
 
+    Task<Dictionary<RecipeCategoryType, IEnumerable<RecipeCategoryForDropdownModel>>> GetCategoriesForFiltering();
+
     Task CreateCategory(RecipeCategoryForCreateModel category);
 
     Task DeleteCategory(string relativeUri);

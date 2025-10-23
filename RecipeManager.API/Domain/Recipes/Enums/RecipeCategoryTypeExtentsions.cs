@@ -14,6 +14,7 @@ public static class RecipeCategoryTypeExtentsions
             RecipeCategoryType.Events => "Events and occasions",
             RecipeCategoryType.Cuisine => "Cuisine",
             RecipeCategoryType.Course => "Course",
+            RecipeCategoryType.MealType => "Meal Type",
             RecipeCategoryType.CookingMethod => "Cooking method",
             _ => throw new ArgumentOutOfRangeException(nameof(category), category, null)
         };

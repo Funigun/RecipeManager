@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Components;
+﻿using System.Text.Json;
+using Microsoft.AspNetCore.Components;
 using MudBlazor;
 using RecipeManager.UI.Blazor.Brokers.HateoasModel;
 using RecipeManager.UI.Blazor.Brokers.RecipeManagersApi;
@@ -12,6 +13,7 @@ public sealed class RecipeCategoryService(IRecipeApi recipeApi, ISnackbar snackb
 {
     private const string CategoriesApiUrl = "api/recipecategories";
     private const string CategoriesDropdownApiUrl = $"{CategoriesApiUrl}/dropdown";
+    private const string CategoriesForFilteringApiUrl = $"{CategoriesApiUrl}/filtering";
 
     public ApiResponseBody ResponseBody { get; private set; } = new();
 
@@ -50,6 +52,24 @@ public sealed class RecipeCategoryService(IRecipeApi recipeApi, ISnackbar snackb
         ResponseBody = (await response.Content.ReadFromJsonAsync<ApiResponseBody>())!;
 
         return [];
+    }
+
+    public async Task<Dictionary<RecipeCategoryType, IEnumerable<RecipeCategoryForDropdownModel>>> GetCategoriesForFiltering()
+    {
+        HttpResponseMessage response = await recipeApi.GetAll(new Uri(CategoriesForFilteringApiUrl, UriKind.Relative));
+
+        if (response.IsSuccessStatusCode)
+        {
+            string jsonValue = await response.Content.ReadAsStringAsync();
+            using JsonDocument? doc = JsonDocument.Parse(jsonValue);
+            JsonElement categories = doc.RootElement.GetProperty("categories");
+            JsonSerializerOptions opt = new() { PropertyNameCaseInsensitive = true };
+            return JsonSerializer.Deserialize<Dictionary<RecipeCategoryType, IEnumerable<RecipeCategoryForDropdownModel>>>(categories.GetRawText(), opt)!;
+        }
+
+        ResponseBody = (await response.Content.ReadFromJsonAsync<ApiResponseBody>())!;
+
+        return RecipeCategoryTypeExtensions.GetCategoryTypesForRecipeFiltering();
     }
 
     public async Task CreateCategory(RecipeCategoryForCreateModel category)

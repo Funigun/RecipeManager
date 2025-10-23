@@ -5,5 +5,6 @@ public enum RecipeCategoryType
     Events,
     Cuisine,
     Course,
+    MealType,
     CookingMethod
 }
