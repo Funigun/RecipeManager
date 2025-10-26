@@ -40,5 +40,7 @@ public class AuthenticationService(IIdentityApi identityApi, AuthenticationState
         return false;
     }
 
+
+
     public async Task Logout() => await ((CustomAuthenticationStateProvider)authenticationStateProvider).MarkUserAsLoggedOut();
 }

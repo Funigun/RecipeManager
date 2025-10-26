@@ -4,4 +4,5 @@ namespace RecipeManager.Identity.Api.Domain;
 
 public class User : IdentityUser<int>
 {
+
 }
