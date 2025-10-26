@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RecipeManager.Api.Application.Abstractions;
 using RecipeManager.Api.Domain.Recipes;
+using RecipeManager.Api.Domain.Recipes.Enums;
 using RecipeManager.Api.Shared.Contracts.Authorization;
 using RecipeManager.Api.Shared.Endpoint;
 using RecipeManager.Shared.Contracts.Authorization;
@@ -12,7 +13,7 @@ namespace RecipeManager.Api.Features.RecipeCategories;
 
 public static class CreateRecipeCategory
 {
-    public sealed record Request(string Name);
+    public sealed record Request(string Name, int CategoryType);
 
     public sealed record Response(RecipeCategoryId Id);
 
@@ -26,6 +27,10 @@ public static class CreateRecipeCategory
                 {
                     return !await dbContext.RecipeCategories.AnyAsync(category => category.Name == name, cancellationToken);
                 }).WithMessage("Recipe category must be unique");
+
+            RuleFor(x => x.CategoryType)
+                .Must(difficulty => difficulty.IsRecipeCategoryType())
+                .WithMessage("Provided invalid recipe category type");
         }
     }
 
@@ -50,7 +55,7 @@ public static class CreateRecipeCategory
 
     public static async Task<IResult> Handler([FromBody] Request request, IAppDbContext dbContext, CancellationToken cancellationToken)
     {
-        RecipeCategory category = RecipeCategory.Create(request.Name);
+        RecipeCategory category = RecipeCategory.Create(request.Name, (RecipeCategoryType)request.CategoryType);
 
         dbContext.RecipeCategories.Add(category);
         await dbContext.SaveChangesAsync(cancellationToken);

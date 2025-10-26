@@ -1,0 +1,107 @@
+﻿@using MudBlazor
+@using RecipeManager.UI.Blazor.Brokers.HateoasModel
+@using RecipeManager.UI.Blazor.Features.Ingredients
+@using RecipeManager.UI.Blazor.Features.RecipeCategories.Models
+@using RecipeManager.UI.Blazor.Features.Recipes.Models
+@using RecipeManager.UI.Blazor.Features.Recipes.Services
+
+@inject IRecipeService RecipeService;
+
+<style>
+    .recipes-grid {
+        width: 1300px; 
+        min-height: 450px; 
+        max-height: 2500px; 
+        margin-top: 30px; 
+        justify-self:center !important; 
+        justify-content: center !important; 
+        overflow-y: hidden;
+    }
+
+    .recipe-step-item {
+        width: 350px;
+        margin-top: 25px;
+        padding: 0px
+    }
+
+    .recipe-step-container {
+        border: none;
+        padding: 0px !important
+    }
+
+    .recipe-step-description {
+        width: 300px;
+        text-align: center;
+    }
+
+    .recipe-step-image {
+        width: 300px;
+        height: 300px
+    }
+
+    .recipes-pagination {
+        justify-self: center !important;
+        justify-content: center !important;
+        margin-top: 25px;
+    }
+</style>
+
+<MudGrid T="HateoasResponse<RecipeModel>" Items="RecipesPage.Item.Recipes" Loading="ShowLoadingBar" 
+         Virtualize="true" FixedHeader="true"  Class="mt-6 recipes-grid">
+
+    @for (int i = 0; i < RecipesPage.Item.Recipes.Count; i++)
+    {
+        HateoasResponse<RecipeModel> recipe = RecipesPage.Item.Recipes[i];
+
+        <MudItem Class="recipe-step-item">
+            <MudPaper Class="d-flex align-center justify-center mud-width-full py-8 recipe-step-container" Outlined=true>
+                <MudStack Spacing="5">
+                    @if (!string.IsNullOrEmpty(recipe.Item.ImageURL))
+                    {
+                        <MudImage Image="recipe.Item.ImageUrl" Class="recipe-step-image" />
+                    }
+                    else
+                    {
+                        <MudIconButton Icon="@Icons.Material.Filled.QuestionMark" Size="Size.Large" Class="recipe-step-image" 
+                                       Color="Color.Primary" OnClick="(() => OpenRecipe(recipe))"></MudIconButton>
+                    }
+                    <MudText Class="recipe-step-description" Typo="Typo.h6">@recipe.Item.Title</MudText>
+                </MudStack>
+            </MudPaper>
+        </MudItem>
+    }
+</MudGrid>
+
+<MudPagination Class="d-flex align-center recipes-pagination" SelectedChanged="PageChanged"
+               Selected="RecipesPage.Item.Page"
+               Count="RecipesPage.Item.TotalCount / RecipesPage.Item.PageSize"
+               ShowPreviousButton="RecipesPage.Links.Any(link => link.Rel == HateoasConstants.Previous)" 
+               ShowNextButton="RecipesPage.Links.Any(link => link.Rel == HateoasConstants.Next)"
+               ShowFirstButton="true" 
+               ShowLastButton="true"/>
+
+@code {
+    [Parameter]
+    public HateoasResponse<RecipesPageModel> RecipesPage { get; set; } = new();
+
+    [Parameter]
+    public IEnumerable<RecipeCategoryForDropdownModel> SelectedCategories { get; set; } = [];
+
+    [Parameter]
+    public IEnumerable<IngredientForDropdownModel> SelectedIngredients { get; set; } = [];
+
+    [Parameter]
+    public bool ShowLoadingBar { get; set; } = true;
+
+    private void OpenRecipe(HateoasResponse<RecipeModel> selectedItem)
+    {
+        RecipeService.OpenUpdateRecipePage(selectedItem.Item.Id);
+    }
+
+    private async Task PageChanged(int selectedPage)
+    {
+
+        RecipesPage = await RecipeService.GetRecipesPage(SelectedCategories.Where(category => category.IsSelected).Select(category => category.Id), SelectedIngredients.Select(ingredient => ingredient.Id), selectedPage, 10);
+        StateHasChanged();
+    }
+}

@@ -20,7 +20,7 @@ public sealed class CreateCategoryTests : BaseIntegrationTest
         // Arrange
         HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", TokenMockFactory.GenerateJwtToken(UserMockFactory.CreateMockedUser()));
 
-        CreateRecipeCategory.Request createUnitRequest = new("Recipe category");
+        CreateRecipeCategory.Request createUnitRequest = new("Recipe category", 1);
         StringContent content = new(JsonSerializer.Serialize(createUnitRequest), Encoding.UTF8, "application/json");
 
         // Act
@@ -31,14 +31,15 @@ public sealed class CreateCategoryTests : BaseIntegrationTest
     }
 
     [Theory]
-    [InlineData("", "Recipe category name must be between 1 and 100 characters long.")]
-    [InlineData("Existing Category", "Recipe category must be unique")]
-    public async Task CreateRecipeCategory_ShouldReturn_BadRequest_ForInvalidInput(string categoryName, string justification)
+    [InlineData("", 1, "Recipe category name must be between 1 and 100 characters long.")]
+    [InlineData("Existing Category", 1, "Recipe category must be unique")]
+    [InlineData("Some random category", -1, "Invalid recipe category type")]
+    public async Task CreateRecipeCategory_ShouldReturn_BadRequest_ForInvalidInput(string categoryName, int categoryType, string justification)
     {
         // Arrange
         HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", TokenMockFactory.GenerateJwtToken(UserMockFactory.CreateMockedAdmin()));
 
-        CreateRecipeCategory.Request createCategoryRequest = new(categoryName);
+        CreateRecipeCategory.Request createCategoryRequest = new(categoryName, categoryType);
         StringContent content = new(JsonSerializer.Serialize(createCategoryRequest), Encoding.UTF8, "application/json");
 
         // Act
@@ -54,7 +55,7 @@ public sealed class CreateCategoryTests : BaseIntegrationTest
         // Arrange
         HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", TokenMockFactory.GenerateJwtToken(UserMockFactory.CreateMockedAdmin()));
 
-        CreateRecipeCategory.Request createCategoryRequest = new("New Recipe Category");
+        CreateRecipeCategory.Request createCategoryRequest = new("New Recipe Category", 1);
         StringContent content = new(JsonSerializer.Serialize(createCategoryRequest), Encoding.UTF8, "application/json");
 
         // Act

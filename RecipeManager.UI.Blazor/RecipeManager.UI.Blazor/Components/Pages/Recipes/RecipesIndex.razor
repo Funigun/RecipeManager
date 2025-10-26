@@ -1,0 +1,114 @@
+﻿@using RecipeManager.UI.Blazor.Brokers.HateoasModel
+@using RecipeManager.UI.Blazor.Features.RecipeCategories
+@using RecipeManager.UI.Blazor.Features.RecipeCategories.Models
+@using RecipeManager.UI.Blazor.Features.RecipeCategories.Services
+@using RecipeManager.UI.Blazor.Features.Recipes.GetRecipes
+@using RecipeManager.UI.Blazor.Features.Recipes.Services
+
+@page "/recipes"
+
+@inject IRecipeService RecipeService
+@inject IRecipeCategoryService RecipeCategoryService
+
+<style>
+    .top-drawer {
+        position: absolute;
+        top: 150px;
+        left: 0;
+        right: 0;
+        z-index: 1000;
+        border: none;
+        max-height: 500px;
+        width: 1300px;
+        justify-self: center;
+        background: var(--mud-palette-background);
+    }
+
+    .page-container {
+        min-height: calc(100dvh - var(--mud-appbar-height));
+        border: none;
+        width: 1300px;
+    }
+</style>
+
+<MudPaper Class="mt-6 page-container" Outlined=true>
+    <MudGrid Style="width:1300px;">
+        <MudItem Style="display: flex; width:inherit;">
+            <MudStack Row="true" Style="gap: 12px; width:inherit; justify-items:center; justify-content:center">
+                @if(filtersCount > 0)
+                {
+                    <MudBadge Content="filtersCount" Overlap="true" Class="mx-6 my-4">
+                        <MudIconButton Icon="@Icons.Material.Filled.FilterList" Color="Color.Primary" Style="justify-self:center"
+                                       OnClick="@(() => ToggleDrawer())"/>
+                    </MudBadge>
+                }
+                else
+                {
+                    <MudIconButton Icon="@Icons.Material.Filled.FilterList" Color="Color.Primary" Style="justify-self:center"
+                                   OnClick="@(() => ToggleDrawer())"/>
+                }
+                <MudText Typo="Typo.h6" Style="align-content: center">Recipes</MudText>
+                <MudIconButton Icon="@Icons.Material.Filled.Add" Color="Color.Primary" Style="justify-self:center"
+                               OnClick="@(() => CreateNewRecipe())" Disabled="@isAddDisabled" />
+            </MudStack>
+        </MudItem>
+
+        <MudCollapse Expanded="@isDrawerOpen" Style="z-index: 100;" Class="top-drawer">
+            <div style="" class="overlay-wrapper">
+                <div class="blocker">
+                @foreach (var categoryType in categoryDropdowns.Keys)
+                {
+                    <MudItem Style="display: flex; width:1200px; margin: 25px 0px 0px 25px;">
+                        <MudText Typo="Typo.subtitle2" Style="width: 150px;" Class="d-flex align-center">@categoryType.ToFriendlyString():</MudText>
+                        <MudChipSet T="RecipeCategoryForDropdownModel" Variant="Variant.Text" AllClosable="false" CheckMark="false" SelectionMode="SelectionMode.MultiSelection"
+                                    Color="Color.Primary">
+                            @foreach (var category in categoryDropdowns[categoryType])
+                            {
+                                <MudChip @bind-Selected="@category.IsSelected" T="RecipeCategoryForDropdownModel" Value="category">@category.Name</MudChip>
+                            }
+                        </MudChipSet>
+                    </MudItem>
+                }
+
+                <MudItem Style="display: flex; margin: 25px; width:1200px">
+                    <MudText Typo="Typo.subtitle2">Ingredients</MudText>
+                </MudItem>
+
+                </div>
+            </div>
+        </MudCollapse>
+    </MudGrid>
+
+    <RecipeListComponent RecipesPage="recipesPage" SelectedCategories="selectedCategories" ShowLoadingBar=recipesLoaded></RecipeListComponent>
+</MudPaper>
+
+
+@code {
+    private HateoasResponse<RecipesPageModel> recipesPage { get; set; } = new();
+    private Dictionary<RecipeCategoryType, IEnumerable<RecipeCategoryForDropdownModel>> categoryDropdowns { get; set; } = new();
+    private IEnumerable<RecipeCategoryForDropdownModel> selectedCategories => categoryDropdowns.Values.SelectMany(s => s);
+    private bool recipesLoaded = false;
+    private bool isAddDisabled = false;
+    private bool isDrawerOpen = false;
+    private int filtersCount => selectedCategories.Count(c => c.IsSelected);
+
+    private void ToggleDrawer() 
+    {
+        isDrawerOpen = !isDrawerOpen;
+    }
+
+    private void CreateNewRecipe()
+    {
+        RecipeService.OpenCreateRecipePage();
+    }
+
+    override protected async Task OnInitializedAsync()
+    {
+        recipesPage = await RecipeService.GetRecipesPage([], [], 1, 10);
+        categoryDropdowns = await RecipeCategoryService.GetCategoriesForFiltering();
+        recipesLoaded = true;
+        isDrawerOpen = false;
+        isAddDisabled = !recipesPage.Links.Any(link => link.Rel == HateoasConstants.Create);
+        StateHasChanged();
+    }
+}

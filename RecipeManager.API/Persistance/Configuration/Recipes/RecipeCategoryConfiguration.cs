@@ -17,5 +17,8 @@ public sealed class RecipeCategoryConfiguration : IEntityTypeConfiguration<Recip
         builder.Property(category => category.Name)
                .HasMaxLength(RecipeCategoryDomainValidator.RecipeCategoryNameMaxLength)
                .IsRequired(true);
+
+        builder.Property(category => category.Type)
+               .IsRequired(true);
     }
 }

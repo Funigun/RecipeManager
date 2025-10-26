@@ -29,8 +29,10 @@ public sealed class IngredientService(IRecipeApi recipeApi, NavigationManager na
             IngredientCreationResponse createdIngredientId = await response.Content.ReadFromJsonAsync<IngredientCreationResponse>(cancellationToken: cancellationToken);
             return createdIngredientId!.Id;
         }
-
-        ResponseBody = (await response.Content.ReadFromJsonAsync<ApiResponseBody>(cancellationToken: cancellationToken))!;
+        else
+        {
+            ResponseBody = (await response.Content.ReadFromJsonAsync<ApiResponseBody>(cancellationToken: cancellationToken))!;
+        }
 
         return Guid.Empty;
     }
@@ -60,6 +62,21 @@ public sealed class IngredientService(IRecipeApi recipeApi, NavigationManager na
 
         ResponseBody = (await response.Content.ReadFromJsonAsync<ApiResponseBody>(cancellationToken: cancellationToken))!;
         return new();
+    }
+
+    public async Task<IEnumerable<IngredientForDropdownModel>> GetIngredientsForDropdownModel(string? ingredientName, CancellationToken cancellationToken = default)
+    {
+        string url = ingredientName == null ? $"{IngredientsApiUrl}/dropdown" : $"{IngredientsApiUrl}/dropdown?ingredientName={ingredientName}";
+        HttpResponseMessage response = await recipeApi.GetAll(new Uri(url, UriKind.Relative));
+
+        if (response.IsSuccessStatusCode)
+        {
+            List<IngredientForDropdownModel> ingredients = (await response.Content.ReadFromJsonAsync<List<IngredientForDropdownModel>>(cancellationToken: cancellationToken))!;
+            return ingredients;
+        }
+
+        ResponseBody = (await response.Content.ReadFromJsonAsync<ApiResponseBody>(cancellationToken: cancellationToken))!;
+        return [];
     }
 
     public async Task UpdateIngredient(string relativeUri, IngredientForUpdateModel ingredientForUpdate, CancellationToken cancellationToken = default)

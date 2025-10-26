@@ -9,6 +9,7 @@ using RecipeManager.UI.Blazor.Components.Common.DialogMessage;
 using RecipeManager.UI.Blazor.Features.IngredientCategories.Services;
 using RecipeManager.UI.Blazor.Features.Ingredients.Services;
 using RecipeManager.UI.Blazor.Features.RecipeCategories.Services;
+using RecipeManager.UI.Blazor.Features.Recipes.Services;
 using RecipeManager.UI.Blazor.Features.Units.Services;
 using RecipeManager.UI.Blazor.Services.Authentication;
 using RecipeManager.UI.Blazor.Services.Authorization;
@@ -45,7 +46,8 @@ try
         config.SnackbarConfiguration.HideTransitionDuration = 500;
         config.SnackbarConfiguration.ShowTransitionDuration = 500;
         config.SnackbarConfiguration.SnackbarVariant = Variant.Filled;
-    });
+    })
+    .AddMudMarkdownServices();
 
     builder.Services.AddRazorComponents()
                     .AddInteractiveServerComponents()
@@ -70,7 +72,8 @@ try
                     .AddScoped<IUnitService, UnitService>()
                     .AddScoped<IIngredientCategoryService, IngredientCategoryService>()
                     .AddScoped<IRecipeCategoryService, RecipeCategoryService>()
-                    .AddScoped<IIngredientService, IngredientService>();
+                    .AddScoped<IIngredientService, IngredientService>()
+                    .AddScoped<IRecipeService, RecipeService>();
 
     WebApplication app = builder.Build();
 

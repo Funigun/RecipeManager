@@ -71,4 +71,42 @@ public sealed class Recipe : AuditableEntity, IEntity<RecipeId>
     {
         _categories = categoryIds.ToList();
     }
+
+    public void UpdateIngredients(IEnumerable<RecipeIngredient> ingredients)
+    {
+        IEnumerable<RecipeIngredient> ingredientsToRemove = Ingredients.Where(ingredient => !ingredients.Any(i => i.Id == ingredient.Id));
+        Ingredients = Ingredients.Except(ingredientsToRemove).ToList();
+
+        foreach (RecipeIngredient ingredient in ingredients)
+        {
+            RecipeIngredient? existingIngredient = Ingredients.FirstOrDefault(ingr => ingr.Id == ingredient.Id);
+
+            if (existingIngredient is not null)
+            {
+                existingIngredient.UnitId = ingredient.UnitId;
+                existingIngredient.Amount = ingredient.Amount;
+            }
+            else
+            {
+                Ingredients.Add(ingredient);
+            }
+        }
+    }
+
+    public void UpdateSections(IEnumerable<RecipeSection> sections)
+    {
+        foreach (RecipeSection updatedSection in sections)
+        {
+            RecipeSection? existingSection = Sections.FirstOrDefault(section => section.Type == updatedSection.Type);
+
+            if (existingSection is not null)
+            {
+                existingSection.UpdateSection(updatedSection);
+            }
+            else
+            {
+                Sections.Add(updatedSection);
+            }
+        }
+    }
 }

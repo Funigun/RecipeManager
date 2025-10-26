@@ -8,7 +8,7 @@
 @inject NavigationManager Navigation
 @inject IAuthenticationService AuthenticationService
 
-<MudThemeProvider />
+<MudThemeProvider IsDarkMode="@isDarkMode" />
 <MudPopoverProvider />
 <MudDialogProvider />
 <MudSnackbarProvider />
@@ -17,15 +17,16 @@
     <MudAppBar Elevation="1">
         @if (isUserAuthenticated)
         {
-            <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())"/>
+            <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="DrawerToggle"/>
         }
         <MudText Typo="Typo.h5" Class="ml-3">Recipes Manager</MudText>
         <MudSpacer />
         @if (isUserAuthenticated)
         {
             <MudText Typo="Typo.h5" Class="ml-3" Style="margin-right: 15px">@user</MudText>
-            <MudIconButton Icon="@Icons.Material.Filled.Settings" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => ShowSettings())" />
-            <MudIconButton Icon="@Icons.Material.Filled.Logout" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => Logout())"/>
+            <MudIconButton Icon="@themeIcon" Color="Color.Inherit" Edge="Edge.Start" OnClick="ToggleTheme" />
+            <MudIconButton Icon="@Icons.Material.Filled.Settings" Color="Color.Inherit" Edge="Edge.Start" OnClick="ShowSettings" />
+            <MudIconButton Icon="@Icons.Material.Filled.Logout" Color="Color.Inherit" Edge="Edge.Start" OnClick="Logout"/>
         }
     </MudAppBar>
 
@@ -37,11 +38,9 @@
     }
 
     <MudMainContent>
-        
-             <div style="justify-self:center; justify-items: center; align-items: center; min-width:25%">
-                 @Body
-             </div>
-      
+        <div style="justify-self:center; justify-items: center; align-items: center; min-width:25%">
+            @Body
+        </div>
     </MudMainContent>
 </MudLayout>
 
@@ -49,6 +48,9 @@
     bool showSideMenu = false;
     bool isUserAuthenticated = false;
     string user = "";
+
+    bool isDarkMode = false;
+    string themeIcon = Icons.Material.Filled.LightMode;
 
     protected override async Task OnInitializedAsync()
     {
@@ -66,12 +68,21 @@
                 user = authState.User?.Identity?.Name ?? string.Empty;
                 showSideMenu = isUserAuthenticated;
             }
+
+            themeIcon = isDarkMode ? Icons.Material.Filled.DarkMode : Icons.Material.Filled.LightMode;
         }
         catch (Exception ex)
         {
             Navigation.NavigateTo("/login", true);
             Console.WriteLine($"Error during authentication: {ex.Message}");
         }
+    }
+
+    private void ToggleTheme()
+    {
+        isDarkMode = !isDarkMode;
+        themeIcon = isDarkMode ? Icons.Material.Filled.DarkMode : Icons.Material.Filled.LightMode;
+        StateHasChanged();
     }
 
     private void DrawerToggle() => showSideMenu = !showSideMenu;

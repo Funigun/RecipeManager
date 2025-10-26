@@ -18,16 +18,22 @@ public static class UpdateRecipe
 {
     public record struct Request(Guid Id) : IRequestId<Request>;
 
-    public sealed record RecipeIngredientDto(Guid IngredientId, Guid UnitId, double Amount);
+    public sealed record RecipeIngredientDto(IngredientDto Ingredient, UnitDto Unit, double Amount);
 
-    public sealed record RecipeAmountDto(double Value, Guid UnitId);
+    public sealed record IngredientDto(Guid Id, Guid? IngredientRecipe);
+
+    public sealed record UnitDto(Guid Id);
+
+    public sealed record RecipeAmountDto(double Amount, UnitDto Unit);
 
     public sealed record RecipeSectionDto(int SectionType, IEnumerable<RecipeStepDto> Steps);
 
     public sealed record RecipeStepDto(int Order, string Description, string? ImageUrl);
 
+    public sealed record RecipeCategoryDto(Guid Id);
+
     public sealed record RecipeDto(string Title, string Description, string? ImageUrl, string? VideoUrl, RecipeAmountDto Amount, byte NumberOfServings, int Difficulty,
-                                   IEnumerable<RecipeIngredientDto> Ingredients, IEnumerable<RecipeSectionDto> Sections, IEnumerable<Guid> CategoryIds, Guid? IngredientId);
+                                   IEnumerable<RecipeIngredientDto> Ingredients, IEnumerable<RecipeSectionDto> Sections, IEnumerable<RecipeCategoryDto> Categories, Guid? IngredientId);
 
     public sealed class AuthorizationPolicy(IAppDbContext dbContext, ICurrentUser currentUser) : IAuthorizationPolicy<Request>
     {
@@ -45,8 +51,8 @@ public static class UpdateRecipe
             RuleFor(x => x.Description).SetValidator(new RecipeDescriptionValidator());
             RuleFor(x => x.ImageUrl).SetValidator(new RecipeImageUrlValidator());
             RuleFor(x => x.VideoUrl).SetValidator(new RecipeVideoUrlValidator());
-            RuleFor(x => x.Amount.Value).SetValidator(new RecipeAmountValidator());
-            RuleFor(x => x.Amount.UnitId).NotEmpty()
+            RuleFor(x => x.Amount.Amount).SetValidator(new RecipeAmountValidator());
+            RuleFor(x => x.Amount.Unit.Id).NotEmpty()
                 .MustAsync(async (unitId, cancellationToken) =>
                 {
                     return await dbContext.Units.AsNoTracking()
@@ -62,7 +68,7 @@ public static class UpdateRecipe
             RuleFor(x => x.Ingredients).SetValidator(new RecipeIngredientsValidator(dbContext));
             RuleFor(x => x.Sections).SetValidator(new RecipeSectionsValidator());
 
-            RuleFor(x => x.CategoryIds)
+            RuleFor(x => x.Categories)
                 .Must(ids => ids.Distinct().Count() == ids.Count())
                     .WithMessage("Duplicate categories are not allowed.")
                 .MustAsync(async (categoryIds, cancellationToken) =>
@@ -72,7 +78,7 @@ public static class UpdateRecipe
                         return true;
                     }
 
-                    IEnumerable<RecipeCategoryId> recipeCategoryIds = categoryIds.Select(c => new RecipeCategoryId(c));
+                    IEnumerable<RecipeCategoryId> recipeCategoryIds = categoryIds.Select(c => new RecipeCategoryId(c.Id));
 
                     return await dbContext.RecipeCategories.AsNoTracking()
                                                             .Where(category => recipeCategoryIds.Contains(category.Id))
@@ -99,7 +105,7 @@ public static class UpdateRecipe
                         return true;
                     }
 
-                    return !request.Ingredients.Any(ingredient => ingredient.IngredientId == ingredientId.Value);
+                    return !request.Ingredients.Any(ingredient => ingredient.Ingredient.Id == ingredientId.Value);
                 })
                 .WithMessage("List of ingredients can not contain an ingredient for which this recipe is designed");
         }
@@ -113,7 +119,7 @@ public static class UpdateRecipe
                 .NotEmpty()
                 .MustAsync(async (ingredients, cancellationToken) =>
                 {
-                    IEnumerable<IngredientId> ingredientIds = ingredients.Select(i => new IngredientId(i.IngredientId));
+                    IEnumerable<IngredientId> ingredientIds = ingredients.Select(i => new IngredientId(i.Ingredient.Id));
 
                     return await dbContext.Ingredients.AsNoTracking()
                                                        .Where(ingredient => ingredientIds.Contains(ingredient.Id))
@@ -122,17 +128,17 @@ public static class UpdateRecipe
                 .WithMessage("Some of ingredients does not exist")
                 .MustAsync(async (ingredients, cancellationToken) =>
                 {
-                    IEnumerable<UnitId> unitIds = ingredients.Select(i => new UnitId(i.UnitId));
+                    IEnumerable<UnitId> unitIds = ingredients.Select(i => new UnitId(i.Unit.Id)).Distinct();
 
                     return await dbContext.Units.AsNoTracking()
-                                                 .Where(unit => unitIds.Contains(unit.Id))
-                                                 .CountAsync(cancellationToken) == ingredients.Count();
+                                                .Where(unit => unitIds.Contains(unit.Id))
+                                                .CountAsync(cancellationToken) == unitIds.Count();
 
                 })
                 .WithMessage("Some of units does not exist")
                 .Must(ingredients =>
                 {
-                    return ingredients.Select(i => i.IngredientId).Distinct().Count() == ingredients.Count();
+                    return ingredients.Select(i => i.Ingredient.Id).Distinct().Count() == ingredients.Count();
                 })
                 .WithMessage("Duplicate ingredients are not allowed");
 
@@ -211,8 +217,12 @@ public static class UpdateRecipe
     public static async Task<IResult> Handler(Request recipeId, [FromBody] RecipeDto recipeDto, [FromServices] IAppDbContext dbContext, [FromServices] ICurrentUser currentUser, CancellationToken cancellationToken)
     {
         RecipeId id = new(recipeId.Id);
-        Recipe recipe = await dbContext.Recipes.AsNoTracking()
-                                               .FirstOrDefaultAsync(r => r.Id == id && r.CreatedBy == currentUser.Id, cancellationToken)
+        Recipe recipe = await dbContext.Recipes
+                                       .Include(recipe => recipe.Ingredients)
+                                       .Include(recipe => recipe.Sections)
+                                            .ThenInclude(section => section.Steps)
+                                       .Include(recipe => recipe.Categories)
+                                       .FirstOrDefaultAsync(r => r.Id == id && r.CreatedBy == currentUser.Id, cancellationToken)
                      ?? throw new EntityNotFoundException<Recipe, RecipeId>(id);
 
         UpdateRecipeData(recipe, recipeDto);
@@ -233,20 +243,20 @@ public static class UpdateRecipe
         recipe.IngredientId = recipeDto.IngredientId.HasValue ? new IngredientId(recipeDto.IngredientId.Value) : null;
         recipe.Ingredients = recipeDto.Ingredients.Select(i => i.ToDomain()).ToList();
         recipe.Sections = recipeDto.Sections.Select(s => s.ToDomain()).ToList();
-        recipe.UpdateCategories(recipeDto.CategoryIds.Select(categoryId => new RecipeCategoryId(categoryId)).ToList());
+        recipe.UpdateCategories(recipeDto.Categories.Select(category => new RecipeCategoryId(category.Id)).ToList());
     }
 
     private static RecipeAmount ToDomain(this RecipeAmountDto dto)
     {
-        return new(dto.Value, new UnitId(dto.UnitId));
+        return new(dto.Amount, new UnitId(dto.Unit.Id));
     }
 
     private static RecipeIngredient ToDomain(this RecipeIngredientDto dto)
     {
         return RecipeIngredient.Create
         (
-            new IngredientId(dto.IngredientId),
-            new UnitId(dto.UnitId),
+            new IngredientId(dto.Ingredient.Id),
+            new UnitId(dto.Unit.Id),
             dto.Amount
         );
     }

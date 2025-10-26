@@ -18,6 +18,8 @@ public interface IUnitService
 
     Task<IEnumerable<PrimaryUnitDto>> GetPrimaryUnits();
 
+    Task<IEnumerable<UnitForDropdownModel>> GetUnitsForDropdown();
+
     Task UpdateUnit(string relativeUri, UnitForUpdateModel unit);
 
     Task DeleteUnit(string relativeUri);

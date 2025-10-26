@@ -3,4 +3,8 @@
 public interface IDialogMessageService
 {
     Task<bool> ShowDeleteConfirmationMessage();
+
+    Task<bool> ShowDeleteItemsConfirmationMessage(int numberOfItems);
+
+    Task<bool> CancelOperationConfirmed();
 }

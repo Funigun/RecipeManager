@@ -1,0 +1,36 @@
+﻿@page "/recipes/update/{RawGuid}"
+@using RecipeManager.UI.Blazor.Brokers.HateoasModel
+@using RecipeManager.UI.Blazor.Features.Recipes.Components
+@using RecipeManager.UI.Blazor.Features.Recipes.Models
+@using RecipeManager.UI.Blazor.Features.Recipes.Services
+@using RecipeManager.UI.Blazor.Features.Units
+@using RecipeManager.UI.Blazor.Features.Units.Services
+
+@inject IRecipeService RecipeService
+@inject IUnitService UnitService
+
+
+    <MudPaper Class="pa-6 mx-auto" Style="width:1000px">
+        <RecipeForm RecipeModel="RecipeModel" Mode="Common.FormMode.View"></RecipeForm>
+    </MudPaper>
+
+
+
+@code {
+    [Parameter]
+    public string RawGuid { get; set; } = "";
+
+    private HateoasResponse<RecipeForManageModel> RecipeModel = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (Guid.TryParse(RawGuid, out Guid recipeId))
+        {
+            RecipeModel = await RecipeService.GetRecipeForManageById(recipeId);
+        }
+        else
+        {
+            // Handle invalid GUID scenario, e.g., navigate back or show an error message
+        }
+    }
+}

@@ -5,6 +5,7 @@ using RecipeManager.Api.Application.Abstractions;
 using RecipeManager.Api.Application.Exceptions;
 using RecipeManager.Api.Domain.Ingredients;
 using RecipeManager.Api.Domain.Recipes;
+using RecipeManager.Api.Domain.Recipes.Enums;
 using RecipeManager.Api.Domain.Recipes.ValueObjects;
 using RecipeManager.Api.Domain.Units;
 using RecipeManager.Api.Shared.Contracts.Authorization;
@@ -20,18 +21,22 @@ public static class GetRecipeById
 {
     public record struct Request(Guid Id) : IRequestId<Request>;
 
-    public sealed record RecipeIngredientDto(Guid IngredientId, string IngredientName, string? IngredientRecipeUrl, Guid UnitId, string UnitName, double Amount);
+    public sealed record RecipeIngredientDto(IngredientDto Ingredient, UnitDto Unit, double Amount);
 
-    public sealed record RecipeAmountDto(double Amount, Guid UnitId, string UnitName);
+    public sealed record UnitDto(Guid Id, string Name);
 
-    public sealed record RecipeSectionDto(int SectionType, IEnumerable<RecipeStepDto> Steps);
+    public sealed record RecipeAmountDto(double Amount, UnitDto Unit);
+
+    public sealed record RecipeSectionDto(int SectionType, IEnumerable<RecipeStepDto> Steps, bool IsRequired);
 
     public sealed record RecipeStepDto(int Order, string Description, string? ImageUrl);
 
     public sealed record RecipeCategoryDto(Guid Id, string Name);
 
-    public sealed record Response(string Title, string Description, string? ImageUrl, string? VideoUrl, RecipeAmountDto Amount, byte NumberOfServings, int Difficulty,
-                                  IEnumerable<RecipeIngredientDto> Ingredients, IEnumerable<RecipeSectionDto> Sections, IEnumerable<RecipeCategoryDto> CategoryIds, Guid? IngredientId);
+    public sealed record IngredientDto(Guid Id, string Name, string? IngredientRecipe);
+
+    public sealed record Response(Guid Id, string Title, string Description, string? ImageUrl, string? VideoUrl, RecipeAmountDto Amount, byte NumberOfServings, int Difficulty,
+                                  IEnumerable<RecipeIngredientDto> Ingredients, IEnumerable<RecipeSectionDto> Sections, IEnumerable<RecipeCategoryDto> Categories, IngredientDto? Ingredient);
 
     [GroupEndpoint("Recipes")]
     public sealed class Endpoint : IEndpoint
@@ -61,8 +66,8 @@ public static class GetRecipeById
 
         bool isRecipeCreator = recipe.CreatedBy == currentUser.Id;
 
-        responseBuilder.AddDelete(LinkOptions.Create("DeleteRecipe", HateoasRelConstants.Delete, isRecipeCreator), new { recipe.Id })
-                       .AddPut(LinkOptions.Create("UpdateRecipe", HateoasRelConstants.Delete, isRecipeCreator), new { recipe.Id });
+        responseBuilder.AddDelete(LinkOptions.Create("DeleteRecipe", HateoasRelConstants.Delete, isRecipeCreator), new { RecipeId = recipe.Id })
+                       .AddPut(LinkOptions.Create("UpdateRecipe", HateoasRelConstants.Update, isRecipeCreator), new { RecipeId = recipe.Id });
 
         return TypedResults.Ok(responseBuilder.Build());
     }
@@ -94,8 +99,12 @@ public static class GetRecipeById
         IEnumerable<RecipeSectionDto> sections = recipe.Sections.Select(MapRecipeSectionDto);
         IEnumerable<RecipeCategoryDto> categories = recipeCategories.Select(c => new RecipeCategoryDto(c.Id.Value, c.Name));
 
+        Ingredient? ingredient = recipeIngredients.FirstOrDefault(i => i.Id == recipe.IngredientId);
+        IngredientDto? ingredientDto = ingredient == null ? null : new IngredientDto(ingredient.Id.Value, ingredient.Name, null);
+
         return new Response
         (
+            recipe.Id.Value,
             recipe.Title,
             recipe.Description ?? string.Empty,
             recipe.ImageURL,
@@ -106,7 +115,7 @@ public static class GetRecipeById
             ingredients,
             sections,
             categories,
-            recipe.IngredientId?.Value
+            ingredientDto
         );
     }
 
@@ -117,11 +126,17 @@ public static class GetRecipeById
 
         return new RecipeIngredientDto
         (
-            recipeIngredient.IngredientId.Value,
-            ingredient?.Name ?? string.Empty,
-            ingredient?.Recipes.Any() == true ? ingredient.Recipes.First().Value.ToString() : null,
-            recipeIngredient.UnitId.Value,
-            unit?.ShortName != null ? unit.ShortName : unit?.Name ?? string.Empty,
+            new IngredientDto
+            (
+                recipeIngredient.IngredientId.Value,
+                ingredient?.Name ?? string.Empty,
+                ingredient?.Recipes.Any() == true ? ingredient.Recipes.First().Value.ToString() : null
+            ),
+            new UnitDto
+            (
+                recipeIngredient.UnitId.Value,
+                unit?.ShortName != null ? unit.ShortName : unit?.Name ?? string.Empty
+            ),
             recipeIngredient.Amount
         );
     }
@@ -131,8 +146,11 @@ public static class GetRecipeById
         return new RecipeAmountDto
         (
             recipeAmount.Amount,
-            recipeAmount.UnitId.Value,
-            units.First(unit => unit.Id == recipeAmount.UnitId)?.ShortName ?? string.Empty
+            new UnitDto
+            (
+                recipeAmount.UnitId.Value,
+                units.First(unit => unit.Id == recipeAmount.UnitId)?.ShortName ?? string.Empty
+            )
         );
     }
 
@@ -141,7 +159,8 @@ public static class GetRecipeById
         return new RecipeSectionDto
         (
             (int)recipeSection.Type,
-            recipeSection.Steps.Select(step => new RecipeStepDto(step.Order, step.Description, step.ImageUrl))
+            recipeSection.Steps.Select(step => new RecipeStepDto(step.Order, step.Description, step.ImageUrl)),
+            recipeSection.Type is RecipeSectionType.Cooking or RecipeSectionType.IngredientsPreparation
         );
     }
 }

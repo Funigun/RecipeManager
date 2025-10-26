@@ -1,0 +1,108 @@
+﻿@using MudBlazor
+@using RecipeManager.UI.Blazor.Components.Common
+@using RecipeManager.UI.Blazor.Components.Common.DialogMessage
+@using RecipeManager.UI.Blazor.Components.Extensions;
+@using RecipeManager.UI.Blazor.Features.Ingredients
+@using RecipeManager.UI.Blazor.Features.Ingredients.Services
+@using RecipeManager.UI.Blazor.Features.Recipes.Models
+@using RecipeManager.UI.Blazor.Features.Units
+
+@inject IIngredientService IngredientService
+@inject ISnackbar Snackbar
+@inject IDialogMessageService DialogService
+
+
+@if (Mode.IsCreateOrEditMode())
+{
+    <MudStack Row=true Spacing="3" Style="margin-bottom: 25px; width: 800px; justify-self: end; margin-left: 20px">
+        <div style="margin-right: 10px; width: 350px">
+            <MudAutocomplete T="IngredientForDropdownModel" Label="Ingredient" @bind-Value="newIngredient.Ingredient" ShowProgressIndicator="true"
+                             SearchFunc="SearchIngredients" ToStringFunc="@(e => e == null ? null : e.Name)" style="width: 300px" />
+        </div>
+
+        <div style="margin-right: 10px; width: 150px !important">
+            <MudTextField T="double" Label="Amount" @bind-Value="newIngredient.Amount" Required="true"></MudTextField>
+        </div>
+
+        <div style="margin-right: 10px; width: 150px !important">
+            <MudSelect T="UnitForDropdownModel" Label="Unit*" @bind-Value="newIngredient.Unit">
+                @foreach (var unit in Units)
+                {
+                    <MudSelectItem Value="@unit">@unit.Name</MudSelectItem>
+                }
+            </MudSelect>
+        </div>
+
+        <MudIconButton Icon="@Icons.Material.Filled.Add" Color="Color.Primary" OnClick="AddIngredient" Disabled="@isAddIngredientDisabled" style="margin-right: 10px"></MudIconButton>
+        <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Error" OnClick="RemoveSelectedIngredients" Disabled="!selectedIngredients.Any()" style="margin-right: 10px"></MudIconButton>
+    </MudStack>
+}
+
+<MudTable T="RecipeIngredientModel" Items="Ingredients" @bind-selectedItems="selectedIngredients" FixedHeader="true" 
+          MultiSelection="Mode.IsCreateOrEditMode()" SelectionChangeable="Mode.IsCreateOrEditMode()">
+    <HeaderContent>
+        <MudTh>Name</MudTh>
+        <MudTh>Amount</MudTh>
+        <MudTh>Quantity</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd>@context.Ingredient.Name</MudTd>
+        <MudTd>@context.Amount</MudTd>
+        <MudTd>@context.Unit.Name</MudTd>
+    </RowTemplate>
+</MudTable>
+
+@code {
+    [Parameter]
+    public ICollection<RecipeIngredientModel> Ingredients { get; set; } = [];
+
+    [Parameter]
+    public EventCallback<ICollection<RecipeIngredientModel>> OnDataChanged { get; set; }
+
+    [Parameter]
+    public IEnumerable<UnitForDropdownModel> Units { get; set; } = [];
+
+    [CascadingParameter]
+    public FormMode Mode { get; set; }
+
+    private IngredientForDropdownModel selectedIngredient = new();
+    private RecipeIngredientModel newIngredient = new();
+    private IEnumerable<IngredientForDropdownModel> ingredients = [];
+    private HashSet<RecipeIngredientModel> selectedIngredients = [];
+
+    private bool isAddIngredientDisabled { get => newIngredient.Ingredient == null || newIngredient.Ingredient.Id == Guid.Empty ||
+                                                  newIngredient.Amount < 1 || newIngredient.Unit == null || newIngredient.Unit.Id == Guid.Empty; }
+
+    private async Task AddIngredient()
+    {
+        if (Ingredients.Any(ingredient => ingredient.Ingredient.Id == newIngredient.Ingredient.Id))
+        {
+            Snackbar.ShowWarning("This ingredient has already been added.");
+            return;
+        }
+
+        Ingredients.Add(newIngredient);
+        newIngredient = new();
+        await OnDataChanged.InvokeAsync(Ingredients);
+    }
+
+    private async Task RemoveSelectedIngredients()
+    {
+        if (await (DialogService.ShowDeleteItemsConfirmationMessage(selectedIngredients.Count())))
+        {
+            Ingredients = Ingredients.Except(selectedIngredients).ToList();
+            selectedIngredients.Clear();
+            await OnDataChanged.InvokeAsync(Ingredients);
+        }
+    }
+
+    private async Task<IEnumerable<IngredientForDropdownModel>> SearchIngredients(string value, CancellationToken cancellationToken)
+    {
+        if (string.IsNullOrEmpty(value) || !string.IsNullOrEmpty(value) && value != newIngredient.Ingredient?.Name)
+        {
+            ingredients = await IngredientService.GetIngredientsForDropdownModel(value, cancellationToken);
+        }
+
+        return ingredients;
+    }
+}

@@ -1,0 +1,96 @@
+﻿@using MudBlazor
+@using RecipeManager.UI.Blazor.Components.Common
+@using RecipeManager.UI.Blazor.Components.Extensions
+@using RecipeManager.UI.Blazor.Features.Recipes.Models
+@using RecipeManager.UI.Blazor.Features.Recipes.Validators
+
+<MudForm T="RecipeSectionModel" Model="RecipeSection">
+    @if (Mode.IsCreateOrEditMode())
+    {
+        <MudStack Row=true Spacing="3">
+            <div style="margin-right: 10px; margin-left: 50px; width: 620px !important">
+                <MudTextField T="string" Label="Step Description*" @bind-Value="newStep.Description" style="width: 620px"></MudTextField>
+            </div>
+        
+            <MudIconButton Icon="@Icons.Material.Filled.Add" Color="Color.Primary" OnClick="AddStep" Disabled="@(string.IsNullOrEmpty(newStep.Description))" style="margin-right: 10px"></MudIconButton>
+            <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Error" OnClick="RemoveSelectedSteps" Disabled="!selectedSteps.Any()" style="margin-right: 10px"></MudIconButton>
+        </MudStack>
+    }
+    <MudTable T="RecipeStepModel" Items="RecipeSection.Steps" @bind-selectedItems="selectedSteps" FixedHeader="true" MultiSelection="@Mode.IsCreateOrEditMode()" SelectionChangeable="@Mode.IsCreateOrEditMode()">
+        <HeaderContent>
+            @if(Mode.IsCreateOrEditMode())
+            {
+                <MudTh Style="width:850px">Details</MudTh>
+            }
+            else
+            {
+                <MudTh Style="width:850px; border: none; height: 0px;"></MudTh>
+            }
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd>
+                <div style="display: flex; gap: 1rem;">
+                    <span><strong>@context.Order.</strong></span>
+                    <span>@context.Description</span>
+                </div>
+
+                <div style="width: 500px; height: 500px; justify-self:center; margin-top: 15px;">
+                    @if (!string.IsNullOrEmpty(@context.ImageUrl))
+                    {
+                        @* <MudImage Src="@context.ImageUrl" Alt="Image" /> *@
+                    }
+                    else
+                    {
+                        <MudIcon Icon="@Icons.Material.Filled.QuestionMark" Style="width:500px; height: 500px; border: 1px solid; margin-top: 15px;" />
+                    }
+                </div>
+            </MudTd>
+        </RowTemplate>
+    </MudTable>
+</MudForm>
+
+
+@code {
+    [Parameter]
+    public RecipeSectionModel RecipeSection { get; set; }
+
+    [Parameter]
+    public EventCallback<RecipeSectionModel> OnDataChanged { get; set; }
+
+    [CascadingParameter]
+    public FormMode Mode { get; set; }
+
+    private HashSet<RecipeStepModel> selectedSteps = new();
+    private RecipeStepModel newStep = new();
+
+    private async Task AddStep()
+    {
+        RecipeSection.Steps.Add(new()
+        {
+            Order = RecipeSection.Steps.Count + 1,
+            Description = newStep.Description
+        });
+
+        newStep.Description = string.Empty;
+
+        await OnDataChanged.InvokeAsync(RecipeSection);
+    }
+
+    private async Task RemoveSelectedSteps()
+    {
+        foreach (RecipeStepModel stepModel in selectedSteps)
+        {
+            RecipeSection.Steps.Remove(stepModel);
+        }
+
+        int stepOrder = 1;
+
+        foreach (RecipeStepModel step in RecipeSection.Steps)
+        {
+            step.Order = stepOrder;
+            stepOrder++;
+        }
+
+        await OnDataChanged.InvokeAsync(RecipeSection);
+    }
+}

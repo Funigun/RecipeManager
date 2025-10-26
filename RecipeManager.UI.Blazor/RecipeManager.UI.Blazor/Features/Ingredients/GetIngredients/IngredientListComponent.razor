@@ -7,10 +7,10 @@
 @inject IIngredientService IngredientService;
 @inject IDialogMessageService DialogService;
     
-<MudTable T="HateoasResponse<IngredientModel>" Items="IngredientsPage.Item.Ingredients" Loading="ShowLoadingBar" Virtualize="true" FixedHeader="true" @ref="@table">
+<MudTable T="HateoasResponse<IngredientModel>" ServerData="RefreshTable" Loading="ShowLoadingBar" Virtualize="true" FixedHeader="true" @ref="@table">
     <ToolBarContent>
         <div style="margin-right: 10px">
-            <MudIconButton Variant="Variant.Filled" Color="Color.Primary" Size="Size.Small" Icon="@Icons.Material.Filled.Search" OnClick="() => RefreshTable()"></MudIconButton>
+            <MudIconButton Variant="Variant.Filled" Color="Color.Primary" Size="Size.Small" Icon="@Icons.Material.Filled.Search" OnClick="() => OnSearchClick()"></MudIconButton>
         </div>
         <MudTextField @bind-Value="categoryToSearch" Placeholder="Search" Class="mt-0"></MudTextField>
     </ToolBarContent>
@@ -37,14 +37,16 @@
     </LoadingContent>
     <PagerContent>
         <div class="d-flex flex-column align-center">
-            <MudTablePager  />
+            <MudTablePager>
+                
+            </MudTablePager>
         </div>
     </PagerContent>
 </MudTable>
 
 @code {
     [Parameter]
-    public HateoasResponse<IngredientsPageModel> IngredientsPage { get; set; } = new();
+    public HateoasResponse<IngredientsPageModel> IngredientsPage { get; set; }
 
     [Parameter]
     public bool ShowLoadingBar { get; set; } = true;
@@ -65,10 +67,17 @@
         }
     }
 
-    private async Task RefreshTable()
+    private async Task<TableData<HateoasResponse<IngredientModel>>> RefreshTable(TableState state, CancellationToken cancellationToken)
     {
         ShowLoadingBar = true;
-        IngredientsPage = await IngredientService.GetIngredientsPage(IngredientsPage.Item.Page, IngredientsPage.Item.PageSize, categoryToSearch);
+        IngredientsPage = await IngredientService.GetIngredientsPage(state.Page + 1, state.PageSize, categoryToSearch);
         ShowLoadingBar = false;
+
+        return new TableData<HateoasResponse<IngredientModel>>() { TotalItems = IngredientsPage.Item.TotalCount, Items = IngredientsPage.Item.Ingredients };
+    }
+
+    private async Task OnSearchClick()
+    {
+        await table.ReloadServerData();
     }
 }
