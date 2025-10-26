@@ -79,17 +79,18 @@
         </MudCollapse>
     </MudGrid>
 
-    <RecipeListComponent RecipesPage="recipesPage" ShowLoadingBar=recipesLoaded></RecipeListComponent>
+    <RecipeListComponent RecipesPage="recipesPage" SelectedCategories="selectedCategories" ShowLoadingBar=recipesLoaded></RecipeListComponent>
 </MudPaper>
 
 
 @code {
     private HateoasResponse<RecipesPageModel> recipesPage { get; set; } = new();
     private Dictionary<RecipeCategoryType, IEnumerable<RecipeCategoryForDropdownModel>> categoryDropdowns { get; set; } = new();
+    private IEnumerable<RecipeCategoryForDropdownModel> selectedCategories => categoryDropdowns.Values.SelectMany(s => s);
     private bool recipesLoaded = false;
     private bool isAddDisabled = false;
     private bool isDrawerOpen = false;
-    private int filtersCount => categoryDropdowns.Values.SelectMany(s => s).Count(c => c.IsSelected);
+    private int filtersCount => selectedCategories.Count(c => c.IsSelected);
 
     private void ToggleDrawer() 
     {

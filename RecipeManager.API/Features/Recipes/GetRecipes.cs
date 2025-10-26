@@ -14,7 +14,40 @@ namespace RecipeManager.Api.Features.Recipes;
 
 public static class GetRecipes
 {
-    public sealed record GetRecipesParameters(IEnumerable<Guid> Categories, IEnumerable<Guid> Ingredients, int PageNumber = 1, int PageSize = 10) : PagedParameters(PageNumber, PageSize);
+    public class ItemIds
+    {
+        public List<Guid> Ids = [];
+
+        public static bool TryParse(string? value, IFormatProvider? provider, out ItemIds? articleIDs)
+        {
+            string? trimmedValue = value?.TrimStart('(').TrimEnd(')');
+            string[]? segments = trimmedValue?.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+
+            if (segments == null)
+            {
+                articleIDs = new ItemIds();
+                return false;
+            }
+
+            List<Guid>? idList = [];
+            foreach (string segment in segments)
+            {
+                if (Guid.TryParse(segment, out Guid id))
+                {
+                    idList.Add(id);
+                }
+            }
+
+            articleIDs = new ItemIds()
+            {
+                Ids = idList
+            };
+
+            return true;
+        }
+    }
+
+    public sealed record GetRecipesParameters(ItemIds? Categories, ItemIds? Ingredients, int Page = 1, int PageSize = 10) : PagedParameters(Page, PageSize);
 
     public sealed record RecipeDto(Guid Id, string Title, string? ImageUrl, int Difficulty, byte NumberOfServings);
 
@@ -35,14 +68,14 @@ public static class GetRecipes
     {
         IQueryable<Recipe> recipesQuery = dbContext.Recipes.AsNoTracking();
 
-        if (parameters.Categories.Any())
+        if (parameters.Categories?.Ids.Any() ?? false)
         {
-            recipesQuery = recipesQuery.Where(r => r.Categories.Any(c => parameters.Categories.Contains(c.Value)));
+            recipesQuery = recipesQuery.Where(r => r.Categories.Any(c => parameters.Categories.Ids.Contains(c.Value)));
         }
 
-        if (parameters.Ingredients.Any())
+        if (parameters.Ingredients?.Ids.Any() ?? false)
         {
-            recipesQuery = recipesQuery.Where(r => r.Ingredients.Any(i => parameters.Ingredients.Contains(i.IngredientId.Value)));
+            recipesQuery = recipesQuery.Where(r => r.Ingredients.Any(i => parameters.Ingredients.Ids.Contains(i.IngredientId.Value)));
         }
 
         int totalCount = await recipesQuery.CountAsync(cancellationToken);
@@ -51,7 +84,7 @@ public static class GetRecipes
                                                     .Select(r => new RecipeDto(r.Id.Value, r.Title, r.ImageURL, (int)r.Difficulty, r.NumberOfServings))
                                                     .ToListAsync(cancellationToken);
 
-        HateoasResponse<Response> response = MapToResponse(recipes, parameters.PageNumber, parameters.PageSize, totalCount, hateoasBuilderFactory);
+        HateoasResponse<Response> response = MapToResponse(recipes, parameters.Page, parameters.PageSize, totalCount, hateoasBuilderFactory);
         return TypedResults.Ok(response);
     }
 

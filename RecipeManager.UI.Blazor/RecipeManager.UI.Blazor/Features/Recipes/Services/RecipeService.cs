@@ -53,14 +53,14 @@ public sealed class RecipeService(IRecipeApi recipeApi, ISnackbar snackbar, Navi
     {
         string requestUrl = $"{RecipesApiUrl}?page={page}&pageSize={pageSize}";
 
-        if (categories.Any())
+        foreach (Guid categoryId in categories)
         {
-            requestUrl += $"&categories={string.Join(",", categories)}";
+            requestUrl += $"&categories={categoryId}";
         }
 
-        if (ingredients.Any())
+        foreach (Guid ingredientId in ingredients)
         {
-            requestUrl += $"&ingredients={string.Join(",", ingredients)}";
+            requestUrl += $"&ingredients={ingredientId}";
         }
 
         HttpResponseMessage response = await recipeApi.GetAll(new Uri(requestUrl, UriKind.Relative));
