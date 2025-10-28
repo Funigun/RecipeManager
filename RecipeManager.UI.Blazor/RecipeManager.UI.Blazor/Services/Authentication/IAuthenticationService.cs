@@ -13,4 +13,6 @@ public interface IAuthenticationService
     Task Logout();
 
     Task<bool> Register(RegistrationRequest userRegistrationModel);
+
+    Task RefreshSession();
 }

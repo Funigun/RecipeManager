@@ -1,6 +1,7 @@
 ﻿using FluentValidation;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RecipeManager.Api.Shared.Endpoint;
 using RecipeManager.Identity.Api.Domain;
@@ -41,7 +42,7 @@ public static class RefreshUserToken
         }
     }
 
-    internal static async Task<Results<Ok<Response>, NotFound>> Handler(string refreshToken, UserManager<User> userManager, AppDbContext dbContext, AuthorizationService authorizationService, IConfiguration configuration, CancellationToken cancellationToken)
+    internal static async Task<Results<Ok<Response>, NotFound>> Handler([FromQuery] string refreshToken, UserManager<User> userManager, AppDbContext dbContext, AuthorizationService authorizationService, IConfiguration configuration, CancellationToken cancellationToken)
     {
         RefreshToken? existingToken = await dbContext.RefreshTokens.Include(token => token.User)
                                                                    .FirstAsync(token => token.Token == refreshToken, cancellationToken);

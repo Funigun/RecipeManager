@@ -2,11 +2,12 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
+using RecipeManager.UI.Blazor.Brokers.IdentityApi;
 using RecipeManager.UI.Blazor.Features.Account.Login;
 
 namespace RecipeManager.UI.Blazor.Services.Authorization;
 
-public class CustomAuthenticationStateProvider(ProtectedLocalStorage localStorage) : AuthenticationStateProvider
+public class CustomAuthenticationStateProvider(ProtectedLocalStorage localStorage, IIdentityApi identityApi) : AuthenticationStateProvider
 {
     public override async Task<AuthenticationState> GetAuthenticationStateAsync()
     {
@@ -31,6 +32,7 @@ public class CustomAuthenticationStateProvider(ProtectedLocalStorage localStorag
     public async Task MarkUserAsLoggedOut()
     {
         await localStorage.DeleteAsync("sessionState");
+        await identityApi.LogoutUser();
 
         ClaimsIdentity identity = new();
         ClaimsPrincipal user = new(identity);
