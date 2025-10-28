@@ -15,4 +15,16 @@ public class IdentityApi(HttpClient httpClient, ProtectedLocalStorage localStora
     {
         return await Post(new Uri("api/account/register", UriKind.Relative), userRegistrationModel);
     }
+
+    public async Task<HttpResponseMessage> RefreshUserToken(string refreshToken)
+    {
+        await AddAuthorizationHeader();
+        return await Post(new Uri($"api/auth/refresh-token?refreshToken={Uri.EscapeDataString(refreshToken)}", UriKind.Relative), new { });
+    }
+
+    public async Task<HttpResponseMessage> LogoutUser()
+    {
+        await AddAuthorizationHeader();
+        return await Post(new Uri("api/auth/logout", UriKind.Relative), new { });
+    }
 }

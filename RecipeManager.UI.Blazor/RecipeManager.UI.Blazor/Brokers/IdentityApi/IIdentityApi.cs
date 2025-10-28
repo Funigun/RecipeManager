@@ -8,4 +8,8 @@ public interface IIdentityApi
     Task<HttpResponseMessage> RegisterUser(RegistrationRequest userRegistrationModel);
 
     Task<HttpResponseMessage> LoginUser(LoginRequest userLoginModel);
+
+    Task<HttpResponseMessage> RefreshUserToken(string refreshToken);
+
+    Task<HttpResponseMessage> LogoutUser();
 }

@@ -1,5 +1,8 @@
 ﻿using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.EntityFrameworkCore;
+using RecipeManager.Api.Shared.Contracts.Authorization;
 using RecipeManager.Api.Shared.Endpoint;
+using RecipeManager.Identity.Api.Persistance;
 
 namespace RecipeManager.Identity.Api.Features.Authorization;
 
@@ -16,9 +19,11 @@ public static class LogOut
         }
     }
 
-    internal static async Task<Results<Ok<string>, NotFound>> Handler()
+    internal static async Task<Results<Ok, NotFound>> Handler(ICurrentUser currentUser, AppDbContext dbContext, CancellationToken cancellationToken)
     {
-        // Logic for changing the password goes here
-        return TypedResults.Ok("Logged out");
+        await dbContext.RefreshTokens.Where(token => token.User.Id == int.Parse(currentUser.Id))
+                                     .ExecuteDeleteAsync(cancellationToken);
+
+        return TypedResults.Ok();
     }
 }

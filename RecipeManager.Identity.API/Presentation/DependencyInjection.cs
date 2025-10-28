@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using RecipeManager.Identity.Api.Domain;
+using RecipeManager.Identity.Api.Features.Common;
 using RecipeManager.Identity.Api.Persistance;
 using Scalar.AspNetCore;
 
@@ -70,6 +71,8 @@ internal static class DependencyInjection
                 .AddRoles<Role>()
                 .AddEntityFrameworkStores<AppDbContext>()
                 .AddApiEndpoints();
+
+        services.AddScoped<AuthorizationService>();
 
         services.Configure<IdentityOptions>(options =>
         {

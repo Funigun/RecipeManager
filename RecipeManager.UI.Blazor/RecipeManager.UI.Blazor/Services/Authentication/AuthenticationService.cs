@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 using RecipeManager.UI.Blazor.Brokers.IdentityApi;
 using RecipeManager.UI.Blazor.Components.Common;
 using RecipeManager.UI.Blazor.Features.Account.Login;
@@ -7,7 +8,7 @@ using RecipeManager.UI.Blazor.Services.Authorization;
 
 namespace RecipeManager.UI.Blazor.Services.Authentication;
 
-public class AuthenticationService(IIdentityApi identityApi, AuthenticationStateProvider authenticationStateProvider) : IAuthenticationService
+public class AuthenticationService(IIdentityApi identityApi, AuthenticationStateProvider authenticationStateProvider, ProtectedLocalStorage localStorage) : IAuthenticationService
 {
     public ApiResponseBody ResponseBody { get; private set; } = new ApiResponseBody();
 
@@ -38,6 +39,31 @@ public class AuthenticationService(IIdentityApi identityApi, AuthenticationState
         ResponseBody = (await response.Content.ReadFromJsonAsync<ApiResponseBody>())!;
 
         return false;
+    }
+
+    public async Task RefreshSession()
+    {
+        LoginResponse? sessionModel = (await localStorage.GetAsync<LoginResponse?>("sessionState")).Value;
+
+        int maxMinutesBeforeExpirationToRefresh = 3;
+
+        if (sessionModel != null && sessionModel.ExpirationDate < DateTime.UtcNow.AddMinutes(maxMinutesBeforeExpirationToRefresh))
+        {
+            HttpResponseMessage? response = await identityApi.RefreshUserToken(sessionModel.RefreshToken);
+
+            if (response.IsSuccessStatusCode)
+            {
+                LoginResponse user = (await response.Content.ReadFromJsonAsync<LoginResponse>())!;
+
+                await ((CustomAuthenticationStateProvider)authenticationStateProvider).MarkUserAsAuthenticated(user);
+                sessionModel = user;
+            }
+        }
+
+        if (sessionModel is null || sessionModel.ExpirationDate < DateTime.UtcNow)
+        {
+            await Logout();
+        }
     }
 
     public async Task Logout() => await ((CustomAuthenticationStateProvider)authenticationStateProvider).MarkUserAsLoggedOut();

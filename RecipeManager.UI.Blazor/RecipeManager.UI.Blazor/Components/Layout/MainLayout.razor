@@ -56,6 +56,7 @@
     {
         try
         {
+            await AuthenticationService.RefreshSession();
             AuthenticationState authState = await ((CustomAuthenticationStateProvider)AuthStateProvider).GetAuthenticationStateAsync();
             isUserAuthenticated = authState.User?.Identity?.IsAuthenticated ?? false;
 
