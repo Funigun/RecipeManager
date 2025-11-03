@@ -1,0 +1,92 @@
+﻿@using MudBlazor
+@using RecipeManager.UI.Blazor.Brokers.HateoasModel
+@using RecipeManager.UI.Blazor.Features.Cookbooks.Services
+<h3>CookbookListComponent</h3>
+
+@inject ICookbookService CookbookService;
+
+<style>
+    .cookbooks-grid {
+        width: 1300px;
+        min-height: 450px;
+        max-height: 2500px;
+        margin-top: 30px;
+        justify-self: center !important;
+        justify-content: center !important;
+        overflow-y: hidden;
+    }
+
+    .cookbook-item {
+        width: 350px;
+        margin-top: 25px;
+        padding: 0px
+    }
+
+    .recipe-step-container {
+        border: none;
+        padding: 0px !important
+    }
+
+    .cookbook-title {
+        width: 300px;
+        text-align: center;
+    }
+
+    .cookbook-cover-image {
+        width: 75px;
+        height: 150px
+    }
+
+    .recipes-pagination {
+        justify-self: center !important;
+        justify-content: center !important;
+        margin-top: 25px;
+    }
+</style>
+
+<MudGrid T="HateoasResponse<CookbooksPage>" Items="CookbooksPage.Item.Recipes" Loading="ShowLoadingBar"
+         Virtualize="true" FixedHeader="true"  Class="mt-6 recipes-grid">
+
+    @for(int i = 0; i < CookbooksPage.Item.Cookbooks.Count; i++)
+    {
+        HateoasResponse<CookbookModel> cookbook = CookbooksPage.Item.Cookbooks[i];
+            
+        <MudItem Class="cookbook-item">
+            <MudPaper Class="d-flex align-center justify-center mud-width-full py-8 recipe-step-container" Outlined=true>
+                <MudStack Spacing="5">
+                    @if (!string.IsNullOrEmpty(cookbook.Item.CoverImageUrl))
+                    {
+                        <MudAvatar Class="cookbook-cover-image" Image="@cookbook.Item.CoverImageUrl" Alt="Cookbook Cover Image" />
+                    }
+                    else
+                    {
+                        <MudAvatar Class="cookbook-cover-image" Icon="@Icons.Material.Filled.Book" Alt="Default Cookbook Image" />
+                    }
+                    <MudText Typo="Typo.h6" Class="cookbook-title">@cookbook.Item.Title</MudText>
+                </MudStack>
+            </MudPaper>
+        </MudItem>
+    }
+</MudGrid>
+
+<MudPagination Class="d-flex align-center recipes-pagination" SelectedChanged="PageChanged"
+               Selected="CookbooksPage.Item.Page"
+               Count="CookbooksPage.Item.TotalCount / CookbooksPage.Item.PageSize"
+               ShowPreviousButton="CookbooksPage.Links.Any(link => link.Rel == HateoasConstants.Previous)"
+               ShowNextButton="CookbooksPage.Links.Any(link => link.Rel == HateoasConstants.Next)"
+               ShowFirstButton="true"
+               ShowLastButton="true" />
+
+@code {
+    [Parameter]
+    public HateoasResponse<CookbooksPageModel> CookbooksPage { get; set; } = new();
+
+    [Parameter]
+    public bool ShowLoadingBar { get; set; } = true;
+
+    private async Task PageChanged(int selectedPage)
+    {
+        CookbooksPage = await CookbookService.GetCookbooksPage(selectedPage, CookbooksPage.Item.PageSize);
+        StateHasChanged();
+    }
+}
