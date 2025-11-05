@@ -22,7 +22,7 @@
 
 @code {
     private HateoasResponse<CookbooksPageModel> CookbooksPage { get; set; } = new();
-    private bool isAddDisabled = false;
+    private bool isAddDisabled = true;
     private bool cookbooksLoaded = false;
 
     private void CreateNewCookbook()
@@ -33,7 +33,7 @@
     protected override async Task OnInitializedAsync()
     {
         CookbooksPage = await CookbookService.GetCookbooksPage(1, 10);
-        isAddDisabled = true;
+        isAddDisabled = !CookbooksPage.Links.Any(link => link.Rel == HateoasConstants.Create);
         cookbooksLoaded = true;
 
         StateHasChanged();

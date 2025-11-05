@@ -1,0 +1,14 @@
+﻿@using RecipeManager.UI.Blazor.Brokers.HateoasModel
+@using RecipeManager.UI.Blazor.Components.Common
+@using RecipeManager.UI.Blazor.Features.Cookbooks.Components
+@using RecipeManager.UI.Blazor.Features.Cookbooks.Models
+
+@page "/cookbooks/create"
+
+<MudPaper Class="pa-6 mx-auto" Style="width:1000px">
+    <CookbookForm CookbookModel="new HateoasResponse<CookbookForManageModel>()" Mode="FormMode.Create"></CookbookForm>
+</MudPaper>
+
+@code {
+    
+}

@@ -12,6 +12,8 @@ public sealed class Cookbook : AuditableEntity, IEntity<CookbookId>
 
     public string Description { get; set; } = string.Empty;
 
+    public string? CoverImageUrl { get; set; }
+
     public IReadOnlyList<CookbookCategory> Categories => _categories.ToList();
 
     private Cookbook()

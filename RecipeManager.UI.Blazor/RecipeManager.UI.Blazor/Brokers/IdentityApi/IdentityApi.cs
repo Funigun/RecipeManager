@@ -25,6 +25,7 @@ public class IdentityApi(HttpClient httpClient, ProtectedLocalStorage localStora
     public async Task<HttpResponseMessage> LogoutUser()
     {
         await AddAuthorizationHeader();
+
         return await Post(new Uri("api/auth/logout", UriKind.Relative), new { });
     }
 }

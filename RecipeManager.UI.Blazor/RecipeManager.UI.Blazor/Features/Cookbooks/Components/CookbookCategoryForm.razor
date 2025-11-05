@@ -1,0 +1,104 @@
+﻿@using MudBlazor
+@using RecipeManager.UI.Blazor.Components.Common
+@using RecipeManager.UI.Blazor.Components.Extensions
+@using RecipeManager.UI.Blazor.Features.Cookbooks.Models
+
+<style>
+    .category-selected {
+        background-color: #e0f7fa;
+    }
+
+    .category-default {
+        background-color: transparent;
+    }
+</style>
+
+<div class="ml-@((DepthLevel - 1) * 4)" style="margin-top: 10px; margin-bottom: 10px;" >
+    <MudPaper Class="@(CookbookCategory.IsSelected ? "category-selected" : "category-default")">
+        <MudForm Model="CookbookCategory" Style="border: solid 1px gray;">
+            <MudStack Row=true >
+                <MudIcon Icon=""></MudIcon>
+
+                <MudTextField @bind-Value="CookbookCategory.Name" Label="Category Name" Required="true" />
+        
+                @if (Mode.IsCreateOrEditMode())
+                {
+                    @if (DepthLevel < MaxDepthLevel)
+                    {
+                        <MudIconButton Icon="@Icons.Material.Filled.Add" Color="Color.Primary" OnClick="@(() => AddSubcategory())"/>
+                    }
+        
+                    <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Error" OnClick="@(() => RemoveCategory())" />
+                }
+
+                @if (CookbookCategory.Subcategories.Any())
+                {
+                    <MudIconButton Icon="@toggleSubCategoriesIcon" Color="Color.Primary" Edge="Edge.End" OnClick="ToggleSubCategories" />
+                }
+            </MudStack>
+
+            @if (CookbookCategory.Subcategories.Any())
+            {
+                <MudCollapse Expanded="areSubcategoriesExpanded">
+                    @foreach (var sub in CookbookCategory.Subcategories)
+                    {
+                        <CascadingValue Value="Mode">
+                            <CookbookCategoryForm CookbookCategory="sub" DepthLevel="@(DepthLevel + 1)" MaxDepthLevel="MaxDepthLevel"
+                                                  OnCategoryRemove="SubCategoryRemoved" OnCategorySelected="OnCategorySelected" />
+                        </CascadingValue>
+                    }
+                </MudCollapse>
+            }
+        
+        </MudForm>
+    </MudPaper>
+</div>
+
+
+@code {
+    [Parameter]
+    public CookbookCategoryForManageModel CookbookCategory { get; set; } = new();
+
+    [Parameter]
+    public int DepthLevel { get; set; } = 1;
+
+    [Parameter]
+    public int MaxDepthLevel { get; set; } = 4;
+
+    [CascadingParameter]
+    public FormMode Mode { get; set; }
+
+    [Parameter]
+    public EventCallback<CookbookCategoryForManageModel> OnCategoryRemove { get; set; }
+
+    [Parameter]
+    public EventCallback<CookbookCategoryForManageModel> OnCategorySelected { get; set; }
+
+    private bool areSubcategoriesExpanded = false;
+    private string toggleSubCategoriesIcon = Icons.Material.Filled.KeyboardArrowDown;
+    
+
+    private void AddSubcategory()
+    {
+        CookbookCategory.Subcategories.Add(new CookbookCategoryForManageModel());
+        areSubcategoriesExpanded = true;
+    }
+
+    private async Task RemoveCategory()
+    {
+        await OnCategoryRemove.InvokeAsync(CookbookCategory);
+    }
+
+    private async Task SubCategoryRemoved(CookbookCategoryForManageModel selectedCategory)
+    {
+        CookbookCategory.Subcategories.Remove(selectedCategory);
+    }
+
+    private void ToggleSubCategories()
+    {
+        areSubcategoriesExpanded = !areSubcategoriesExpanded;
+        toggleSubCategoriesIcon = areSubcategoriesExpanded
+                                ? Icons.Material.Filled.KeyboardArrowUp
+                                : Icons.Material.Filled.KeyboardArrowDown;
+    }
+}

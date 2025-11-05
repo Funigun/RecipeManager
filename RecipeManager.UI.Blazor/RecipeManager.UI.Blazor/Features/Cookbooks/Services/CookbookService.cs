@@ -10,11 +10,11 @@ namespace RecipeManager.UI.Blazor.Features.Cookbooks.Services;
 
 public sealed class CookbookService(IRecipeApi recipeApi, ISnackbar snackbar, NavigationManager navigationManager) : ICookbookService
 {
-    private const string CookbooksPageUrl = "/recipes";
-    private const string CreateCookbookPageUrl = "/recipes/create";
-    private const string UpdateCookbookPageUrl = "/recipes/update";
+    private const string CookbooksPageUrl = "/cookbooks";
+    private const string CreateCookbookPageUrl = "/cookbooks/create";
+    private const string UpdateCookbookPageUrl = "/cookbooks/update";
 
-    private const string CookbooksApiUrl = "api/recipes";
+    private const string CookbooksApiUrl = "api/cookbooks";
 
     public ApiResponseBody ResponseBody { get; private set; } = new();
 
