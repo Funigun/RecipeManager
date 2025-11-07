@@ -75,6 +75,21 @@ public sealed class RecipeService(IRecipeApi recipeApi, ISnackbar snackbar, Navi
         return new HateoasResponse<RecipesPageModel>();
     }
 
+    public async Task<IEnumerable<RecipeForDropdownModel>> GetRecipesForDropdown(string recipeName, int numberOfRecipesToLoad)
+    {
+        string requestUrl = $"{RecipesApiUrl}/dropdown?recipeName={recipeName}&numberOfRecipesToLoad={numberOfRecipesToLoad}";
+
+        HttpResponseMessage response = await recipeApi.GetAll(new Uri(requestUrl, UriKind.Relative));
+
+        if (response.IsSuccessStatusCode)
+        {
+            return (await response.Content.ReadFromJsonAsync<IEnumerable<RecipeForDropdownModel>>())!;
+        }
+
+        ResponseBody = (await response.Content.ReadFromJsonAsync<ApiResponseBody>())!;
+        return [];
+    }
+
     public async Task UpdateRecipe(string relativeUri, RecipeForManageModel recipe)
     {
         HttpResponseMessage response = await recipeApi.Update(new Uri(relativeUri), recipe);

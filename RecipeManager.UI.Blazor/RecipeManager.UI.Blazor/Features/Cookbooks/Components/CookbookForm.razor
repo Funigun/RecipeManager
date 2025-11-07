@@ -50,10 +50,11 @@
                     <MudTooltip Text="Add new cookbook category">
                         <MudIconButton Icon="@Icons.Material.Filled.Add" Color="Color.Primary" OnClick="AddCategory" />
                     </MudTooltip>
-                    <MudAutocomplete T="RecipeForDropdownModel" ResetValueOnEmptyText="true" ShowProgressIndicator="true"
-                                     SearchFunc="SearchRecipes" ToStringFunc="@(e => e == null ? null : e.Title)" ValueChanged="OnSelectedRecipeChanged">
 
+                    <MudAutocomplete T="RecipeForDropdownModel" ResetValueOnEmptyText="true" ShowProgressIndicator="true" MaxItems="10"
+                                     SearchFunc="SearchRecipes" ToStringFunc="@(e => e == null ? null : e.Title)" ValueChanged="OnSelectedRecipeChanged">
                     </MudAutocomplete>
+
                     <MudTooltip Text="Add recipe to selected category">
                         <MudIconButton Icon="@Icons.Material.Filled.Add" Color="Color.Primary" OnClick="AddRecipe" Disabled="isAddRecipeDisabled" />
                     </MudTooltip>
@@ -141,7 +142,7 @@
 
     private async Task<IEnumerable<RecipeForDropdownModel>> SearchRecipes(string value, CancellationToken cancellationToken)
     {
-        //ToDo: implement search for recipe by name once during Recipes UI development
+        recipes = await RecipeService.GetRecipesForDropdown(value, 25);
         return recipes;
     }
 
@@ -157,6 +158,8 @@
         CookbookModel.Item.ResetCategorySelection();
         selectedCategory.IsSelected = true;
         selectedBookCategory = selectedCategory;
+        isAddRecipeDisabled = selectedRecipe is null || selectedBookCategory is null ||
+                              selectedBookCategory.Recipes.Any(recipe => recipe.Id == selectedRecipe.Id);
     }
 
     private async Task CategoryRemoved(CookbookCategoryForManageModel selectedCategory)

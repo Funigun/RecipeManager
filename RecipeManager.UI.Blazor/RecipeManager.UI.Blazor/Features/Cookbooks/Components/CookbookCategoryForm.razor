@@ -2,6 +2,7 @@
 @using RecipeManager.UI.Blazor.Components.Common
 @using RecipeManager.UI.Blazor.Components.Extensions
 @using RecipeManager.UI.Blazor.Features.Cookbooks.Models
+@using RecipeManager.UI.Blazor.Features.Recipes
 
 <style>
     .category-selected {
@@ -11,14 +12,16 @@
     .category-default {
         background-color: transparent;
     }
+
+    .category-level {
+        z-index: @DepthLevel;
+    }
 </style>
 
-<div class="ml-@((DepthLevel - 1) * 4)" style="margin-top: 10px; margin-bottom: 10px;" >
+<div class="ml-@((DepthLevel - 1) * 4)" style="margin-top: 10px; margin-bottom: 10px;" onclick="SelectCategory">
     <MudPaper Class="@(CookbookCategory.IsSelected ? "category-selected" : "category-default")">
         <MudForm Model="CookbookCategory" Style="border: solid 1px gray;">
             <MudStack Row=true >
-                <MudIcon Icon=""></MudIcon>
-
                 <MudTextField @bind-Value="CookbookCategory.Name" Label="Category Name" Required="true" />
         
                 @if (Mode.IsCreateOrEditMode())
@@ -36,6 +39,26 @@
                     <MudIconButton Icon="@toggleSubCategoriesIcon" Color="Color.Primary" Edge="Edge.End" OnClick="ToggleSubCategories" />
                 }
             </MudStack>
+
+            <MudDropContainer T="CookbookRecipeForManageModel" Items="CookbookCategory.Recipes" ItemDropped="OnItemDropped">
+                <ItemRenderer>
+                    <MudStack Row=true>
+                        @if (@context.ImageUrl != null)
+                        {
+                            <MudImage Src="@context.ImageUrl" Alt="Recipe Image" Style="max-width: 150px; max-height:150px; margin-top: 15px;" />
+                        }
+                        else
+                        {
+                            <MudIcon Icon="@Icons.Material.Filled.QuestionMark" Style="width:150px; height: 150px; border: 1px solid; margin-top: 15px;" />
+                        }
+                        <MudText>@context.Title</MudText>
+                        @if (Mode.IsCreateOrEditMode())
+                        {
+                            <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Error" OnClick="@(() => RemoveRecipe(context))" />
+                        }
+                    </MudStack>
+                </ItemRenderer>
+            </MudDropContainer>
 
             @if (CookbookCategory.Subcategories.Any())
             {
@@ -76,17 +99,28 @@
 
     private bool areSubcategoriesExpanded = false;
     private string toggleSubCategoriesIcon = Icons.Material.Filled.KeyboardArrowDown;
-    
 
-    private void AddSubcategory()
+
+    private async Task AddSubcategory()
     {
         CookbookCategory.Subcategories.Add(new CookbookCategoryForManageModel());
         areSubcategoriesExpanded = true;
+
     }
 
     private async Task RemoveCategory()
     {
         await OnCategoryRemove.InvokeAsync(CookbookCategory);
+    }
+
+    private void SelectCategory(bool selectCategory)
+    {
+        
+    }
+
+    private async Task RemoveRecipe(CookbookRecipeForManageModel recipeToDelete)
+    {
+        CookbookCategory.Recipes.Remove(recipeToDelete);
     }
 
     private async Task SubCategoryRemoved(CookbookCategoryForManageModel selectedCategory)
@@ -101,4 +135,12 @@
                                 ? Icons.Material.Filled.KeyboardArrowUp
                                 : Icons.Material.Filled.KeyboardArrowDown;
     }
+
+    private void OnItemDropped(MudItemDropInfo<CookbookRecipeForManageModel> cookbookRecipe)
+    {
+        CookbookRecipeForManageModel recipe = cookbookRecipe.Item!;
+        CookbookCategory.Recipes.Remove(recipe);
+        CookbookCategory.Recipes.Add(recipe);
+    }
+
 }
