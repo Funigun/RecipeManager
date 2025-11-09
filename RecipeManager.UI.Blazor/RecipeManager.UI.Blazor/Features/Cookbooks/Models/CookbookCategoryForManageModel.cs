@@ -11,6 +11,9 @@ public class CookbookCategoryForManageModel
     [JsonIgnore]
     public bool IsSelected { get; set; } = false;
 
+    [JsonIgnore]
+    public int DepthLevel { get; set; } = 1;
+
     public List<CookbookRecipeForManageModel> Recipes { get; set; } = [];
 
     public List<CookbookCategoryForManageModel> Subcategories { get; set; } = [];
