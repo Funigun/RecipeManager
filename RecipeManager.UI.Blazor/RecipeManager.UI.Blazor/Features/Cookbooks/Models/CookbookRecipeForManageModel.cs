@@ -11,5 +11,5 @@ public class CookbookRecipeForManageModel
     public string ImageUrl { get; set; } = string.Empty;
 
     [JsonIgnore]
-    public string DropZoneIndetifier { get; set; } = "Zone";
+    public bool IsSelected { get; set; }
 }

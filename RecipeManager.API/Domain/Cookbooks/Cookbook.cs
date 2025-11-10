@@ -20,20 +20,22 @@ public sealed class Cookbook : AuditableEntity, IEntity<CookbookId>
     {
     }
 
-    public static Cookbook Create(string title, string description, IEnumerable<CookbookCategory> categories)
+    public static Cookbook Create(string title, string description, string? coverImageUrl, IEnumerable<CookbookCategory> categories)
     {
         return new()
         {
             Title = title,
             Description = description,
+            CoverImageUrl = coverImageUrl,
             _categories = categories.ToList()
         };
     }
 
-    public void Update(string title, string description, IEnumerable<CookbookCategory> categories)
+    public void Update(string title, string description, string? coverImageUrl, IEnumerable<CookbookCategory> categories)
     {
         Title = title;
         Description = description;
+        CoverImageUrl = coverImageUrl;
         _categories = categories.ToList();
     }
 }

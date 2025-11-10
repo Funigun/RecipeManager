@@ -29,11 +29,13 @@
     .cookbook-title {
         width: 300px;
         text-align: center;
+        text-wrap: wrap;
     }
 
     .cookbook-cover-image {
         width: 75px;
-        height: 150px
+        height: 150px;
+        align-self: center;
     }
 
     .recipes-pagination {
@@ -55,11 +57,12 @@
                 <MudStack Spacing="5">
                     @if (!string.IsNullOrEmpty(cookbook.Item.CoverImageUrl))
                     {
-                        <MudAvatar Class="cookbook-cover-image" Image="@cookbook.Item.CoverImageUrl" Alt="Cookbook Cover Image" />
+                        <MudImage Src="@cookbook.Item.CoverImageUrl" Class="cookbook-cover-image" />
                     }
                     else
                     {
-                        <MudAvatar Class="cookbook-cover-image" Icon="@Icons.Material.Filled.Book" Alt="Default Cookbook Image" />
+                        <MudIconButton Icon="@Icons.Material.Filled.QuestionMark" Size="Size.Large" Class="recipe-step-image"
+                                       Color="Color.Primary" OnClick="(() => OpenCookbook(cookbook))"></MudIconButton>
                     }
                     <MudText Typo="Typo.h6" Class="cookbook-title">@cookbook.Item.Title</MudText>
                 </MudStack>
@@ -87,5 +90,10 @@
     {
         CookbooksPage = await CookbookService.GetCookbooksPage(selectedPage, CookbooksPage.Item.PageSize);
         StateHasChanged();
+    }
+
+    private void OpenCookbook(HateoasResponse<CookbookModel> cookbook)
+    {
+        CookbookService.OpenUpdateCookbookPage(cookbook.Item.Id);
     }
 }

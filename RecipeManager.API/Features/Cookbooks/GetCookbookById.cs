@@ -22,14 +22,14 @@ public static class GetCookbookById
 
     public sealed record class CookbookCategoryDto(Guid Id, string Name, IEnumerable<HateoasResponse<RecipeDto>> Recipes, IEnumerable<CookbookCategoryDto> Subcategories);
 
-    public sealed record Response(Guid Id, string Title, string Description, IEnumerable<CookbookCategoryDto> Categories);
+    public sealed record Response(Guid Id, string Title, string Description, string? CoverImageUrl, IEnumerable<CookbookCategoryDto> Categories);
 
     [GroupEndpoint("Cookbooks")]
     public sealed class Endpoint : IEndpoint
     {
         public void MapEndpoint([FromServices] IEndpointRouteBuilder endpoints)
         {
-            endpoints.MapStandardGet<Response>("/{cookbookId}", Handler)
+            endpoints.MapStandardGet<Response>("{cookbookId}", Handler)
                      .WithName("GetCookbookById")
                      .WithDescription("Gets a cookbook by its id");
         }
@@ -96,6 +96,7 @@ public static class GetCookbookById
             cookbook.Id.Value,
             cookbook.Title,
             cookbook.Description,
+            cookbook.CoverImageUrl,
             rootCategories.Select(category => MapToCookbookCategoryDto(category, categories, hateoasRecipes))
         );
     }

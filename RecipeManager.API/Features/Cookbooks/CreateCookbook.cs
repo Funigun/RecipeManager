@@ -10,9 +10,11 @@ namespace RecipeManager.Api.Features.Cookbooks;
 
 public static class CreateCookbook
 {
-    public record CookbookCategoryDto(string Name, IEnumerable<Guid> Recipes, IEnumerable<CookbookCategoryDto> Subcategories);
+    public record CookbookCategoryDto(string Name, IEnumerable<CookbookRecipeDto> Recipes, IEnumerable<CookbookCategoryDto> Subcategories);
 
-    public sealed record Request(string Title, string Description, IEnumerable<CookbookCategoryDto> Categories);
+    public record CookbookRecipeDto(Guid Id);
+
+    public sealed record Request(string Title, string Description, string? CoverImageUrl, IEnumerable<CookbookCategoryDto> Categories);
 
     public sealed record Response(Guid Id);
 
@@ -70,11 +72,11 @@ public static class CreateCookbook
         }
     }
 
-    public static async Task<Response> Handler(Request request, [FromServices] IAppDbContext dbContext, CancellationToken cancellationToken)
+    public static async Task<Response> Handler([FromBody] Request request, [FromServices] IAppDbContext dbContext, CancellationToken cancellationToken)
     {
-        Cookbook cookbook = Cookbook.Create(request.Title, request.Description, []);
+        Cookbook cookbook = Cookbook.Create(request.Title, request.Description, request.CoverImageUrl, []);
         List<CookbookCategory> categories = request.Categories.Select(categoryDto => MapToCookbookCategory(categoryDto, cookbook)).ToList();
-        cookbook.Update(request.Title, request.Description, categories);
+        cookbook.Update(request.Title, request.Description, request.CoverImageUrl, categories);
 
         dbContext.Cookbooks.Add(cookbook);
         await dbContext.SaveChangesAsync(cancellationToken);
@@ -86,6 +88,6 @@ public static class CreateCookbook
     {
         List<CookbookCategory> subcategories = categoryDto.Subcategories.Select(subcategoryDto => MapToCookbookCategory(subcategoryDto, cookbook)).ToList();
 
-        return CookbookCategory.Create(categoryDto.Name, cookbook, subcategories, categoryDto.Recipes.Select(recipeId => new RecipeId(recipeId)));
+        return CookbookCategory.Create(categoryDto.Name, cookbook, subcategories, categoryDto.Recipes.Select(recipe => new RecipeId(recipe.Id)));
     }
 }

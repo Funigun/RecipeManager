@@ -1,0 +1,31 @@
+﻿@page "/cookbooks/update/{RawGuid}"
+
+@using RecipeManager.UI.Blazor.Brokers.HateoasModel
+@using RecipeManager.UI.Blazor.Features.Cookbooks.Components
+@using RecipeManager.UI.Blazor.Features.Cookbooks.Models
+@using RecipeManager.UI.Blazor.Features.Cookbooks.Services
+
+@inject ICookbookService CookbookService;
+
+<MudPaper Class="pa-6 mx-auto" Style="width:1250px">
+    <CookbookForm CookbookModel="Cookbook" Mode="Common.FormMode.View"/>
+</MudPaper>
+
+@code {
+    [Parameter]
+    public string RawGuid { get; set; } = "";
+
+    private HateoasResponse<CookbookForManageModel> Cookbook { get; set; } = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (Guid.TryParse(RawGuid, out Guid cookbookId))
+        {
+            Cookbook = await CookbookService.GetCookbookForManageById(cookbookId);
+        }
+        else
+        {
+            
+        }
+    }
+}

@@ -15,9 +15,11 @@ public static class UpdateCookbook
 {
     public record struct Request(Guid Id) : IRequestId<Request>;
 
-    public record CookbookCategoryDto(string Name, IEnumerable<Guid> Recipes, IEnumerable<CookbookCategoryDto> Subcategories);
+    public record CookbookCategoryDto(string Name, IEnumerable<CookbookRecipeDto> Recipes, IEnumerable<CookbookCategoryDto> Subcategories);
 
-    public sealed record CookbookDto(string Title, string Description, IEnumerable<CookbookCategoryDto> Categories);
+    public record CookbookRecipeDto(Guid Id);
+
+    public sealed record CookbookDto(string Title, string Description, string? CoverImageUrl, IEnumerable<CookbookCategoryDto> Categories);
 
     public sealed class AuthorizationPolicy(IAppDbContext dbContext, ICurrentUser currentUser) : IAuthorizationPolicy<Request>
     {
@@ -92,7 +94,7 @@ public static class UpdateCookbook
         await dbContext.CookbookCategories.Where(category => category.Cookbook.Id == cookbook.Id)
                                           .ExecuteDeleteAsync(cancellationToken);
 
-        cookbook.Update(request.Title, request.Description, request.Categories.Select(category => MapToCookbookCategory(category, cookbook)));
+        cookbook.Update(request.Title, request.Description, request.CoverImageUrl, request.Categories.Select(category => MapToCookbookCategory(category, cookbook)));
         await dbContext.SaveChangesAsync(cancellationToken);
 
         return TypedResults.Ok();
@@ -102,6 +104,6 @@ public static class UpdateCookbook
     {
         List<CookbookCategory> subcategories = categoryDto.Subcategories.Select(subcategoryDto => MapToCookbookCategory(subcategoryDto, cookbook)).ToList();
 
-        return CookbookCategory.Create(categoryDto.Name, cookbook, subcategories, categoryDto.Recipes.Select(recipeId => new RecipeId(recipeId)));
+        return CookbookCategory.Create(categoryDto.Name, cookbook, subcategories, categoryDto.Recipes.Select(recipe => new RecipeId(recipe.Id)));
     }
 }

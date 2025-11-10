@@ -5,6 +5,7 @@ using RecipeManager.UI.Blazor.Brokers.RecipeManagersApi;
 using RecipeManager.UI.Blazor.Components.Common;
 using RecipeManager.UI.Blazor.Components.Extensions;
 using RecipeManager.UI.Blazor.Features.Cookbooks.GetCookbooks;
+using RecipeManager.UI.Blazor.Features.Cookbooks.Models;
 
 namespace RecipeManager.UI.Blazor.Features.Cookbooks.Services;
 
@@ -18,7 +19,7 @@ public sealed class CookbookService(IRecipeApi recipeApi, ISnackbar snackbar, Na
 
     public ApiResponseBody ResponseBody { get; private set; } = new();
 
-    public async Task CreateCookbook(object cookbook)
+    public async Task CreateCookbook(CookbookForManageModel cookbook)
     {
         HttpResponseMessage response = await recipeApi.Create(new Uri(CookbooksApiUrl, UriKind.Relative), cookbook);
 
@@ -33,19 +34,19 @@ public sealed class CookbookService(IRecipeApi recipeApi, ISnackbar snackbar, Na
         }
     }
 
-    public async Task<HateoasResponse<object>> GetCookbookForManageById(Guid cookbookId)
+    public async Task<HateoasResponse<CookbookForManageModel>> GetCookbookForManageById(Guid cookbookId)
     {
         HttpResponseMessage response = await recipeApi.GetById(new Uri($"{CookbooksApiUrl}/{cookbookId}", UriKind.Relative));
 
         if (response.IsSuccessStatusCode)
         {
-            return (await response.Content.ReadFromJsonAsync<HateoasResponse<object>>())!;
+            return (await response.Content.ReadFromJsonAsync<HateoasResponse<CookbookForManageModel>>())!;
         }
 
         ResponseBody = (await response.Content.ReadFromJsonAsync<ApiResponseBody>())!;
         navigationManager.NavigateTo(CookbooksPageUrl);
 
-        return new HateoasResponse<object>();
+        return new HateoasResponse<CookbookForManageModel>();
     }
 
     public async Task<HateoasResponse<CookbooksPageModel>> GetCookbooksPage(int page, int pageSize, string sortBy = "title", bool isAscending = true)
@@ -63,9 +64,9 @@ public sealed class CookbookService(IRecipeApi recipeApi, ISnackbar snackbar, Na
         return new HateoasResponse<CookbooksPageModel>();
     }
 
-    public async Task UpdateCookbook(Guid cookbookId, object cookbook)
+    public async Task UpdateCookbook(string relativerUrl, CookbookForManageModel cookbook)
     {
-        HttpResponseMessage response = await recipeApi.Update(new Uri($"{CookbooksApiUrl}/{cookbookId}", UriKind.Relative), cookbook);
+        HttpResponseMessage response = await recipeApi.Update(new Uri(relativerUrl, UriKind.Relative), cookbook);
 
         if (response.IsSuccessStatusCode)
         {

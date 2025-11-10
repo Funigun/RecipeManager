@@ -46,7 +46,7 @@
 <MudPaper Elevation="@CookbookCategory.DepthLevel" Class="@(CookbookCategory.IsSelected ? "category-selected" : "category-default")" Style="margin-top: 10px; margin-bottom: 10px; border: none" Outlined=true>
     <MudForm Model="CookbookCategory">
         <MudStack Row=true >
-            <MudCheckBox T="bool" ValueChanged="SelectCategory"></MudCheckBox>
+            <MudCheckBox T="bool" ReadOnly="false" ValueChanged="SelectCategory"></MudCheckBox>
 
             @if (CookbookCategory.Subcategories.Any())
             {

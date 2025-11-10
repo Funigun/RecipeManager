@@ -175,7 +175,7 @@
     [Parameter]
     public FormMode Mode { get; set; }
 
-    private MudForm Form { get; set; }
+    private MudForm Form { get; set; } = default!;
 
     private IEnumerable<IngredientForDropdownModel> ingredients = [];
     private IEnumerable<UnitForDropdownModel> units { get; set; } = [];
