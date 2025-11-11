@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components;
+using Microsoft.JSInterop;
 using MudBlazor;
 using RecipeManager.UI.Blazor.Brokers.HateoasModel;
 using RecipeManager.UI.Blazor.Brokers.RecipeManagersApi;
@@ -9,7 +10,7 @@ using RecipeManager.UI.Blazor.Features.Recipes.Models;
 
 namespace RecipeManager.UI.Blazor.Features.Recipes.Services;
 
-public sealed class RecipeService(IRecipeApi recipeApi, ISnackbar snackbar, NavigationManager navigationManager) : IRecipeService
+public sealed class RecipeService(IRecipeApi recipeApi, ISnackbar snackbar, IJSRuntime jSRuntime, NavigationManager navigationManager) : IRecipeService
 {
     private const string RecipesPageUrl = "/recipes";
     private const string CreateRecipePageUrl = "/recipes/create";
@@ -125,8 +126,17 @@ public sealed class RecipeService(IRecipeApi recipeApi, ISnackbar snackbar, Navi
         navigationManager.NavigateTo(CreateRecipePageUrl);
     }
 
-    public void OpenUpdateRecipePage(Guid recipeId)
+    public async Task OpenUpdateRecipePage(Guid recipeId, bool openInNewTab = false)
     {
-        navigationManager.NavigateTo($"{UpdateRecipePageUrl}/{recipeId}");
+        string url = $"{UpdateRecipePageUrl}/{recipeId}";
+
+        if (openInNewTab)
+        {
+            await jSRuntime.InvokeVoidAsync("open", url, "_blank");
+        }
+        else
+        {
+            navigationManager.NavigateTo(url);
+        }
     }
 }

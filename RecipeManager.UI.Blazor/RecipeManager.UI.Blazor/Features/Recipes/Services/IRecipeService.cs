@@ -20,5 +20,5 @@ public interface IRecipeService
 
     void OpenCreateRecipePage();
 
-    void OpenUpdateRecipePage(Guid recipeId);
+    Task OpenUpdateRecipePage(Guid recipeId, bool openInNewTab = false);
 }

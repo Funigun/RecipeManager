@@ -54,7 +54,7 @@
             }          
 
             <span class="@TitleStyle">
-                <MudTextField @bind-Value="CookbookCategory.Name" Label="Category Name" Required="true" />
+                <MudTextField ReadOnly="Mode.IsViewMode()" @bind-Value="CookbookCategory.Name" Label="Category Name" Required="true" />
             </span>
             
         </MudStack>

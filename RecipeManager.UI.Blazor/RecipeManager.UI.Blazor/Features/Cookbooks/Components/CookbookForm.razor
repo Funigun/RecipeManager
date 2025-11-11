@@ -15,14 +15,14 @@
 @inject IDialogMessageService DialogService
 @inject NavigationManager NavigationManager
 
-<MudForm @ref="Form" Model="CookbookModel" ReadOnly="Mode.IsViewMode()" Validation="@(validator.ValidateValue)" @bind-IsValid="@isSubmitEnabled" @rendermode="RenderMode.InteractiveAuto">
+<MudForm @ref="Form" Model="CookbookModel" Validation="@(validator.ValidateValue)" @bind-IsValid="@isSubmitEnabled" @rendermode="RenderMode.InteractiveAuto">
     <MudStack Spacing="5">
         <div style="align-self: center; width: 95%">
 
             <MudGrid Style="width: 100%">
                 <MudItem Style="width: 25%;">
                     <div style="width: 150px; height: 250px; justify-self:left;">
-                        @if (CookbookModel != null && CookbookModel.Item.CoverImageUrl != null)
+                        @if (CookbookModel.Item.CoverImageUrl != null)
                         {
                             <MudImage Src="CookbookModel.Item.CoverImageUrl" Style="max-width: 150px; max-height:250px; margin-top: 15px;" />
                         }
@@ -35,7 +35,7 @@
 
                 <MudItem Style=" width: 65%;">
                     <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Style="margin-top: 15px;">
-                        <MudTextField Required Label="Title" For="@(() => CookbookModel.Item.Title)" @bind-Value="CookbookModel.Item.Title" />
+                        <MudTextField ReadOnly="Mode.IsViewMode()" Required Label="Title" For="@(() => CookbookModel.Item.Title)" @bind-Value="CookbookModel.Item.Title" />
 
                         @if (Mode.IsViewMode() && @CookbookModel.Links.FirstOrDefault(link => link.Rel == HateoasConstants.Update) != null)
                         {
@@ -47,7 +47,7 @@
                         }
                     </MudStack>
 
-                    <MudTextField Required Label="Description" For="@(() => CookbookModel.Item.Description)" @bind-Value="CookbookModel.Item.Description" />
+                    <MudTextField ReadOnly="Mode.IsViewMode()" Required Label="Description" For="@(() => CookbookModel.Item.Description)" @bind-Value="CookbookModel.Item.Description" />
                 </MudItem>
             </MudGrid>
 
@@ -71,7 +71,7 @@
                 </div>
             }
 
-            @if (CookbookModel != null && CookbookModel.Item.Categories.Any())
+            @if (CookbookModel.Item.Categories.Any())
             {
                 <MudGrid Style="margin-top: 25px;">                    
                     <MudItem Style="padding-top: 0px; width: 45%;">
@@ -91,23 +91,28 @@
                             <MudGrid T="CookbookRecipeForManageModel" Items="selectedBookCategory.Recipes" Style="margin-left: 5px">
                                 @for (int i = 0; i < selectedBookCategory.Recipes.Count; i++)
                                 {
-                                    var recipe = selectedBookCategory.Recipes[i].Item;
+                                    var recipe = selectedBookCategory.Recipes[i];
 
                                     <MudStack Style="width: 100%">
                                         <MudItem Style="width: 100%">
                                             <MudStack Row=true>
-                                                @if (!string.IsNullOrEmpty(@recipe.ImageUrl))
+                                                @if (!string.IsNullOrEmpty(@recipe.Item.ImageUrl))
                                                 {
-                                                    <MudImage Src="@recipe.ImageUrl" Style="max-width: 100px; max-height:100px; margin-top: 10px; margin-bottom: 10px;" />
+                                                    <MudImage Src="@recipe.Item.ImageUrl" Style="max-width: 100px; max-height:100px; margin-top: 10px; margin-bottom: 10px;" />
                                                 }
                                                 else
                                                 {
                                                     <MudIcon Icon="@Icons.Material.Filled.QuestionMark" Style="width:100px; height: 100px; border: 1px solid; margin-top: 10px; margin-bottom: 10px;" />
                                                 }
 
-                                                <MudText Style="display:flex; margin-left: 5px; align-items: center">@recipe.Title</MudText>
+                                                <MudText Style="display:flex; margin-left: 5px; align-items: center">@recipe.Item.Title</MudText>
 
-                                                <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Primary" OnClick="@(() => RemoveRecipeFromCategory(@selectedBookCategory.Recipes[i]))" />
+                                                <MudIconButton Icon="@Icons.Material.Filled.OpenInNew" Color="Color.Primary" OnClick="@(() => ShowRecipe(@recipe))" />
+
+                                                @if(Mode.IsCreateOrEditMode())
+                                                {
+                                                    <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Primary" OnClick="@(() => RemoveRecipeFromCategory(@selectedBookCategory.Recipes[i]))" />
+                                                }
                                             </MudStack>
                                         </MudItem>
                                     </MudStack>
@@ -120,7 +125,7 @@
         </div>
     </MudStack>
 
-    @if (Mode.IsCreateMode() || (Mode.IsEditMode() && CookbookModel != null && CookbookModel.Links.FirstOrDefault(link => link.Rel == HateoasConstants.Update) != null))
+    @if (Mode.IsCreateMode() || (Mode.IsEditMode() && CookbookModel.Links.FirstOrDefault(link => link.Rel == HateoasConstants.Update) != null))
     {
         <MudGrid Class="mt-4">
             <MudItem xs="6">
@@ -166,6 +171,11 @@
     private RecipeForDropdownModel selectedRecipe = default!;
     private IEnumerable<string> errorMessages = [];
     private bool isSubmitEnabled = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        allAddedRecipes = CookbookModel.Item.GetRecipes().ToList();
+    }
 
     private async Task ToggleEditCookbook(MouseEventArgs args)
     {
@@ -216,6 +226,11 @@
         selectedBookCategory.Recipes.Remove(recipe);
         allAddedRecipes.Remove(recipe);
         StateHasChanged();
+    }
+
+    private async Task ShowRecipe(HateoasResponse<CookbookRecipeForManageModel> recipe)
+    {
+        await RecipeService.OpenUpdateRecipePage(recipe.Item.Id, true);
     }
 
     private async Task<IEnumerable<RecipeForDropdownModel>> SearchRecipes(string value, CancellationToken cancellationToken)

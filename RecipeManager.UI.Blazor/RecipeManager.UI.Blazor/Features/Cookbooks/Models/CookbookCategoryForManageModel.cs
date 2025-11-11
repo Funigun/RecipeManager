@@ -28,4 +28,12 @@ public class CookbookCategoryForManageModel
             subcategory.ResetSelection();
         }
     }
+
+    public IEnumerable<HateoasResponse<CookbookRecipeForManageModel>> GetAllRecipes()
+    {
+        List<HateoasResponse<CookbookRecipeForManageModel>> recipes = Recipes.ToList();
+        recipes.AddRange(Subcategories.SelectMany(s => s.GetAllRecipes()));
+
+        return recipes;
+    }
 }

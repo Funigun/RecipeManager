@@ -1,4 +1,6 @@
-﻿namespace RecipeManager.UI.Blazor.Features.Cookbooks.Models;
+﻿using RecipeManager.UI.Blazor.Brokers.HateoasModel;
+
+namespace RecipeManager.UI.Blazor.Features.Cookbooks.Models;
 
 public sealed class CookbookForManageModel
 {
@@ -18,5 +20,10 @@ public sealed class CookbookForManageModel
         {
             category.ResetSelection();
         }
+    }
+
+    public IEnumerable<HateoasResponse<CookbookRecipeForManageModel>> GetRecipes()
+    {
+        return Categories.SelectMany(category => category.GetAllRecipes()).ToList();
     }
 }
