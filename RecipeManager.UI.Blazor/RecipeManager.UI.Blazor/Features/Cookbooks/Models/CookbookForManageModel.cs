@@ -26,4 +26,45 @@ public sealed class CookbookForManageModel
     {
         return Categories.SelectMany(category => category.GetAllRecipes()).ToList();
     }
+
+    public bool CategoryExists(string categoryName)
+    {
+        foreach (CookbookCategoryForManageModel category in Categories)
+        {
+            if (category.CategoryExists(categoryName))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public void DeleteCategory(CookbookCategoryForManageModel categoryToRemove)
+    {
+        if (categoryToRemove.DepthLevel == 1)
+        {
+            Categories.Remove(categoryToRemove);
+        }
+        else if (categoryToRemove.DepthLevel == 2)
+        {
+            foreach (CookbookCategoryForManageModel category in Categories)
+            {
+                if (category.Subcategories.Remove(categoryToRemove))
+                {
+                    break;
+                }
+            }
+        }
+        else
+        {
+            foreach (CookbookCategoryForManageModel category in Categories)
+            {
+                if (category.DeleteSubcategory(categoryToRemove))
+                {
+                    break;
+                }
+            }
+        }
+    }
 }

@@ -43,34 +43,40 @@
 </style>
 
 
-<MudPaper Elevation="@CookbookCategory.DepthLevel" Class="@(CookbookCategory.IsSelected ? "category-selected" : "category-default")" Style="margin-top: 10px; margin-bottom: 10px; border: none" Outlined=true>
+<MudPaper Elevation="@CookbookCategory.DepthLevel" Class="@(CookbookCategory.IsSelected  ? "category-selected" : "category-default")" Style="margin-top: 15px; margin-bottom: 10px; border: none" Outlined=true>
     <MudForm Model="CookbookCategory">
         <MudStack Row=true >
             <MudCheckBox T="bool" ReadOnly="false" ValueChanged="SelectCategory"></MudCheckBox>
-
+        
             @if (CookbookCategory.Subcategories.Any())
             {
                 <MudIconButton Icon="@toggleSubCategoriesIcon" Color="Color.Primary" Edge="Edge.End" OnClick="ToggleSubCategories" />
             }          
-
+        
             <span class="@TitleStyle">
-                <MudTextField ReadOnly="Mode.IsViewMode()" @bind-Value="CookbookCategory.Name" Label="Category Name" Required="true" />
+                <MudTextField ReadOnly="Mode.IsViewMode()" @bind-Value="CookbookCategory.Name" Label="Category Name" Required=true />
             </span>
-            
+        
+            @if (Mode.IsCreateOrEditMode() && CookbookCategory.IsSelected)
+            {
+                <MudTooltip Text="Delete selected category">
+                    <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Error" OnClick="DeleteCategory" />
+                </MudTooltip>
+            }
         </MudStack>
-            
-        @if (CookbookCategory.Subcategories.Any())
-        {
-            <MudCollapse Expanded="areSubcategoriesExpanded">
-                @foreach (var sub in CookbookCategory.Subcategories)
-                {
-                    <CascadingValue Value="Mode">
-                        <CookbookCategoryForm CookbookCategory="sub" OnCategorySelected="OnCategorySelected" />
-                    </CascadingValue>
-                }
-            </MudCollapse>
-        }
     </MudForm>
+        
+    @if (CookbookCategory.Subcategories.Any())
+    {
+        <MudCollapse Expanded="areSubcategoriesExpanded">
+            @foreach (var sub in CookbookCategory.Subcategories)
+            {
+                <CascadingValue Value="Mode">
+                    <CookbookCategoryForm CookbookCategory="sub" OnCategorySelected="OnCategorySelected" />
+                </CascadingValue>
+            }
+        </MudCollapse>
+    }
 </MudPaper>
 
 @code {
@@ -82,6 +88,9 @@
 
     [Parameter]
     public EventCallback<CookbookCategoryForManageModel> OnCategorySelected { get; set; }
+
+    [Parameter]
+    public EventCallback<CookbookCategoryForManageModel> OnDeleteCategory { get; set; }
 
     private bool areSubcategoriesExpanded = false;
     private string toggleSubCategoriesIcon = Icons.Material.Filled.KeyboardArrowDown;
@@ -98,6 +107,11 @@
     {
         CookbookCategory.IsSelected = selectCategory;
         await OnCategorySelected.InvokeAsync(CookbookCategory);
+    }
+
+    private async Task DeleteCategory()
+    {
+        await OnDeleteCategory.InvokeAsync(CookbookCategory);
     }
 
     private void ToggleSubCategories()

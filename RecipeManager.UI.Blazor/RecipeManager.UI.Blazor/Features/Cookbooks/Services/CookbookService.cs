@@ -66,7 +66,7 @@ public sealed class CookbookService(IRecipeApi recipeApi, ISnackbar snackbar, Na
 
     public async Task UpdateCookbook(string relativerUrl, CookbookForManageModel cookbook)
     {
-        HttpResponseMessage response = await recipeApi.Update(new Uri(relativerUrl, UriKind.Relative), cookbook);
+        HttpResponseMessage response = await recipeApi.Update(new Uri(relativerUrl), cookbook);
 
         if (response.IsSuccessStatusCode)
         {

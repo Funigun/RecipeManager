@@ -46,8 +46,8 @@ public static class GetCookbookById
         Response response = MapToResponse(cookbook, categories, recipes, hateoasBuilderFactory);
         HateoasResponseBuilder<Response> builder = hateoasBuilderFactory.ForItem(response);
 
-        builder.AddDelete(LinkOptions.Create("DeleteCookbook", HateoasRelConstants.Delete, isCookbookCreator), new { id = cookbook.Id });
-        builder.AddPut(LinkOptions.Create("DeleteCookbook", HateoasRelConstants.Update, isCookbookCreator), new { id = cookbook.Id });
+        builder.AddDelete(LinkOptions.Create("DeleteCookbook", HateoasRelConstants.Delete, isCookbookCreator), new { CookbookId = cookbook.Id });
+        builder.AddPut(LinkOptions.Create("UpdateCookbook", HateoasRelConstants.Update, isCookbookCreator), new { CookbookId = cookbook.Id });
 
         return TypedResults.Ok(builder.Build());
     }

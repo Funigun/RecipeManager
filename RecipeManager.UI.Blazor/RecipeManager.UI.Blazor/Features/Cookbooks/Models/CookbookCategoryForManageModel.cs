@@ -36,4 +36,45 @@ public class CookbookCategoryForManageModel
 
         return recipes;
     }
+
+    public bool CategoryExists(string categoryName)
+    {
+        if (Name.Equals(categoryName, StringComparison.OrdinalIgnoreCase))
+        {
+            return true;
+        }
+
+        foreach (CookbookCategoryForManageModel subcategory in Subcategories)
+        {
+            if (subcategory.CategoryExists(categoryName))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public bool DeleteSubcategory(CookbookCategoryForManageModel categoryToRemove)
+    {
+        if (categoryToRemove.DepthLevel - DepthLevel == 1)
+        {
+            if (Subcategories.Remove(categoryToRemove))
+            {
+                return true;
+            }
+            else
+            {
+                foreach (CookbookCategoryForManageModel subcategory in Subcategories)
+                {
+                    if (subcategory.DeleteSubcategory(categoryToRemove))
+                    {
+                        return true;
+                    }
+                }
+            }
+        }
+
+        return false;
+    }
 }
