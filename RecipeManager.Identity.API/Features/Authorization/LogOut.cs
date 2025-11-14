@@ -15,7 +15,8 @@ public static class LogOut
         {
             endpoints.MapPost("/logout", Handler)
                      .WithName("Logout")
-                     .WithDescription("Signs user out");
+                     .WithDescription("Signs user out")
+                     .RequireAuthorization();
         }
     }
 

@@ -10,6 +10,8 @@ public interface IRecipeService
 
     Task<HateoasResponse<RecipeForManageModel>> GetRecipeForManageById(Guid recipeId);
 
+    Task<IEnumerable<RecipeForDropdownModel>> GetRecipesForDropdown(string recipeName, int numberOfRecipesToLoad);
+
     Task<HateoasResponse<RecipesPageModel>> GetRecipesPage(IEnumerable<Guid> categories, IEnumerable<Guid> ingredients, int page, int pageSize);
 
     Task UpdateRecipe(string relativeUri, RecipeForManageModel recipe);
@@ -18,5 +20,5 @@ public interface IRecipeService
 
     void OpenCreateRecipePage();
 
-    void OpenUpdateRecipePage(Guid recipeId);
+    Task OpenUpdateRecipePage(Guid recipeId, bool openInNewTab = false);
 }

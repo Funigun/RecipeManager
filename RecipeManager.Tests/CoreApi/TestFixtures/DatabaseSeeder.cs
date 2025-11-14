@@ -113,9 +113,9 @@ internal static class DatabaseSeeder
 
         IEnumerable<Cookbook> cookbooks =
         [
-            Cookbook.Create("Test book", "This is a test book", []),
-            Cookbook.Create("To Delete", "This is a test book to delete", []),
-            Cookbook.Create("To Update", "This is a test book to update", [])
+            Cookbook.Create("Test book", "This is a test book", null, []),
+            Cookbook.Create("To Delete", "This is a test book to delete", null, []),
+            Cookbook.Create("To Update", "This is a test book to update", null, [])
         ];
 
         dbContext.Cookbooks.AddRange(cookbooks);
@@ -135,7 +135,7 @@ internal static class DatabaseSeeder
         ];
 
         Cookbook cookbook = cookbooks.First();
-        cookbook.Update(cookbook.Title, cookbook.Description, cookbookCategories.ToList());
+        cookbook.Update(cookbook.Title, cookbook.Description, null, cookbookCategories.ToList());
         dbContext.Cookbooks.Update(cookbook);
         await dbContext.SaveChangesAsync();
     }

@@ -22,14 +22,14 @@ public static class GetCookbookById
 
     public sealed record class CookbookCategoryDto(Guid Id, string Name, IEnumerable<HateoasResponse<RecipeDto>> Recipes, IEnumerable<CookbookCategoryDto> Subcategories);
 
-    public sealed record Response(Guid Id, string Title, string Description, IEnumerable<CookbookCategoryDto> Categories);
+    public sealed record Response(Guid Id, string Title, string Description, string? CoverImageUrl, IEnumerable<CookbookCategoryDto> Categories);
 
     [GroupEndpoint("Cookbooks")]
     public sealed class Endpoint : IEndpoint
     {
         public void MapEndpoint([FromServices] IEndpointRouteBuilder endpoints)
         {
-            endpoints.MapStandardGet<Response>("/{cookbookId}", Handler)
+            endpoints.MapStandardGet<Response>("{cookbookId}", Handler)
                      .WithName("GetCookbookById")
                      .WithDescription("Gets a cookbook by its id");
         }
@@ -46,8 +46,8 @@ public static class GetCookbookById
         Response response = MapToResponse(cookbook, categories, recipes, hateoasBuilderFactory);
         HateoasResponseBuilder<Response> builder = hateoasBuilderFactory.ForItem(response);
 
-        builder.AddDelete(LinkOptions.Create("DeleteCookbook", HateoasRelConstants.Delete, isCookbookCreator), new { id = cookbook.Id });
-        builder.AddPut(LinkOptions.Create("DeleteCookbook", HateoasRelConstants.Update, isCookbookCreator), new { id = cookbook.Id });
+        builder.AddDelete(LinkOptions.Create("DeleteCookbook", HateoasRelConstants.Delete, isCookbookCreator), new { CookbookId = cookbook.Id });
+        builder.AddPut(LinkOptions.Create("UpdateCookbook", HateoasRelConstants.Update, isCookbookCreator), new { CookbookId = cookbook.Id });
 
         return TypedResults.Ok(builder.Build());
     }
@@ -96,6 +96,7 @@ public static class GetCookbookById
             cookbook.Id.Value,
             cookbook.Title,
             cookbook.Description,
+            cookbook.CoverImageUrl,
             rootCategories.Select(category => MapToCookbookCategoryDto(category, categories, hateoasRecipes))
         );
     }

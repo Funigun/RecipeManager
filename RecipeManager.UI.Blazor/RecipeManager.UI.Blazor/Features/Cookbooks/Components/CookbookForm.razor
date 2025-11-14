@@ -1,0 +1,325 @@
+﻿@using Microsoft.AspNetCore.Components.Web
+@using MudBlazor
+@using RecipeManager.UI.Blazor.Brokers.HateoasModel
+@using RecipeManager.UI.Blazor.Components.Common
+@using RecipeManager.UI.Blazor.Components.Common.DialogMessage
+@using RecipeManager.UI.Blazor.Components.Extensions
+@using RecipeManager.UI.Blazor.Features.Cookbooks.Models
+@using RecipeManager.UI.Blazor.Features.Cookbooks.Services
+@using RecipeManager.UI.Blazor.Features.Cookbooks.Validators
+@using RecipeManager.UI.Blazor.Features.Recipes.Services
+@using RecipeManager.UI.Blazor.Features.Recipes
+
+@inject ICookbookService CookbookService
+@inject IRecipeService RecipeService
+@inject IDialogMessageService DialogService
+@inject NavigationManager NavigationManager
+
+<MudForm @ref="Form" Model="CookbookModel" Validation="@(validator.ValidateValue)" @bind-IsValid="@isSubmitEnabled" @rendermode="RenderMode.InteractiveAuto">
+    <MudStack Spacing="5">
+        <div style="align-self: center; width: 95%">
+            <MudGrid Style="width: 100%">
+                <MudItem Style="width: 25%;">
+                    <div style="width: 150px; height: 250px; justify-self:left;">
+                        @if (CookbookModel.Item.CoverImageUrl != null)
+                        {
+                            <MudImage Src="CookbookModel.Item.CoverImageUrl" Style="max-width: 150px; max-height:250px; margin-top: 15px;" />
+                        }
+                        else
+                        {
+                            <MudIcon Icon="@Icons.Material.Filled.QuestionMark" Style="width:150px; height: 250px; border: 1px solid; margin-top: 15px;" />
+                        }
+                    </div>
+                </MudItem>
+
+                <MudItem Style=" width: 65%;">
+                    <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Style="margin-top: 15px;">
+                        <MudTextField ReadOnly="Mode.IsViewMode()" Required Label="Title" For="@(() => CookbookModel.Item.Title)" @bind-Value="CookbookModel.Item.Title" />
+
+                        @if (Mode.IsViewMode() && @CookbookModel.Links.FirstOrDefault(link => link.Rel == HateoasConstants.Update) != null)
+                        {
+                            <MudIconButton Icon="@Icons.Material.Filled.Edit" Color="Color.Primary" OnClick="ToggleEditCookbook" />
+                        }
+                        else if (Mode.IsEditMode())
+                        {
+                            <MudIconButton Icon="@Icons.Material.Filled.Cancel" Color="Color.Primary" OnClick="ToggleEditCookbook" />
+                        }
+                    </MudStack>
+
+                    <MudTextField ReadOnly="Mode.IsViewMode()" Required Label="Description" For="@(() => CookbookModel.Item.Description)" @bind-Value="CookbookModel.Item.Description" />
+                </MudItem>
+            </MudGrid>
+
+            <MudGrid Style="margin-top: 25px;">                    
+                <MudItem Style="padding-top: 0px; width: 45%;">
+                    <MudStack>
+                        @if (Mode.IsCreateOrEditMode())
+                        {
+                            <MudStack Row=true>
+                                <MudTextField T="string" Label="New Category Name" @bind-Value="newCategoryName" />
+
+                                <MudTooltip Text="Add new cookbook category">
+                                    <MudIconButton Icon="@Icons.Material.Filled.Add" Color="Color.Primary" OnClick="AddCategory" Disabled="IsAddCategoryDisabled" />
+                                </MudTooltip>
+                            </MudStack>
+                        }
+                        @foreach (var category in CookbookModel.Item.Categories)
+                        {
+                            <MudStack>
+                                <CascadingValue Value="Mode">
+                                    <CookbookCategoryForm CookbookCategory="category" OnCategorySelected="SelectedCategoryChanged" OnDeleteCategory="DeleteCategory" />
+                                </CascadingValue>
+                            </MudStack>
+                        }
+                    </MudStack>
+                </MudItem>
+                   
+                <MudItem Style="margin-left: 25px; width: 45%; border-left: solid 0.6px gray; padding-top: 0px;">
+                    <MudStack>
+                        @if(Mode.IsCreateOrEditMode())
+                        {
+                            <MudStack Row=true Style="align-items:center">
+                                <MudAutocomplete T="RecipeForDropdownModel" ResetValueOnEmptyText="true" ShowProgressIndicator="true" MaxItems="10" Placeholder="Find recipe to add"
+                                                 SearchFunc="SearchRecipes" ToStringFunc="@(e => e == null ? null : e.Title)" ValueChanged="OnSelectedRecipeChanged"
+                                                 Style="margin-top: 15px">
+                                </MudAutocomplete>
+
+                                <MudTooltip Text="Add recipe to selected category">
+                                    <MudIconButton Icon="@Icons.Material.Filled.Add" Color="Color.Primary" OnClick="AddRecipe" Disabled="IsAddRecipeDisabled" />
+                                </MudTooltip>
+                            </MudStack>
+                        }
+
+                        @if (selectedBookCategory != null && selectedBookCategory.Recipes.Any())
+                        {
+                            <MudGrid T="CookbookRecipeForManageModel" Items="selectedBookCategory.Recipes" Style="margin-left: 5px; margin-top: 5px;">
+                                @for (int i = 0; i < selectedBookCategory.Recipes.Count; i++)
+                                {
+                                    var recipe = selectedBookCategory.Recipes[i];
+
+                                    <MudStack Style="width: 100%">
+                                        <MudItem Style="width: 100%">
+                                            <MudStack Row=true>
+                                                @if (!string.IsNullOrEmpty(@recipe.Item.ImageUrl))
+                                                {
+                                                    <MudImage Src="@recipe.Item.ImageUrl" Style="max-width: 100px; max-height:100px; margin-top: 10px; margin-bottom: 10px;" />
+                                                }
+                                                else
+                                                {
+                                                    <MudIcon Icon="@Icons.Material.Filled.QuestionMark" Style="width:100px; height: 100px; border: 1px solid; margin-top: 10px; margin-bottom: 10px;" />
+                                                }
+
+                                                <MudText Style="display:flex; margin-left: 5px; align-items: center">@recipe.Item.Title</MudText>
+
+                                                <MudIconButton Icon="@Icons.Material.Filled.OpenInNew" Color="Color.Primary" OnClick="@(() => ShowRecipe(@recipe))" />
+
+                                                @if(Mode.IsCreateOrEditMode())
+                                                {
+                                                    <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Error" OnClick="@(() => RemoveRecipeFromCategory(@selectedBookCategory.Recipes[i]))" />
+                                                }
+                                            </MudStack>
+                                        </MudItem>
+                                    </MudStack>
+                                }
+                            </MudGrid>
+                        }
+                    </MudStack>
+                </MudItem>
+            </MudGrid>
+        </div>
+    </MudStack>
+
+    @if (Mode.IsCreateMode() || (Mode.IsEditMode() && CookbookModel.Links.FirstOrDefault(link => link.Rel == HateoasConstants.Update) != null))
+    {
+        <MudGrid Class="mt-4">
+            <MudItem xs="6">
+                <MudButton Variant="Variant.Outlined" Color="Color.Default" FullWidth="false">
+                    Back
+                </MudButton>
+            </MudItem>
+            <MudItem xs="6" Class="d-flex justify-end">
+                @if (Mode.IsEditMode() && @CookbookModel.Links.FirstOrDefault(link => link.Rel == HateoasConstants.Delete) != null)
+                {
+                    <MudButton Variant="Variant.Filled" Color="Color.Error" OnClick="DeleteCookbook" Style="margin-right: 20px">
+                        Delete
+                    </MudButton>
+                }
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="SaveCookbook">
+                    Save
+                </MudButton>
+            </MudItem>
+        </MudGrid>
+    }
+
+    <CustomValidationSummary ErrorMessages="@errorMessages" />
+
+</MudForm>
+
+@code {
+    [Parameter]
+    public HateoasResponse<CookbookForManageModel> CookbookModel { get; set; }
+
+    [Parameter]
+    public FormMode Mode { get; set; }
+
+    private MudForm Form { get; set; } = default!;
+
+    private readonly CookbookModelValidator validator = new();
+
+    private string newCategoryName = string.Empty;
+
+    private bool IsAddRecipeDisabled 
+    { 
+        get => selectedBookCategory is null || 
+               selectedRecipe is null || 
+               allAddedRecipes.Any(r => r.Item.Id == selectedRecipe.Id); 
+    }
+
+    private bool IsAddCategoryDisabled 
+    {  
+        get => newCategoryName.Trim().Length == 0 || 
+               CookbookModel.Item.CategoryExists(newCategoryName) ||
+               selectedBookCategory is not null && 
+               selectedBookCategory.DepthLevel >= 4;
+    }
+
+    private List<HateoasResponse<CookbookRecipeForManageModel>> allAddedRecipes = [];
+
+    private CookbookCategoryForManageModel selectedBookCategory = default!;
+    private RecipeForDropdownModel selectedRecipe = default!;
+    private IEnumerable<string> errorMessages = [];
+    private bool isSubmitEnabled = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        allAddedRecipes = CookbookModel.Item.GetRecipes().ToList();
+    }
+
+    private async Task ToggleEditCookbook(MouseEventArgs args)
+    {
+        if (Mode.IsEditMode() && (await DialogService.CancelOperationConfirmed()))
+        {
+            NavigationManager.Refresh(true);
+        }
+        else
+        {
+            Mode = FormMode.Edit;
+            StateHasChanged();
+        }
+    }
+
+    private void AddCategory()
+    {
+        CookbookCategoryForManageModel newCategory = new()
+        {
+            Name = newCategoryName.Trim(),
+            DepthLevel = selectedBookCategory is null ? 1 : selectedBookCategory.DepthLevel + 1
+        };
+
+        if(selectedBookCategory is null)
+        {
+            CookbookModel.Item.Categories.Add(newCategory);
+        }
+        else
+        {
+            selectedBookCategory.Subcategories.Add(newCategory);
+        }
+    }
+
+    private void AddRecipe()
+    {
+        HateoasResponse<CookbookRecipeForManageModel> recipe = new()
+        {
+            Item = new()
+            {
+                Id = selectedRecipe.Id,
+                Title = selectedRecipe.Title,
+            }
+        };
+
+        selectedBookCategory.Recipes.Add(recipe);
+        allAddedRecipes.Add(recipe);
+        StateHasChanged();
+    }
+
+    private void RemoveRecipeFromCategory(HateoasResponse<CookbookRecipeForManageModel> recipe)
+    {
+        selectedBookCategory.Recipes.Remove(recipe);
+        allAddedRecipes.Remove(recipe);
+        StateHasChanged();
+    }
+
+    private async Task ShowRecipe(HateoasResponse<CookbookRecipeForManageModel> recipe)
+    {
+        await RecipeService.OpenUpdateRecipePage(recipe.Item.Id, true);
+    }
+
+    private async Task<IEnumerable<RecipeForDropdownModel>> SearchRecipes(string value, CancellationToken cancellationToken)
+    {
+        return await RecipeService.GetRecipesForDropdown(value, 25);
+    }
+
+    private void OnSelectedRecipeChanged(RecipeForDropdownModel value)
+    {
+        selectedRecipe = value;
+        StateHasChanged();
+    }
+
+    private async Task SelectedCategoryChanged(CookbookCategoryForManageModel selectedCategory)
+    {
+        bool isCurrentCategorySelected = selectedCategory.IsSelected;
+        CookbookModel.Item.ResetCategorySelection();
+        selectedCategory.IsSelected = isCurrentCategorySelected;
+        selectedBookCategory = isCurrentCategorySelected ? selectedCategory : null!;
+
+        StateHasChanged();
+    }
+
+    private async Task DeleteCategory(CookbookCategoryForManageModel selectedCategory)
+    {
+        CookbookModel.Item.DeleteCategory(selectedCategory);
+    }
+
+    private bool CanAddRecipe()
+    {
+        return selectedRecipe is null || selectedBookCategory is null ||
+                              selectedBookCategory.Recipes.Any(recipe => recipe.Item.Id == selectedRecipe.Id);
+    }
+
+    private bool CanAddCategory()
+    {
+        return selectedBookCategory is not null && selectedBookCategory.DepthLevel >= 4;
+    }
+
+    private async Task DeleteCookbook()
+    {
+        if (await DialogService.ShowDeleteConfirmationMessage())
+        {
+            await CookbookService.DeleteCookbook(CookbookModel.Item.Id);
+        }
+    }
+
+    private async Task SaveCookbook()
+    {
+        if (await IsCookbokValid())
+        {
+            CookbookDto cookbookDto = CookbookDto.FromManageModel(CookbookModel.Item);
+
+            if(Mode.IsEditMode())
+            {
+                await CookbookService.UpdateCookbook(CookbookModel.Links.First(link => link.Rel == HateoasConstants.Update).Href, cookbookDto);
+            }
+            else
+            {
+                await CookbookService.CreateCookbook(cookbookDto);
+            }
+        }
+    }
+
+    private async Task<bool> IsCookbokValid()
+    {
+        await Form.Validate();
+
+        return Form.IsValid;
+    }
+}

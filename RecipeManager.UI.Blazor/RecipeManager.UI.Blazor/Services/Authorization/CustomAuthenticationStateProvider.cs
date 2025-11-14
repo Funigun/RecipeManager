@@ -31,8 +31,8 @@ public class CustomAuthenticationStateProvider(ProtectedLocalStorage localStorag
 
     public async Task MarkUserAsLoggedOut()
     {
-        await localStorage.DeleteAsync("sessionState");
         await identityApi.LogoutUser();
+        await localStorage.DeleteAsync("sessionState");
 
         ClaimsIdentity identity = new();
         ClaimsPrincipal user = new(identity);

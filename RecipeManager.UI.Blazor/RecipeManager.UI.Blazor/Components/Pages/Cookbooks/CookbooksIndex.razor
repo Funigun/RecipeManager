@@ -1,0 +1,41 @@
+﻿@page "/cookbooks"
+@using RecipeManager.UI.Blazor.Brokers.HateoasModel
+@using RecipeManager.UI.Blazor.Features.Cookbooks
+@using RecipeManager.UI.Blazor.Features.Cookbooks.GetCookbooks
+@using RecipeManager.UI.Blazor.Features.Cookbooks.Services
+
+@inject ICookbookService CookbookService;
+
+<MudPaper Class="mt-6 page-container" Outlined=true>
+    <MudGrid Style="width:1300px;">
+        <MudItem Style="display: flex; width:inherit;">
+            <MudStack Row="true" Style="gap: 12px; width:inherit; justify-items:center; justify-content:center">
+                <MudText Typo="Typo.h6" Style="align-content: center">Cookbooks</MudText>
+                <MudIconButton Icon="@Icons.Material.Filled.Add" Color="Color.Primary" Style="justify-self:center"
+                               OnClick="@(() => CreateNewCookbook())" Disabled="@isAddDisabled" />
+            </MudStack>
+        </MudItem>
+    </MudGrid>
+
+    <CookbookListComponent CookbooksPage="CookbooksPage" ShowLoadingBar="!cookbooksLoaded"></CookbookListComponent>
+</MudPaper>
+
+@code {
+    private HateoasResponse<CookbooksPageModel> CookbooksPage { get; set; } = new();
+    private bool isAddDisabled = true;
+    private bool cookbooksLoaded = false;
+
+    private void CreateNewCookbook()
+    {
+        CookbookService.OpenCreateCookbookPage();
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        CookbooksPage = await CookbookService.GetCookbooksPage(1, 10);
+        isAddDisabled = !CookbooksPage.Links.Any(link => link.Rel == HateoasConstants.Create);
+        cookbooksLoaded = true;
+
+        StateHasChanged();
+    }
+}
