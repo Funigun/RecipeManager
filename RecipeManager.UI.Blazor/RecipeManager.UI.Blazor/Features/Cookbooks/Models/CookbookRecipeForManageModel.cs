@@ -1,6 +1,4 @@
-﻿using System.Text.Json.Serialization;
-
-namespace RecipeManager.UI.Blazor.Features.Cookbooks.Models;
+﻿namespace RecipeManager.UI.Blazor.Features.Cookbooks.Models;
 
 public class CookbookRecipeForManageModel
 {
@@ -9,7 +7,4 @@ public class CookbookRecipeForManageModel
     public string Title { get; set; } = string.Empty;
 
     public string ImageUrl { get; set; } = string.Empty;
-
-    [JsonIgnore]
-    public bool IsSelected { get; set; }
 }

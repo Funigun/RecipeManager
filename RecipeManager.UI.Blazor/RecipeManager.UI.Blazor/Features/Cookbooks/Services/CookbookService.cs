@@ -19,7 +19,7 @@ public sealed class CookbookService(IRecipeApi recipeApi, ISnackbar snackbar, Na
 
     public ApiResponseBody ResponseBody { get; private set; } = new();
 
-    public async Task CreateCookbook(CookbookForManageModel cookbook)
+    public async Task CreateCookbook(CookbookDto cookbook)
     {
         HttpResponseMessage response = await recipeApi.Create(new Uri(CookbooksApiUrl, UriKind.Relative), cookbook);
 
@@ -64,7 +64,7 @@ public sealed class CookbookService(IRecipeApi recipeApi, ISnackbar snackbar, Na
         return new HateoasResponse<CookbooksPageModel>();
     }
 
-    public async Task UpdateCookbook(string relativerUrl, CookbookForManageModel cookbook)
+    public async Task UpdateCookbook(string relativerUrl, CookbookDto cookbook)
     {
         HttpResponseMessage response = await recipeApi.Update(new Uri(relativerUrl), cookbook);
 

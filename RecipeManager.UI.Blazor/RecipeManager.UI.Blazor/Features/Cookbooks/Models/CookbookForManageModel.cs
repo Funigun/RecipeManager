@@ -12,7 +12,7 @@ public sealed class CookbookForManageModel
 
     public string? CoverImageUrl { get; set; }
 
-    public List<CookbookCategoryForManageModel> Categories { get; set; } = new();
+    public List<CookbookCategoryForManageModel> Categories { get; set; } = [];
 
     public void ResetCategorySelection()
     {
@@ -29,15 +29,7 @@ public sealed class CookbookForManageModel
 
     public bool CategoryExists(string categoryName)
     {
-        foreach (CookbookCategoryForManageModel category in Categories)
-        {
-            if (category.CategoryExists(categoryName))
-            {
-                return true;
-            }
-        }
-
-        return false;
+        return Categories.Any(category => category.CategoryExists(categoryName));
     }
 
     public void DeleteCategory(CookbookCategoryForManageModel categoryToRemove)

@@ -303,13 +303,15 @@
     {
         if (await IsCookbokValid())
         {
+            CookbookDto cookbookDto = CookbookDto.FromManageModel(CookbookModel.Item);
+
             if(Mode.IsEditMode())
             {
-                await CookbookService.UpdateCookbook(CookbookModel.Links.First(link => link.Rel == HateoasConstants.Update).Href, CookbookModel.Item);
+                await CookbookService.UpdateCookbook(CookbookModel.Links.First(link => link.Rel == HateoasConstants.Update).Href, cookbookDto);
             }
             else
             {
-                await CookbookService.CreateCookbook(CookbookModel.Item);
+                await CookbookService.CreateCookbook(cookbookDto);
             }
         }
     }

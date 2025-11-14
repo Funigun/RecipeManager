@@ -87,8 +87,7 @@ public static class UpdateCookbook
     {
         CookbookId id = new(cookbookId.Id);
 
-        Cookbook? cookbook = await dbContext.Cookbooks.Include(c => c.Categories)
-                                                      .FirstOrDefaultAsync(c => c.Id == id, cancellationToken)
+        Cookbook? cookbook = await dbContext.Cookbooks.FirstOrDefaultAsync(c => c.Id == id, cancellationToken)
                           ?? throw new EntityNotFoundException<Cookbook, CookbookId>(id);
 
         await dbContext.CookbookCategories.Where(category => category.Cookbook.Id == cookbook.Id)

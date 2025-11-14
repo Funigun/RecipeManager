@@ -9,7 +9,7 @@ public interface ICookbookService
 {
     ApiResponseBody ResponseBody { get; }
 
-    Task CreateCookbook(CookbookForManageModel cookbook);
+    Task CreateCookbook(CookbookDto cookbook);
 
     Task DeleteCookbook(Guid cookbookId);
 
@@ -21,5 +21,5 @@ public interface ICookbookService
 
     void OpenUpdateCookbookPage(Guid cookbookId);
 
-    Task UpdateCookbook(string relativeUrl, CookbookForManageModel cookbook);
+    Task UpdateCookbook(string relativeUrl, CookbookDto cookbook);
 }
