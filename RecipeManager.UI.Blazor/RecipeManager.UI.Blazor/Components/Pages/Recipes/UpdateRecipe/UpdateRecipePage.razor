@@ -1,7 +1,8 @@
 ﻿@page "/recipes/update/{RawGuid}"
 
 @using RecipeManager.UI.Blazor.Brokers.HateoasModel
-@using RecipeManager.UI.Blazor.Features.Recipes.Components
+@using RecipeManager.UI.Blazor.Components.Common
+@using RecipeManager.UI.Blazor.Components.Pages.Recipes.Common
 @using RecipeManager.UI.Blazor.Features.Recipes.Models
 @using RecipeManager.UI.Blazor.Features.Recipes.Services
 @using RecipeManager.UI.Blazor.Features.Units
@@ -11,7 +12,7 @@
 @inject IUnitService UnitService
 
 <MudPaper Class="pa-6 mx-auto" Style="width:1000px">
-    <RecipeForm RecipeModel="RecipeModel" Mode="Common.FormMode.View"></RecipeForm>
+    <RecipeForm RecipeModel="RecipeModel" Mode="FormMode.View"></RecipeForm>
 </MudPaper>
 
 @code {

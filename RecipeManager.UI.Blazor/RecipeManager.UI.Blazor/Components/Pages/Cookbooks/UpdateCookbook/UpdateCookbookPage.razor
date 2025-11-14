@@ -1,14 +1,15 @@
 ﻿@page "/cookbooks/update/{RawGuid}"
 
 @using RecipeManager.UI.Blazor.Brokers.HateoasModel
-@using RecipeManager.UI.Blazor.Features.Cookbooks.Components
+@using RecipeManager.UI.Blazor.Components.Common
+@using RecipeManager.UI.Blazor.Components.Pages.Cookbooks.Common
 @using RecipeManager.UI.Blazor.Features.Cookbooks.Models
 @using RecipeManager.UI.Blazor.Features.Cookbooks.Services
 
 @inject ICookbookService CookbookService;
 
 <MudPaper Class="pa-6 mx-auto" Style="width:1250px">
-    <CookbookForm CookbookModel="Cookbook" Mode="Common.FormMode.View"/>
+    <CookbookForm CookbookModel="Cookbook" Mode="FormMode.View"/>
 </MudPaper>
 
 @code {
