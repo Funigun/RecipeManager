@@ -5,7 +5,10 @@ public interface IRequestId<TRequest>
 {
     Guid Id { get; set; }
 
-    bool TryParse(string? input, out TRequest id)
+// Warning disabled as this format is required to parse parameter for Minimal API endpoint handler as part of AsParameters input
+#pragma warning disable CA1000 // Do not declare static members on generic types
+
+    static bool TryParse(string? input, out TRequest id)
     {
         if (Guid.TryParse(input, out Guid guid))
         {
@@ -19,4 +22,5 @@ public interface IRequestId<TRequest>
         id = default!;
         return false;
     }
+#pragma warning restore CA1000 // Do not declare static members on generic types
 }

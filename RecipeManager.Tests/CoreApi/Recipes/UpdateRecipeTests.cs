@@ -28,6 +28,7 @@ public sealed class UpdateRecipeTests : BaseIntegrationTest
                                                .AsSplitQuery()
                                                .AsNoTracking()
                                                .FirstAsync(recipe => recipe.Title == "To Update", TestContext.Current.CancellationToken);
+
         UpdateRecipe.RecipeDto recipeDto = new
         (
             recipe.Title,

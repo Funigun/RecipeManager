@@ -17,7 +17,7 @@ namespace RecipeManager.Api.Features.RecipeCategories;
 
 public static class GetRecipeCategories
 {
-    public sealed record Request(int Page, int PageSize, int? CategoryType) : PagedParameters(Page, PageSize);
+    public sealed record Request(int Page = 1, int PageSize = 10, int? CategoryType = null) : PagedParameters(Page, PageSize);
 
     public sealed record CategoryDto(Guid Id, string Name, string Type);
 

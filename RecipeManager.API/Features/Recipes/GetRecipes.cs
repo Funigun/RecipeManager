@@ -19,14 +19,14 @@ public static class GetRecipes
     {
         public List<Guid> Ids = [];
 
-        public static bool TryParse(string? value, IFormatProvider? provider, out ItemIds? articleIDs)
+        public static bool TryParse(string? value, IFormatProvider? provider, out ItemIds? itemIds)
         {
             string? trimmedValue = value?.TrimStart('(').TrimEnd(')');
             string[]? segments = trimmedValue?.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
 
             if (segments == null)
             {
-                articleIDs = new ItemIds();
+                itemIds = new ItemIds();
                 return false;
             }
 
@@ -39,7 +39,7 @@ public static class GetRecipes
                 }
             }
 
-            articleIDs = new ItemIds()
+            itemIds = new ItemIds()
             {
                 Ids = idList
             };
