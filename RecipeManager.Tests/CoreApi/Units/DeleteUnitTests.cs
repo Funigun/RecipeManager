@@ -20,7 +20,7 @@ public sealed class DeleteUnitTests : BaseIntegrationTest
         Guid guid = Guid.CreateVersion7();
 
         // Act
-        HttpResponseMessage response = await HttpClient.DeleteAsync($"/api/units/{guid}", CancellationToken.None);
+        HttpResponseMessage response = await HttpClient.DeleteAsync($"/api/units/{guid}", TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Equal(System.Net.HttpStatusCode.Forbidden, response.StatusCode);
@@ -34,7 +34,7 @@ public sealed class DeleteUnitTests : BaseIntegrationTest
         Guid guid = Guid.CreateVersion7();
 
         // Act
-        HttpResponseMessage response = await HttpClient.DeleteAsync($"/api/units/{guid}", CancellationToken.None);
+        HttpResponseMessage response = await HttpClient.DeleteAsync($"/api/units/{guid}", TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Equal(System.Net.HttpStatusCode.NotFound, response.StatusCode);
@@ -46,10 +46,10 @@ public sealed class DeleteUnitTests : BaseIntegrationTest
         // Arrange
         HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", TokenMockFactory.GenerateJwtToken(UserMockFactory.CreateMockedAdmin()));
 
-        Guid unitId = (await DbContext.Units.AsNoTracking().FirstAsync(unit => unit.Name == "To Delete", CancellationToken.None)).Id.Value;
+        Guid unitId = (await DbContext.Units.AsNoTracking().FirstAsync(unit => unit.Name == "To Delete", TestContext.Current.CancellationToken)).Id.Value;
 
         // Act
-        HttpResponseMessage deleteResponse = await HttpClient.DeleteAsync($"/api/units/{unitId}", CancellationToken.None);
+        HttpResponseMessage deleteResponse = await HttpClient.DeleteAsync($"/api/units/{unitId}", TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Equal(System.Net.HttpStatusCode.NoContent, deleteResponse.StatusCode);

@@ -149,14 +149,11 @@
             </MudItem>
         </MudGrid>
     }
-
-    <CustomValidationSummary ErrorMessages="@errorMessages" />
-
 </MudForm>
 
 @code {
     [Parameter]
-    public HateoasResponse<CookbookForManageModel> CookbookModel { get; set; }
+    public HateoasResponse<CookbookForManageModel> CookbookModel { get; set; } = new();
 
     [Parameter]
     public FormMode Mode { get; set; }
@@ -183,10 +180,8 @@
     }
 
     private List<HateoasResponse<CookbookRecipeForManageModel>> allAddedRecipes = [];
-
     private CookbookCategoryForManageModel selectedBookCategory = default!;
     private RecipeForDropdownModel selectedRecipe = default!;
-    private IEnumerable<string> errorMessages = [];
     private bool isSubmitEnabled = false;
 
     protected override async Task OnInitializedAsync()

@@ -19,7 +19,7 @@ public sealed class GetIngredientCategoriesTests : BaseIntegrationTest
     public async Task GetRecipeCategories_ShouldReturn_NotAuthorized_WhenUserIsNotLoggedIn()
     {
         // Act
-        HttpResponseMessage response = await HttpClient.GetAsync("/api/ingredientCategories", CancellationToken.None);
+        HttpResponseMessage response = await HttpClient.GetAsync("/api/ingredientCategories", TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Equal(System.Net.HttpStatusCode.Unauthorized, response.StatusCode);
@@ -32,11 +32,11 @@ public sealed class GetIngredientCategoriesTests : BaseIntegrationTest
         HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", TokenMockFactory.GenerateJwtToken(UserMockFactory.CreateMockedUser()));
 
         // Act
-        HttpResponseMessage response = await HttpClient.GetAsync("/api/ingredientCategories", CancellationToken.None);
+        HttpResponseMessage response = await HttpClient.GetAsync("/api/ingredientCategories", TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Equal(System.Net.HttpStatusCode.OK, response.StatusCode);
-        string content = await response.Content.ReadAsStringAsync(CancellationToken.None);
+        string content = await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
         Assert.NotNull(content);
 
         HateoasCollectionResponse<GetRecipeCategories.CategoryDto>? categories = JsonSerializer.Deserialize<HateoasCollectionResponse<GetRecipeCategories.CategoryDto>>(content, JsonOptions);
@@ -56,11 +56,11 @@ public sealed class GetIngredientCategoriesTests : BaseIntegrationTest
         HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", TokenMockFactory.GenerateJwtToken(UserMockFactory.CreateMockedAdmin()));
 
         // Act
-        HttpResponseMessage response = await HttpClient.GetAsync("/api/ingredientCategories", CancellationToken.None);
+        HttpResponseMessage response = await HttpClient.GetAsync("/api/ingredientCategories", TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Equal(System.Net.HttpStatusCode.OK, response.StatusCode);
-        string content = await response.Content.ReadAsStringAsync(CancellationToken.None);
+        string content = await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
         Assert.NotNull(content);
 
         HateoasCollectionResponse<GetIngredientCategories.Response>? categories = JsonSerializer.Deserialize<HateoasCollectionResponse<GetIngredientCategories.Response>>(content, JsonOptions);

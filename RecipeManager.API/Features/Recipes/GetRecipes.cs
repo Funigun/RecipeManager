@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http.HttpResults;
+﻿using System.Collections.ObjectModel;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RecipeManager.Api.Application.Abstractions;
@@ -68,12 +69,12 @@ public static class GetRecipes
     {
         IQueryable<Recipe> recipesQuery = dbContext.Recipes.AsNoTracking();
 
-        if (parameters.Categories?.Ids.Any() ?? false)
+        if (parameters.Categories?.Ids.Count == 0)
         {
             recipesQuery = recipesQuery.Where(r => r.Categories.Any(c => parameters.Categories.Ids.Contains(c.Value)));
         }
 
-        if (parameters.Ingredients?.Ids.Any() ?? false)
+        if (parameters.Ingredients?.Ids.Count == 0)
         {
             recipesQuery = recipesQuery.Where(r => r.Ingredients.Any(i => parameters.Ingredients.Ids.Contains(i.IngredientId.Value)));
         }
@@ -95,7 +96,7 @@ public static class GetRecipes
         recipesBuilder.WithCollectionLink()
                       .WithGet(LinkOptions.Create("GetRecipeById", HateoasRelConstants.Self, true), recipe => new { id = recipe.Id });
 
-        Response response = new Response(page, pageSize, totalCount, recipesBuilder.Build().Items);
+        Response response = new(page, pageSize, totalCount, recipesBuilder.Build().Items);
         HateoasResponseBuilder<Response> responsebuilder = hateoasBuilderFactory.ForItem(response);
 
         responsebuilder.AddPagedNavigation("GetRecipes", new { page, pageSize });

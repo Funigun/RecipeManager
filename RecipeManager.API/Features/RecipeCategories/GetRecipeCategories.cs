@@ -34,7 +34,7 @@ public static class GetRecipeCategories
         }
     }
 
-    internal static async Task<Results<Ok<HateoasResponse<Response>>, NotFound>> Handler([AsParameters] Request request, [FromServices] ICurrentUser currentUser, IAppDbContext dbContext, [FromServices] IHateoasBuilderFactory hateoasBuilderFactory, CancellationToken cancellationToken)
+    internal static async Task<Results<Ok<HateoasResponse<Response>>, NotFound>> Handler([AsParameters] Request request, [FromServices] ICurrentUser currentUser, [FromServices] IAppDbContext dbContext, [FromServices] IHateoasBuilderFactory hateoasBuilderFactory, CancellationToken cancellationToken)
     {
         IQueryable<RecipeCategory> categories = dbContext.RecipeCategories.AsNoTracking();
 
@@ -45,13 +45,11 @@ public static class GetRecipeCategories
 
         int totalCount = await categories.CountAsync(cancellationToken);
 
-        List<RecipeCategory> results = await categories//.OrderBy(category => (int)category.Type)
-                                                       .OrderBy(category => category.Name)
+        List<RecipeCategory> results = await categories.OrderBy(category => category.Name)
                                                        .SetPage(request)
                                                        .ToListAsync(cancellationToken);
 
         HateoasResponse<Response> response = MapToResponse(results, request.Page, request.PageSize, totalCount, currentUser, hateoasBuilderFactory);
-
 
         return TypedResults.Ok(response);
     }
@@ -70,7 +68,7 @@ public static class GetRecipeCategories
                 .AddPost(LinkOptions.Create("CreateRecipeCategory", HateoasRelConstants.Create, isActionAllowed), null);
         }
 
-        Response response = new Response(page, pageSize, totalCount, categoriesBuilder.Build().Items);
+        Response response = new(page, pageSize, totalCount, categoriesBuilder.Build().Items);
         HateoasResponseBuilder<Response> responsebuilder = hateoasBuilderFactory.ForItem(response);
 
         responsebuilder.AddPagedNavigation("GetRecipeCategories", new { page, pageSize });

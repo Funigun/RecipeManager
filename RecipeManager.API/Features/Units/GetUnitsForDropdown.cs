@@ -21,7 +21,7 @@ public static class GetUnitsForDropdown
         }
     }
 
-    private static async Task<Results<Ok<IEnumerable<Response>>, NotFound>> Handler([FromServices] IAppDbContext dbContext, CancellationToken cancellationToken)
+    public static async Task<Results<Ok<IEnumerable<Response>>, NotFound>> Handler([FromServices] IAppDbContext dbContext, CancellationToken cancellationToken)
     {
         IEnumerable<Response> results = await dbContext.Units
                                                        .AsNoTracking()

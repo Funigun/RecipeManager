@@ -17,10 +17,10 @@ public sealed class DeleteCookbookTests : BaseIntegrationTest
     {
         // Arrange
         HttpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", TokenMockFactory.GenerateJwtToken(UserMockFactory.CreateMockedAdmin()));
-        CookbookId cookbookId = (await DbContext.Cookbooks.AsNoTracking().Where(cookbook => cookbook.Title == "To Delete").FirstAsync(CancellationToken.None)).Id;
+        CookbookId cookbookId = (await DbContext.Cookbooks.AsNoTracking().Where(cookbook => cookbook.Title == "To Delete").FirstAsync(TestContext.Current.CancellationToken)).Id;
 
         // Act
-        HttpResponseMessage response = await HttpClient.DeleteAsync($"/api/cookbooks/{cookbookId.Value}", CancellationToken.None);
+        HttpResponseMessage response = await HttpClient.DeleteAsync($"/api/cookbooks/{cookbookId.Value}", TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Equal(System.Net.HttpStatusCode.NoContent, response.StatusCode);

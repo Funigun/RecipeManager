@@ -18,7 +18,7 @@ public sealed class GetUnitsTests : BaseIntegrationTest
     public async Task GetUnits_ShouldReturn_NotAuthorized_WhenUserIsNotLoggedIn()
     {
         // Act
-        HttpResponseMessage response = await HttpClient.GetAsync("/api/units", CancellationToken.None);
+        HttpResponseMessage response = await HttpClient.GetAsync("/api/units", TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Equal(System.Net.HttpStatusCode.Unauthorized, response.StatusCode);
@@ -31,11 +31,11 @@ public sealed class GetUnitsTests : BaseIntegrationTest
         HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", TokenMockFactory.GenerateJwtToken(UserMockFactory.CreateMockedUser()));
 
         // Act
-        HttpResponseMessage response = await HttpClient.GetAsync("/api/units", CancellationToken.None);
+        HttpResponseMessage response = await HttpClient.GetAsync("/api/units", TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Equal(System.Net.HttpStatusCode.OK, response.StatusCode);
-        string content = await response.Content.ReadAsStringAsync(CancellationToken.None);
+        string content = await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
         Assert.NotNull(content);
 
         HateoasCollectionResponse<GetUnits.Response>? units = JsonSerializer.Deserialize<HateoasCollectionResponse<GetUnits.Response>>(content, JsonOptions);
@@ -55,11 +55,11 @@ public sealed class GetUnitsTests : BaseIntegrationTest
         HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", TokenMockFactory.GenerateJwtToken(UserMockFactory.CreateMockedAdmin()));
 
         // Act
-        HttpResponseMessage response = await HttpClient.GetAsync("/api/units", CancellationToken.None);
+        HttpResponseMessage response = await HttpClient.GetAsync("/api/units", TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Equal(System.Net.HttpStatusCode.OK, response.StatusCode);
-        string content = await response.Content.ReadAsStringAsync(CancellationToken.None);
+        string content = await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
         Assert.NotNull(content);
 
         HateoasCollectionResponse<GetUnits.Response>? units = JsonSerializer.Deserialize<HateoasCollectionResponse<GetUnits.Response>>(content, JsonOptions);

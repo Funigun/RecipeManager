@@ -20,11 +20,11 @@ public sealed class GetIngredientByIdTests : BaseIntegrationTest
     {
         // Arrange
         HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", TokenMockFactory.GenerateJwtToken(UserMockFactory.CreateMockedUser()));
-        Guid ingredientId = (await DbContext.Ingredients.AsNoTracking().FirstAsync(ingredient => ingredient.Name == "Existing Ingredient", CancellationToken.None)).Id.Value;
+        Guid ingredientId = (await DbContext.Ingredients.AsNoTracking().FirstAsync(ingredient => ingredient.Name == "Existing Ingredient", TestContext.Current.CancellationToken)).Id.Value;
 
         // Act
-        HttpResponseMessage response = await HttpClient.GetAsync($"/api/ingredients/{ingredientId}", CancellationToken.None);
-        string responseBody = await response.Content.ReadAsStringAsync();
+        HttpResponseMessage response = await HttpClient.GetAsync($"/api/ingredients/{ingredientId}", TestContext.Current.CancellationToken);
+        string responseBody = await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
         HateoasResponse<GetIngredientById.Response>? ingredientResponse = JsonSerializer.Deserialize<HateoasResponse<GetIngredientById.Response>>(responseBody, JsonOptions);
 
         // Assert

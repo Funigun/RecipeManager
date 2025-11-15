@@ -17,15 +17,15 @@ public sealed class CreateCookbookTests : BaseIntegrationTest
     {
         // Arrange
         HttpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", TokenMockFactory.GenerateJwtToken(UserMockFactory.CreateMockedAdmin()));
-        CreateCookbook.Request createCookbookRequest = new("New Cookbook", "Desc", []);
-        StringContent content = new(System.Text.Json.JsonSerializer.Serialize(createCookbookRequest), System.Text.Encoding.UTF8, "application/json");
+        CreateCookbook.Request createCookbookRequest = new("New Cookbook", "Desc", null, []);
+        using StringContent content = new(System.Text.Json.JsonSerializer.Serialize(createCookbookRequest), System.Text.Encoding.UTF8, "application/json");
 
         // Act
-        HttpResponseMessage response = await HttpClient.PostAsync("/api/cookbooks", content, CancellationToken.None);
+        HttpResponseMessage response = await HttpClient.PostAsync("/api/cookbooks", content, TestContext.Current.CancellationToken);
 
         // Assert
         response.EnsureSuccessStatusCode();
-        CreateCookbook.Response? responseData = await response.Content.ReadFromJsonAsync<CreateCookbook.Response>(cancellationToken: CancellationToken.None);
+        CreateCookbook.Response? responseData = await response.Content.ReadFromJsonAsync<CreateCookbook.Response>(cancellationToken: TestContext.Current.CancellationToken);
         Assert.NotNull(responseData);
         Assert.NotEqual(Guid.Empty, responseData.Id);
     }

@@ -5,16 +5,18 @@ public interface IRequestId<TRequest>
 {
     Guid Id { get; set; }
 
-    static bool TryParse(string? input, out TRequest id)
+    bool TryParse(string? input, out TRequest id)
     {
         if (Guid.TryParse(input, out Guid guid))
         {
-            id = new TRequest();
-            id.Id = guid;
+            id = new()
+            {
+                Id = guid
+            };
             return true;
         }
 
-        id = default;
+        id = default!;
         return false;
     }
 }

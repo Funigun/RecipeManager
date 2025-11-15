@@ -53,7 +53,7 @@ public static class CreateRecipeCategory
         }
     }
 
-    public static async Task<IResult> Handler([FromBody] Request request, IAppDbContext dbContext, CancellationToken cancellationToken)
+    public static async Task<IResult> Handler([FromBody] Request request, [FromServices] IAppDbContext dbContext, CancellationToken cancellationToken)
     {
         RecipeCategory category = RecipeCategory.Create(request.Name, (RecipeCategoryType)request.CategoryType);
 

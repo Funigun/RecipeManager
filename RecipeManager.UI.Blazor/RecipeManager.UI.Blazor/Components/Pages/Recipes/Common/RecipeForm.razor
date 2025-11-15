@@ -167,7 +167,7 @@
 
 @code {
     [Parameter]
-    public HateoasResponse<RecipeForManageModel> RecipeModel { get; set; }
+    public HateoasResponse<RecipeForManageModel> RecipeModel { get; set; } = new();
 
     [Parameter]
     public EventCallback<HateoasResponse<RecipeForManageModel>> OnValidSubmit { get; set; }
@@ -180,7 +180,7 @@
     private IEnumerable<IngredientForDropdownModel> ingredients = [];
     private IEnumerable<UnitForDropdownModel> units { get; set; } = [];
 
-    private Dictionary<RecipeSectionType, List<string>> RecipeSectionErrors;
+    private Dictionary<RecipeSectionType, List<string>> RecipeSectionErrors = [];
     private Dictionary<RecipeDifficulty, string> Difficulties { get; set; } = RecipeDifficultyExtensions.GetRecipeDifficulties();
     private readonly RecipeModelValidator validator = new();
     private readonly RecipeSectionValidator sectionValidator = new();

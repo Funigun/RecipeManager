@@ -46,12 +46,12 @@
 
 @code {
     [Parameter]
-    public HateoasResponse<IngredientsPageModel> IngredientsPage { get; set; }
+    public HateoasResponse<IngredientsPageModel> IngredientsPage { get; set; } = new();
 
     [Parameter]
     public bool ShowLoadingBar { get; set; } = true;
 
-    private MudTable<HateoasResponse<IngredientModel>> table;
+    private MudTable<HateoasResponse<IngredientModel>> table = default!;
     private string categoryToSearch = "";
 
     public async Task UpdateIngredient(HateoasResponse<IngredientModel> selectedItem)

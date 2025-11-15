@@ -18,10 +18,10 @@ public sealed class DeleteRecipeTests : BaseIntegrationTest
     {
         // Arrange
         HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", TokenMockFactory.GenerateJwtToken(UserMockFactory.CreateMockedAdmin()));
-        RecipeId recipeId = (await DbContext.Recipes.AsNoTracking().FirstAsync(recipe => recipe.Title == "To Delete", CancellationToken.None)).Id.Value;
+        RecipeId recipeId = (await DbContext.Recipes.AsNoTracking().FirstAsync(recipe => recipe.Title == "To Delete", TestContext.Current.CancellationToken)).Id.Value;
 
         // Act
-        HttpResponseMessage response = await HttpClient.DeleteAsync($"/api/recipes/{recipeId}", CancellationToken.None);
+        HttpResponseMessage response = await HttpClient.DeleteAsync($"/api/recipes/{recipeId}", TestContext.Current.CancellationToken);
 
         // Assert
         response.EnsureSuccessStatusCode();

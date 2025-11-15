@@ -29,7 +29,7 @@ public static class GetUnitById
         }
     }
 
-    internal static async Task<Results<Ok<HateoasResponse<Response>>, NotFound>> Handler(Guid unitId, [FromServices] ICurrentUser currentUser, IAppDbContext dbContext, [FromServices] IHateoasBuilderFactory hateoasBuilderFactory, CancellationToken cancellationToken)
+    internal static async Task<Results<Ok<HateoasResponse<Response>>, NotFound>> Handler(Guid unitId, [FromServices] ICurrentUser currentUser, [FromServices] IAppDbContext dbContext, [FromServices] IHateoasBuilderFactory hateoasBuilderFactory, CancellationToken cancellationToken)
     {
         UnitId id = new(unitId);
         Unit? unit = await dbContext.Units.AsNoTracking().FirstOrDefaultAsync(unit => unit.Id == id, cancellationToken);

@@ -21,7 +21,7 @@ public static class GetIngredientCategoriesForDropdown
         }
     }
 
-    internal static async Task<Results<Ok<IEnumerable<Response>>, NotFound>> Handler([FromQuery] string? categoryName, IAppDbContext dbContext, CancellationToken cancellationToken)
+    internal static async Task<Results<Ok<IEnumerable<Response>>, NotFound>> Handler([FromQuery] string? categoryName, [FromServices] IAppDbContext dbContext, CancellationToken cancellationToken)
     {
         IEnumerable<Response> results = await dbContext.IngredientCategories
                                                        .Where(category => string.IsNullOrEmpty(categoryName) || category.Name.Contains(categoryName))

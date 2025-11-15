@@ -27,7 +27,7 @@ public sealed class UpdateRecipeTests : BaseIntegrationTest
                                                .Include(r => r.Sections)
                                                .AsSplitQuery()
                                                .AsNoTracking()
-                                               .FirstAsync(recipe => recipe.Title == "To Update", CancellationToken.None);
+                                               .FirstAsync(recipe => recipe.Title == "To Update", TestContext.Current.CancellationToken);
         UpdateRecipe.RecipeDto recipeDto = new
         (
             recipe.Title,
@@ -43,10 +43,10 @@ public sealed class UpdateRecipeTests : BaseIntegrationTest
             null
         );
 
-        StringContent content = new(JsonSerializer.Serialize(recipeDto), Encoding.UTF8, "application/json");
+        using StringContent content = new(JsonSerializer.Serialize(recipeDto), Encoding.UTF8, "application/json");
 
         // Act
-        HttpResponseMessage response = await HttpClient.PutAsync($"/api/recipes/{recipe.Id.Value}", content, CancellationToken.None);
+        HttpResponseMessage response = await HttpClient.PutAsync($"/api/recipes/{recipe.Id.Value}", content, TestContext.Current.CancellationToken);
 
         // Assert
         response.EnsureSuccessStatusCode();

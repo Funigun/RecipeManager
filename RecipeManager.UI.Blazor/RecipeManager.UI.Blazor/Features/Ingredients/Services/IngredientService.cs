@@ -26,7 +26,7 @@ public sealed class IngredientService(IRecipeApi recipeApi, NavigationManager na
 
         if (response.IsSuccessStatusCode)
         {
-            IngredientCreationResponse createdIngredientId = await response.Content.ReadFromJsonAsync<IngredientCreationResponse>(cancellationToken: cancellationToken);
+            IngredientCreationResponse createdIngredientId = (await response.Content.ReadFromJsonAsync<IngredientCreationResponse>(cancellationToken: cancellationToken))!;
             return createdIngredientId!.Id;
         }
         else

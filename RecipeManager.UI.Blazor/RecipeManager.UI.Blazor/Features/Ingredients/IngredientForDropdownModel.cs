@@ -4,7 +4,7 @@ public sealed class IngredientForDropdownModel
 {
     public Guid Id { get; set; }
 
-    public string Name { get; set; }
+    public string Name { get; set; } = string.Empty;
 
     public string? IngredientRecipe { get; set; }
 }
