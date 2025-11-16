@@ -25,6 +25,7 @@ public sealed class UpdateRecipeTests : BaseIntegrationTest
         Recipe recipe = await DbContext.Recipes.Include(r => r.Ingredients)
                                                .Include(r => r.Categories)
                                                .Include(r => r.Sections)
+                                                .ThenInclude(s => s.Steps)
                                                .AsSplitQuery()
                                                .AsNoTracking()
                                                .FirstAsync(recipe => recipe.Title == "To Update", TestContext.Current.CancellationToken);
@@ -35,7 +36,7 @@ public sealed class UpdateRecipeTests : BaseIntegrationTest
             "Updated description",
             null,
             null,
-            new UpdateRecipe.RecipeAmountDto(500d, new(recipe.Amount.Unit.Id)),
+            new UpdateRecipe.RecipeAmountDto(500d, new(recipe.Amount.UnitId.Value)),
             5,
             (int)recipe.Difficulty,
             recipe.Ingredients.Select(ingredient => new UpdateRecipe.RecipeIngredientDto(new(ingredient.IngredientId, null), new(ingredient.UnitId), ingredient.Amount)).ToList(),
