@@ -22,10 +22,10 @@ public sealed class CreateUnitTests : BaseIntegrationTest
         HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", TokenMockFactory.GenerateJwtToken(UserMockFactory.CreateMockedUser()));
 
         CreateUnit.Request createUnitRequest = new("Valid Unit", "VA", 0, null);
-        StringContent content = new(JsonSerializer.Serialize(createUnitRequest), Encoding.UTF8, "application/json");
+        using StringContent content = new(JsonSerializer.Serialize(createUnitRequest), Encoding.UTF8, "application/json");
 
         // Act
-        HttpResponseMessage response = await HttpClient.PostAsync("/api/units", content, CancellationToken.None);
+        HttpResponseMessage response = await HttpClient.PostAsync("/api/units", content, TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Equal(System.Net.HttpStatusCode.Forbidden, response.StatusCode);
@@ -43,13 +43,13 @@ public sealed class CreateUnitTests : BaseIntegrationTest
         HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", TokenMockFactory.GenerateJwtToken(UserMockFactory.CreateMockedAdmin()));
 
         CreateUnit.Request createUnitRequest = new(unitName, shortName, group, null);
-        StringContent content = new(JsonSerializer.Serialize(createUnitRequest), Encoding.UTF8, "application/json");
+        using StringContent content = new(JsonSerializer.Serialize(createUnitRequest), Encoding.UTF8, "application/json");
 
         // Act
-        HttpResponseMessage response = await HttpClient.PostAsync("/api/units", content, CancellationToken.None);
+        HttpResponseMessage response = await HttpClient.PostAsync("/api/units", content, TestContext.Current.CancellationToken);
 
         // Assert
-        Assert.Equal(System.Net.HttpStatusCode.BadRequest, response.StatusCode);
+        Assert.True(response.StatusCode == System.Net.HttpStatusCode.BadRequest, $"Expected BadRequest for justification: {justification}");
     }
 
     [Fact]
@@ -59,11 +59,11 @@ public sealed class CreateUnitTests : BaseIntegrationTest
         HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", TokenMockFactory.GenerateJwtToken(UserMockFactory.CreateMockedAdmin()));
 
         CreateUnit.Request createUnitRequest = new("Valid Unit", "VA", 0, null);
-        StringContent content = new(JsonSerializer.Serialize(createUnitRequest), Encoding.UTF8, "application/json");
+        using StringContent content = new(JsonSerializer.Serialize(createUnitRequest), Encoding.UTF8, "application/json");
 
         // Act
-        HttpResponseMessage response = await HttpClient.PostAsync("/api/units", content, CancellationToken.None);
-        string responseContent = await response.Content.ReadAsStringAsync(CancellationToken.None);
+        HttpResponseMessage response = await HttpClient.PostAsync("/api/units", content, TestContext.Current.CancellationToken);
+        string responseContent = await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
         CreateUnit.Response? unitId = JsonSerializer.Deserialize<CreateUnit.Response?>(responseContent, JsonOptions);
 
         // Assert

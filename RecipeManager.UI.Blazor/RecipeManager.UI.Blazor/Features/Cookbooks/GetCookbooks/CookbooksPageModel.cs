@@ -1,4 +1,5 @@
-﻿using RecipeManager.UI.Blazor.Brokers.HateoasModel;
+﻿using System.Collections.ObjectModel;
+using RecipeManager.UI.Blazor.Brokers.HateoasModel;
 
 namespace RecipeManager.UI.Blazor.Features.Cookbooks.GetCookbooks;
 
@@ -10,5 +11,5 @@ public sealed class CookbooksPageModel
 
     public int TotalCount { get; set; }
 
-    public List<HateoasResponse<CookbookModel>> Cookbooks { get; set; } = [];
+    public Collection<HateoasResponse<CookbookModel>> Cookbooks { get; set; } = [];
 }

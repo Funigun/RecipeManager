@@ -2,9 +2,9 @@
 
 public sealed class HateoasResponse<TItem>
 {
-    public TItem Item { get; init; }
+    public TItem Item { get; init; } = default!;
 
-    public ICollection<Link> Links { get; set; } = [];
+    public ICollection<Link> Links { get; } = [];
 
     public HateoasResponse()
     {

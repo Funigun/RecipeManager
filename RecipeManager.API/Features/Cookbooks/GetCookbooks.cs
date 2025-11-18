@@ -15,7 +15,7 @@ namespace RecipeManager.Api.Features.Cookbooks;
 
 public static class GetCookbooks
 {
-    public sealed record GetCookbooksParameters(string SortBy, bool IsAscending, int Page = 1, int PageSize = 10) : PagedParameters(Page, PageSize);
+    public sealed record GetCookbooksParameters(string SortBy = "title", bool IsAscending = true, int Page = 1, int PageSize = 10) : PagedParameters(Page, PageSize);
 
     public sealed record CoookbookDto(Guid Id, string Title, string? CoverImageUrl);
 

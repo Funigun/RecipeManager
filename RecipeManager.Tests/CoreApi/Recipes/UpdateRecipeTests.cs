@@ -25,16 +25,18 @@ public sealed class UpdateRecipeTests : BaseIntegrationTest
         Recipe recipe = await DbContext.Recipes.Include(r => r.Ingredients)
                                                .Include(r => r.Categories)
                                                .Include(r => r.Sections)
+                                                .ThenInclude(s => s.Steps)
                                                .AsSplitQuery()
                                                .AsNoTracking()
-                                               .FirstAsync(recipe => recipe.Title == "To Update", CancellationToken.None);
+                                               .FirstAsync(recipe => recipe.Title == "To Update", TestContext.Current.CancellationToken);
+
         UpdateRecipe.RecipeDto recipeDto = new
         (
             recipe.Title,
             "Updated description",
             null,
             null,
-            new UpdateRecipe.RecipeAmountDto(500d, new(recipe.Amount.Unit.Id)),
+            new UpdateRecipe.RecipeAmountDto(500d, new(recipe.Amount.UnitId.Value)),
             5,
             (int)recipe.Difficulty,
             recipe.Ingredients.Select(ingredient => new UpdateRecipe.RecipeIngredientDto(new(ingredient.IngredientId, null), new(ingredient.UnitId), ingredient.Amount)).ToList(),
@@ -43,10 +45,10 @@ public sealed class UpdateRecipeTests : BaseIntegrationTest
             null
         );
 
-        StringContent content = new(JsonSerializer.Serialize(recipeDto), Encoding.UTF8, "application/json");
+        using StringContent content = new(JsonSerializer.Serialize(recipeDto), Encoding.UTF8, "application/json");
 
         // Act
-        HttpResponseMessage response = await HttpClient.PutAsync($"/api/recipes/{recipe.Id.Value}", content, CancellationToken.None);
+        HttpResponseMessage response = await HttpClient.PutAsync($"/api/recipes/{recipe.Id.Value}", content, TestContext.Current.CancellationToken);
 
         // Assert
         response.EnsureSuccessStatusCode();

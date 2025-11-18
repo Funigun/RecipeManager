@@ -8,9 +8,9 @@ public class HateoasCollectionResponseBuilder<TItem>
     private readonly HateoasLinkService _linkService;
     private readonly HateoasCollectionListBuilder<TItem> _collectionListBuilder = default!;
 
-    public ICollection<HateoasResponse<TItem>> Items { get; protected set; }
+    public ICollection<HateoasResponse<TItem>> Items { get; }
 
-    public ICollection<Link> Links { get; protected set; } = [];
+    public ICollection<Link> Links { get; } = [];
 
     public HateoasCollectionResponseBuilder(IEnumerable<TItem> items, HateoasLinkService linkService)
     {

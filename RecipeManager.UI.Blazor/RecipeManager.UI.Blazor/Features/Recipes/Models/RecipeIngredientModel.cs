@@ -5,9 +5,9 @@ namespace RecipeManager.UI.Blazor.Features.Recipes.Models;
 
 public sealed class RecipeIngredientModel
 {
-    public IngredientForDropdownModel Ingredient { get; set; }
+    public IngredientForDropdownModel Ingredient { get; set; } = new();
 
-    public UnitForDropdownModel Unit { get; set; }
+    public UnitForDropdownModel Unit { get; set; } = new();
 
     public double Amount { get; set; }
 

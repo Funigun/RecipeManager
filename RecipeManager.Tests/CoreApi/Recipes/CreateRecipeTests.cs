@@ -24,11 +24,11 @@ public sealed class CreateRecipeTests : BaseIntegrationTest
         // Arrange
         HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", TokenMockFactory.GenerateJwtToken(UserMockFactory.CreateMockedAdmin()));
         CreateRecipe.Request request = await CreateFakeRecipe();
-        StringContent content = new(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json");
+        using StringContent content = new(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json");
 
         // Act
-        HttpResponseMessage response = await HttpClient.PostAsync("/api/recipes", content, CancellationToken.None);
-        string responseBody = await response.Content.ReadAsStringAsync();
+        HttpResponseMessage response = await HttpClient.PostAsync("/api/recipes", content, TestContext.Current.CancellationToken);
+        string responseBody = await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
         CreateRecipe.Response? recipeId = JsonSerializer.Deserialize<CreateRecipe.Response>(responseBody, JsonOptions);
 
         // Assert
@@ -41,8 +41,8 @@ public sealed class CreateRecipeTests : BaseIntegrationTest
 
     private async Task<CreateRecipe.Request> CreateFakeRecipe()
     {
-        UnitId unitId = (await DbContext.Units.AsNoTracking().FirstAsync(CancellationToken.None)).Id;
-        IngredientId ingredientId = (await DbContext.Ingredients.AsNoTracking().FirstAsync(CancellationToken.None)).Id;
+        UnitId unitId = (await DbContext.Units.AsNoTracking().FirstAsync(TestContext.Current.CancellationToken)).Id;
+        IngredientId ingredientId = (await DbContext.Ingredients.AsNoTracking().FirstAsync(TestContext.Current.CancellationToken)).Id;
 
         CreateRecipe.RecipeAmountDto amount = new(10d, new(unitId.Value));
         CreateRecipe.RecipeIngredientDto ingredientDto = new(new(ingredientId.Value, null), new(unitId.Value), 10d);

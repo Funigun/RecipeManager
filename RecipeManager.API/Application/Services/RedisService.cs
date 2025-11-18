@@ -6,14 +6,14 @@ namespace RecipeManager.Api.Application.Services;
 
 public class RedisService(IConnectionMultiplexer connection) : IRedisService
 {
+    private static readonly JsonSerializerOptions _options = new() { PropertyNameCaseInsensitive = true };
     private readonly IDatabase _database = connection.GetDatabase();
-    private static readonly JsonSerializerOptions options = new() { PropertyNameCaseInsensitive = true };
 
     public async Task<T?> GetValue<T>(string key)
            where T : class
     {
         RedisValue result = await _database.StringGetAsync(key);
-        return result.IsNullOrEmpty ? null : JsonSerializer.Deserialize<T>(result, options);
+        return result.IsNullOrEmpty ? null : JsonSerializer.Deserialize<T>(result!, _options);
 
     }
 
@@ -25,6 +25,6 @@ public class RedisService(IConnectionMultiplexer connection) : IRedisService
     public async Task SetValue<T>(string key, T value, TimeSpan? expiry = null)
            where T : class
     {
-        await _database.StringSetAsync(key, JsonSerializer.Serialize(value, options), expiry);
+        await _database.StringSetAsync(key, JsonSerializer.Serialize(value, _options), expiry);
     }
 }

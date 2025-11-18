@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RecipeManager.Api.Application.Abstractions;
 using RecipeManager.Api.Application.Exceptions;
@@ -34,7 +35,7 @@ public static class DeleteRecipeCategory
         }
     }
 
-    public static async Task<Results<NoContent, NotFound>> Handler(Request categoryId, IAppDbContext dbContext, CancellationToken cancellationToken)
+    public static async Task<Results<NoContent, NotFound>> Handler(Request categoryId, [FromServices] IAppDbContext dbContext, CancellationToken cancellationToken)
     {
         RecipeCategoryId id = new(categoryId.Id);
 

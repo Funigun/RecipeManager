@@ -87,7 +87,7 @@
 
     private async Task RemoveSelectedIngredients()
     {
-        if (await (DialogService.ShowDeleteItemsConfirmationMessage(selectedIngredients.Count())))
+        if (await (DialogService.ShowDeleteItemsConfirmationMessage(selectedIngredients.Count)))
         {
             Ingredients = Ingredients.Except(selectedIngredients).ToList();
             selectedIngredients.Clear();

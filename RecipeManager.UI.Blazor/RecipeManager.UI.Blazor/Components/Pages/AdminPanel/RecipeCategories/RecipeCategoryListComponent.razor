@@ -51,8 +51,8 @@
     [Parameter]
     public bool ShowLoadingBar { get; set; } = true;
 
-    private MudTable<HateoasResponse<RecipeCategoryModel>> table;
-    private Dictionary<int, string> categoryTypes { get; set; }
+    private MudTable<HateoasResponse<RecipeCategoryModel>> table = default!;
+    private Dictionary<int, string> categoryTypes { get; set; } = [];
     private int categoryTypeToSearch = -1;
 
     protected async override Task OnInitializedAsync()

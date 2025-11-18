@@ -40,8 +40,6 @@
     [Parameter]
     public bool ShowLoadingBar { get; set; } = true;
 
-    private string previousGroup = string.Empty;
-
     private async Task DeleteUnit(HateoasResponse<UnitModel> selectedItem)
     {
         if (await DialogService.ShowDeleteConfirmationMessage())

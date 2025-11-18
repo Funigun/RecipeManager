@@ -5,9 +5,11 @@
 @using RecipeManager.UI.Blazor.Features.Ingredients.Services
 @using RecipeManager.UI.Blazor.Features.Ingredients.UpdateIngredient
 @using RecipeManager.UI.Blazor.Features.Recipes
+@using RecipeManager.UI.Blazor.Features.Recipes.Services
 
 @inject IIngredientService IngredientService;
 @inject IIngredientCategoryService IngredientCategoryService;
+@inject IRecipeService RecipeService;
 
 @if (isLoaded)
 {
@@ -118,9 +120,9 @@
     private bool showCategories = false;
     private bool isAddCategoryDisabled = true;
 
-    private IEnumerable<RecipeForDropdownModel> recipes = [];
-    public List<RecipeForDropdownModel> selectedRecipes = [];
-    private RecipeForDropdownModel selectedRecipe;
+
+    private List<RecipeForDropdownModel> selectedRecipes = [];
+    private RecipeForDropdownModel selectedRecipe = default!;
     private bool showRecipes = false;
     private string toggleRecipesIcon = Icons.Material.Filled.KeyboardArrowDown;
     private bool isAddRecipeDisabled = true;
@@ -198,8 +200,7 @@
 
     private async Task<IEnumerable<RecipeForDropdownModel>> SearchRecipes(string value, CancellationToken cancellationToken)
     {
-        //ToDo: implement search for recipe by name once during Recipes UI development
-        return recipes;
+        return await RecipeService.GetRecipesForDropdown(value, 25);
     }
 
     private void AddRecipe()

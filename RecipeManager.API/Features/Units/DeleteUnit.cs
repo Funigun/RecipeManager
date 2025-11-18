@@ -1,5 +1,6 @@
 ﻿using FluentValidation;
 using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
 using RecipeManager.Api.Application.Abstractions;
 using RecipeManager.Api.Application.Exceptions;
 using RecipeManager.Api.Domain.Units;
@@ -34,7 +35,7 @@ public static class DeleteUnit
         }
     }
 
-    public static async Task<Results<NoContent, NotFound>> Handler(Request unitId, IAppDbContext dbContext, CancellationToken cancellationToken)
+    public static async Task<Results<NoContent, NotFound>> Handler(Request unitId, [FromServices] IAppDbContext dbContext, CancellationToken cancellationToken)
     {
         UnitId id = new(unitId.Id);
 

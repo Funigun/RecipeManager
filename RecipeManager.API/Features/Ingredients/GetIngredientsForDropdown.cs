@@ -23,7 +23,7 @@ public static class GetIngredientsForDropdown
         }
     }
 
-    private static async Task<Results<Ok<IEnumerable<Response>>, NotFound>> Handler([FromQuery] string? ingredientName, [FromServices] IAppDbContext dbContext, [FromServices] ICurrentUser currentUser, CancellationToken cancellationToken)
+    public static async Task<Results<Ok<IEnumerable<Response>>, NotFound>> Handler([FromQuery] string? ingredientName, [FromServices] IAppDbContext dbContext, [FromServices] ICurrentUser currentUser, CancellationToken cancellationToken)
     {
         IQueryable<Ingredient> query = dbContext.Ingredients.AsNoTracking().Where(ingredient => ingredient.CreatedBy == currentUser.Id);
 
@@ -33,7 +33,7 @@ public static class GetIngredientsForDropdown
             query = query.Where(ingredient => ingredient.Name.ToLower().Contains(ingredientName));
         }
 
-        IEnumerable<Response> results = await query.OrderBy(Ingredient => Ingredient.Name)
+        IEnumerable<Response> results = await query.OrderBy(ingredient => ingredient.Name)
                                                    .Select(ingredient => new Response(ingredient.Id, ingredient.Name, ingredient.Recipes.Any() ? $"/recipes/{ingredient.Recipes[0]}" : null))
                                                    .ToListAsync(cancellationToken);
 

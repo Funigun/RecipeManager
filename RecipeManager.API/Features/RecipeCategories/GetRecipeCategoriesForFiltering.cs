@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RecipeManager.Api.Application.Abstractions;
 using RecipeManager.Api.Domain.Recipes;
@@ -23,7 +24,7 @@ public static class GetRecipeCategoriesForFiltering
         }
     }
 
-    internal static async Task<Results<Ok<Response>, NotFound>> Handler(IAppDbContext dbContext, CancellationToken cancellationToken)
+    internal static async Task<Results<Ok<Response>, NotFound>> Handler([FromServices] IAppDbContext dbContext, CancellationToken cancellationToken)
     {
         List<RecipeCategory> categories = await dbContext.RecipeCategories.AsNoTracking().ToListAsync(cancellationToken);
 

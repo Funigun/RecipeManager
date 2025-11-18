@@ -23,7 +23,7 @@ public static class GetPrimaryUnits
         }
     }
 
-    internal static async Task<Results<Ok<IEnumerable<Response>>, BadRequest>> Handler([FromServices] IAppDbContext dbContext, IRedisService redisService, CancellationToken cancellationToken)
+    internal static async Task<Results<Ok<IEnumerable<Response>>, BadRequest>> Handler([FromServices] IAppDbContext dbContext, CancellationToken cancellationToken)
     {
         IEnumerable<Unit> primaryUnits = await dbContext.Units.AsNoTracking()
                                                               .Where(unit => unit.PrimaryUnit == null)

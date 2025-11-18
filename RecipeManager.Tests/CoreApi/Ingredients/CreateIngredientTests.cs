@@ -14,8 +14,6 @@ public sealed class CreateIngredientTests : BaseIntegrationTest
     {
     }
 
-    //ToDo: Add tests for unhappy paths (auth, validation) in all Ingredient tests
-
     [Fact]
     public async Task CreateIngredient_ShouldReturn_CategoryId_ForValidInput()
     {
@@ -23,11 +21,11 @@ public sealed class CreateIngredientTests : BaseIntegrationTest
         HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", TokenMockFactory.GenerateJwtToken(UserMockFactory.CreateMockedAdmin()));
 
         CreateIngredient.Request request = new("New fake ingredient", [], []);
-        StringContent content = new(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json");
+        using StringContent content = new(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json");
 
         // Act
-        HttpResponseMessage response = await HttpClient.PostAsync("/api/ingredients", content, CancellationToken.None);
-        string responseBody = await response.Content.ReadAsStringAsync();
+        HttpResponseMessage response = await HttpClient.PostAsync("/api/ingredients", content, TestContext.Current.CancellationToken);
+        string responseBody = await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
         CreateIngredient.Response? ingredientId = JsonSerializer.Deserialize<CreateIngredient.Response>(responseBody, JsonOptions);
 
         // Assert

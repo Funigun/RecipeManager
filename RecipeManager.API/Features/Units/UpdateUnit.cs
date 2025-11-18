@@ -1,5 +1,6 @@
 ﻿using FluentValidation;
 using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RecipeManager.Api.Application.Abstractions;
 using RecipeManager.Api.Application.Exceptions;
@@ -81,7 +82,7 @@ public static class UpdateUnit
         }
     }
 
-    internal static async Task<Results<NoContent, NotFound, BadRequest>> Handler(Guid unitId, Request request, IAppDbContext dbContext, CancellationToken cancellationToken)
+    internal static async Task<Results<NoContent, NotFound, BadRequest>> Handler(Guid unitId, [FromBody] Request request, [FromServices] IAppDbContext dbContext, CancellationToken cancellationToken)
     {
         UnitId id = new(unitId);
 

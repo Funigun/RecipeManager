@@ -22,10 +22,10 @@ public sealed class CreateIngredientCategoryTests : BaseIntegrationTest
         HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", TokenMockFactory.GenerateJwtToken(UserMockFactory.CreateMockedUser()));
 
         CreateIngredientCategory.Request createCategoryRequest = new("Ingredient category");
-        StringContent content = new(JsonSerializer.Serialize(createCategoryRequest), Encoding.UTF8, "application/json");
+        using StringContent content = new(JsonSerializer.Serialize(createCategoryRequest), Encoding.UTF8, "application/json");
 
         // Act
-        HttpResponseMessage response = await HttpClient.PostAsync("/api/ingredientCategories", content, CancellationToken.None);
+        HttpResponseMessage response = await HttpClient.PostAsync("/api/ingredientCategories", content, TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Equal(System.Net.HttpStatusCode.Forbidden, response.StatusCode);
@@ -40,13 +40,13 @@ public sealed class CreateIngredientCategoryTests : BaseIntegrationTest
         HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", TokenMockFactory.GenerateJwtToken(UserMockFactory.CreateMockedAdmin()));
 
         CreateIngredientCategory.Request createCategoryRequest = new(categoryName);
-        StringContent content = new(JsonSerializer.Serialize(createCategoryRequest), Encoding.UTF8, "application/json");
+        using StringContent content = new(JsonSerializer.Serialize(createCategoryRequest), Encoding.UTF8, "application/json");
 
         // Act
-        HttpResponseMessage response = await HttpClient.PostAsync("/api/ingredientCategories", content, CancellationToken.None);
+        HttpResponseMessage response = await HttpClient.PostAsync("/api/ingredientCategories", content, TestContext.Current.CancellationToken);
 
         // Assert
-        Assert.Equal(System.Net.HttpStatusCode.BadRequest, response.StatusCode);
+        Assert.True(response.StatusCode == System.Net.HttpStatusCode.BadRequest, $"Expected BadRequest but got {response.StatusCode} for justification: {justification}");
     }
 
     [Fact]
@@ -56,11 +56,11 @@ public sealed class CreateIngredientCategoryTests : BaseIntegrationTest
         HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", TokenMockFactory.GenerateJwtToken(UserMockFactory.CreateMockedAdmin()));
 
         CreateIngredientCategory.Request createCategoryRequest = new("New Recipe Category");
-        StringContent content = new(JsonSerializer.Serialize(createCategoryRequest), Encoding.UTF8, "application/json");
+        using StringContent content = new(JsonSerializer.Serialize(createCategoryRequest), Encoding.UTF8, "application/json");
 
         // Act
-        HttpResponseMessage response = await HttpClient.PostAsync("/api/ingredientCategories", content, CancellationToken.None);
-        string responseBody = await response.Content.ReadAsStringAsync();
+        HttpResponseMessage response = await HttpClient.PostAsync("/api/ingredientCategories", content, TestContext.Current.CancellationToken);
+        string responseBody = await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
         CreateRecipeCategory.Response? categoryId = JsonSerializer.Deserialize<CreateRecipeCategory.Response>(responseBody, JsonOptions);
 
         // Assert

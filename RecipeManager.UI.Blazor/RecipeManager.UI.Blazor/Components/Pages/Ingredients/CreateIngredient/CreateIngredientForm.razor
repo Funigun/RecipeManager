@@ -4,9 +4,11 @@
 @using RecipeManager.UI.Blazor.Features.Ingredients.CreateIngredient
 @using RecipeManager.UI.Blazor.Features.Ingredients.Services
 @using RecipeManager.UI.Blazor.Features.Recipes
+@using RecipeManager.UI.Blazor.Features.Recipes.Services
 
 @inject IIngredientService IngredientService;
 @inject IIngredientCategoryService IngredientCategoryService;
+@inject IRecipeService RecipeService;
 
 <MudForm Model="@ingredientModel" Validation="@(validator.ValidateValue)" @bind-IsValid="@isSubmitEnabled">
     <MudText Typo="Typo.h5" Class="mb-4">Create Ingredient</MudText>
@@ -103,16 +105,14 @@
     private readonly IngredientForCreateValidator validator = new();
 
     private IEnumerable<IngredientCategoryForDropdownModel> categories = [];
-    private List<IngredientCategoryForDropdownModel> selectedCategories = [];
+    private readonly List<IngredientCategoryForDropdownModel> selectedCategories = [];
     private IngredientCategoryForDropdownModel selectedCategory = new();
     private string toggleCategoriesIcon = Icons.Material.Filled.KeyboardArrowDown;
     private bool showCategories = false;
     private bool isAddCategoryDisabled = true;
 
-
-    private IEnumerable<RecipeForDropdownModel> recipes = [];
-    public List<RecipeForDropdownModel> selectedRecipes = [];
-    private RecipeForDropdownModel selectedRecipe;
+    private List<RecipeForDropdownModel> selectedRecipes = [];
+    private RecipeForDropdownModel selectedRecipe = default!;
     private bool showRecipes = false;
     private string toggleRecipesIcon = Icons.Material.Filled.KeyboardArrowDown;     
     private bool isAddRecipeDisabled = true;
@@ -171,8 +171,7 @@
 
     private async Task<IEnumerable<RecipeForDropdownModel>> SearchRecipes(string value, CancellationToken cancellationToken)
     {
-        //ToDo: implement search for recipe by name once during Recipes UI development
-        return recipes;
+        return await RecipeService.GetRecipesForDropdown(value, 25);
     }
 
     private void AddRecipe()

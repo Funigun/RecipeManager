@@ -1,4 +1,5 @@
-﻿using RecipeManager.UI.Blazor.Brokers.HateoasModel;
+﻿using System.Collections.ObjectModel;
+using RecipeManager.UI.Blazor.Brokers.HateoasModel;
 
 namespace RecipeManager.UI.Blazor.Features.RecipeCategories.Models;
 
@@ -10,5 +11,5 @@ public class RecipeCategoryPageModel
 
     public int TotalCount { get; set; }
 
-    public List<HateoasResponse<RecipeCategoryModel>> Categories { get; set; } = [];
+    public Collection<HateoasResponse<RecipeCategoryModel>> Categories { get; set; } = [];
 }

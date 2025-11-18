@@ -50,8 +50,8 @@ try
                     .AddEndpoints(assembly)
                     .AddAuthorizationPolicies(assembly)
                     .AddValidatorsFromAssembly(assembly)
-                    .AddValidatorsFromAssembly(contractsAssembly)
-                    .AddScoped<IRedisService, RedisService>();
+                    .AddValidatorsFromAssembly(contractsAssembly);
+                    //.AddScoped<IRedisService, RedisService>();
 
     builder.Services.AddPersistance(builder.Configuration);
 
@@ -62,7 +62,7 @@ try
                         policy.RequireAuthenticatedUser();
                     });
 
-    builder.AddRedisClient("Cache");
+    //builder.AddRedisClient("Cache");
 
     WebApplication app = builder.Build();
 

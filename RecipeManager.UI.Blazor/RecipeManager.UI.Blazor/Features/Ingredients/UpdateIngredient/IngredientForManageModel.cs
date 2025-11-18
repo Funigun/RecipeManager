@@ -1,23 +1,24 @@
-﻿using RecipeManager.UI.Blazor.Features.IngredientCategories.Models;
+﻿using System.Collections.ObjectModel;
+using RecipeManager.UI.Blazor.Features.IngredientCategories.Models;
 using RecipeManager.UI.Blazor.Features.Recipes;
 
 namespace RecipeManager.UI.Blazor.Features.Ingredients.UpdateIngredient;
 
 public sealed class IngredientForManageModel
 {
-    public string Name { get; set; }
+    public string Name { get; set; } = string.Empty;
 
-    public IEnumerable<IngredientCategoryForDropdownModel> Categories { get; set; }
+    public Collection<IngredientCategoryForDropdownModel> Categories { get; set; } = [];
 
-    public IEnumerable<RecipeForDropdownModel> Recipes { get; set; }
+    public Collection<RecipeForDropdownModel> Recipes { get; set; } = [];
 
     public IngredientForUpdateModel ToUpdateModel()
     {
         return new IngredientForUpdateModel
         {
             Name = Name,
-            Categories = Categories.Select(c => c.Id).ToList(),
-            Recipes = Recipes.Select(r => r.Id).ToList()
+            Categories = new(Categories.Select(c => c.Id).ToList()),
+            Recipes = new(Recipes.Select(r => r.Id).ToList())
         };
     }
 }

@@ -17,10 +17,10 @@ public sealed class DeleteIngredientTests : BaseIntegrationTest
     {
         // Arrange
         HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", TokenMockFactory.GenerateJwtToken(UserMockFactory.CreateMockedAdmin()));
-        Guid ingredientId = (await DbContext.Ingredients.AsNoTracking().FirstAsync(ingredient => ingredient.Name == "To Delete", CancellationToken.None)).Id.Value;
+        Guid ingredientId = (await DbContext.Ingredients.AsNoTracking().FirstAsync(ingredient => ingredient.Name == "To Delete", TestContext.Current.CancellationToken)).Id.Value;
 
         // Act
-        HttpResponseMessage deleteResponse = await HttpClient.DeleteAsync($"/api/ingredients/{ingredientId}", CancellationToken.None);
+        HttpResponseMessage deleteResponse = await HttpClient.DeleteAsync($"/api/ingredients/{ingredientId}", TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Equal(System.Net.HttpStatusCode.NoContent, deleteResponse.StatusCode);

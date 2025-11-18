@@ -75,7 +75,7 @@ public sealed class WebApiFactory : WebApplicationFactory<IAssemblyMarker>, IAsy
         HttpClient = CreateClient();
 
         HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", TokenMockFactory.GenerateJwtToken(UserMockFactory.CreateMockedAdmin()));
-        _ = await HttpClient.GetAsync("/api/units", CancellationToken.None);
+        _ = await HttpClient.GetAsync("/api/units", TestContext.Current.CancellationToken);
 
         await DbContext.SeedAsync();
     }

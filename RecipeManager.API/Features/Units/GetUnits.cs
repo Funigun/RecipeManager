@@ -40,7 +40,6 @@ public static class GetUnits
                                                          .ThenBy(unit => unit.Name)
                                                        .ToListAsync(cancellationToken);
 
-
         IEnumerable<Response> responses = units.Select(ToGetResponse);
 
         bool isActionAllowed = currentUser.HasRole(UserRoles.Admin);

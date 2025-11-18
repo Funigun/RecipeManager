@@ -20,13 +20,13 @@ public sealed class UpdateIngredientTests : BaseIntegrationTest
     {
         // Arrange
         HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", TokenMockFactory.GenerateJwtToken(UserMockFactory.CreateMockedAdmin()));
-        Guid ingredientId = (await DbContext.Ingredients.AsNoTracking().FirstAsync(ingredient => ingredient.Name == "Existing Ingredient", CancellationToken.None)).Id.Value;
+        Guid ingredientId = (await DbContext.Ingredients.AsNoTracking().FirstAsync(ingredient => ingredient.Name == "Existing Ingredient", TestContext.Current.CancellationToken)).Id.Value;
 
         UpdateIngredient.IngredientDto request = new("Update Name", [], []);
-        StringContent content = new(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json");
+        using StringContent content = new(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json");
 
         // Act
-        HttpResponseMessage response = await HttpClient.PutAsync($"/api/ingredients/{ingredientId}", content, CancellationToken.None);
+        HttpResponseMessage response = await HttpClient.PutAsync($"/api/ingredients/{ingredientId}", content, TestContext.Current.CancellationToken);
 
         // Assert
         response.EnsureSuccessStatusCode();

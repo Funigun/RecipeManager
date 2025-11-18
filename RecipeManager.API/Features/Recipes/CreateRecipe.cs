@@ -204,7 +204,7 @@ public static class CreateRecipe
         }
     }
 
-    public static async Task<IResult> Handler([FromBody] Request request, IAppDbContext dbContext, CancellationToken cancellationToken)
+    public static async Task<IResult> Handler([FromBody] Request request, [FromServices] IAppDbContext dbContext, CancellationToken cancellationToken)
     {
         Recipe recipe = request.ToDomain();
 

@@ -1,4 +1,5 @@
-﻿using RecipeManager.UI.Blazor.Brokers.HateoasModel;
+﻿using System.Collections.ObjectModel;
+using RecipeManager.UI.Blazor.Brokers.HateoasModel;
 
 namespace RecipeManager.UI.Blazor.Features.Cookbooks.Models;
 
@@ -12,7 +13,7 @@ public sealed class CookbookForManageModel
 
     public string? CoverImageUrl { get; set; }
 
-    public List<CookbookCategoryForManageModel> Categories { get; set; } = [];
+    public Collection<CookbookCategoryForManageModel> Categories { get; set; } = [];
 
     public void ResetCategorySelection()
     {

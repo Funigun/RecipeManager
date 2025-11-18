@@ -6,7 +6,7 @@ public sealed class RecipeSectionModel
 {
     public RecipeSectionType SectionType { get; set; }
 
-    public ICollection<RecipeStepModel> Steps { get; set; }
+    public ICollection<RecipeStepModel> Steps { get; set; } = [];
 
     public bool IsRequired { get; set; }
 

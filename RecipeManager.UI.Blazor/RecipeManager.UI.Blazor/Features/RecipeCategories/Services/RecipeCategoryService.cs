@@ -15,6 +15,8 @@ public sealed class RecipeCategoryService(IRecipeApi recipeApi, ISnackbar snackb
     private const string CategoriesDropdownApiUrl = $"{CategoriesApiUrl}/dropdown";
     private const string CategoriesForFilteringApiUrl = $"{CategoriesApiUrl}/filtering";
 
+    private static readonly JsonSerializerOptions _jsonOptions = new() { PropertyNameCaseInsensitive = true };
+
     public ApiResponseBody ResponseBody { get; private set; } = new();
 
     public async Task<HateoasResponse<RecipeCategoryPageModel>> GetCategories(int pageNumber, int pageSie, int? categoryType)
@@ -30,7 +32,6 @@ public sealed class RecipeCategoryService(IRecipeApi recipeApi, ISnackbar snackb
 
         if (response.IsSuccessStatusCode)
         {
-            string resp = await response.Content.ReadAsStringAsync();
             return (await response.Content.ReadFromJsonAsync<HateoasResponse<RecipeCategoryPageModel>>())!;
         }
 
@@ -63,8 +64,7 @@ public sealed class RecipeCategoryService(IRecipeApi recipeApi, ISnackbar snackb
             string jsonValue = await response.Content.ReadAsStringAsync();
             using JsonDocument? doc = JsonDocument.Parse(jsonValue);
             JsonElement categories = doc.RootElement.GetProperty("categories");
-            JsonSerializerOptions opt = new() { PropertyNameCaseInsensitive = true };
-            return JsonSerializer.Deserialize<Dictionary<RecipeCategoryType, IEnumerable<RecipeCategoryForDropdownModel>>>(categories.GetRawText(), opt)!;
+            return JsonSerializer.Deserialize<Dictionary<RecipeCategoryType, IEnumerable<RecipeCategoryForDropdownModel>>>(categories.GetRawText(), _jsonOptions)!;
         }
 
         ResponseBody = (await response.Content.ReadFromJsonAsync<ApiResponseBody>())!;

@@ -1,4 +1,5 @@
-﻿using System.Text.Json.Serialization;
+﻿using System.Collections.ObjectModel;
+using System.Text.Json.Serialization;
 using RecipeManager.UI.Blazor.Brokers.HateoasModel;
 
 namespace RecipeManager.UI.Blazor.Features.Cookbooks.Models;
@@ -15,9 +16,9 @@ public class CookbookCategoryForManageModel
     [JsonIgnore]
     public int DepthLevel { get; set; } = 1;
 
-    public List<HateoasResponse<CookbookRecipeForManageModel>> Recipes { get; set; } = [];
+    public Collection<HateoasResponse<CookbookRecipeForManageModel>> Recipes { get; set; } = [];
 
-    public List<CookbookCategoryForManageModel> Subcategories { get; set; } = [];
+    public Collection<CookbookCategoryForManageModel> Subcategories { get; set; } = [];
 
     public void ResetSelection()
     {

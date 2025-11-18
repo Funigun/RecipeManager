@@ -33,9 +33,9 @@ public class UnitService(IRecipeApi recipeApi, ISnackbar snackbar, NavigationMan
         ResponseBody = (await response.Content.ReadFromJsonAsync<ApiResponseBody>())!;
     }
 
-    public async Task<HateoasResponse<UnitForUpdateModel>> GetUnitById(Guid unitId)
+    public async Task<HateoasResponse<UnitForUpdateModel>> GetUnitById(Guid id)
     {
-        HttpResponseMessage response = await recipeApi.GetById(new Uri($"{UnitsApiUrl}/{unitId}", UriKind.Relative));
+        HttpResponseMessage response = await recipeApi.GetById(new Uri($"{UnitsApiUrl}/{id}", UriKind.Relative));
 
         if (response.IsSuccessStatusCode)
         {

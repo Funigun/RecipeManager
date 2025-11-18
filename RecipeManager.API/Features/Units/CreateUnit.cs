@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RecipeManager.Api.Application.Abstractions;
 using RecipeManager.Api.Domain.Units;
@@ -77,7 +78,7 @@ public static class CreateUnit
         }
     }
 
-    public static async Task<IResult> Handler(Request request, IAppDbContext dbContext, CancellationToken cancellationToken)
+    public static async Task<IResult> Handler(Request request, [FromServices] IAppDbContext dbContext, CancellationToken cancellationToken)
     {
         Unit unit = request.ToUnit();
 

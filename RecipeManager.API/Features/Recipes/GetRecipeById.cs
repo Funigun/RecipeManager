@@ -53,9 +53,9 @@ public static class GetRecipeById
     {
         Recipe? recipe = await GetRecipe(new RecipeId(id.Id), dbContext, cancellationToken);
 
-        IEnumerable<Ingredient> recipeIngredients = await GetRecipeIngredients(recipe, dbContext, cancellationToken);
+        IEnumerable<Ingredient> recipeIngredients = await GetRecipeIngredients(recipe!, dbContext, cancellationToken);
         IEnumerable<Unit> units = await dbContext.Units.AsNoTracking().ToListAsync(cancellationToken);
-        IEnumerable<RecipeCategory> categories = recipe.Categories.Count > 0
+        IEnumerable<RecipeCategory> categories = recipe!.Categories.Count > 0
                                                ? await dbContext.RecipeCategories.Where(category => recipe.Categories.Contains(category.Id))
                                                                                  .AsNoTracking()
                                                                                  .ToListAsync(cancellationToken)
@@ -130,7 +130,7 @@ public static class GetRecipeById
             (
                 recipeIngredient.IngredientId.Value,
                 ingredient?.Name ?? string.Empty,
-                ingredient?.Recipes.Any() == true ? ingredient.Recipes.First().Value.ToString() : null
+                ingredient?.Recipes.Any() == true ? ingredient.Recipes[0].Value.ToString() : null
             ),
             new UnitDto
             (

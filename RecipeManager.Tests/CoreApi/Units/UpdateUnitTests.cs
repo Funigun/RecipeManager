@@ -23,10 +23,10 @@ public sealed class UpdateUnitTests : BaseIntegrationTest
 
         Guid unitId = Guid.CreateVersion7();
         UpdateUnit.Request updateUnitRequest = new("Updated Unit", "UU", 0, null, 1);
-        StringContent content = new(JsonSerializer.Serialize(updateUnitRequest), Encoding.UTF8, "application/json");
+        using StringContent content = new(JsonSerializer.Serialize(updateUnitRequest), Encoding.UTF8, "application/json");
 
         // Act
-        HttpResponseMessage response = await HttpClient.PutAsync($"/api/units/{unitId}", content, CancellationToken.None);
+        HttpResponseMessage response = await HttpClient.PutAsync($"/api/units/{unitId}", content, TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Equal(System.Net.HttpStatusCode.Forbidden, response.StatusCode);
@@ -41,15 +41,15 @@ public sealed class UpdateUnitTests : BaseIntegrationTest
         // Arrange
         HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", TokenMockFactory.GenerateJwtToken(UserMockFactory.CreateMockedAdmin()));
 
-        Guid unitId = DbContext.Units.AsNoTracking().Select(unit => unit.Id.Value).First();
+        Guid unitId = await DbContext.Units.AsNoTracking().Select(unit => unit.Id.Value).FirstAsync(TestContext.Current.CancellationToken);
         UpdateUnit.Request updateUnitRequest = new(unitName, shortName, group, null, 1);
-        StringContent content = new(JsonSerializer.Serialize(updateUnitRequest), Encoding.UTF8, "application/json");
+        using StringContent content = new(JsonSerializer.Serialize(updateUnitRequest), Encoding.UTF8, "application/json");
 
         // Act
-        HttpResponseMessage response = await HttpClient.PutAsync($"/api/units/{unitId}", content, CancellationToken.None);
+        HttpResponseMessage response = await HttpClient.PutAsync($"/api/units/{unitId}", content, TestContext.Current.CancellationToken);
 
         // Assert
-        Assert.Equal(System.Net.HttpStatusCode.BadRequest, response.StatusCode);
+        Assert.True(response.StatusCode == System.Net.HttpStatusCode.BadRequest, $"Expected BadRequest for justification: {justification}");
     }
 
     [Fact]
@@ -58,12 +58,12 @@ public sealed class UpdateUnitTests : BaseIntegrationTest
         // Arrange
         HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", TokenMockFactory.GenerateJwtToken(UserMockFactory.CreateMockedAdmin()));
 
-        Guid unitId = (await DbContext.Units.AsNoTracking().FirstAsync(unit => unit.Name != "Duplicated Name", CancellationToken.None)).Id.Value;
+        Guid unitId = (await DbContext.Units.AsNoTracking().FirstAsync(unit => unit.Name != "Duplicated Name", TestContext.Current.CancellationToken)).Id.Value;
         UpdateUnit.Request updateUnitRequest = new("Duplicated Name", "shortName", 1, null, 1);
-        StringContent content = new(JsonSerializer.Serialize(updateUnitRequest), Encoding.UTF8, "application/json");
+        using StringContent content = new(JsonSerializer.Serialize(updateUnitRequest), Encoding.UTF8, "application/json");
 
         // Act
-        HttpResponseMessage response = await HttpClient.PutAsync($"/api/units/{unitId}", content, CancellationToken.None);
+        HttpResponseMessage response = await HttpClient.PutAsync($"/api/units/{unitId}", content, TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Equal(System.Net.HttpStatusCode.BadRequest, response.StatusCode);
@@ -75,12 +75,12 @@ public sealed class UpdateUnitTests : BaseIntegrationTest
         // Arrange
         HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", TokenMockFactory.GenerateJwtToken(UserMockFactory.CreateMockedAdmin()));
 
-        Guid unitId = (await DbContext.Units.AsNoTracking().FirstAsync(unit => unit.ShortName != "Duplicated Short Name", CancellationToken.None)).Id.Value;
+        Guid unitId = (await DbContext.Units.AsNoTracking().FirstAsync(unit => unit.ShortName != "Duplicated Short Name", TestContext.Current.CancellationToken)).Id.Value;
         UpdateUnit.Request updateUnitRequest = new("Duplicated", "Duplicated Short Name", 1, null, 1);
-        StringContent content = new(JsonSerializer.Serialize(updateUnitRequest), Encoding.UTF8, "application/json");
+        using StringContent content = new(JsonSerializer.Serialize(updateUnitRequest), Encoding.UTF8, "application/json");
 
         // Act
-        HttpResponseMessage response = await HttpClient.PutAsync($"/api/units/{unitId}", content, CancellationToken.None);
+        HttpResponseMessage response = await HttpClient.PutAsync($"/api/units/{unitId}", content, TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Equal(System.Net.HttpStatusCode.BadRequest, response.StatusCode);
@@ -92,12 +92,12 @@ public sealed class UpdateUnitTests : BaseIntegrationTest
         // Arrange
         HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", TokenMockFactory.GenerateJwtToken(UserMockFactory.CreateMockedAdmin()));
 
-        Guid unitId = DbContext.Units.AsNoTracking().Where(unit => unit.Name == "To Update").Select(unit => unit.Id.Value).First();
+        Guid unitId = await DbContext.Units.AsNoTracking().Where(unit => unit.Name == "To Update").Select(unit => unit.Id.Value).FirstAsync(TestContext.Current.CancellationToken);
         UpdateUnit.Request updateUnitRequest = new("Updated Unit", "UU", 0, null, 1);
-        StringContent content = new(JsonSerializer.Serialize(updateUnitRequest), Encoding.UTF8, "application/json");
+        using StringContent content = new(JsonSerializer.Serialize(updateUnitRequest), Encoding.UTF8, "application/json");
 
-        // Act
-        HttpResponseMessage response = await HttpClient.PutAsync($"/api/units/{unitId}", content, CancellationToken.None);
+        // ActW
+        HttpResponseMessage response = await HttpClient.PutAsync($"/api/units/{unitId}", content, TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Equal(System.Net.HttpStatusCode.NoContent, response.StatusCode);

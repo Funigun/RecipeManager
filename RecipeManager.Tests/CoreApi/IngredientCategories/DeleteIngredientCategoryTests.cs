@@ -20,7 +20,7 @@ public sealed class DeleteIngredientCategoryTests : BaseIntegrationTest
         Guid guid = Guid.CreateVersion7();
 
         // Act
-        HttpResponseMessage response = await HttpClient.DeleteAsync($"/api/ingredientCategories/{guid}", CancellationToken.None);
+        HttpResponseMessage response = await HttpClient.DeleteAsync($"/api/ingredientCategories/{guid}", TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Equal(System.Net.HttpStatusCode.Forbidden, response.StatusCode);
@@ -34,7 +34,7 @@ public sealed class DeleteIngredientCategoryTests : BaseIntegrationTest
         Guid guid = Guid.CreateVersion7();
 
         // Act
-        HttpResponseMessage response = await HttpClient.DeleteAsync($"/api/ingredientCategories/{guid}", CancellationToken.None);
+        HttpResponseMessage response = await HttpClient.DeleteAsync($"/api/ingredientCategories/{guid}", TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Equal(System.Net.HttpStatusCode.NotFound, response.StatusCode);
@@ -45,10 +45,10 @@ public sealed class DeleteIngredientCategoryTests : BaseIntegrationTest
     {
         // Arrange
         HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", TokenMockFactory.GenerateJwtToken(UserMockFactory.CreateMockedAdmin()));
-        Guid categoryId = (await DbContext.IngredientCategories.AsNoTracking().FirstAsync(category => category.Name == "To Delete", CancellationToken.None)).Id.Value;
+        Guid categoryId = (await DbContext.IngredientCategories.AsNoTracking().FirstAsync(category => category.Name == "To Delete", TestContext.Current.CancellationToken)).Id.Value;
 
         // Act
-        HttpResponseMessage deleteResponse = await HttpClient.DeleteAsync($"/api/ingredientCategories/{categoryId}", CancellationToken.None);
+        HttpResponseMessage deleteResponse = await HttpClient.DeleteAsync($"/api/ingredientCategories/{categoryId}", TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Equal(System.Net.HttpStatusCode.NoContent, deleteResponse.StatusCode);
