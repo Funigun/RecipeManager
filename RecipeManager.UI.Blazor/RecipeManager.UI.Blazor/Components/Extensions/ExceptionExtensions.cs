@@ -10,14 +10,16 @@ public static class ExceptionExtensions
         int statusCode = (int)message.StatusCode;
 
         ApiResponseBody body = message.Content.ReadFromJsonAsync<ApiResponseBody>().GetAwaiter().GetResult()
-                            ?? new()
-                            {
-                                StatusCode = statusCode,
-                                Message = "An error occurred while processing your request.",
-                                Errors = [],
-                                ValidationErrors = []
-                            };
+                             ?? new()
+                             {
+                                 StatusCode = statusCode,
+                                 Message = "An error occurred while processing your request.",
+                                 Errors = [],
+                                 ValidationErrors = []
+                             };
 
         return JsonSerializer.Serialize(body);
     }
+
+
 }

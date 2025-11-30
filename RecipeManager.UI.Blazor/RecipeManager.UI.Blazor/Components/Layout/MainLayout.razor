@@ -1,6 +1,7 @@
 ﻿@inherits LayoutComponentBase
 
 @using Microsoft.AspNetCore.Components.Authorization
+@using RecipeManager.UI.Blazor.Components.Common
 @using RecipeManager.UI.Blazor.Services.Authentication
 @using RecipeManager.UI.Blazor.Services.Authorization
 
@@ -38,9 +39,13 @@
     }
 
     <MudMainContent>
-        <div style="justify-self:center; justify-items: center; align-items: center; min-width:25%">
-            @Body
-        </div>
+        <CustomErrorBoundaryComponent>
+            <ChildContent>
+                <div style="justify-self:center; justify-items: center; align-items: center; min-width:25%">
+                    @Body
+                </div>
+            </ChildContent>
+        </CustomErrorBoundaryComponent>
     </MudMainContent>
 </MudLayout>
 

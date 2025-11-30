@@ -84,6 +84,12 @@ public sealed class RecipeCategoryService(IRecipeApi recipeApi, ISnackbar snackb
         else
         {
             ResponseBody = (await response.Content.ReadFromJsonAsync<ApiResponseBody>())!;
+
+            if (response.StatusCode != System.Net.HttpStatusCode.BadRequest)
+            {
+                throw new Exception(JsonSerializer.Serialize(ResponseBody));
+            }
+
             snackbar.ShowError(string.Join('\n', ResponseBody.GetAllErrors()));
         }
     }
@@ -97,9 +103,8 @@ public sealed class RecipeCategoryService(IRecipeApi recipeApi, ISnackbar snackb
             navigationManager.Refresh(true);
             snackbar.ShowSuccess("Category deleted sucessfully");
         }
-        else
-        {
-            ResponseBody = (await response.Content.ReadFromJsonAsync<ApiResponseBody>())!;
-        }
+
+        ResponseBody = (await response.Content.ReadFromJsonAsync<ApiResponseBody>())!;
+        throw new Exception(JsonSerializer.Serialize(ResponseBody));
     }
 }

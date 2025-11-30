@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Components;
+﻿using System.Text.Json;
+using System.Threading;
+using Microsoft.AspNetCore.Components;
 using MudBlazor;
 using RecipeManager.UI.Blazor.Brokers.HateoasModel;
 using RecipeManager.UI.Blazor.Brokers.RecipeManagersApi;
@@ -20,21 +22,23 @@ public sealed class IngredientService(IRecipeApi recipeApi, NavigationManager na
 
     public ApiResponseBody ResponseBody { get; private set; } = new();
 
-    public async Task<Guid> CreateIngredient(IngredientForCreateModel ingredientForCreate, CancellationToken cancellationToken = default)
+    public async Task CreateIngredient(IngredientForCreateModel ingredientForCreate, CancellationToken cancellationToken = default)
     {
         HttpResponseMessage response = await recipeApi.Create(new Uri(IngredientsApiUrl, UriKind.Relative), ingredientForCreate);
 
         if (response.IsSuccessStatusCode)
         {
-            IngredientCreationResponse createdIngredientId = (await response.Content.ReadFromJsonAsync<IngredientCreationResponse>(cancellationToken: cancellationToken))!;
-            return createdIngredientId!.Id;
+            snackbar.ShowSuccess("Ingredient added sucessfully");
         }
         else
         {
             ResponseBody = (await response.Content.ReadFromJsonAsync<ApiResponseBody>(cancellationToken: cancellationToken))!;
-        }
 
-        return Guid.Empty;
+            if (response.StatusCode != System.Net.HttpStatusCode.BadRequest)
+            {
+                throw new Exception(JsonSerializer.Serialize(ResponseBody));
+            }
+        }
     }
 
     public async Task<HateoasResponse<IngredientsPageModel>> GetIngredientsPage(int page, int pageSize, string category = "", CancellationToken cancellationToken = default)
@@ -47,11 +51,10 @@ public sealed class IngredientService(IRecipeApi recipeApi, NavigationManager na
         }
 
         ResponseBody = (await response.Content.ReadFromJsonAsync<ApiResponseBody>(cancellationToken: cancellationToken))!;
-
-        return new HateoasResponse<IngredientsPageModel>();
+        throw new Exception(JsonSerializer.Serialize(ResponseBody));
     }
 
-    public async Task<HateoasResponse<IngredientForManageModel>> GetIngredientById(Guid id, CancellationToken cancellationToken = default)
+    public async Task<HateoasResponse<IngredientForManageModel>> GetIngredientById(string id, CancellationToken cancellationToken = default)
     {
         HttpResponseMessage response = await recipeApi.GetById(new Uri($"{IngredientsApiUrl}/{id}", UriKind.Relative));
 
@@ -61,7 +64,7 @@ public sealed class IngredientService(IRecipeApi recipeApi, NavigationManager na
         }
 
         ResponseBody = (await response.Content.ReadFromJsonAsync<ApiResponseBody>(cancellationToken: cancellationToken))!;
-        return new();
+        throw new Exception(JsonSerializer.Serialize(ResponseBody));
     }
 
     public async Task<IEnumerable<IngredientForDropdownModel>> GetIngredientsForDropdownModel(string? ingredientName, CancellationToken cancellationToken = default)
@@ -76,7 +79,7 @@ public sealed class IngredientService(IRecipeApi recipeApi, NavigationManager na
         }
 
         ResponseBody = (await response.Content.ReadFromJsonAsync<ApiResponseBody>(cancellationToken: cancellationToken))!;
-        return [];
+        throw new Exception(JsonSerializer.Serialize(ResponseBody));
     }
 
     public async Task UpdateIngredient(string relativeUri, IngredientForUpdateModel ingredientForUpdate, CancellationToken cancellationToken = default)
@@ -91,6 +94,11 @@ public sealed class IngredientService(IRecipeApi recipeApi, NavigationManager na
         else
         {
             ResponseBody = (await response.Content.ReadFromJsonAsync<ApiResponseBody>(cancellationToken: cancellationToken))!;
+
+            if (response.StatusCode != System.Net.HttpStatusCode.BadRequest)
+            {
+                throw new Exception(JsonSerializer.Serialize(ResponseBody));
+            }
         }
     }
 
@@ -102,6 +110,11 @@ public sealed class IngredientService(IRecipeApi recipeApi, NavigationManager na
         {
             navigationManager.Refresh(true);
             snackbar.ShowSuccess("Ingredient deleted sucessfully");
+        }
+        else
+        {
+            ResponseBody = (await response.Content.ReadFromJsonAsync<ApiResponseBody>())!;
+            throw new Exception(JsonSerializer.Serialize(ResponseBody));
         }
     }
 

@@ -134,17 +134,14 @@
     {
         if (firstRender)
         {
-            if (Guid.TryParse(IngredientId, out Guid id))
-            {
-                ingredient = await IngredientService.GetIngredientById(id);
-                ingredientModel = ingredient.Item.ToUpdateModel();
-                selectedCategories = ingredient.Item.Categories.ToList();
-                selectedRecipes = ingredient.Item.Recipes.ToList();
-                showCategories = selectedCategories.Any();
-                toggleCategoriesIcon = showCategories ? Icons.Material.Filled.KeyboardArrowUp : Icons.Material.Filled.KeyboardArrowDown;
-                showRecipes = selectedRecipes.Any();
-                toggleRecipesIcon = showRecipes ? Icons.Material.Filled.KeyboardArrowUp : Icons.Material.Filled.KeyboardArrowDown;
-            }
+            ingredient = await IngredientService.GetIngredientById(IngredientId);
+            ingredientModel = ingredient.Item.ToUpdateModel();
+            selectedCategories = ingredient.Item.Categories.ToList();
+            selectedRecipes = ingredient.Item.Recipes.ToList();
+            showCategories = selectedCategories.Any();
+            toggleCategoriesIcon = showCategories ? Icons.Material.Filled.KeyboardArrowUp : Icons.Material.Filled.KeyboardArrowDown;
+            showRecipes = selectedRecipes.Any();
+            toggleRecipesIcon = showRecipes ? Icons.Material.Filled.KeyboardArrowUp : Icons.Material.Filled.KeyboardArrowDown;
 
             isLoaded = true;
             StateHasChanged();

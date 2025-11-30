@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Components;
+﻿using System.Text.Json;
+using Microsoft.AspNetCore.Components;
 using MudBlazor;
 using RecipeManager.UI.Blazor.Brokers.HateoasModel;
 using RecipeManager.UI.Blazor.Brokers.RecipeManagersApi;
@@ -31,6 +32,11 @@ public class UnitService(IRecipeApi recipeApi, ISnackbar snackbar, NavigationMan
         }
 
         ResponseBody = (await response.Content.ReadFromJsonAsync<ApiResponseBody>())!;
+
+        if (response.StatusCode != System.Net.HttpStatusCode.BadRequest)
+        {
+            throw new Exception(JsonSerializer.Serialize(ResponseBody));
+        }
     }
 
     public async Task<HateoasResponse<UnitForUpdateModel>> GetUnitById(Guid id)
@@ -86,6 +92,11 @@ public class UnitService(IRecipeApi recipeApi, ISnackbar snackbar, NavigationMan
         else
         {
             ResponseBody = (await response.Content.ReadFromJsonAsync<ApiResponseBody>())!;
+
+            if (response.StatusCode != System.Net.HttpStatusCode.BadRequest)
+            {
+                throw new Exception(JsonSerializer.Serialize(ResponseBody));
+            }
         }
     }
 
@@ -97,6 +108,11 @@ public class UnitService(IRecipeApi recipeApi, ISnackbar snackbar, NavigationMan
         {
             navigationManager.Refresh(true);
             snackbar.ShowSuccess("Unit deleted sucessfully");
+        }
+        else
+        {
+            ResponseBody = (await response.Content.ReadFromJsonAsync<ApiResponseBody>())!;
+            throw new Exception(JsonSerializer.Serialize(ResponseBody));
         }
     }
 

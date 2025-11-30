@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Components;
+﻿using System.Text.Json;
+using Microsoft.AspNetCore.Components;
 using MudBlazor;
 using RecipeManager.UI.Blazor.Brokers.HateoasModel;
 using RecipeManager.UI.Blazor.Brokers.RecipeManagersApi;
@@ -57,6 +58,12 @@ public sealed class IngredientCategoryService(IRecipeApi recipeApi, ISnackbar sn
         else
         {
             ResponseBody = (await response.Content.ReadFromJsonAsync<ApiResponseBody>())!;
+
+            if (response.StatusCode != System.Net.HttpStatusCode.BadRequest)
+            {
+                throw new Exception(JsonSerializer.Serialize(ResponseBody));
+            }
+
             snackbar.ShowError(string.Join('\n', ResponseBody.GetAllErrors()));
         }
     }
@@ -69,6 +76,11 @@ public sealed class IngredientCategoryService(IRecipeApi recipeApi, ISnackbar sn
         {
             navigationManager.Refresh(true);
             snackbar.ShowSuccess("Category deleted sucessfully");
+        }
+        else
+        {
+            ResponseBody = (await response.Content.ReadFromJsonAsync<ApiResponseBody>())!;
+            throw new Exception(JsonSerializer.Serialize(ResponseBody));
         }
     }
 }
