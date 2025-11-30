@@ -9,19 +9,34 @@
 }
 else
 {
-    @ErrorContent?.Invoke(CurrentException)
+    <div style="justify-self:center; justify-items: center; align-items: center; min-width:25%">
+        <h3>Error: @apiResponse.StatusCode</h3>
+
+        <h5>Message: @apiResponse.Message</h5>
+
+        @if(apiResponse.Errors.Any())
+        {
+            foreach(var error in apiResponse.Errors)
+            {
+                <p>@error</p>
+            }
+        }
+    </div>
 }
 
 
 @code {
+    private ApiResponseBody apiResponse = new();
+
+
     protected override Task OnErrorAsync(Exception exception)
     {
-        ApiResponseBody apiResponse = JsonSerializer.Deserialize<ApiResponseBody>(exception.Message) 
-                                   ?? new ApiResponseBody
-                                   {
-                                       StatusCode = 500,
-                                       Message = "An unexpected error occurred."
-                                   };
+        apiResponse = JsonSerializer.Deserialize<ApiResponseBody>(exception.Message)
+                    ?? new ApiResponseBody
+                    {
+                        StatusCode = 500,
+                        Message = "An unexpected error occurred."
+                    };
 
         NavigationManager.NavigateTo($"/Error/{apiResponse.StatusCode}");
 

@@ -10,11 +10,11 @@ public interface IIngredientService
 {
     ApiResponseBody ResponseBody { get; }
 
-    Task<Guid> CreateIngredient(IngredientForCreateModel ingredientForCreate, CancellationToken cancellationToken = default);
+    Task CreateIngredient(IngredientForCreateModel ingredientForCreate, CancellationToken cancellationToken = default);
 
     Task<HateoasResponse<IngredientsPageModel>> GetIngredientsPage(int page, int pageSize, string category = "", CancellationToken cancellationToken = default);
 
-    Task<HateoasResponse<IngredientForManageModel>> GetIngredientById(Guid id, CancellationToken cancellationToken = default);
+    Task<HateoasResponse<IngredientForManageModel>> GetIngredientById(string id, CancellationToken cancellationToken = default);
 
     Task<IEnumerable<IngredientForDropdownModel>> GetIngredientsForDropdownModel(string ingredientName, CancellationToken cancellationToken = default);
 

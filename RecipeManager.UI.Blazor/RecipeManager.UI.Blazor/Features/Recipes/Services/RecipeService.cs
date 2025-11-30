@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Components;
+﻿using System.Text.Json;
+using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using MudBlazor;
 using RecipeManager.UI.Blazor.Brokers.HateoasModel;
@@ -32,6 +33,9 @@ public sealed class RecipeService(IRecipeApi recipeApi, ISnackbar snackbar, IJSR
         else
         {
             ResponseBody = (await response.Content.ReadFromJsonAsync<ApiResponseBody>())!;
+
+            ResponseBody = (await response.Content.ReadFromJsonAsync<ApiResponseBody>())!;
+            throw new Exception(JsonSerializer.Serialize(ResponseBody));
         }
     }
 
@@ -103,6 +107,9 @@ public sealed class RecipeService(IRecipeApi recipeApi, ISnackbar snackbar, IJSR
         else
         {
             ResponseBody = (await response.Content.ReadFromJsonAsync<ApiResponseBody>())!;
+
+            ResponseBody = (await response.Content.ReadFromJsonAsync<ApiResponseBody>())!;
+            throw new Exception(JsonSerializer.Serialize(ResponseBody));
         }
     }
 
@@ -118,6 +125,7 @@ public sealed class RecipeService(IRecipeApi recipeApi, ISnackbar snackbar, IJSR
         else
         {
             ResponseBody = (await response.Content.ReadFromJsonAsync<ApiResponseBody>())!;
+            throw new Exception(JsonSerializer.Serialize(ResponseBody));
         }
     }
 
