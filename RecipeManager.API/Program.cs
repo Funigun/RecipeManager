@@ -44,6 +44,7 @@ try
     builder.Services.AddOpenApi("v1", options =>
     {
         options.AddDocumentTransformer<BearerSecuritySchemeTransformer>();
+        options.OpenApiVersion = Microsoft.OpenApi.OpenApiSpecVersion.OpenApi3_1;
     });
 
     builder.Services.AddSharedServices()

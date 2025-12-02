@@ -67,7 +67,7 @@ public static class Extensions
                        .AddAspNetCoreInstrumentation()
                        .AddHttpClientInstrumentation()
                        .AddEntityFrameworkCoreInstrumentation()
-                       .AddSqlClientInstrumentation(options => options.SetDbStatementForText = true)
+                       .AddSqlClientInstrumentation()
                        .AddRedisInstrumentation();
             });
 

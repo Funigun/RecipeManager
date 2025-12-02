@@ -22,7 +22,7 @@ public sealed class WebApiFactory : WebApplicationFactory<IAssemblyMarker>, IAsy
                                                                       .WithPortBinding(1433)
                                                                       .WithEnvironment("ACCEPT_EULA", "Y")
                                                                       .WithName("MealsManagerTestDb")
-                                                                      .WithWaitStrategy(Wait.ForUnixContainer().UntilPortIsAvailable(1433))
+                                                                      .WithWaitStrategy(Wait.ForUnixContainer().UntilExternalTcpPortIsAvailable(1433))
                                                                       .Build();
 
     public AppDbContext DbContext { get; private set; } = default!;

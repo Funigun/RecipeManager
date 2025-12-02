@@ -13,7 +13,7 @@ public class RedisService(IConnectionMultiplexer connection) : IRedisService
            where T : class
     {
         RedisValue result = await _database.StringGetAsync(key);
-        return result.IsNullOrEmpty ? null : JsonSerializer.Deserialize<T>(result!, _options);
+        return result.IsNullOrEmpty ? null : JsonSerializer.Deserialize<T>((string)result!, _options);
 
     }
 
@@ -25,6 +25,7 @@ public class RedisService(IConnectionMultiplexer connection) : IRedisService
     public async Task SetValue<T>(string key, T value, TimeSpan? expiry = null)
            where T : class
     {
-        await _database.StringSetAsync(key, JsonSerializer.Serialize(value, _options), expiry);
+        Expiration expiration = expiry.HasValue ? new Expiration(expiry.Value) : default;
+        await _database.StringSetAsync(key, JsonSerializer.Serialize(value, _options), expiration);
     }
 }
