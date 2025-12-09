@@ -11,8 +11,11 @@
 @inject IRecipeService RecipeService
 @inject IUnitService UnitService
 
-<MudPaper Class="pa-6 mx-auto" Style="width:1000px">
-    <RecipeForm RecipeModel="RecipeModel" Mode="FormMode.View"></RecipeForm>
+<MudPaper Class="pa-6 mx-auto" Style="width:1250px">
+    @if(RecipeModel.Item != null && RecipeModel.Item.Id != Guid.Empty)
+    {
+        <RecipeForm RecipeModel="RecipeModel" Mode="FormMode.View"></RecipeForm>
+    }
 </MudPaper>
 
 @code {
