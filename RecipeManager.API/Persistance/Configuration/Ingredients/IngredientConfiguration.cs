@@ -17,6 +17,35 @@ public sealed class IngredientConfiguration : IEntityTypeConfiguration<Ingredien
                .HasMaxLength(IngredientDomainValidator.IngredientNameMaxLength)
                .IsRequired(true);
 
+        builder.ComplexProperty(ingredient => ingredient.NutritionalValue, nutritionalValue =>
+        {
+            nutritionalValue.Property(c => c.Calories)
+                            .IsRequired(true);
+
+            nutritionalValue.Property(c => c.Carbohydrates)
+                            .IsRequired(true);
+
+            nutritionalValue.Property(c => c.Fats)
+                            .IsRequired(true);
+
+            nutritionalValue.Property(c => c.Proteins)
+                            .IsRequired(true);
+
+            nutritionalValue.Property(c => c.IngredientAmount)
+                            .IsRequired(true);
+
+            nutritionalValue.Property(c => c.IngredientUnit)
+                            .IsRequired(true);
+
+            nutritionalValue.ToJson();
+        });
+
+        builder.HasOne<IngredientCategory>()
+               .WithMany()
+               .HasForeignKey(ingredient => ingredient.ShoppingListCategoryId)
+               .IsRequired(false)
+               .OnDelete(DeleteBehavior.ClientSetNull);
+
         builder.OwnsMany(ingredient => ingredient.Categories, categories =>
         {
             categories.ToTable("IngredientToIngredientCategory");

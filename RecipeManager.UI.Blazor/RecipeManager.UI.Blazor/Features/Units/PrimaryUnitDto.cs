@@ -2,7 +2,7 @@
 
 public sealed record PrimaryUnitDto
 {
-    public Guid? UnitId { get; init; }
+    public Guid UnitId { get; set; }
 
-    public string Name { get; init; } = string.Empty;
+    public string Name { get; set; } = string.Empty;
 }

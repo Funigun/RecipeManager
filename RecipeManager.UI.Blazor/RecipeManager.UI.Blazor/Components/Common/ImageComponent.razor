@@ -1,0 +1,24 @@
+﻿@if (!string.IsNullOrEmpty(ImageSource))
+{
+    <MudImage Src="RecipeModel.Item.ImageURL" Alt="Recipe Image" Style="@CalculatedStyle" />
+}
+else
+{
+    <MudIcon Icon="@Icons.Material.Filled.QuestionMark" Style="@CalculatedStyle" />
+}
+
+@code {
+    [Parameter]
+    public string? ImageSource { get; set; }
+
+    [Parameter]
+    public int MaxWidth { get; set; }
+
+    [Parameter]
+    public int MaxHeight { get; set; }
+
+    [Parameter]
+    public string? ImageStyle { get; set; }
+
+   private string CalculatedStyle => $"max-width: {MaxWidth}px; max-height: {MaxHeight}px; border: 1px solid; {ImageStyle ?? ""}";
+}

@@ -22,7 +22,7 @@ public abstract class BaseIntegrationTest : IAsyncLifetime
 
         DbContext = new AppDbContext(
             new DbContextOptionsBuilder<AppDbContext>()
-                .UseSqlServer(webApiFactory.ConnectionString)
+                .UseSqlServer(webApiFactory.ConnectionString, o => o.UseCompatibilityLevel(170))
                 .Options,
             UserMockFactory.CreateMockedAdmin()
         );

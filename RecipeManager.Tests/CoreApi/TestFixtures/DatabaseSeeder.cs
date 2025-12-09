@@ -18,7 +18,8 @@ internal static class DatabaseSeeder
             Unit.Create("Duplicated Name", "TU", UnitGroup.Weight, null, 1),
             Unit.Create("Test", "Duplicated Short Name", UnitGroup.Weight, null, 1),
             Unit.Create("To Update", null, UnitGroup.Weight, null, 1),
-            Unit.Create("To Delete", null, UnitGroup.Weight, null, 1)
+            Unit.Create("To Delete", null, UnitGroup.Weight, null, 1),
+            Unit.Create("Existing Unit", "EU", UnitGroup.Weight, null, 1)
         ];
 
         IEnumerable<RecipeCategory> recipeCategories =
@@ -43,12 +44,14 @@ internal static class DatabaseSeeder
 
         await dbContext.SaveChangesAsync();
 
+        UnitId unitId = dbContext.Units.Where(unit => unit.Name == "Existing Unit").First().Id;
+
         IEnumerable<Ingredient> ingredients =
         [
-            Ingredient.Create("Existing Ingredient", [ingredientCategories.ElementAt(0).Id], []),
-            Ingredient.Create("Fake ingredient 1", [ingredientCategories.ElementAt(1).Id], []),
-            Ingredient.Create("Fake ingredient 2", [ingredientCategories.ElementAt(2).Id], []),
-            Ingredient.Create("To Delete", [ingredientCategories.ElementAt(3).Id], [])
+            Ingredient.Create("Existing Ingredient", new() { IngredientUnit = unitId }, ingredientCategories.ElementAt(1).Id, [ingredientCategories.ElementAt(0).Id], []),
+            Ingredient.Create("Fake ingredient 1", new() { IngredientUnit = unitId }, ingredientCategories.ElementAt(0).Id, [ingredientCategories.ElementAt(1).Id], []),
+            Ingredient.Create("Fake ingredient 2", new() { IngredientUnit = unitId }, ingredientCategories.ElementAt(0).Id, [ingredientCategories.ElementAt(2).Id], []),
+            Ingredient.Create("To Delete", new() { IngredientUnit = unitId }, ingredientCategories.ElementAt(0).Id, [ingredientCategories.ElementAt(3).Id], [])
         ];
 
         dbContext.Ingredients.AddRange(ingredients);

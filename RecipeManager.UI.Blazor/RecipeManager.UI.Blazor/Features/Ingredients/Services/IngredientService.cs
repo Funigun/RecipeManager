@@ -6,9 +6,8 @@ using RecipeManager.UI.Blazor.Brokers.HateoasModel;
 using RecipeManager.UI.Blazor.Brokers.RecipeManagersApi;
 using RecipeManager.UI.Blazor.Components.Common;
 using RecipeManager.UI.Blazor.Components.Extensions;
-using RecipeManager.UI.Blazor.Features.Ingredients.CreateIngredient;
 using RecipeManager.UI.Blazor.Features.Ingredients.GetIngredients;
-using RecipeManager.UI.Blazor.Features.Ingredients.UpdateIngredient;
+using RecipeManager.UI.Blazor.Features.Ingredients.Manage;
 
 namespace RecipeManager.UI.Blazor.Features.Ingredients.Services;
 

@@ -1,0 +1,255 @@
+﻿@using RecipeManager.UI.Blazor.Brokers.HateoasModel
+@using RecipeManager.UI.Blazor.Components.Common
+@using RecipeManager.UI.Blazor.Components.Extensions
+@using RecipeManager.UI.Blazor.Features.IngredientCategories.Models
+@using RecipeManager.UI.Blazor.Features.IngredientCategories.Services
+@using RecipeManager.UI.Blazor.Features.Ingredients.Manage
+@using RecipeManager.UI.Blazor.Features.Ingredients.Services
+@using RecipeManager.UI.Blazor.Features.Recipes
+@using RecipeManager.UI.Blazor.Features.Recipes.Services
+@using RecipeManager.UI.Blazor.Features.Units
+@using RecipeManager.UI.Blazor.Features.Units.Services
+
+@inject IIngredientService IngredientService;
+@inject IIngredientCategoryService IngredientCategoryService;
+@inject IRecipeService RecipeService;
+@inject IUnitService UnitService;
+
+<MudForm Model="@IngredientModel" Validation="@(validator.ValidateValue)" @bind-IsValid="@isSubmitEnabled">
+    <MudText Typo="Typo.h5" Class="mb-4" Style="text-align: center">@formTitle</MudText>
+
+    <MudStack Spacing="5">        
+        <MudStack Row="true">
+            <ImageComponent ImageSource="" MaxHeight="75" MaxWidth="75" ImageStyle="margin-top: 20px;"/>
+            <MudTextField Label="Name" For="@(() => IngredientModel.Item.Name)" @bind-Value="IngredientModel.Item.Name" Required="true" />
+            <MudIconButton Icon="@Icons.Material.Filled.FileUpload" Color="Color.Primary" Style="margin-top: 15px;" />
+        </MudStack>
+
+        <MudTooltip Text="Category where ingredient will be placed while creating shopping list, however if this is not specified then first assigned category will be used.">
+            <MudAutocomplete T="IngredientCategoryForDropdownModel" Label="Shoping List Category" ResetValueOnEmptyText="true" ShowProgressIndicator="true"
+                             SearchFunc="SearchCategories" ToStringFunc="@(e => e == null ? null : e.Name)" @bind-Value="IngredientModel.Item.ShoppingListCategory"
+                             ReadOnly="@Mode.IsViewMode()" />
+        </MudTooltip>
+        
+        <MudStack Row="true">
+            <MudText Typo="Typo.subtitle1" Style="align-content: center; width: calc(100% - 60px)">Nutritional Values</MudText>
+            <MudIconButton Icon="@toggleRecipesIcon" Color="Color.Primary" Edge="Edge.End" OnClick="ToggleNutritionalValues" />
+        </MudStack>
+
+        <MudCollapse Expanded="@showNutritionalValues">
+            <MudStack Row="true">
+                <MudTextField Label="Amount" For="@(() => IngredientModel.Item.NutritionalValues.IngredientAmount)" @bind-Value="IngredientModel.Item.NutritionalValues.IngredientAmount" Required="true" />
+                <MudSelect T="Guid" @bind-Value="IngredientModel.Item.NutritionalValues.IngredientUnitId" Required="true" Style="align-self: end; width: 125px;">
+                    @foreach (var unit in _availableUnits)
+                    {
+                        <MudSelectItem Value="@unit.UnitId">@unit.Name</MudSelectItem>
+                    }
+                </MudSelect>
+                
+                <MudText Style="align-content: end;"> contains:</MudText>
+            </MudStack>
+            <MudTextField T="int" Label="Calories" For="@(() => IngredientModel.Item.NutritionalValues.Calories)" @bind-Value="IngredientModel.Item.NutritionalValues.Calories" Required="true" />
+            <MudTextField T="double" Label="Carbohydrates" For="@(() => IngredientModel.Item.NutritionalValues.Carbohydrates)" @bind-Value="IngredientModel.Item.NutritionalValues.Carbohydrates" Required="true" />
+            <MudTextField T="double" Label="Fats" For="@(() => IngredientModel.Item.NutritionalValues.Fats)" @bind-Value="IngredientModel.Item.NutritionalValues.Fats" Required="true" />
+            <MudTextField T="double" Label="Proteins" For="@(() => IngredientModel.Item.NutritionalValues.Proteins)" @bind-Value="IngredientModel.Item.NutritionalValues.Proteins" Required="true" />
+        </MudCollapse>
+
+        <MudStack Row="true">
+            <MudText Typo="Typo.subtitle1" Style="align-content: center; width: calc(100% - 60px)">Categories</MudText>
+            <MudIconButton Icon="@toggleCategoriesIcon" Color="Color.Primary" OnClick="ToggleCategories" />
+        </MudStack>
+
+        <MudCollapse Expanded="@showCategories">
+                <MudStack Spacing="5">
+                    @if(Mode.IsCreateOrEditMode())
+                    {
+                        <MudStack Row="true">
+                            <MudAutocomplete T="IngredientCategoryForDropdownModel" Label="Categories" ResetValueOnEmptyText="true" ShowProgressIndicator="true"
+                                             SearchFunc="SearchCategories" ToStringFunc="@(e => e == null ? null : e.Name)" ValueChanged="OnSelectedCategoryChanged" />
+                    
+                            <MudIconButton Disabled="@isAddCategoryDisabled" Icon="@Icons.Material.Filled.Add" Color="Color.Primary" OnClick="AddCategory" />
+                        </MudStack>
+                    }
+
+                    <div style="max-height: 80px; overflow-y:auto">
+                    <MudChipSet T="IngredientCategoryForDropdownModel" AllClosable="@Mode.IsCreateOrEditMode()" OnClose="RemoveCategory">
+                        @foreach (var category in IngredientModel.Item.Categories)
+                            {
+                                <MudChip Text="@category.Name" Value="category" Color="Color.Primary"/>
+                            }
+                        </MudChipSet>
+                    </div>
+                </MudStack>
+        </MudCollapse>
+        
+        <MudStack Row="true">
+            <MudText Typo="Typo.subtitle1" Style="align-content: center; width: calc(100% - 60px)">Recipes</MudText>
+            <MudIconButton Icon="@toggleRecipesIcon" Color="Color.Primary" Edge="Edge.End" OnClick="ToggleRecipes" />
+        </MudStack>
+
+
+        <MudCollapse Expanded="@showRecipes">
+            <MudStack Spacing="5">
+                @if (Mode.IsCreateOrEditMode())
+                {
+                    <MudStack Row="true">
+                        <MudAutocomplete T="RecipeForDropdownModel" Label="Recipes" ShowProgressIndicator="true"
+                        SearchFunc="SearchRecipes" ToStringFunc="@(e => e == null ? null : e.Title)" ValueChanged="OnSelectedRecipeChanged" />
+                        <MudIconButton Disabled="@isAddRecipeDisabled" Icon="@Icons.Material.Filled.Add" Color="Color.Primary" OnClick="AddRecipe" />
+                    </MudStack>
+                }
+
+                <div style="max-height: 80px; overflow-y:auto">
+                    <MudChipSet T="RecipeForDropdownModel" AllClosable="@Mode.IsCreateOrEditMode()" OnClose="RemoveRecipe">
+                        @foreach (var recipe in IngredientModel.Item.Recipes)
+                        {
+                            <MudChip Text="@recipe.Title" Value="@recipe" Color="Color.Primary"/>
+                        }
+                    </MudChipSet>
+                </div>
+            </MudStack>
+        </MudCollapse>
+
+        <MudGrid Class="mt-4">
+            <MudItem xs="6">
+                <MudButton Variant="Variant.Outlined" Color="Color.Default" OnClick="GoBack" FullWidth="false">
+                    Back
+                </MudButton>
+            </MudItem>
+            <MudItem xs="6" Class="d-flex justify-end">
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="SubmitIngredient">
+                    Save
+                </MudButton>
+            </MudItem>
+        </MudGrid>
+
+        <CustomValidationSummary ErrorMessages="@errorMessages" />
+    </MudStack>
+</MudForm>
+
+@code {
+    [Parameter]
+    public FormMode Mode { get; set; } = FormMode.View;
+
+    [Parameter]
+    public HateoasResponse<IngredientForManageModel> IngredientModel { get; set; } = new();
+    private readonly IngredientForManageValidator validator = new();
+
+    private string formTitle => Mode.IsCreateMode() ? "Create Ingredient" : "Edit Ingredient";
+
+    private string toggleNutritionalValuesIcon = Icons.Material.Filled.KeyboardArrowDown;
+    private bool showNutritionalValues = false;
+
+    private IEnumerable<PrimaryUnitDto> _availableUnits = [];
+
+    private IEnumerable<IngredientCategoryForDropdownModel> categories = [];
+    private IngredientCategoryForDropdownModel selectedCategory = new();
+    private string toggleCategoriesIcon = Icons.Material.Filled.KeyboardArrowDown;
+    private bool showCategories = false;
+    private bool isAddCategoryDisabled = true;
+
+    private RecipeForDropdownModel selectedRecipe = default!;
+    private bool showRecipes = false;
+    private string toggleRecipesIcon = Icons.Material.Filled.KeyboardArrowDown;     
+    private bool isAddRecipeDisabled = true;
+
+    private bool isSubmitEnabled = false;
+    private IEnumerable<string> errorMessages = [];
+
+    protected override async Task OnInitializedAsync()
+    {
+        _availableUnits = await UnitService.GetPrimaryUnits();
+    }
+
+    private void GoBack()
+    {
+        IngredientService.OpenIndexPage();
+    }
+
+    private async Task SubmitIngredient()
+    {
+        if(Mode.IsCreateMode())
+        {
+            await IngredientService.CreateIngredient(IngredientModel.Item.ToCreateModel());
+        }
+        else if(Mode.IsEditMode())
+        {
+            await IngredientService.UpdateIngredient(IngredientModel.Links.First(l => l.Rel == HateoasConstants.Update).Href, IngredientModel.Item.ToUpdateModel());
+        }
+        errorMessages = IngredientService.ResponseBody.GetAllErrors();
+    }
+
+    private async Task<IEnumerable<IngredientCategoryForDropdownModel>> SearchCategories(string value, CancellationToken cancellationToken)
+    {
+        if (string.IsNullOrEmpty(value) || !string.IsNullOrEmpty(value) && value != selectedCategory?.Name)
+        {
+            categories = await IngredientCategoryService.GetCategoriesForDropdown(value);
+        }
+
+        return categories;
+    }
+
+    private void ToggleNutritionalValues()
+    {
+        showNutritionalValues = !showNutritionalValues;
+        toggleNutritionalValuesIcon = showNutritionalValues ? Icons.Material.Filled.KeyboardArrowUp : Icons.Material.Filled.KeyboardArrowDown;
+    }
+
+    private void AddCategory()
+    {
+        IngredientModel.Item.Categories.Add(selectedCategory);
+        isAddCategoryDisabled = true;
+    }
+
+    private void RemoveCategory(MudChip<IngredientCategoryForDropdownModel> chip)
+    {
+        IngredientModel.Item.Categories.Remove(chip.Value!);
+        isAddCategoryDisabled = selectedCategory is null || IngredientModel.Item.Categories.Any(category => category.Id == selectedCategory.Id);
+    }
+
+    private void ToggleCategories()
+    {
+        showCategories = !showCategories;
+        toggleCategoriesIcon = showCategories ? Icons.Material.Filled.KeyboardArrowUp : Icons.Material.Filled.KeyboardArrowDown;
+    }
+
+    private void OnSelectedShoppingListCategoryChanged(IngredientCategoryForDropdownModel value)
+    {
+        IngredientModel.Item.ShoppingListCategory = value;
+    }
+
+    private void OnSelectedCategoryChanged(IngredientCategoryForDropdownModel value)
+    {
+        selectedCategory = value;
+        isAddCategoryDisabled = selectedCategory is null || IngredientModel.Item.Categories.Any(category => category.Id == selectedCategory.Id);
+    }
+
+    private async Task<IEnumerable<RecipeForDropdownModel>> SearchRecipes(string value, CancellationToken cancellationToken)
+    {
+        return await RecipeService.GetRecipesForDropdown(value, 25);
+    }
+
+    private void AddRecipe()
+    {
+        IngredientModel.Item.Recipes.Add(selectedRecipe);
+        isAddRecipeDisabled = true;
+    }
+
+    private void RemoveRecipe(MudChip<RecipeForDropdownModel> chip)
+    {
+        IngredientModel.Item.Recipes.Remove(chip.Value!);
+        isAddRecipeDisabled = selectedRecipe is null || IngredientModel.Item.Recipes.Any(recipe => recipe.Id == selectedRecipe.Id);
+    }
+
+    private void ToggleRecipes()
+    {
+        showRecipes = !showRecipes;
+        toggleRecipesIcon = showRecipes ? Icons.Material.Filled.KeyboardArrowUp : Icons.Material.Filled.KeyboardArrowDown;
+    }
+
+    private void OnSelectedRecipeChanged(RecipeForDropdownModel value)
+    {
+        selectedRecipe = value;
+        isAddRecipeDisabled = selectedRecipe is null || IngredientModel.Item.Recipes.Any(recipe => recipe.Id == selectedRecipe.Id);
+    }
+}
