@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RecipeManager.Api.Application.Abstractions;
 using RecipeManager.Api.Application.Exceptions;
+using RecipeManager.Api.Domain.Common;
 using RecipeManager.Api.Domain.Ingredients;
 using RecipeManager.Api.Domain.Recipes;
 using RecipeManager.Api.Domain.Recipes.Enums;
@@ -10,6 +11,7 @@ using RecipeManager.Api.Domain.Recipes.ValueObjects;
 using RecipeManager.Api.Domain.Units;
 using RecipeManager.Api.Shared.Contracts.Authorization;
 using RecipeManager.Api.Shared.Endpoint;
+using RecipeManager.Shared.Contracts.Ingredients;
 using RecipeManager.Shared.Contracts.Recipes;
 
 namespace RecipeManager.Api.Features.Recipes;
@@ -26,13 +28,15 @@ public static class UpdateRecipe
 
     public sealed record RecipeAmountDto(double Amount, UnitDto Unit);
 
+    public sealed record NutritionalValueDto(int Calories, double Proteins, double Fats, double Carbohydrates, int IngredientAmount, Guid IngredientUnitId);
+
     public sealed record RecipeSectionDto(int SectionType, IEnumerable<RecipeStepDto> Steps);
 
     public sealed record RecipeStepDto(int Order, string Description, string? ImageUrl);
 
     public sealed record RecipeCategoryDto(Guid Id);
 
-    public sealed record RecipeDto(string Title, string Description, string? ImageUrl, string? VideoUrl, RecipeAmountDto Amount, byte NumberOfServings, int Difficulty,
+    public sealed record RecipeDto(string Title, string Description, string? ImageUrl, string? VideoUrl, RecipeAmountDto Amount, byte NumberOfServings, int Difficulty, NutritionalValueDto NutritionalValues,
                                    IEnumerable<RecipeIngredientDto> Ingredients, IEnumerable<RecipeSectionDto> Sections, IEnumerable<RecipeCategoryDto> Categories, Guid? IngredientId);
 
     public sealed class AuthorizationPolicy(IAppDbContext dbContext, ICurrentUser currentUser) : IAuthorizationPolicy<Request>
@@ -64,6 +68,12 @@ public static class UpdateRecipe
             RuleFor(x => x.Difficulty)
                 .Must(difficulty => difficulty.IsRecipeDifficulty())
                 .WithMessage("Provided invalid recipe difficulty level");
+
+            RuleFor(x => x.NutritionalValues.Calories).SetValidator(new IngredientNutritionalCaloriesValueValidator());
+            RuleFor(x => x.NutritionalValues.Carbohydrates).SetValidator(new IngredientNutritionalCarbohydratesValueValidator());
+            RuleFor(x => x.NutritionalValues.Fats).SetValidator(new IngredientNutritionalFatsValueValidator());
+            RuleFor(x => x.NutritionalValues.Proteins).SetValidator(new IngredientNutritionalProteinsValueValidator());
+            RuleFor(x => x.NutritionalValues.IngredientAmount).SetValidator(new IngredientNutritionalAmountValidator());
 
             RuleFor(x => x.Ingredients).SetValidator(new RecipeIngredientsValidator(dbContext));
             RuleFor(x => x.Sections).SetValidator(new RecipeSectionsValidator());
@@ -240,6 +250,7 @@ public static class UpdateRecipe
         recipe.Amount = recipeDto.Amount.ToDomain();
         recipe.NumberOfServings = recipeDto.NumberOfServings;
         recipe.Difficulty = (RecipeDifficulty)recipeDto.Difficulty;
+        recipe.NutritionalValue = recipeDto.NutritionalValues.ToNutritionalValue();
         recipe.IngredientId = recipeDto.IngredientId.HasValue ? new IngredientId(recipeDto.IngredientId.Value) : null;
         recipe.Ingredients = recipeDto.Ingredients.Select(i => i.ToDomain()).ToList();
         recipe.Sections = recipeDto.Sections.Select(s => s.ToDomain()).ToList();
@@ -276,5 +287,18 @@ public static class UpdateRecipe
             dto.Description,
             dto.ImageUrl
         );
+    }
+
+    private static NutritionalValue ToNutritionalValue(this NutritionalValueDto dto)
+    {
+        return new NutritionalValue
+        {
+            Calories = dto.Calories,
+            Proteins = dto.Proteins,
+            Fats = dto.Fats,
+            Carbohydrates = dto.Carbohydrates,
+            IngredientAmount = dto.IngredientAmount,
+            IngredientUnit = new UnitId(dto.IngredientUnitId)
+        };
     }
 }

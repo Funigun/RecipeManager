@@ -2,12 +2,14 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RecipeManager.Api.Application.Abstractions;
+using RecipeManager.Api.Domain.Common;
 using RecipeManager.Api.Domain.Ingredients;
 using RecipeManager.Api.Domain.Recipes;
 using RecipeManager.Api.Domain.Recipes.Enums;
 using RecipeManager.Api.Domain.Recipes.ValueObjects;
 using RecipeManager.Api.Domain.Units;
 using RecipeManager.Api.Shared.Endpoint;
+using RecipeManager.Shared.Contracts.Ingredients;
 using RecipeManager.Shared.Contracts.Recipes;
 
 namespace RecipeManager.Api.Features.Recipes;
@@ -22,13 +24,15 @@ public static class CreateRecipe
 
     public sealed record RecipeAmountDto(double Amount, UnitDto Unit);
 
+    public sealed record NutritionalValueDto(int Calories, double Proteins, double Fats, double Carbohydrates, int IngredientAmount, Guid IngredientUnitId);
+
     public sealed record RecipeSectionDto(int SectionType, IEnumerable<RecipeStepDto> Steps);
 
     public sealed record RecipeStepDto(int Order, string Description, string? ImageUrl);
 
     public sealed record RecipeCategory(Guid Id);
 
-    public sealed record Request(string Title, string Description, string? ImageUrl, string? VideoUrl, RecipeAmountDto Amount, byte NumberOfServings, int Difficulty,
+    public sealed record Request(string Title, string Description, string? ImageUrl, string? VideoUrl, RecipeAmountDto Amount, byte NumberOfServings, int Difficulty, NutritionalValueDto NutritionalValues,
                                  IEnumerable<RecipeIngredientDto> Ingredients, IEnumerable<RecipeSectionDto> Sections, IEnumerable<RecipeCategory> Categories, Guid? IngredientId);
 
     public sealed record Response(Guid Id);
@@ -54,6 +58,12 @@ public static class CreateRecipe
             RuleFor(x => x.Difficulty)
                 .Must(difficulty => difficulty.IsRecipeDifficulty())
                 .WithMessage("Provided invalid recipe difficulty level");
+
+            RuleFor(x => x.NutritionalValues.Calories).SetValidator(new IngredientNutritionalCaloriesValueValidator());
+            RuleFor(x => x.NutritionalValues.Carbohydrates).SetValidator(new IngredientNutritionalCarbohydratesValueValidator());
+            RuleFor(x => x.NutritionalValues.Fats).SetValidator(new IngredientNutritionalFatsValueValidator());
+            RuleFor(x => x.NutritionalValues.Proteins).SetValidator(new IngredientNutritionalProteinsValueValidator());
+            RuleFor(x => x.NutritionalValues.IngredientAmount).SetValidator(new IngredientNutritionalAmountValidator());
 
             RuleFor(x => x.Ingredients).SetValidator(new RecipeIngredientsValidator(dbContext));
             RuleFor(x => x.Sections).SetValidator(new RecipeSectionsValidator());
@@ -221,6 +231,7 @@ public static class CreateRecipe
             request.Amount.ToDomain(),
             request.NumberOfServings,
             (RecipeDifficulty)request.Difficulty,
+            request.NutritionalValues.ToNutritionalValue(),
             request.Ingredients.Select(ToDomain),
             request.Sections.Select(ToDomain),
             request.Categories.Select(c => new RecipeCategoryId(c.Id)),
@@ -261,5 +272,18 @@ public static class CreateRecipe
             dto.Description,
             dto.ImageUrl
         );
+    }
+
+    private static NutritionalValue ToNutritionalValue(this NutritionalValueDto dto)
+    {
+        return new NutritionalValue
+        {
+            Calories = dto.Calories,
+            Proteins = dto.Proteins,
+            Fats = dto.Fats,
+            Carbohydrates = dto.Carbohydrates,
+            IngredientAmount = dto.IngredientAmount,
+            IngredientUnit = new UnitId(dto.IngredientUnitId)
+        };
     }
 }

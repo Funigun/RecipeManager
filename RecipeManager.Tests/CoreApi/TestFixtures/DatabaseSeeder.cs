@@ -65,6 +65,7 @@ internal static class DatabaseSeeder
                 RecipeAmount.Create(10d, units.First().Id.Value),
                 2,
                 RecipeDifficulty.Easy,
+                new() { IngredientUnit = unitId },
                 [
                     RecipeIngredient.Create(ingredients.First().Id.Value, units.First().Id.Value, 10d)
                 ],
@@ -81,6 +82,7 @@ internal static class DatabaseSeeder
                 RecipeAmount.Create(10d, units.First().Id.Value),
                 2,
                 RecipeDifficulty.Easy,
+                new() { IngredientUnit = unitId },
                 [
                     RecipeIngredient.Create(ingredients.First().Id.Value, units.First().Id.Value, 10d)
                 ],
@@ -97,6 +99,7 @@ internal static class DatabaseSeeder
                 RecipeAmount.Create(10d, units.First().Id.Value),
                 2,
                 RecipeDifficulty.Easy,
+                new() { IngredientUnit = unitId },
                 [
                     RecipeIngredient.Create(ingredients.First().Id.Value, units.First().Id.Value, 10d)
                 ],

@@ -1,4 +1,5 @@
-﻿using RecipeManager.Api.Domain.Common.Abstractions;
+﻿using RecipeManager.Api.Domain.Common;
+using RecipeManager.Api.Domain.Common.Abstractions;
 using RecipeManager.Api.Domain.Ingredients;
 using RecipeManager.Api.Domain.Recipes.Enums;
 using RecipeManager.Api.Domain.Recipes.ValueObjects;
@@ -25,6 +26,8 @@ public sealed class Recipe : AuditableEntity, IEntity<RecipeId>
 
     public RecipeDifficulty Difficulty { get; set; }
 
+    public NutritionalValue NutritionalValue { get; set; }
+
     public IngredientId? IngredientId { get; set; }
 
     public ICollection<RecipeIngredient> Ingredients { get; set; } = [];
@@ -37,7 +40,7 @@ public sealed class Recipe : AuditableEntity, IEntity<RecipeId>
     {
     }
 
-    public static Recipe Create(string title, RecipeAmount amount, byte numberOfServings, RecipeDifficulty difficulty, IEnumerable<RecipeIngredient> ingredients, IEnumerable<RecipeSection> sections, IEnumerable<RecipeCategoryId> categories, IngredientId ingredientId, string? description = null, string? imageUrl = null, string? videoUrl = null)
+    public static Recipe Create(string title, RecipeAmount amount, byte numberOfServings, RecipeDifficulty difficulty, NutritionalValue nutritionalValue, IEnumerable<RecipeIngredient> ingredients, IEnumerable<RecipeSection> sections, IEnumerable<RecipeCategoryId> categories, IngredientId ingredientId, string? description = null, string? imageUrl = null, string? videoUrl = null)
     {
         return new()
         {
@@ -45,6 +48,7 @@ public sealed class Recipe : AuditableEntity, IEntity<RecipeId>
             Amount = amount,
             NumberOfServings = numberOfServings,
             Difficulty = difficulty,
+            NutritionalValue = nutritionalValue,
             IngredientId = ingredientId,
             Ingredients = ingredients.ToList(),
             Sections = sections.ToList(),

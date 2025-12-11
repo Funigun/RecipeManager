@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RecipeManager.Api.Application.Abstractions;
 using RecipeManager.Api.Application.Exceptions;
+using RecipeManager.Api.Domain.Common;
 using RecipeManager.Api.Domain.Ingredients;
 using RecipeManager.Api.Domain.Recipes;
 using RecipeManager.Api.Domain.Recipes.Enums;
@@ -35,7 +36,9 @@ public static class GetRecipeById
 
     public sealed record IngredientDto(Guid Id, string Name, string? IngredientRecipe);
 
-    public sealed record Response(Guid Id, string Title, string Description, string? ImageUrl, string? VideoUrl, RecipeAmountDto Amount, byte NumberOfServings, int Difficulty,
+    public sealed record NutritionalValueDto(int Calories, double Proteins, double Fats, double Carbohydrates, int IngredientAmount, Guid IngredientUnitId);
+
+    public sealed record Response(Guid Id, string Title, string Description, string? ImageUrl, string? VideoUrl, RecipeAmountDto Amount, byte NumberOfServings, int Difficulty, NutritionalValueDto NutritionalValues,
                                   IEnumerable<RecipeIngredientDto> Ingredients, IEnumerable<RecipeSectionDto> Sections, IEnumerable<RecipeCategoryDto> Categories, IngredientDto? Ingredient);
 
     [GroupEndpoint("Recipes")]
@@ -112,6 +115,7 @@ public static class GetRecipeById
             MapToRecipeAmountDto(recipe.Amount, units),
             recipe.NumberOfServings,
             (int)recipe.Difficulty,
+            MapToMapToNutritionalValuesDto(recipe.NutritionalValue),
             ingredients,
             sections,
             categories,
@@ -161,6 +165,19 @@ public static class GetRecipeById
             (int)recipeSection.Type,
             recipeSection.Steps.Select(step => new RecipeStepDto(step.Order, step.Description, step.ImageUrl)),
             recipeSection.Type is RecipeSectionType.Cooking or RecipeSectionType.IngredientsPreparation
+        );
+    }
+
+    private static NutritionalValueDto MapToMapToNutritionalValuesDto(NutritionalValue nutritionalValue)
+    {
+        return new
+        (
+            nutritionalValue.Calories,
+            nutritionalValue.Proteins,
+            nutritionalValue.Fats,
+            nutritionalValue.Carbohydrates,
+            nutritionalValue.IngredientAmount,
+            nutritionalValue.IngredientUnit
         );
     }
 }

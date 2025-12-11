@@ -22,6 +22,8 @@ public sealed class RecipeForManageModel
 
     public RecipeDifficulty Difficulty { get; set; }
 
+    public NutritionalValuesModel NutritionalValues { get; set; } = new();
+
     public ICollection<RecipeIngredientModel> Ingredients { get; set; } = [];
 
     public ICollection<RecipeSectionModel> Sections { get; set; } =

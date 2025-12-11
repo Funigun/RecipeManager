@@ -24,10 +24,10 @@
         </div>
 
         <div style="margin-right: 10px; width: 150px !important">
-            <MudSelect T="UnitForDropdownModel" Label="Unit*" @bind-Value="newIngredient.Unit">
+            <MudSelect T="Guid" Label="Unit*" @bind-Value="newIngredient.Unit.Id">
                 @foreach (var unit in Units)
                 {
-                    <MudSelectItem Value="@unit">@unit.Name</MudSelectItem>
+                    <MudSelectItem Value="@unit.Id">@unit.Name</MudSelectItem>
                 }
             </MudSelect>
         </div>

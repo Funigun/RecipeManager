@@ -128,10 +128,10 @@
                     </MudGrid>
 
                     <MudGrid Style="margin-top: 15px;">
-                        <MudItem xs="3"><MudTextField T="double" Label="Kcal"></MudTextField>        </MudItem>
-                        <MudItem xs="3"><MudTextField T="double" Label="Carbohydrates"></MudTextField> </MudItem>
-                        <MudItem xs="3"><MudTextField T="double" Label="Proteins"></MudTextField>      </MudItem>
-                        <MudItem xs="3"><MudTextField T="double" Label="Fats"></MudTextField>          </MudItem>
+                        <MudItem xs="3"><MudTextField T="int" For="@(() => RecipeModel.Item.NutritionalValues.Calories)" @bind-Value="RecipeModel.Item.NutritionalValues.Calories" Label="Kcal"/></MudItem>
+                        <MudItem xs="3"><MudTextField T="double" For="@(() => RecipeModel.Item.NutritionalValues.Carbohydrates)" @bind-Value="RecipeModel.Item.NutritionalValues.Carbohydrates" Label="Carbohydrates"/></MudItem>
+                        <MudItem xs="3"><MudTextField T="double" For="@(() => RecipeModel.Item.NutritionalValues.Proteins)" @bind-Value="RecipeModel.Item.NutritionalValues.Proteins" Label="Proteins"/></MudItem>
+                        <MudItem xs="3"><MudTextField T="double" For="@(() => RecipeModel.Item.NutritionalValues.Fats)" @bind-Value="RecipeModel.Item.NutritionalValues.Fats" Label="Fats"/>></MudItem>
                     </MudGrid>
                 </MudStack>
             </MudExpansionPanel>
