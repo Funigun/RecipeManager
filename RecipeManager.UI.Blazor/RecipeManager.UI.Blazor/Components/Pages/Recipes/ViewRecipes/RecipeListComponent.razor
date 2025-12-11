@@ -9,7 +9,7 @@
 
 <style>
     .recipes-grid {
-        width: 1300px; 
+        width: 1500px; 
         min-height: 450px; 
         max-height: 2500px; 
         margin-top: 30px; 
@@ -25,19 +25,18 @@
     }
 
     .recipe-step-container {
-        border: none;
         padding: 0px !important;
     }
 
     .recipe-step-description {
-        width: 300px;
+        width: 350px;
         text-align: center;
         text-wrap: wrap;
     }
 
     .recipe-step-image {
-        width: 300px;
-        height: 300px;
+        width: 350px;
+        height: 350px;
         align-self: center;
     }
 
@@ -56,7 +55,7 @@
         HateoasResponse<RecipeModel> recipe = RecipesPage.Item.Recipes[i];
 
         <MudItem Class="recipe-step-item">
-            <MudPaper Class="d-flex align-center justify-center mud-width-full py-8 recipe-step-container" Outlined=true>
+            <MudPaper Class="d-flex align-center justify-center mud-width-full py-8 recipe-step-container" Outlined="true">
                 <MudStack Spacing="5">
                     @if (!string.IsNullOrEmpty(recipe.Item.ImageURL))
                     {

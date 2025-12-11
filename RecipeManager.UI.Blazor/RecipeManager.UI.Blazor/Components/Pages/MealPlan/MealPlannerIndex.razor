@@ -24,7 +24,7 @@
         justify-content: center;
         align-self: center;
         display: flex;
-        width: 250px;
+        width: inherit;
     }
 
     .meal-plan-row {
@@ -32,7 +32,6 @@
         margin-top: 40px;
         padding: 0px;
         display: flex;
-        width: inherit;
     }
 
     .meal-plan-day {
@@ -118,12 +117,13 @@
         <MudItem Class="meal-plan-header-row">
             @foreach(var weekDay in days)
             {
-                <MudItem Class="meal-plan-header-item">
-                    <MudText Typo="Typo.h6" Style="align-content: center;">
-                        @weekDay
-                    </MudText>
-                </MudItem>
-                
+                <MudPaper Outlined="false" Class="meal-plan-header-item">
+                    <MudItem >
+                        <MudText Typo="Typo.h6" Style="align-content: center;">
+                            @weekDay
+                        </MudText>
+                    </MudItem>
+                </MudPaper>
             }
         </MudItem>
 
@@ -206,7 +206,7 @@
 
     private void GenerateMealPlan()
     {
-        DateTimeOffset start = DateTimeOffset.Now.AddDays(-2);
+        DateTimeOffset start = DateTimeOffset.Now.AddDays(-10);
         DateTimeOffset end = start.AddDays(34);
         MealPlannerWeek week = new();
         MealPlannerDay day;
