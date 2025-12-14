@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RecipeManager.Api.Application.Abstractions;
 using RecipeManager.Api.Domain.Recipes;
+using RecipeManager.Api.Shared.Contracts.Authorization;
 using RecipeManager.Api.Shared.Endpoint;
 
 namespace RecipeManager.Api.Features.Recipes;
@@ -22,10 +23,10 @@ public static class GetRecipeForDropdownModel
         }
     }
 
-    internal static async Task<Results<Ok<IEnumerable<Response>>, BadRequest>> Handler([FromQuery] string recipeName, [FromQuery] int numberOfRecipesToLoad, [FromServices] IAppDbContext dbContext, CancellationToken cancellationToken)
+    internal static async Task<Results<Ok<IEnumerable<Response>>, BadRequest>> Handler([FromQuery] string recipeName, [FromQuery] int numberOfRecipesToLoad, [FromServices] IAppDbContext dbContext, ICurrentUser currentUser, CancellationToken cancellationToken)
     {
         IEnumerable<Recipe> recipes = await dbContext.Recipes.AsNoTracking()
-                                                             .Where(recipe => recipe.Title.Contains(recipeName))
+                                                             .Where(recipe => recipe.Title.Contains(recipeName) && recipe.CreatedBy == currentUser.Id)
                                                              .Take(numberOfRecipesToLoad)
                                                              .ToListAsync(cancellationToken);
 

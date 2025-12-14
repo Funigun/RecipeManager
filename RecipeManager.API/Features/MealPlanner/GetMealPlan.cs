@@ -19,7 +19,7 @@ public static class GetMealPlan
 
     public sealed record RecipeDto(Guid Id, string Title, string? ImageUrl);
 
-    public sealed record MealPlanDayDto(DateTimeOffset Date, ICollection<RecipeDto> Recipes);
+    public sealed record MealPlanDayDto(Guid Id, DateTimeOffset Date, ICollection<RecipeDto> Recipes);
 
     public sealed record MealPlanWeekDto(ICollection<MealPlanDayDto> Days);
 
@@ -88,7 +88,7 @@ public static class GetMealPlan
             mealPlans.TryGetValue(date, out MealPlan? dayPlan);
 
             ICollection<RecipeDto> recipesForDay = dayPlan == null ? [] : recipes.Where(recipe => dayPlan.Recipes.Any(r => r.Value == recipe.Id)).ToList();
-            week.Add(new(date, recipesForDay));
+            week.Add(new(dayPlan?.Id ?? Guid.Empty, date, recipesForDay));
 
             if (date.DayOfWeek == DayOfWeek.Sunday)
             {

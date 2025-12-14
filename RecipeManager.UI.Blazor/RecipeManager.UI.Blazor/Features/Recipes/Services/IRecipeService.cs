@@ -12,6 +12,8 @@ public interface IRecipeService
 
     Task<IEnumerable<RecipeForDropdownModel>> GetRecipesForDropdown(string recipeName, int numberOfRecipesToLoad);
 
+    Task<IEnumerable<RecipeForMealPlanModel>> GetRecipesForMealPlan(string recipeName, int numberOfRecipesToLoad);
+
     Task<HateoasResponse<RecipesPageModel>> GetRecipesPage(IEnumerable<Guid> categories, IEnumerable<Guid> ingredients, int page, int pageSize);
 
     Task UpdateRecipe(string relativeUri, RecipeForManageModel recipe);

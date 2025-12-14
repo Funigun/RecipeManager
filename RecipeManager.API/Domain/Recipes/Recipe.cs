@@ -113,4 +113,24 @@ public sealed class Recipe : AuditableEntity, IEntity<RecipeId>
             }
         }
     }
+
+    public int CalculateCaloriesForSingleServing()
+    {
+        return (int)Math.Round((decimal)(NutritionalValue.Calories / NumberOfServings), 0);
+    }
+
+    public double CalculateProteinsForSingleServing()
+    {
+        return Math.Round(NutritionalValue.Proteins / NumberOfServings, 2);
+    }
+
+    public double CalculateFatsForSingleServing()
+    {
+        return Math.Round(NutritionalValue.Fats / NumberOfServings, 2);
+    }
+
+    public double CalculateCarbohydratesForSingleServing()
+    {
+        return Math.Round(NutritionalValue.Carbohydrates / NumberOfServings, 2);
+    }
 }
