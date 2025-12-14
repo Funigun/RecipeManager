@@ -1,6 +1,6 @@
 ﻿using RecipeManager.UI.Blazor.Features.Recipes;
 
-namespace RecipeManager.UI.Blazor.Components.Pages.MealPlan;
+namespace RecipeManager.UI.Blazor.Features.MealPlan.Models;
 
 public class MealPlannerDay
 {
@@ -9,4 +9,6 @@ public class MealPlannerDay
     public bool IsSelected { get; set; }
 
     public ICollection<RecipeForDropdownModel> Recipes { get; set; } = [];
+
+
 }

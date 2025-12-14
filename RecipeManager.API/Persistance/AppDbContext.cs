@@ -5,11 +5,13 @@ using RecipeManager.Api.Application.Abstractions;
 using RecipeManager.Api.Domain.Common.Abstractions;
 using RecipeManager.Api.Domain.Cookbooks;
 using RecipeManager.Api.Domain.Ingredients;
+using RecipeManager.Api.Domain.MealPlan;
 using RecipeManager.Api.Domain.Recipes;
 using RecipeManager.Api.Domain.Units;
 using RecipeManager.Api.Persistance.Configuration.Cookbooks.Converters;
 using RecipeManager.Api.Persistance.Configuration.Id;
 using RecipeManager.Api.Persistance.Configuration.Ingredients.Converters;
+using RecipeManager.Api.Persistance.Configuration.MealPlanner.Converters;
 using RecipeManager.Api.Persistance.Configuration.Recipes.Converters;
 using RecipeManager.Api.Persistance.Configuration.Units;
 using RecipeManager.Api.Shared.Contracts.Authorization;
@@ -33,6 +35,8 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<CookbookCategory> CookbookCategories { get; set; }
 
     public DbSet<Cookbook> Cookbooks { get; set; }
+
+    public DbSet<MealPlan> MealPlans { get; set; }
 
     public AppDbContext(DbContextOptions<AppDbContext> options, ICurrentUser currentUser) : this(options)
     {
@@ -81,6 +85,8 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
 
         configurationBuilder.Properties<CookbookCategoryId>().HaveConversion<CookbookCategoryIdConverter>();
         configurationBuilder.Properties<CookbookId>().HaveConversion<CookbookIdConverter>();
+
+        configurationBuilder.Properties<MealPlanId>().HaveConversion<MealPlanIdConverter>();
     }
 
     private void UpdateEntities()

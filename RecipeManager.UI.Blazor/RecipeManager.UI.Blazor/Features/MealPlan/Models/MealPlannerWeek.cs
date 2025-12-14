@@ -1,4 +1,4 @@
-﻿namespace RecipeManager.UI.Blazor.Components.Pages.MealPlan;
+﻿namespace RecipeManager.UI.Blazor.Features.MealPlan.Models;
 
 public class MealPlannerWeek
 {

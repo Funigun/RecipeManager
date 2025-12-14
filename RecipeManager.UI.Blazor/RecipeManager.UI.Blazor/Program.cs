@@ -9,6 +9,7 @@ using RecipeManager.UI.Blazor.Components.Common.DialogMessage;
 using RecipeManager.UI.Blazor.Features.Cookbooks.Services;
 using RecipeManager.UI.Blazor.Features.IngredientCategories.Services;
 using RecipeManager.UI.Blazor.Features.Ingredients.Services;
+using RecipeManager.UI.Blazor.Features.MealPlan.Services;
 using RecipeManager.UI.Blazor.Features.RecipeCategories.Services;
 using RecipeManager.UI.Blazor.Features.Recipes.Services;
 using RecipeManager.UI.Blazor.Features.Units.Services;
@@ -75,7 +76,8 @@ try
                     .AddScoped<IRecipeCategoryService, RecipeCategoryService>()
                     .AddScoped<IIngredientService, IngredientService>()
                     .AddScoped<IRecipeService, RecipeService>()
-                    .AddScoped<ICookbookService, CookbookService>();
+                    .AddScoped<ICookbookService, CookbookService>()
+                    .AddScoped<IMealPlanService, MealPlanService>();
 
     WebApplication app = builder.Build();
 
