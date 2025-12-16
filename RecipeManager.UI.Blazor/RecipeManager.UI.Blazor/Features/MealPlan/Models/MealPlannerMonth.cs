@@ -6,6 +6,14 @@ public class MealPlannerMonth
 {
     public ICollection<MealPlannerWeek> Weeks { get; set; } = [];
 
+    public void SetSupportingFields()
+    {
+        foreach (MealPlannerWeek week in Weeks)
+        {
+            week.SetDaysSupportingFields();
+        }
+    }
+
     public void AddRecipe(RecipeForMealPlanModel recipe)
     {
         foreach (MealPlannerWeek week in Weeks)
@@ -14,13 +22,14 @@ public class MealPlannerMonth
         }
     }
 
-    public IEnumerable<MealPlanForUpdateModel> GetPlansToUpdate()
+    public MealPlanForUpdateModel GetPlansToUpdate()
     {
-        return Weeks.SelectMany(week => week.GetPlansToUpdate()).Select(plan => new MealPlanForUpdateModel
+
+        return new MealPlanForUpdateModel(Weeks.SelectMany(week => week.GetPlansToUpdate()).Select(plan => new MealPlanDayForUpdateModel
         (
             plan.Id == Guid.Empty ? null : plan.Id,
             plan.Date,
             plan.Recipes.Select(recipe => recipe.Id).ToList()
-        ));
+        )));
     }
 }

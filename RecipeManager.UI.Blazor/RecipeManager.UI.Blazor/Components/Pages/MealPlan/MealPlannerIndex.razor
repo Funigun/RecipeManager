@@ -48,6 +48,10 @@
         width: inherit;
     }
 
+    .meal-plan-day-selected {
+        background: lightBlue;
+    }
+
     .meal-plan-day-shadowed {
         border: solid 1px black;
         padding: 0px !important;
@@ -124,13 +128,21 @@
                 <MudItem Class="meal-plan-row">
                     @foreach(var day in weekplan.Days)
                     {
-                        <MudPaper Class="@(day.Date.Month == DateTimeOffset.Now.Month ? "meal-plan-day" : "meal-plan-day-shadowed")" onclick="@(() => test(@day))">
+                        
+                        <MudPaper Class="@DetermineDayClass(day)" onclick="@(() => test(@day))">
                             
                             <MudMenu ActivationEvent="@MouseEvent.RightClick" PositionAtCursor>
                                 <ActivatorContent>
                                     
                             <MudStack Spacing="3">
-                                <MudText Class="d-flex align-center justify-center" Style="border-bottom: 1px solid black" Typo="Typo.h6">@day.Date.ToString("dd.MM.yyyy") (@day.Recipes.Count)</MudText>
+                                
+                                 <MudText Class="d-flex align-center justify-center" Style="border-bottom: 1px solid black" Typo="Typo.h6">
+                                     <MudStack Row="true">
+                                         @day.Header
+                                         <MudBadge Style="margin-left: 5px !important;" Origin="Origin.CenterRight" Color="Color.Primary" Visible="@day.Recipes.Any()" Content="@day.Recipes.Count" />
+                                         <MudBadge Style="padding-left: 25px !important;" Origin="Origin.CenterRight" Color="Color.Warning" Icon="@Icons.Material.Filled.Warning" Visible="@day.HasChanges"/>
+                                     </MudStack>
+                                 </MudText>
                                 
                                 <div class="recipe-container">
                                     @foreach (var meal in day.Recipes)
@@ -216,9 +228,18 @@
         copiedPlanDayId = id;
     }
 
+    private string DetermineDayClass(MealPlannerDay day)
+    {
+        string applicableClasses = day.IsSelected ? "meal-plan-day-selected " : string.Empty;
+        applicableClasses += day.Date.Month == DateTimeOffset.Now.Month ? " meal-plan-day" : " meal-plan-day-shadowed";
+
+        return applicableClasses;
+    }
+
     protected override async Task OnInitializedAsync()
     {
         MealPlanner = await MealPlanService.GetMonthlyMealPlan(DateTimeOffset.UtcNow);
+        MealPlanner.SetSupportingFields();
         StateHasChanged();
     }
 

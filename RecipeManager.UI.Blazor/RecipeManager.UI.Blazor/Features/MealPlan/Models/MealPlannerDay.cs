@@ -6,12 +6,15 @@ namespace RecipeManager.UI.Blazor.Features.MealPlan.Models;
 
 public class MealPlannerDay
 {
-    private readonly IEnumerable<Guid> _originalRecipeIds;
+    private IEnumerable<Guid> _originalRecipeIds = [];
 
     public Guid Id { get; set; }
 
     [JsonIgnore]
     public Guid FrontId { get; set; }
+
+    [JsonIgnore]
+    public string Header => $"{Date.ToString("dd.MM.yyyy")}";
 
     public DateTimeOffset Date { get; set; }
 
@@ -25,8 +28,12 @@ public class MealPlannerDay
 
     public MealPlannerDay()
     {
+    }
+
+    public void SetSupportingFields()
+    {
         FrontId = Id == Guid.Empty ? Guid.CreateVersion7() : Id;
-        _originalRecipeIds = Recipes.Select(r => r.Id);
+        _originalRecipeIds = Recipes.Select(r => r.Id).ToList();
     }
 
     public void AddRecipe(RecipeForMealPlanModel recipe)

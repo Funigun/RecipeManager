@@ -1,4 +1,5 @@
 using System.Reflection;
+using System.Text.Json.Serialization.Metadata;
 using FluentValidation;
 using RecipeManager.Api.Persistance;
 using RecipeManager.Api.Presentation;
@@ -43,6 +44,10 @@ try
     {
         options.AddDocumentTransformer<BearerSecuritySchemeTransformer>();
         options.OpenApiVersion = Microsoft.OpenApi.OpenApiSpecVersion.OpenApi3_1;
+        options.CreateSchemaReferenceId = (JsonTypeInfo typeInfo) =>
+        {
+            return typeInfo.Type.FullName;
+        };
     });
 
     builder.Services.AddSharedServices()

@@ -6,6 +6,14 @@ public class MealPlannerWeek
 {
     public ICollection<MealPlannerDay> Days { get; set; } = [];
 
+    public void SetDaysSupportingFields()
+    {
+        foreach (MealPlannerDay day in Days)
+        {
+            day.SetSupportingFields();
+        }
+    }
+
     public void AddRecipe(RecipeForMealPlanModel recipe)
     {
         foreach (MealPlannerDay day in Days)
@@ -13,6 +21,7 @@ public class MealPlannerWeek
             if (day.IsSelected && !day.Recipes.Any(r => r.Id == recipe.Id))
             {
                 day.AddRecipe(recipe);
+                day.IsSelected = false;
             }
         }
     }

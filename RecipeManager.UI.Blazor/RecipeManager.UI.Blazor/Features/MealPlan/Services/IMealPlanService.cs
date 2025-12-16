@@ -9,5 +9,5 @@ public interface IMealPlanService
 
     Task<MealPlannerMonth> GetMonthlyMealPlan(DateTimeOffset day);
 
-    Task UpdateMealPlan(IEnumerable<MealPlanForUpdateModel> mealPlans);
+    Task UpdateMealPlan(MealPlanForUpdateModel mealPlanForUpdate);
 }

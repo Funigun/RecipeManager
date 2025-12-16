@@ -25,9 +25,9 @@ public sealed class MealPlanService(IRecipeApi recipeApi, ISnackbar snackbar, Na
         return new MealPlannerMonth();
     }
 
-    public async Task UpdateMealPlan(IEnumerable<MealPlanForUpdateModel> mealPlans)
+    public async Task UpdateMealPlan(MealPlanForUpdateModel mealPlanForUpdate)
     {
-        HttpResponseMessage response = await recipeApi.Update(new Uri($"{MealPlansApiUrl}", UriKind.Relative), mealPlans);
+        HttpResponseMessage response = await recipeApi.Update(new Uri($"{MealPlansApiUrl}", UriKind.Relative), mealPlanForUpdate);
 
         if (response.IsSuccessStatusCode)
         {

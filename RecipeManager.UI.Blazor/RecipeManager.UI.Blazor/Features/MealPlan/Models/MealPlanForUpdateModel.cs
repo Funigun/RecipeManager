@@ -1,3 +1,3 @@
 ﻿namespace RecipeManager.UI.Blazor.Features.MealPlan.Models;
 
-public sealed record MealPlanForUpdateModel(Guid? Id, DateTimeOffset Date, ICollection<Guid> RecipeIds);
+public sealed record MealPlanForUpdateModel(IEnumerable<MealPlanDayForUpdateModel> MealPlans);
