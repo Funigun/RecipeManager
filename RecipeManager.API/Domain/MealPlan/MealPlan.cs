@@ -25,4 +25,9 @@ public sealed class MealPlan : AuditableEntity, IEntity<MealPlanId>
             _recipes = recipes,
         };
     }
+
+    public void UpdateRecipes(List<RecipeId> recipes)
+    {
+        _recipes = recipes;
+    }
 }

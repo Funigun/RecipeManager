@@ -1,4 +1,5 @@
 ﻿using RecipeManager.UI.Blazor.Brokers.HateoasModel;
+using RecipeManager.UI.Blazor.Components.Common;
 using RecipeManager.UI.Blazor.Features.Recipes.GetRecipes;
 using RecipeManager.UI.Blazor.Features.Recipes.Models;
 
@@ -6,6 +7,8 @@ namespace RecipeManager.UI.Blazor.Features.Recipes.Services;
 
 public interface IRecipeService
 {
+    ApiResponseBody ResponseBody { get; }
+
     Task CreateRecipe(RecipeForManageModel recipe);
 
     Task<HateoasResponse<RecipeForManageModel>> GetRecipeForManageById(Guid recipeId);

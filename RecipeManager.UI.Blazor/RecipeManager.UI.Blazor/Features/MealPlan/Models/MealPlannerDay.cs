@@ -6,6 +6,8 @@ namespace RecipeManager.UI.Blazor.Features.MealPlan.Models;
 
 public class MealPlannerDay
 {
+    private readonly IEnumerable<Guid> _originalRecipeIds;
+
     public Guid Id { get; set; }
 
     [JsonIgnore]
@@ -15,6 +17,8 @@ public class MealPlannerDay
 
     public bool IsSelected { get; set; }
 
+    public bool HasChanges => !_originalRecipeIds.SequenceEqual(Recipes.Select(r => r.Id));
+
     public ICollection<RecipeForMealPlanModel> Recipes { get; set; } = [];
 
     public NutritionalValuesModel NutritionalValues { get; set; } = new();
@@ -22,6 +26,7 @@ public class MealPlannerDay
     public MealPlannerDay()
     {
         FrontId = Id == Guid.Empty ? Guid.CreateVersion7() : Id;
+        _originalRecipeIds = Recipes.Select(r => r.Id);
     }
 
     public void AddRecipe(RecipeForMealPlanModel recipe)

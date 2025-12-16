@@ -1,7 +1,5 @@
 using System.Reflection;
 using FluentValidation;
-using RecipeManager.Api.Application.Abstractions;
-using RecipeManager.Api.Application.Services;
 using RecipeManager.Api.Persistance;
 using RecipeManager.Api.Presentation;
 using RecipeManager.Api.Shared;

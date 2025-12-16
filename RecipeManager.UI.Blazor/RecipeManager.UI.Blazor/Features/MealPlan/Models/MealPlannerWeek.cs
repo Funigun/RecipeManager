@@ -16,4 +16,9 @@ public class MealPlannerWeek
             }
         }
     }
+
+    public IEnumerable<MealPlannerDay> GetPlansToUpdate()
+    {
+        return Days.Where(day => day.HasChanges).ToList();
+    }
 }

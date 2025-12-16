@@ -90,7 +90,7 @@
                             <MudIconButton Icon="@Icons.Material.Filled.FormatListBulleted" Color="Color.Primary" />
                         </MudTooltip>
                         <MudTooltip Text="Save updated days">
-                            <MudIconButton Icon="@Icons.Material.Filled.Save" Color="Color.Primary" />
+                            <MudIconButton Icon="@Icons.Material.Filled.Save" Color="Color.Primary" OnClick="@(() => SaveMealPlan())" />
                         </MudTooltip>
                     </MudStack>
                     <MudStack Row="true" Class="d-flex align-center justify-center">    
@@ -237,5 +237,10 @@
     {
         selectedRecipe = value;
         StateHasChanged();
+    }
+
+    private async Task SaveMealPlan()
+    {
+        await MealPlanService.UpdateMealPlan(MealPlanner.GetPlansToUpdate());
     }
 }
