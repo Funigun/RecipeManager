@@ -1,4 +1,5 @@
-﻿using RecipeManager.UI.Blazor.Features.Recipes;
+﻿using System.Text.Json.Serialization;
+using RecipeManager.UI.Blazor.Features.Recipes;
 
 namespace RecipeManager.UI.Blazor.Features.MealPlan.Models;
 

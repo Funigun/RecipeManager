@@ -129,7 +129,7 @@
                     @foreach(var day in weekplan.Days)
                     {
                         
-                        <MudPaper Class="@DetermineDayClass(day)" onclick="@(() => test(@day))">
+                        <MudPaper Class="@DetermineDayClass(day)" onclick="@(() => DayPlanSelectedChanged(@day))">
                             
                             <MudMenu ActivationEvent="@MouseEvent.RightClick" PositionAtCursor>
                                 <ActivatorContent>
@@ -137,31 +137,52 @@
                             <MudStack Spacing="3">
                                 
                                  <MudText Class="d-flex align-center justify-center" Style="border-bottom: 1px solid black" Typo="Typo.h6">
-                                     <MudStack Row="true">
+                                     <MudStack Row="true" Style="display: flex; align-items: center" Spacing="5">
                                          @day.Header
-                                         <MudBadge Style="margin-left: 5px !important;" Origin="Origin.CenterRight" Color="Color.Primary" Visible="@day.Recipes.Any()" Content="@day.Recipes.Count" />
-                                         <MudBadge Style="padding-left: 25px !important;" Origin="Origin.CenterRight" Color="Color.Warning" Icon="@Icons.Material.Filled.Warning" Visible="@day.HasChanges"/>
+                                            <MudBadge Origin="Origin.CenterRight" Color="Color.Primary" Visible="@day.Recipes.Any()" Content="@day.Recipes.Count" />
+                                         
+                                         @if (copiedPlanDay != null && copiedPlanDay.FrontId == day.FrontId)
+                                         {
+                                             <MudTooltip Text="Currently copied day plan">
+                                                 <MudIcon Style="display: flex;" Icon="@Icons.Material.Filled.ContentCopy" Color="Color.Primary" />
+                                             </MudTooltip>
+                                         }
+
+                                         @if(@day.HasChanges)
+                                         {
+                                             <MudTooltip Text="Day has unsaved changes">
+                                                <MudIcon Style="display: flex;" Icon="@Icons.Material.Filled.Warning" Color="Color.Warning"/>
+                                             </MudTooltip>
+                                         }
                                      </MudStack>
                                  </MudText>
                                 
                                 <div class="recipe-container">
                                     @foreach (var meal in day.Recipes)
                                     {
-                                        <MudStack Row="true" Spacing="5" Class="d-flex align-center justify-center" Style="margin-top: 5px;">
-                                            <MudCheckBox T="bool" @bind-Value="@meal.IsSelected"></MudCheckBox>
-    
-                                            <MudTooltip Text="@meal.Title">
-                                                @if (!string.IsNullOrEmpty(meal.ImageUrl))
-                                                {
-                                                    <MudImage Image="recipe.Item.ImageUrl" Class="recipe-image" />
-                                                }
-                                                else
-                                                {
-                                                    <MudIconButton Icon="@Icons.Material.Filled.QuestionMark" Size="Size.Large" Class="recipe-image"
-                                                                   Color="Color.Primary"></MudIconButton>
-                                                }
-                                            </MudTooltip>
-                                        </MudStack>
+                                       <MudStack>
+                                            <MudStack Row="true" Spacing="5" Class="d-flex align-center justify-center" Style="margin-top: 5px;">
+                                                <MudCheckBox T="bool" @bind-Value="@meal.IsSelected"></MudCheckBox>
+                                            
+                                                <MudTooltip Text="@meal.Title">
+                                                    @if (!string.IsNullOrEmpty(meal.ImageUrl))
+                                                    {
+                                                        <MudImage Image="recipe.Item.ImageUrl" Class="recipe-image" />
+                                                    }
+                                                    else
+                                                    {
+                                                        <MudIconButton Icon="@Icons.Material.Filled.QuestionMark" Size="Size.Large" Class="recipe-image"
+                                                                       Color="Color.Primary"></MudIconButton>
+                                                    }
+                                                </MudTooltip>
+                                            </MudStack>
+                                            <MudStack Spacing="1">
+                                                <span style="border-top: solid 0.75px black; max-width: 240px; width: 240px;" />
+                                                <MudText Class="align-center justify-center" Style="font-size: 12px; margin-left: 5px; width: 230px; text-align:left; overflow-wrap: break-word; white-space: nowrap;overflow: hidden; text-overflow: ellipsis;" Typo="Typo.h6" Lines="1">@meal.Title</MudText>
+                                                <MudText Class="align-center justify-center" Style="font-size: 12px; margin-left: 5px; width: 230px; text-align:left" Typo="Typo.h6">Kcal: @meal.NutritionalValues.Calories</MudText>
+                                                <span style="border-bottom: solid 0.75px black; max-width: 240px; width: 240px;" />
+                                             </MudStack>
+                                       </MudStack>
                                     }
                                 </div>
                                 <MudText Class="d-flex align-center justify-center" Style="font-size: 12px; border-top: solid 0.75px black; width: 240px; text-align:center" Typo="Typo.h6">Kcal: @day.NutritionalValues.Calories</MudText>
@@ -177,12 +198,12 @@
                             <ChildContent>
                                     <MudStack class="align-center justify-center">
                                         <MudTooltip Text="Copy plan for selected day">
-                                            <MudIconButton Icon="@Icons.Material.Filled.CopyAll" Color="Color.Primary" OnClick="@(() => CopyDayPlan(day.FrontId))" />
+                                            <MudIconButton Icon="@Icons.Material.Filled.CopyAll" Color="Color.Primary" OnClick="@(() => CopyDayPlan(day))" />
                                         </MudTooltip>
-                                        @if (copiedPlanDayId != Guid.Empty && day.FrontId != copiedPlanDayId)
+                                        @if (copiedPlanDay != null && day.FrontId != copiedPlanDay.FrontId)
                                         {
                                             <MudTooltip Text="Add copied day plan">
-                                                <MudIconButton Icon="@Icons.Material.Filled.ContentPaste" Color="Color.Primary" />
+                                                <MudIconButton Icon="@Icons.Material.Filled.ContentPaste" Color="Color.Primary" OnClick="@(() => PasteDayPlan(day))" />
                                             </MudTooltip>
                                         }
                                         <MudTooltip Text="Generate shopping list">
@@ -210,22 +231,31 @@
     private MealPlannerMonth MealPlanner = new();
     private RecipeForMealPlanModel selectedRecipe = default!;
 
-    private Guid copiedPlanDayId;
+    private MealPlannerDay? copiedPlanDay;
 
     private bool IsAddRecipeDisabled
     {
         get => selectedRecipe == null;
     }
 
-    private void test(MealPlannerDay day)
+    private void DayPlanSelectedChanged(MealPlannerDay day)
     {
         day.IsSelected = !day.IsSelected;
         StateHasChanged();
     }
 
-    private void CopyDayPlan(Guid id)
+    private void CopyDayPlan(MealPlannerDay day)
     {
-        copiedPlanDayId = id;
+        copiedPlanDay = day;
+        StateHasChanged();
+    }
+
+    private void PasteDayPlan(MealPlannerDay day)
+    {
+        day.CopyPlanFromOtherDay(copiedPlanDay!);
+        copiedPlanDay = null;
+
+        StateHasChanged();
     }
 
     private string DetermineDayClass(MealPlannerDay day)

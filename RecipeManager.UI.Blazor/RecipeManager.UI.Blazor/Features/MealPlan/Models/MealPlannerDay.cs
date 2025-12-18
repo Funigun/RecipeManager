@@ -67,6 +67,16 @@ public class MealPlannerDay
         }
     }
 
+    public void CopyPlanFromOtherDay(MealPlannerDay dayPlan)
+    {
+        ClearRecipes();
+
+        foreach (RecipeForMealPlanModel recipe in dayPlan.Recipes)
+        {
+            AddRecipe(recipe);
+        }
+    }
+
     public void ClearRecipes()
     {
         Recipes.Clear();
