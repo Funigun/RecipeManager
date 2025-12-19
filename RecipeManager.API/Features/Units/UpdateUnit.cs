@@ -15,7 +15,16 @@ namespace RecipeManager.Api.Features.Units;
 
 public static class UpdateUnit
 {
-    public sealed record Request(string Name, string? ShortName, int Group, Guid? PrimaryUnit, int ConversionFactor);
+    public sealed record Request(
+        string Name,
+        string? ShortName,
+        string PluralName,
+        string? PluralShortName,
+        int Group,
+        bool IsBaseUnit,
+        Guid? PrimaryUnit,
+        int ConversionFactor
+    );
 
     public sealed class Validator : AbstractValidator<Request>
     {
@@ -41,6 +50,18 @@ public static class UpdateUnit
                         return !await dbContext.Units.AnyAsync(unit => unit.ShortName == shortName && unit.Id != unitId, cancellationToken);
                     }).WithMessage("Unit Short Name must be unique");
             });
+
+            RuleFor(x => x.PluralName)
+                .SetValidator(new UnitPluralNameValidator());
+
+            When(x => x.PluralShortName is not null, () =>
+            {
+                RuleFor(x => x.PluralShortName)
+                    .SetValidator(new UnitPluralShortNameValidator());
+            });
+
+            RuleFor(x => x.IsBaseUnit)
+                .SetValidator(new UnitIsBaseUnitValidator());
 
             RuleFor(x => x.Group)
                 .Must(group => group.IsUnitGroup())
@@ -89,7 +110,16 @@ public static class UpdateUnit
         Unit? unit = await dbContext.Units.FindAsync([id], cancellationToken)
                   ?? throw new EntityNotFoundException<Unit, UnitId>(id);
 
-        unit.Update(request.Name, request.ShortName, (UnitGroup)request.Group, request.PrimaryUnit, request.ConversionFactor);
+        unit.Update(
+            request.Name,
+            request.ShortName,
+            request.PluralName,
+            request.PluralShortName,
+            (UnitGroup)request.Group,
+            request.IsBaseUnit,
+            request.PrimaryUnit,
+            request.ConversionFactor
+        );
 
         await dbContext.SaveChangesAsync(cancellationToken);
 

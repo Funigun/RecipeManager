@@ -82,8 +82,6 @@ public static class GenerateShoppingList
                                                                                                    .Distinct()
                                                                                                    .ToListAsync(cancellationToken);
 
-
-
         IEnumerable<IGrouping<IngredientCategoryId, Ingredient>>? groupedIngredients = ingredients.GroupBy(ingredient => ingredient.GetShoppingListGroupId());
 
         foreach (IGrouping<IngredientCategoryId, Ingredient> group in groupedIngredients)

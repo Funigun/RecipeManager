@@ -13,9 +13,28 @@ namespace RecipeManager.Api.Features.Units;
 
 public static class CreateUnit
 {
-    public sealed record Request(string Name, string? ShortName, int Group, Guid? PrimaryUnit, int ConversionFactor = 1);
+    public sealed record Request(
+        string Name,
+        string? ShortName,
+        string PluralName,
+        string? PluralShortName,
+        int Group,
+        bool IsBaseUnit,
+        Guid? PrimaryUnit,
+        int ConversionFactor = 1
+    );
 
-    public sealed record Response(UnitId Id);
+    public sealed record Response(
+        UnitId Id,
+        string Name,
+        string? ShortName,
+        string PluralName,
+        string? PluralShortName,
+        int Group,
+        bool IsBaseUnit,
+        Guid? PrimaryUnit,
+        int ConversionFactor
+    );
 
     public sealed class Validator : AbstractValidator<Request>
     {
@@ -37,6 +56,18 @@ public static class CreateUnit
                         return !await dbContext.Units.AnyAsync(unit => unit.ShortName == shortName, cancellationToken);
                     }).WithMessage("Unit Short Name must be unique");
             });
+
+            RuleFor(x => x.PluralName)
+                .SetValidator(new UnitPluralNameValidator());
+
+            When(x => x.PluralShortName is not null, () =>
+            {
+                RuleFor(x => x.PluralShortName)
+                    .SetValidator(new UnitPluralShortNameValidator());
+            });
+
+            RuleFor(x => x.IsBaseUnit)
+                .SetValidator(new UnitIsBaseUnitValidator());
 
             RuleFor(x => x.Group)
                 .Must(group => group.IsUnitGroup())
@@ -91,11 +122,30 @@ public static class CreateUnit
 
     private static Unit ToUnit(this Request request)
     {
-        return Unit.Create(request.Name, request.ShortName, (UnitGroup)request.Group, request.PrimaryUnit, request.ConversionFactor);
+        return Unit.Create(
+            request.Name,
+            request.ShortName,
+            request.PluralName,
+            request.PluralShortName,
+            (UnitGroup)request.Group,
+            request.IsBaseUnit,
+            request.PrimaryUnit,
+            request.ConversionFactor
+        );
     }
 
     private static Response ToPostResponse(this Unit unit)
     {
-        return new Response(unit.Id);
+        return new Response(
+            unit.Id,
+            unit.Name,
+            unit.ShortName,
+            unit.PluralName,
+            unit.PluralShortName,
+            (int)unit.Group,
+            unit.IsBaseUnit,
+            unit.PrimaryUnit?.Value,
+            unit.ConversionFactor
+        );
     }
 }

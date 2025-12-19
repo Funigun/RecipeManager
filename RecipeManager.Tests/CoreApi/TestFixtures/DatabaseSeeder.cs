@@ -15,11 +15,11 @@ internal static class DatabaseSeeder
     {
         IEnumerable<Unit> units =
         [
-            Unit.Create("Duplicated Name", "TU", UnitGroup.Weight, null, 1),
-            Unit.Create("Test", "Duplicated Short Name", UnitGroup.Weight, null, 1),
-            Unit.Create("To Update", null, UnitGroup.Weight, null, 1),
-            Unit.Create("To Delete", null, UnitGroup.Weight, null, 1),
-            Unit.Create("Existing Unit", "EU", UnitGroup.Weight, null, 1)
+            Unit.Create("Duplicated Name", "TU", "Duplicated Name", "TUs", UnitGroup.Weight, false, null, 1),
+            Unit.Create("Test", "Duplicated Short Name", "Test", "Duplicated Short Name", UnitGroup.Weight, false, null, 1),
+            Unit.Create("To Update", null, "To Update", null, UnitGroup.Weight, false, null, 1),
+            Unit.Create("To Delete", null, "To Delete", null, UnitGroup.Weight, false, null, 1),
+            Unit.Create("Existing Unit", "EU", "Existing Unit", "EU", UnitGroup.Weight, false, null, 1)
         ];
 
         IEnumerable<RecipeCategory> recipeCategories =

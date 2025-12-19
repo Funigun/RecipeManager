@@ -18,7 +18,16 @@ public static class GetUnits
 {
     public sealed record PrimaryUnitDto(Guid Id, string Name, int ConversionFactory);
 
-    public sealed record Response(Guid UnitId, string Name, string? ShortName, string Group, PrimaryUnitDto? PrimaryUnit);
+    public sealed record Response(
+        Guid UnitId,
+        string Name,
+        string? ShortName,
+        string PluralName,
+        string? PluralShortName,
+        string Group,
+        bool IsBaseUnit,
+        PrimaryUnitDto? PrimaryUnit
+    );
 
     [GroupEndpoint("Units")]
     public class Enpoint : IEndpoint
@@ -62,7 +71,10 @@ public static class GetUnits
             unit.Id.Value,
             unit.Name,
             unit.ShortName,
+            unit.PluralName,
+            unit.PluralShortName,
             unit.Group.ToFriendlyString(),
+            unit.IsBaseUnit,
             unit.PrimaryUnit is not null ? new PrimaryUnitDto(unit.PrimaryUnit.Value, unit.Name, unit.ConversionFactor) : null
         );
     }
