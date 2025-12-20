@@ -6,7 +6,11 @@ public sealed class UnitModel
 
     public string Name { get; set; } = string.Empty;
 
+    public string PluralName { get; set; } = string.Empty;
+
     public string? ShortName { get; set; }
+
+    public string? PluralShortName { get; set; }
 
     public string Group { get; set; } = string.Empty;
 

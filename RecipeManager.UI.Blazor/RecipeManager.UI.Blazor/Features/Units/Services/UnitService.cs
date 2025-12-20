@@ -5,8 +5,8 @@ using RecipeManager.UI.Blazor.Brokers.HateoasModel;
 using RecipeManager.UI.Blazor.Brokers.RecipeManagersApi;
 using RecipeManager.UI.Blazor.Components.Common;
 using RecipeManager.UI.Blazor.Components.Extensions;
-using RecipeManager.UI.Blazor.Features.Units.CreateUnit;
 using RecipeManager.UI.Blazor.Features.Units.GetUnits;
+using RecipeManager.UI.Blazor.Features.Units.Manage;
 using RecipeManager.UI.Blazor.Features.Units.UpdateUnit;
 
 namespace RecipeManager.UI.Blazor.Features.Units.Services;
@@ -21,7 +21,7 @@ public class UnitService(IRecipeApi recipeApi, ISnackbar snackbar, NavigationMan
 
     public ApiResponseBody ResponseBody { get; private set; } = new();
 
-    public async Task CreateUnit(UnitForCreateModel unit)
+    public async Task CreateUnit(UnitForManageModel unit)
     {
         HttpResponseMessage response = await recipeApi.Create(new Uri(UnitsApiUrl, UriKind.Relative), unit);
 
@@ -39,18 +39,18 @@ public class UnitService(IRecipeApi recipeApi, ISnackbar snackbar, NavigationMan
         }
     }
 
-    public async Task<HateoasResponse<UnitForUpdateModel>> GetUnitById(Guid id)
+    public async Task<HateoasResponse<UnitForManageModel>> GetUnitById(Guid id)
     {
         HttpResponseMessage response = await recipeApi.GetById(new Uri($"{UnitsApiUrl}/{id}", UriKind.Relative));
 
         if (response.IsSuccessStatusCode)
         {
-            return (await response.Content.ReadFromJsonAsync<HateoasResponse<UnitForUpdateModel>>())!;
+            return (await response.Content.ReadFromJsonAsync<HateoasResponse<UnitForManageModel>>())!;
         }
 
         ResponseBody = (await response.Content.ReadFromJsonAsync<ApiResponseBody>())!;
 
-        return new HateoasResponse<UnitForUpdateModel>();
+        return new HateoasResponse<UnitForManageModel>();
     }
 
     public async Task<HateoasCollectionResponse<UnitModel>> GetUnits()
@@ -80,7 +80,7 @@ public class UnitService(IRecipeApi recipeApi, ISnackbar snackbar, NavigationMan
              : [];
     }
 
-    public async Task UpdateUnit(string relativeUri, UnitForUpdateModel unit)
+    public async Task UpdateUnit(string relativeUri, UnitForManageModel unit)
     {
         HttpResponseMessage response = await recipeApi.Update(new Uri(relativeUri), unit);
 

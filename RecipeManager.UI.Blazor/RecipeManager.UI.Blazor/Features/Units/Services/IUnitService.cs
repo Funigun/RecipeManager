@@ -1,8 +1,7 @@
 ﻿using RecipeManager.UI.Blazor.Brokers.HateoasModel;
 using RecipeManager.UI.Blazor.Components.Common;
-using RecipeManager.UI.Blazor.Features.Units.CreateUnit;
 using RecipeManager.UI.Blazor.Features.Units.GetUnits;
-using RecipeManager.UI.Blazor.Features.Units.UpdateUnit;
+using RecipeManager.UI.Blazor.Features.Units.Manage;
 
 namespace RecipeManager.UI.Blazor.Features.Units.Services;
 
@@ -10,9 +9,9 @@ public interface IUnitService
 {
     ApiResponseBody ResponseBody { get; }
 
-    Task CreateUnit(UnitForCreateModel unit);
+    Task CreateUnit(UnitForManageModel unit);
 
-    Task<HateoasResponse<UnitForUpdateModel>> GetUnitById(Guid id);
+    Task<HateoasResponse<UnitForManageModel>> GetUnitById(Guid id);
 
     Task<HateoasCollectionResponse<UnitModel>> GetUnits();
 
@@ -20,7 +19,7 @@ public interface IUnitService
 
     Task<IEnumerable<UnitForDropdownModel>> GetUnitsForDropdown();
 
-    Task UpdateUnit(string relativeUri, UnitForUpdateModel unit);
+    Task UpdateUnit(string relativeUri, UnitForManageModel unit);
 
     Task DeleteUnit(string relativeUri);
 

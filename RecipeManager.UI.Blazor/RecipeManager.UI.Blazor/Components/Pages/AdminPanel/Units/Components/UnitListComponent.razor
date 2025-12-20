@@ -14,7 +14,9 @@
 <MudTable T="HateoasResponse<UnitModel>" Items="Items.Items" Loading="ShowLoadingBar" LoadingProgressColor="Color.Info">
     <HeaderContent>
         <MudTh>Name</MudTh>
+        <MudTh>Plural Name</MudTh>
         <MudTh>Short Name</MudTh>
+        <MudTh>Plural Short Name</MudTh>
         <MudTh>Group</MudTh>
         <MudTh>Primary Unit</MudTh>
         <MudTh>Conversion Factor</MudTh>
@@ -22,7 +24,9 @@
     </HeaderContent>
     <RowTemplate>
         <MudTd DataLabel="Name">@context.Item.Name</MudTd>
+        <MudTd DataLabel="Plural Name">@context.Item.PluralName</MudTd>
         <MudTd DataLabel="Short Name">@context.Item.ShortName</MudTd>
+        <MudTd DataLabel="Plural Short Name">@context.Item.PluralShortName</MudTd>
         <MudTd DataLabel="Group">@context.Item.Group</MudTd>
         <MudTd DataLabel="Primary Unit">@context.Item.PrimaryUnit?.Name</MudTd>
         <MudTd DataLabel="Conversion Factor">@(GetConversionFactorDisplay(context.Item))</MudTd>

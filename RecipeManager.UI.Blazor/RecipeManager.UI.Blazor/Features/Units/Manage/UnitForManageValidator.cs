@@ -2,17 +2,23 @@
 using RecipeManager.Shared.Contracts.Units;
 using RecipeManager.UI.Blazor.Components.Common;
 
-namespace RecipeManager.UI.Blazor.Features.Units.CreateUnit;
+namespace RecipeManager.UI.Blazor.Features.Units.Manage;
 
-public class UnitForCreateValidator : BaseAbstractValidator<UnitForCreateModel>
+public class UnitForManageValidator : BaseAbstractValidator<UnitForManageModel>
 {
-    public UnitForCreateValidator()
+    public UnitForManageValidator()
     {
         RuleFor(x => x.Name)
             .SetValidator(new UnitNameValidator());
 
         RuleFor(x => x.ShortName)
             .SetValidator(new UnitShortNameValidator());
+
+        RuleFor(x => x.PluralName)
+            .SetValidator(new UnitPluralNameValidator());
+
+        RuleFor(x => x.PluralShortName)
+            .SetValidator(new UnitPluralShortNameValidator());
 
         When(x => x.PrimaryUnit is not null, () =>
         {
