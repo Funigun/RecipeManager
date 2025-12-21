@@ -27,9 +27,11 @@ public static class GetIngredientById
 
     public sealed record IngredientCategoryDto(Guid Id, string Name);
 
-    public sealed record IngredientDto(Guid Id, string Name, NutritionalValueDto NutritionalValues, IngredientCategoryDto ShoppingListCategory, IEnumerable<IngredientRecipeDto> Recipes, IEnumerable<IngredientCategoryDto> Categories);
+    public sealed record IngredientUnitConvertionDto(Guid UnitToConvertId, double Ratio);
 
-    public sealed record Response(Guid Id, string Name, NutritionalValueDto NutritionalValues, IngredientCategoryDto ShoppingListCategory, IEnumerable<HateoasResponse<IngredientRecipeDto>> Recipes, IEnumerable<IngredientCategoryDto> Categories);
+    public sealed record IngredientDto(Guid Id, string Name, NutritionalValueDto NutritionalValues, Guid BaseUnit, IEnumerable<IngredientUnitConvertionDto> IngredientUnitConvertions, IngredientCategoryDto ShoppingListCategory, IEnumerable<IngredientRecipeDto> Recipes, IEnumerable<IngredientCategoryDto> Categories);
+
+    public sealed record Response(Guid Id, string Name, NutritionalValueDto NutritionalValues, Guid BaseUnit, IEnumerable<IngredientUnitConvertionDto> IngredientUnitConvertions, IngredientCategoryDto ShoppingListCategory, IEnumerable<HateoasResponse<IngredientRecipeDto>> Recipes, IEnumerable<IngredientCategoryDto> Categories);
 
     [GroupEndpoint("Ingredients")]
     public sealed class Endpoint : IEndpoint
@@ -51,9 +53,13 @@ public static class GetIngredientById
 
         IEnumerable<IngredientRecipeDto> recipes = await GetIngredientRecipes(dbContext, ingredient, cancellationToken);
         IEnumerable<IngredientCategoryDto> categories = await GetIngredientCategories(dbContext, ingredient, cancellationToken);
-        Unit unit = await dbContext.Units.FirstAsync(unit => unit.Id == ingredient.NutritionalValue.IngredientUnit, cancellationToken);
 
-        IngredientDto ingredientDto = MapToIngredientDto(ingredient, categories.FirstOrDefault(c => c.Id == ingredient.ShoppingListCategoryId?.Value),  recipes, categories.Where(c => c.Id != ingredient.ShoppingListCategoryId?.Value));
+        IngredientDto ingredientDto = MapToIngredientDto(
+            ingredient,
+            categories.FirstOrDefault(c => c.Id == ingredient.ShoppingListCategoryId?.Value),
+            recipes,
+            categories.Where(c => c.Id != ingredient.ShoppingListCategoryId?.Value)
+        );
 
         bool isIngredientCreator = ingredient.CreatedBy == currentUser.Id;
         HateoasResponse<Response> hateoasResponse = MapToHateoasResponse(ingredientDto, hateoasBuilderFactory, isIngredientCreator);
@@ -91,7 +97,16 @@ public static class GetIngredientById
 
     private static IngredientDto MapToIngredientDto(Ingredient ingredient, IngredientCategoryDto? shoppingListCategory, IEnumerable<IngredientRecipeDto> recipes, IEnumerable<IngredientCategoryDto> categories)
     {
-        return new IngredientDto(ingredient.Id.Value, ingredient.Name, MapToNutritionalValuesDto(ingredient.NutritionalValue), shoppingListCategory ?? default!, recipes, categories);
+        return new IngredientDto(
+            ingredient.Id.Value,
+            ingredient.Name,
+            MapToNutritionalValuesDto(ingredient.NutritionalValue),
+            ingredient.BaseUnit.Value,
+            ingredient.IngredientUnitConvertions.Select(c => new IngredientUnitConvertionDto(c.UnitToConvertId.Value, c.Ratio)),
+            shoppingListCategory ?? default!,
+            recipes,
+            categories
+        );
     }
 
     private static NutritionalValueDto MapToNutritionalValuesDto(NutritionalValue nutritionalValue)
@@ -106,7 +121,16 @@ public static class GetIngredientById
         recipesBuilder.WithCollectionLink()
                       .WithGet(LinkOptions.Create("GetRecipeById", HateoasRelConstants.Self, true), recipe => new { recipeId = recipe.Id });
 
-        Response response = new(ingredientDto.Id, ingredientDto.Name, ingredientDto.NutritionalValues, ingredientDto.ShoppingListCategory, recipesBuilder.Build().Items, ingredientDto.Categories);
+        Response response = new(
+            ingredientDto.Id,
+            ingredientDto.Name,
+            ingredientDto.NutritionalValues,
+            ingredientDto.BaseUnit,
+            ingredientDto.IngredientUnitConvertions,
+            ingredientDto.ShoppingListCategory,
+            recipesBuilder.Build().Items,
+            ingredientDto.Categories
+        );
 
         HateoasResponseBuilder<Response> responseBuilder = hateoasBuilderFactory.ForItem(response);
 

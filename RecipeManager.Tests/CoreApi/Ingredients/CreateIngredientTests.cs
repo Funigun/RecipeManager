@@ -31,7 +31,7 @@ public sealed class CreateIngredientTests : BaseIntegrationTest
                                                      .FirstAsync(TestContext.Current.CancellationToken);
 
         CreateIngredient.NutritionalValueDto nutritionalValue = new(100, 5, 10, 20, 1, existingUnitId.Value);
-        CreateIngredient.Request request = new("New fake ingredient", nutritionalValue, categoryId, [], []);
+        CreateIngredient.Request request = new("New fake ingredient", nutritionalValue, existingUnitId, [], categoryId, [], []);
         using StringContent content = new(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json");
 
         // Act
@@ -61,7 +61,7 @@ public sealed class CreateIngredientTests : BaseIntegrationTest
                                                      .FirstAsync(TestContext.Current.CancellationToken);
 
         CreateIngredient.NutritionalValueDto nutritionalValue = new(100, 5, 10, 20, 1, existingUnitId.Value);
-        CreateIngredient.Request? request = new(string.Empty, nutritionalValue, categoryId, [], []);
+        CreateIngredient.Request? request = new(string.Empty, nutritionalValue, existingUnitId, [], categoryId, [], []);
         using StringContent content = new(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json");
 
         // Act
@@ -82,7 +82,7 @@ public sealed class CreateIngredientTests : BaseIntegrationTest
                                                      .FirstAsync(TestContext.Current.CancellationToken);
 
         CreateIngredient.NutritionalValueDto nutritionalValue = new(100, 5, 10, 20, 1, existingUnitId.Value);
-        CreateIngredient.Request? request = new(string.Empty, nutritionalValue, Guid.Empty, [], []);
+        CreateIngredient.Request? request = new(string.Empty, nutritionalValue, existingUnitId, [], Guid.Empty, [], []);
         using StringContent content = new(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json");
 
         // Act
@@ -107,7 +107,7 @@ public sealed class CreateIngredientTests : BaseIntegrationTest
                                                      .FirstAsync(TestContext.Current.CancellationToken);
 
         CreateIngredient.NutritionalValueDto nutritionalValue = new(100, 5, 10, 20, 1, existingUnitId.Value);
-        CreateIngredient.Request? request = new(string.Empty, nutritionalValue, categoryId, [Guid.Empty], []);
+        CreateIngredient.Request? request = new(string.Empty, nutritionalValue, existingUnitId, [], categoryId, [Guid.Empty], []);
         using StringContent content = new(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json");
 
         // Act
@@ -132,7 +132,7 @@ public sealed class CreateIngredientTests : BaseIntegrationTest
                                                      .FirstAsync(TestContext.Current.CancellationToken);
 
         CreateIngredient.NutritionalValueDto nutritionalValue = new(100, 5, 10, 20, 1, existingUnitId.Value);
-        CreateIngredient.Request? request = new(string.Empty, nutritionalValue, categoryId, [], [Guid.Empty]);
+        CreateIngredient.Request? request = new(string.Empty, nutritionalValue, existingUnitId, [], categoryId, [], [Guid.Empty]);
         using StringContent content = new(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json");
 
         // Act
@@ -157,7 +157,7 @@ public sealed class CreateIngredientTests : BaseIntegrationTest
                                                      .FirstAsync(TestContext.Current.CancellationToken);
 
         CreateIngredient.NutritionalValueDto nutritionalValue = new(100, 5, 10, 20, 1, existingUnitId.Value);
-        CreateIngredient.Request? request = new(string.Empty, nutritionalValue, categoryId, [categoryId], []);
+        CreateIngredient.Request? request = new(string.Empty, nutritionalValue, existingUnitId, [], categoryId, [categoryId], []);
         using StringContent content = new(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json");
 
         // Act
@@ -186,7 +186,7 @@ public sealed class CreateIngredientTests : BaseIntegrationTest
                                                      .FirstAsync(TestContext.Current.CancellationToken);
 
         CreateIngredient.NutritionalValueDto nutritionalValue = new(calories, proteins, fats, carbohydrates, amount, existingUnitId.Value);
-        CreateIngredient.Request? request = new("Valid Name", nutritionalValue, categoryId, [], []);
+        CreateIngredient.Request? request = new("Valid Name", nutritionalValue, existingUnitId, [], categoryId, [], []);
         using StringContent content = new(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json");
 
         // Act

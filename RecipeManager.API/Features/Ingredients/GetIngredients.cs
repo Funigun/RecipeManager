@@ -19,7 +19,11 @@ public static class GetIngredients
     [BindProperties]
     public sealed record GetIngredientsFilterParameters(string Category = "", int Page = 1, int PageSize = 10) : PagedParameters(Page, PageSize);
 
-    public sealed record IngredientDto(Guid Id, string Name);
+    public sealed record NutritionalValueDto(int Calories, double Proteins, double Fats, double Carbohydrates, int IngredientAmount, Guid IngredientUnitId);
+
+    public sealed record IngredientUnitConvertionDto(Guid UnitToConvertId, double Ratio);
+
+    public sealed record IngredientDto(Guid Id, string Name, Guid BaseUnit, IEnumerable<IngredientUnitConvertionDto> IngredientUnitConvertions, NutritionalValueDto NutritionalValues);
 
     public sealed record Response(int Page, int PageSize, int TotalCount, IEnumerable<HateoasResponse<IngredientDto>> Ingredients) : PagedResult(Page, PageSize, TotalCount);
 
@@ -43,7 +47,20 @@ public static class GetIngredients
         int totalCount = await query.CountAsync(cancellationToken);
 
         List<Ingredient> ingredients = await query.SetPage(filter).ToListAsync(cancellationToken);
-        List<IngredientDto> ingredientDtos = ingredients.Select(ingredient => new IngredientDto(ingredient.Id.Value, ingredient.Name)).ToList();
+        List<IngredientDto> ingredientDtos = ingredients.Select(ingredient => new IngredientDto(
+            ingredient.Id.Value,
+            ingredient.Name,
+            ingredient.BaseUnit.Value,
+            ingredient.IngredientUnitConvertions.Select(c => new IngredientUnitConvertionDto(c.UnitToConvertId.Value, c.Ratio)),
+            new NutritionalValueDto(
+                ingredient.NutritionalValue.Calories,
+                ingredient.NutritionalValue.Proteins,
+                ingredient.NutritionalValue.Fats,
+                ingredient.NutritionalValue.Carbohydrates,
+                ingredient.NutritionalValue.IngredientAmount,
+                ingredient.NutritionalValue.IngredientUnit.Value
+            )
+        )).ToList();
 
         IEnumerable<HateoasResponse<IngredientDto>> ingredientHateoas = MapIngredientsToHateoasResponse(ingredientDtos, hateoasBuilderFactory);
         HateoasResponse<Response> response = MapToHateoasResponse(filter, totalCount, ingredientHateoas, hateoasBuilderFactory);

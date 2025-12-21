@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using RecipeManager.Api.Domain.Ingredients;
+using RecipeManager.Api.Domain.Units;
 
 namespace RecipeManager.Api.Persistance.Configuration.Ingredients;
 
@@ -46,6 +47,11 @@ public sealed class IngredientConfiguration : IEntityTypeConfiguration<Ingredien
                .IsRequired(false)
                .OnDelete(DeleteBehavior.ClientSetNull);
 
+        builder.HasOne<Unit>()
+               .WithMany()
+               .HasForeignKey(ingredient => ingredient.BaseUnit)
+               .IsRequired(true);
+
         builder.OwnsMany(ingredient => ingredient.Categories, categories =>
         {
             categories.ToTable("IngredientToIngredientCategory");
@@ -54,6 +60,11 @@ public sealed class IngredientConfiguration : IEntityTypeConfiguration<Ingredien
         builder.OwnsMany(ingredient => ingredient.Recipes, recipes =>
         {
             recipes.ToTable("IngredientToRecipe");
+        });
+
+        builder.OwnsMany(ingredient => ingredient.IngredientUnitConvertions, ingredientUnitConvertions =>
+        {
+            ingredientUnitConvertions.ToJson();
         });
     }
 }

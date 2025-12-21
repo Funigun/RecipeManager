@@ -15,7 +15,17 @@ public static class CreateIngredient
 {
     public sealed record NutritionalValueDto(int Calories, double Proteins, double Fats, double Carbohydrates, int IngredientAmount, Guid IngredientUnitId);
 
-    public sealed record Request(string Name, NutritionalValueDto NutritionalValues, Guid? ShoppingListCategoryId, IEnumerable<Guid> Categories, IEnumerable<Guid> Recipes);
+    public sealed record IngredientUnitConvertionDto(Guid UnitToConvertId, double Ratio);
+
+    public sealed record Request(
+        string Name,
+        NutritionalValueDto NutritionalValues,
+        Guid BaseUnit,
+        IEnumerable<IngredientUnitConvertionDto> IngredientUnitConvertions,
+        Guid? ShoppingListCategoryId,
+        IEnumerable<Guid> Categories,
+        IEnumerable<Guid> Recipes
+    );
 
     public sealed record Response(IngredientId Id);
 
@@ -36,6 +46,22 @@ public static class CreateIngredient
                 UnitId unitId = new(ingredientUnitId);
                 return await dbContext.Units.AsNoTracking().AnyAsync(unit => unit.Id == unitId, cancellationToken);
             }).WithMessage("Ingredient unit does not exist");
+
+            RuleFor(x => x.BaseUnit).MustAsync(async (baseUnitId, cancellationToken) =>
+            {
+                UnitId unitId = new(baseUnitId);
+                return await dbContext.Units.AsNoTracking().AnyAsync(unit => unit.Id == unitId, cancellationToken);
+            }).WithMessage("Base unit does not exist");
+
+            RuleForEach(x => x.IngredientUnitConvertions).ChildRules(convertion =>
+            {
+                convertion.RuleFor(c => c.UnitToConvertId).MustAsync(async (unitToConvertId, cancellationToken) =>
+                {
+                    UnitId unitId = new(unitToConvertId);
+                    return await dbContext.Units.AsNoTracking().AnyAsync(unit => unit.Id == unitId, cancellationToken);
+                }).WithMessage("Unit to convert does not exist");
+                convertion.RuleFor(c => c.Ratio).GreaterThan(0).WithMessage("Ratio must be greater than 0");
+            });
 
             When(x => x.ShoppingListCategoryId.HasValue, () =>
             {
@@ -105,6 +131,8 @@ public static class CreateIngredient
         (
             request.Name,
             request.NutritionalValues.ToNutritionalValue(),
+            new UnitId(request.BaseUnit),
+            request.IngredientUnitConvertions.Select(c => new IngredientUnitConvertion { UnitToConvertId = new UnitId(c.UnitToConvertId), Ratio = c.Ratio }),
             request.ShoppingListCategoryId,
             request.Categories.Select(c => new IngredientCategoryId(c)),
             request.Recipes.Select(r => new RecipeId(r))
