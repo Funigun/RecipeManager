@@ -12,5 +12,7 @@ public sealed class NutritionalValuesModel
 
     public int IngredientAmount { get; set; }
 
-    public Guid IngredientUnitId { get; set; }
+    public Guid? IngredientUnitId { get; set; } = Guid.Empty;
+
+    public string? IngredientUnit { get; set; } = string.Empty;
 }

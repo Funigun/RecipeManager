@@ -50,7 +50,8 @@ public sealed class IngredientConfiguration : IEntityTypeConfiguration<Ingredien
         builder.HasOne<Unit>()
                .WithMany()
                .HasForeignKey(ingredient => ingredient.BaseUnit)
-               .IsRequired(true);
+               .IsRequired(false)
+               .OnDelete(DeleteBehavior.ClientSetNull);
 
         builder.OwnsMany(ingredient => ingredient.Categories, categories =>
         {
@@ -60,11 +61,6 @@ public sealed class IngredientConfiguration : IEntityTypeConfiguration<Ingredien
         builder.OwnsMany(ingredient => ingredient.Recipes, recipes =>
         {
             recipes.ToTable("IngredientToRecipe");
-        });
-
-        builder.OwnsMany(ingredient => ingredient.IngredientUnitConvertions, ingredientUnitConvertions =>
-        {
-            ingredientUnitConvertions.ToJson();
         });
     }
 }

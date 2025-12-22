@@ -7,6 +7,9 @@
 
 @inject IUnitService UnitService
 
+@if (primaryUnits.Any())
+{
+   
 <MudForm Model="@UnitModel.Item" Validation="@(validator.ValidateValue)" @bind-IsValid="@isSubmitEnabled" ReadOnly="Mode.IsViewMode()">
     <MudText Typo="Typo.h5" Class="mb-4">Create Unit</MudText>
 
@@ -30,7 +33,7 @@
             }
         </MudSelect>
 
-        <MudSelect T="Guid ?" Label="Primary Unit" Required="false" @bind-Value="UnitModel.Item.PrimaryUnit">
+        <MudSelect T="Guid?" Label="Primary Unit" Required="false" @bind-Value="UnitModel.Item.PrimaryUnit">
             @foreach (var unit in primaryUnits)
             {
                 <MudSelectItem Value="@unit.UnitId">@unit.Name</MudSelectItem>
@@ -59,7 +62,7 @@
     </MudStack>
 
 </MudForm>
-
+}
 
 @code {
     [Parameter]
@@ -77,6 +80,7 @@
     override protected async Task OnInitializedAsync()
     {
         primaryUnits = await UnitService.GetPrimaryUnits();
+        StateHasChanged();
     }
 
     private void GoBack()

@@ -48,10 +48,10 @@ internal static class DatabaseSeeder
 
         IEnumerable<Ingredient> ingredients =
         [
-            Ingredient.Create("Existing Ingredient", new() { IngredientUnit = unitId }, unitId, [], ingredientCategories.ElementAt(1).Id, [ingredientCategories.ElementAt(0).Id], []),
-            Ingredient.Create("Fake ingredient 1", new() { IngredientUnit = unitId }, unitId, [], ingredientCategories.ElementAt(0).Id, [ingredientCategories.ElementAt(1).Id], []),
-            Ingredient.Create("Fake ingredient 2", new() { IngredientUnit = unitId }, unitId, [], ingredientCategories.ElementAt(0).Id, [ingredientCategories.ElementAt(2).Id], []),
-            Ingredient.Create("To Delete", new() { IngredientUnit = unitId }, unitId, [], ingredientCategories.ElementAt(0).Id, [ingredientCategories.ElementAt(3).Id], [])
+            Ingredient.Create("Existing Ingredient", new() { IngredientUnit = unitId }, unitId, new IngredientPackage { PackageUnitId = unitId, PackageSize = 100, PackageSizeUnitId = unitId }, [], ingredientCategories.ElementAt(1).Id, [ingredientCategories.ElementAt(0).Id], []),
+            Ingredient.Create("Fake ingredient 1", new() { IngredientUnit = unitId }, unitId, new IngredientPackage { PackageUnitId = unitId, PackageSize = 100, PackageSizeUnitId = unitId }, [], ingredientCategories.ElementAt(0).Id, [ingredientCategories.ElementAt(1).Id], []),
+            Ingredient.Create("Fake ingredient 2", new() { IngredientUnit = unitId }, unitId, new IngredientPackage { PackageUnitId = unitId, PackageSize = 100, PackageSizeUnitId = unitId }, [], ingredientCategories.ElementAt(0).Id, [ingredientCategories.ElementAt(2).Id], []),
+            Ingredient.Create("To Delete", new() { IngredientUnit = unitId }, unitId, new IngredientPackage { PackageUnitId = unitId, PackageSize = 100, PackageSizeUnitId = unitId }, [], ingredientCategories.ElementAt(0).Id, [ingredientCategories.ElementAt(3).Id], [])
         ];
 
         dbContext.Ingredients.AddRange(ingredients);

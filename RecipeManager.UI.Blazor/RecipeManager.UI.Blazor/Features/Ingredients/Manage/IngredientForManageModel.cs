@@ -10,11 +10,15 @@ public sealed class IngredientForManageModel
 
     public IngredientCategoryForDropdownModel ShoppingListCategory { get; set; } = new();
 
+    public Guid? BaseUnit { get; set; }
+
     public NutritionalValuesModel NutritionalValues { get; set; } = new();
 
     public Collection<IngredientCategoryForDropdownModel> Categories { get; set; } = [];
 
     public Collection<RecipeForDropdownModel> Recipes { get; set; } = [];
+
+    public Collection<IngredientUnitConvertionModel> Convertions { get; set; } = [];
 
     public IngredientForUpdateModel ToUpdateModel()
     {

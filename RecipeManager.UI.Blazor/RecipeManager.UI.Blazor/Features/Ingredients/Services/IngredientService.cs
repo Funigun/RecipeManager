@@ -50,7 +50,7 @@ public sealed class IngredientService(IRecipeApi recipeApi, NavigationManager na
         }
 
         ResponseBody = (await response.Content.ReadFromJsonAsync<ApiResponseBody>(cancellationToken: cancellationToken))!;
-        throw new Exception(JsonSerializer.Serialize(ResponseBody));
+          throw new Exception(JsonSerializer.Serialize(ResponseBody));
     }
 
     public async Task<HateoasResponse<IngredientForManageModel>> GetIngredientById(string id, CancellationToken cancellationToken = default)

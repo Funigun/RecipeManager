@@ -21,10 +21,13 @@ public static class UpdateIngredient
 
     public sealed record IngredientUnitConvertionDto(Guid UnitToConvertId, double Ratio);
 
+    public sealed record IngredientPackageDto(Guid PackageUnitId, int PackageSize, Guid PackageSizeUnitId);
+
     public sealed record IngredientDto(
         string Name,
         NutritionalValueDto NutritionalValues,
         Guid BaseUnit,
+        IngredientPackageDto IngredientPackage,
         IEnumerable<IngredientUnitConvertionDto> IngredientUnitConvertions,
         Guid? ShoppingListCategoryId,
         IEnumerable<Guid> Categories,
@@ -64,6 +67,17 @@ public static class UpdateIngredient
                 UnitId unitId = new(baseUnitId);
                 return await dbContext.Units.AsNoTracking().AnyAsync(unit => unit.Id == unitId, cancellationToken);
             }).WithMessage("Base unit does not exist");
+
+            RuleFor(x => x.IngredientPackage.PackageUnitId)
+                .MustAsync(async (unitId, cancellationToken) => await dbContext.Units.AnyAsync(u => u.Id == new UnitId(unitId), cancellationToken))
+                .WithMessage("Package unit does not exist");
+
+            RuleFor(x => x.IngredientPackage.PackageSize)
+                .GreaterThan(0).WithMessage("Package size must be greater than 0");
+
+            RuleFor(x => x.IngredientPackage.PackageSizeUnitId)
+                .MustAsync(async (unitId, cancellationToken) => await dbContext.Units.AnyAsync(u => u.Id == new UnitId(unitId), cancellationToken))
+                .WithMessage("Package size unit does not exist");
 
             RuleForEach(x => x.IngredientUnitConvertions).ChildRules(convertion =>
             {
@@ -138,6 +152,12 @@ public static class UpdateIngredient
             request.Name,
             request.NutritionalValues.ToNutritionalValue(),
             new UnitId(request.BaseUnit),
+            new IngredientPackage
+            {
+                PackageUnitId = new UnitId(request.IngredientPackage.PackageUnitId),
+                PackageSize = request.IngredientPackage.PackageSize,
+                PackageSizeUnitId = new UnitId(request.IngredientPackage.PackageSizeUnitId)
+            },
             request.IngredientUnitConvertions.Select(c => new IngredientUnitConvertion { UnitToConvertId = new UnitId(c.UnitToConvertId), Ratio = c.Ratio }),
             request.ShoppingListCategoryId,
             request.Categories.Select(c => new IngredientCategoryId(c)),

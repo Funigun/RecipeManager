@@ -13,8 +13,8 @@ using RecipeManager.Api.Persistance;
 namespace RecipeManager.Api.Persistance.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20251221110139_AddBaseUnitAndConversionsToIngredientModel")]
-    partial class AddBaseUnitAndConversionsToIngredientModel
+    [Migration("20251221202031_AddBaseUnitAndUnitConversionsToIngredient")]
+    partial class AddBaseUnitAndUnitConversionsToIngredient
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -107,7 +107,7 @@ namespace RecipeManager.Api.Persistance.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("BaseUnit")
+                    b.Property<Guid?>("BaseUnit")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("CreatedBy")
@@ -186,6 +186,32 @@ namespace RecipeManager.Api.Persistance.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("IngredientCategory", (string)null);
+                });
+
+            modelBuilder.Entity("RecipeManager.Api.Domain.Ingredients.IngredientUnitConvertion", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<Guid>("IngredientId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<double>("Ratio")
+                        .HasColumnType("float");
+
+                    b.Property<Guid>("UnitToConvertId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("IngredientId");
+
+                    b.HasIndex("UnitToConvertId");
+
+                    b.ToTable("IngredientUnitConversion", (string)null);
                 });
 
             modelBuilder.Entity("RecipeManager.Api.Domain.MealPlan.MealPlan", b =>
@@ -449,9 +475,7 @@ namespace RecipeManager.Api.Persistance.Migrations
                 {
                     b.HasOne("RecipeManager.Api.Domain.Units.Unit", null)
                         .WithMany()
-                        .HasForeignKey("BaseUnit")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("BaseUnit");
 
                     b.HasOne("RecipeManager.Api.Domain.Ingredients.IngredientCategory", null)
                         .WithMany()
@@ -501,32 +525,24 @@ namespace RecipeManager.Api.Persistance.Migrations
                                 .HasForeignKey("IngredientId");
                         });
 
-                    b.OwnsMany("RecipeManager.Api.Domain.Ingredients.IngredientUnitConvertion", "IngredientUnitConvertions", b1 =>
-                        {
-                            b1.Property<Guid>("IngredientId");
-
-                            b1.Property<int>("__synthesizedOrdinal")
-                                .ValueGeneratedOnAddOrUpdate();
-
-                            b1.Property<double>("Ratio");
-
-                            b1.Property<Guid>("UnitToConvertId");
-
-                            b1.HasKey("IngredientId", "__synthesizedOrdinal");
-
-                            b1.ToTable("Ingredient");
-
-                            b1.ToJson("IngredientUnitConvertions");
-
-                            b1.WithOwner()
-                                .HasForeignKey("IngredientId");
-                        });
-
                     b.Navigation("Categories");
 
-                    b.Navigation("IngredientUnitConvertions");
-
                     b.Navigation("Recipes");
+                });
+
+            modelBuilder.Entity("RecipeManager.Api.Domain.Ingredients.IngredientUnitConvertion", b =>
+                {
+                    b.HasOne("RecipeManager.Api.Domain.Ingredients.Ingredient", null)
+                        .WithMany("IngredientUnitConvertions")
+                        .HasForeignKey("IngredientId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("RecipeManager.Api.Domain.Units.Unit", null)
+                        .WithMany()
+                        .HasForeignKey("UnitToConvertId")
+                        .OnDelete(DeleteBehavior.ClientCascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("RecipeManager.Api.Domain.MealPlan.MealPlan", b =>
@@ -717,6 +733,11 @@ namespace RecipeManager.Api.Persistance.Migrations
             modelBuilder.Entity("RecipeManager.Api.Domain.Cookbooks.CookbookCategory", b =>
                 {
                     b.Navigation("Subcategories");
+                });
+
+            modelBuilder.Entity("RecipeManager.Api.Domain.Ingredients.Ingredient", b =>
+                {
+                    b.Navigation("IngredientUnitConvertions");
                 });
 
             modelBuilder.Entity("RecipeManager.Api.Domain.Recipes.Recipe", b =>

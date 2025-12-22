@@ -24,8 +24,9 @@ public sealed class UpdateIngredientTests : BaseIntegrationTest
         Guid ingredientCategoryId = (await DbContext.IngredientCategories.AsNoTracking().FirstAsync(category => category.Name == "Existing Category", TestContext.Current.CancellationToken)).Id.Value;
         Guid unitId = (await DbContext.Units.AsNoTracking().FirstAsync(unit => unit.Name == "Existing Unit", TestContext.Current.CancellationToken)).Id.Value;
 
+        UpdateIngredient.IngredientPackageDto packageDto = new(unitId, 100, unitId);
         UpdateIngredient.NutritionalValueDto nutritionalValue = new(100, 1, 1, 1, 1, unitId);
-        UpdateIngredient.IngredientDto request = new("Update Name", nutritionalValue, unitId, [], ingredientCategoryId, [], []);
+        UpdateIngredient.IngredientDto request = new("Update Name", nutritionalValue, unitId, packageDto, [], ingredientCategoryId, [], []);
         using StringContent content = new(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json");
 
         // Act

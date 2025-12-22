@@ -29,9 +29,11 @@ public static class GetIngredientById
 
     public sealed record IngredientUnitConvertionDto(Guid UnitToConvertId, double Ratio);
 
-    public sealed record IngredientDto(Guid Id, string Name, NutritionalValueDto NutritionalValues, Guid BaseUnit, IEnumerable<IngredientUnitConvertionDto> IngredientUnitConvertions, IngredientCategoryDto ShoppingListCategory, IEnumerable<IngredientRecipeDto> Recipes, IEnumerable<IngredientCategoryDto> Categories);
+    public sealed record IngredientPackageDto(Guid PackageUnitId, int PackageSize, Guid PackageSizeUnitId);
 
-    public sealed record Response(Guid Id, string Name, NutritionalValueDto NutritionalValues, Guid BaseUnit, IEnumerable<IngredientUnitConvertionDto> IngredientUnitConvertions, IngredientCategoryDto ShoppingListCategory, IEnumerable<HateoasResponse<IngredientRecipeDto>> Recipes, IEnumerable<IngredientCategoryDto> Categories);
+    public sealed record IngredientDto(Guid Id, string Name, NutritionalValueDto NutritionalValues, Guid BaseUnit, IngredientPackageDto IngredientPackage, IEnumerable<IngredientUnitConvertionDto> IngredientUnitConvertions, IngredientCategoryDto ShoppingListCategory, IEnumerable<IngredientRecipeDto> Recipes, IEnumerable<IngredientCategoryDto> Categories);
+
+    public sealed record Response(Guid Id, string Name, NutritionalValueDto NutritionalValues, Guid BaseUnit, IngredientPackageDto IngredientPackage, IEnumerable<IngredientUnitConvertionDto> IngredientUnitConvertions, IngredientCategoryDto ShoppingListCategory, IEnumerable<HateoasResponse<IngredientRecipeDto>> Recipes, IEnumerable<IngredientCategoryDto> Categories);
 
     [GroupEndpoint("Ingredients")]
     public sealed class Endpoint : IEndpoint
@@ -101,7 +103,12 @@ public static class GetIngredientById
             ingredient.Id.Value,
             ingredient.Name,
             MapToNutritionalValuesDto(ingredient.NutritionalValue),
-            ingredient.BaseUnit.Value,
+            ingredient.BaseUnit!.Value,
+            new IngredientPackageDto(
+                ingredient.IngredientPackage.PackageUnitId.Value,
+                ingredient.IngredientPackage.PackageSize,
+                ingredient.IngredientPackage.PackageSizeUnitId.Value
+            ),
             ingredient.IngredientUnitConvertions.Select(c => new IngredientUnitConvertionDto(c.UnitToConvertId.Value, c.Ratio)),
             shoppingListCategory ?? default!,
             recipes,
@@ -126,6 +133,7 @@ public static class GetIngredientById
             ingredientDto.Name,
             ingredientDto.NutritionalValues,
             ingredientDto.BaseUnit,
+            ingredientDto.IngredientPackage,
             ingredientDto.IngredientUnitConvertions,
             ingredientDto.ShoppingListCategory,
             recipesBuilder.Build().Items,

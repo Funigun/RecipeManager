@@ -32,5 +32,7 @@ public sealed class GetIngredientByIdTests : BaseIntegrationTest
         Assert.NotNull(ingredientResponse);
         Assert.Equal(System.Net.HttpStatusCode.OK, response.StatusCode);
         Assert.Equal(ingredientId, ingredientResponse.Item.Id);
+        Assert.NotNull(ingredientResponse.Item.IngredientPackage);
+        Assert.True(ingredientResponse.Item.IngredientPackage.PackageSize > 0);
     }
 }

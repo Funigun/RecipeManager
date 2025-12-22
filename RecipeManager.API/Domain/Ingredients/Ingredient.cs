@@ -17,9 +17,11 @@ public sealed class Ingredient : AuditableEntity, IEntity<IngredientId>
 
     public NutritionalValue NutritionalValue { get; set; } = new();
 
-    public UnitId BaseUnit { get; set; } = default!;
+    public UnitId? BaseUnit { get; set; }
 
     public IngredientCategoryId? ShoppingListCategoryId { get; set; }
+
+    public IngredientPackage IngredientPackage { get; set; } = default!;
 
     public IReadOnlyList<IngredientCategoryId> Categories => _categories.ToList();
 
@@ -31,7 +33,7 @@ public sealed class Ingredient : AuditableEntity, IEntity<IngredientId>
     {
     }
 
-    public static Ingredient Create(string name, NutritionalValue nutritionalValue, UnitId baseUnit, IEnumerable<IngredientUnitConvertion> ingredientUnitConvertions, IngredientCategoryId? ingredientCategoryId, IEnumerable<IngredientCategoryId> categoryIds, IEnumerable<RecipeId> recipeIds)
+    public static Ingredient Create(string name, NutritionalValue nutritionalValue, UnitId? baseUnit, IngredientPackage ingredientPackage, IEnumerable<IngredientUnitConvertion> ingredientUnitConvertions, IngredientCategoryId? ingredientCategoryId, IEnumerable<IngredientCategoryId> categoryIds, IEnumerable<RecipeId> recipeIds)
     {
         return new()
         {
@@ -39,13 +41,14 @@ public sealed class Ingredient : AuditableEntity, IEntity<IngredientId>
             ShoppingListCategoryId = ingredientCategoryId,
             NutritionalValue = nutritionalValue,
             BaseUnit = baseUnit,
+            IngredientPackage = ingredientPackage,
             _ingredientUnitConvertions = ingredientUnitConvertions.ToList(),
             _categories = categoryIds.ToList(),
             _recipes = recipeIds.ToList()
         };
     }
 
-    public void Update(string name, NutritionalValue nutritionalValue, UnitId baseUnit, IEnumerable<IngredientUnitConvertion> ingredientUnitConvertions, IngredientCategoryId? ingredientCategoryId, IEnumerable<IngredientCategoryId> categoryIds, IEnumerable<RecipeId> recipeIds)
+    public void Update(string name, NutritionalValue nutritionalValue, UnitId? baseUnit, IngredientPackage ingredientPackage, IEnumerable<IngredientUnitConvertion> ingredientUnitConvertions, IngredientCategoryId? ingredientCategoryId, IEnumerable<IngredientCategoryId> categoryIds, IEnumerable<RecipeId> recipeIds)
     {
         Name = name;
         ShoppingListCategoryId = ingredientCategoryId;
@@ -56,6 +59,7 @@ public sealed class Ingredient : AuditableEntity, IEntity<IngredientId>
         NutritionalValue.IngredientAmount = nutritionalValue.IngredientAmount;
         NutritionalValue.IngredientUnit = nutritionalValue.IngredientUnit;
         BaseUnit = baseUnit;
+        IngredientPackage = ingredientPackage;
         _ingredientUnitConvertions = ingredientUnitConvertions.ToList();
         _categories = categoryIds.ToList();
         _recipes = recipeIds.ToList();

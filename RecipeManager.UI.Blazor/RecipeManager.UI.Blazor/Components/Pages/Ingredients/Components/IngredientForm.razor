@@ -3,6 +3,7 @@
 @using RecipeManager.UI.Blazor.Components.Extensions
 @using RecipeManager.UI.Blazor.Features.IngredientCategories.Models
 @using RecipeManager.UI.Blazor.Features.IngredientCategories.Services
+@using RecipeManager.UI.Blazor.Features.Ingredients
 @using RecipeManager.UI.Blazor.Features.Ingredients.Manage
 @using RecipeManager.UI.Blazor.Features.Ingredients.Services
 @using RecipeManager.UI.Blazor.Features.Recipes
@@ -15,6 +16,8 @@
 @inject IRecipeService RecipeService;
 @inject IUnitService UnitService;
 
+@if (_availableBaseUnits.Any() && _availableUnits.Any())
+{
 <MudForm Model="@IngredientModel" Validation="@(validator.ValidateValue)" @bind-IsValid="@isSubmitEnabled">
     <MudText Typo="Typo.h5" Class="mb-4" Style="text-align: center">@formTitle</MudText>
 
@@ -25,11 +28,56 @@
             <MudIconButton Icon="@Icons.Material.Filled.FileUpload" Color="Color.Primary" Style="margin-top: 15px;" />
         </MudStack>
 
-        <MudTooltip Text="Category where ingredient will be placed while creating shopping list, however if this is not specified then first assigned category will be used.">
-            <MudAutocomplete T="IngredientCategoryForDropdownModel" Label="Shoping List Category" ResetValueOnEmptyText="true" ShowProgressIndicator="true"
-                             SearchFunc="SearchCategories" ToStringFunc="@(e => e == null ? null : e.Name)" @bind-Value="IngredientModel.Item.ShoppingListCategory"
-                             ReadOnly="@Mode.IsViewMode()" />
-        </MudTooltip>
+        <MudStack Row="true" Style="align-items: end;">
+            <MudTooltip Text="Category where ingredient will be placed while creating shopping list, however if this is not specified then first assigned category will be used.">
+                <MudAutocomplete T="IngredientCategoryForDropdownModel" Label="Shoping List Category" ResetValueOnEmptyText="true" ShowProgressIndicator="true"
+                                 SearchFunc="SearchCategories" ToStringFunc="@(e => e == null ? null : e.Name)" @bind-Value="IngredientModel.Item.ShoppingListCategory"
+                                 ReadOnly="@Mode.IsViewMode()" />
+            </MudTooltip>
+
+            <MudTooltip Text="Base unit ingredient will be used during shopping list calculations, it should refer to most common measurement for specific ingredient">
+                <MudSelect T="Guid?" @bind-Value="IngredientModel.Item.BaseUnit" Label="Base Unit" Required="true" Style="width: 125px;">
+                    @foreach (var unit in _availableBaseUnits)
+                    {
+                        <MudSelectItem Value="@unit.UnitId">@unit.Name</MudSelectItem>
+                    }
+                </MudSelect>
+            </MudTooltip>
+        </MudStack>
+        
+        <MudStack Row="true">
+            <MudText Typo="Typo.subtitle1" Style="align-content: center; width: calc(100% - 60px)">Conversion table</MudText>
+            <MudIconButton Icon="@toggleConversionTableIcon" Color="Color.Primary" Edge="Edge.End" OnClick="ToggleConversionTable" />
+        </MudStack>
+
+        <MudCollapse Expanded="@showConversionTable">
+            <MudStack Row="true" Style="align-items: end;">
+                <MudSelect T="Guid" @bind-Value="selectedUnitToConvert.UnitToConvertId" Label="Unit to convert" Required="true" Style="width: 125px;">
+                    @foreach (var unit in _availableUnits)
+                    {
+                        <MudSelectItem Value="@unit.Id">@unit.Name</MudSelectItem>
+                    }
+                </MudSelect>
+
+                <MudTextField T="double" Label="Conversion ratio" @bind-value="selectedUnitToConvert.Ratio" for="@(() => selectedUnitToConvert.Ratio)" Typo="Typo.h5" Style="width: 125px;" />
+                <MudIconButton Icon="@Icons.Material.Filled.Add" Color="Color.Primary" Edge="Edge.End" OnClick="AddUnitConversion" Disabled="@CanAddConversionUnit()" />
+            </MudStack>
+
+            <MudTable T="IngredientUnitConvertionModel" Items="IngredientModel.Item.Convertions" Style="margin-top: 15px;">
+                <HeaderContent>
+                    <MudTh>Unit Name</MudTh>
+                    <MudTh>Ratio</MudTh>
+                    <MudTh>Actions</MudTh>
+                </HeaderContent>
+                <RowTemplate>
+                    <MudTd DataLabel="Unit Name">@context.UnitToConvert</MudTd>
+                    <MudTd DataLabel="Ratio">@context.Ratio</MudTd>
+                    <MudTd DataLabel="Actions">
+                            <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Error" Edge="Edge.End" OnClick="@(() => DeleteUnitConversion(@context))" />
+                    </MudTd>
+                </RowTemplate>
+            </MudTable>
+        </MudCollapse>
         
         <MudStack Row="true">
             <MudText Typo="Typo.subtitle1" Style="align-content: center; width: calc(100% - 60px)">Nutritional Values</MudText>
@@ -39,8 +87,8 @@
         <MudCollapse Expanded="@showNutritionalValues">
             <MudStack Row="true">
                 <MudTextField Label="Amount" For="@(() => IngredientModel.Item.NutritionalValues.IngredientAmount)" @bind-Value="IngredientModel.Item.NutritionalValues.IngredientAmount" Required="true" />
-                <MudSelect T="Guid" @bind-Value="IngredientModel.Item.NutritionalValues.IngredientUnitId" Required="true" Style="align-self: end; width: 125px;">
-                    @foreach (var unit in _availableUnits)
+                <MudSelect T="Guid?" @bind-Value="IngredientModel.Item.NutritionalValues.IngredientUnitId" Label="Nutritional Units" Required="true" Style="align-self: end; width: 125px;">
+                    @foreach (var unit in _availableBaseUnits)
                     {
                         <MudSelectItem Value="@unit.UnitId">@unit.Name</MudSelectItem>
                     }
@@ -126,6 +174,7 @@
         <CustomValidationSummary ErrorMessages="@errorMessages" />
     </MudStack>
 </MudForm>
+}
 
 @code {
     [Parameter]
@@ -140,7 +189,8 @@
     private string toggleNutritionalValuesIcon = Icons.Material.Filled.KeyboardArrowDown;
     private bool showNutritionalValues = false;
 
-    private IEnumerable<PrimaryUnitDto> _availableUnits = [];
+    private IEnumerable<PrimaryUnitDto> _availableBaseUnits = [];
+    private IEnumerable<UnitForDropdownModel> _availableUnits = [];
 
     private IEnumerable<IngredientCategoryForDropdownModel> categories = [];
     private IngredientCategoryForDropdownModel selectedCategory = new();
@@ -153,12 +203,18 @@
     private string toggleRecipesIcon = Icons.Material.Filled.KeyboardArrowDown;     
     private bool isAddRecipeDisabled = true;
 
+    private IngredientUnitConvertionModel selectedUnitToConvert = new();
+    private string toggleConversionTableIcon = Icons.Material.Filled.KeyboardArrowDown;
+    private bool showConversionTable = false;
+
     private bool isSubmitEnabled = false;
     private IEnumerable<string> errorMessages = [];
 
     protected override async Task OnInitializedAsync()
     {
-        _availableUnits = await UnitService.GetPrimaryUnits();
+        _availableBaseUnits = await UnitService.GetPrimaryUnits();
+        _availableUnits = await UnitService.GetUnitsForDropdown();
+        StateHasChanged();
     }
 
     private void GoBack()
@@ -187,6 +243,37 @@
         }
 
         return categories;
+    }
+
+    private bool CanAddConversionUnit()
+    {
+        return selectedUnitToConvert.UnitToConvertId == Guid.Empty || selectedUnitToConvert.Ratio <= 0 ||
+              (selectedUnitToConvert.UnitToConvertId != Guid.Empty && (IngredientModel.Item.Convertions.Any(c => c.UnitToConvertId == selectedUnitToConvert.UnitToConvertId) || selectedUnitToConvert.UnitToConvertId == IngredientModel.Item.BaseUnit));
+    }
+
+    private void ToggleConversionTable()
+    {
+        showConversionTable = !showConversionTable;
+        toggleConversionTableIcon = showConversionTable ? Icons.Material.Filled.KeyboardArrowUp : Icons.Material.Filled.KeyboardArrowDown;
+    }
+
+    private void AddUnitConversion()
+    {
+        IngredientUnitConvertionModel unitConversionModel = new() 
+        { 
+            UnitToConvertId = selectedUnitToConvert.UnitToConvertId,
+            UnitToConvert = _availableUnits.First(unit => unit.Id == selectedUnitToConvert.UnitToConvertId).Name,
+            Ratio = selectedUnitToConvert.Ratio
+        };
+
+        IngredientModel.Item.Convertions.Add(unitConversionModel);
+        StateHasChanged();
+    }
+
+    private void DeleteUnitConversion(IngredientUnitConvertionModel unitToDelete)
+    {
+        IngredientModel.Item.Convertions.Remove(unitToDelete);
+        StateHasChanged();
     }
 
     private void ToggleNutritionalValues()
