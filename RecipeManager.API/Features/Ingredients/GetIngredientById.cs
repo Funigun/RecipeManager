@@ -74,6 +74,8 @@ public static class GetIngredientById
         return await dbContext.Ingredients.AsNoTracking()
                                           .Include(i => i.Categories)
                                           .Include(i => i.Recipes)
+                                          .Include(i => i.IngredientPackage)
+                                          .AsSplitQuery()
                                           .FirstOrDefaultAsync(i => i.Id == ingredientId, cancellationToken);
     }
 

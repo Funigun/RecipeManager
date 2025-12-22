@@ -44,6 +44,31 @@
                 </MudSelect>
             </MudTooltip>
         </MudStack>
+
+        <MudStack Row="true">
+            <MudText Typo="Typo.subtitle1" Style="align-content: center; width: calc(100% - 60px)">Package details</MudText>
+            <MudIconButton Icon="@togglePackageDetailsIcon" Color="Color.Primary" Edge="Edge.End" OnClick="TogglePackageDetails" />
+        </MudStack>
+
+        <MudCollapse Expanded="@showPackageDetails">
+                <MudStack Row="true" Style="align-items: end;" Spacing="5">
+                    <MudSelect T="Guid" @bind-Value="IngredientModel.Item.IngredientPackage.PackageUnitId" Label="Package unit" Required="true">
+                        @foreach (var unit in _availableUnits)
+                        {
+                            <MudSelectItem Value="@unit.Id">@unit.Name</MudSelectItem>
+                        }
+                    </MudSelect>
+
+                    <MudTextField T="int" Label="Package size" @bind-value="IngredientModel.Item.IngredientPackage.PackageSize" for="@(() => IngredientModel.Item.IngredientPackage.PackageSize)" Typo="Typo.h5" Style="width: 125px;" />
+
+                    <MudSelect T="Guid" @bind-Value="IngredientModel.Item.IngredientPackage.PackageSizeUnitId" Label="Package size unit" Required="true" Style="width: 125px;">
+                        @foreach (var unit in _availableUnits)
+                        {
+                            <MudSelectItem Value="@unit.Id">@unit.Name</MudSelectItem>
+                        }
+                    </MudSelect>
+            </MudStack>
+        </MudCollapse>
         
         <MudStack Row="true">
             <MudText Typo="Typo.subtitle1" Style="align-content: center; width: calc(100% - 60px)">Conversion table</MudText>
@@ -207,6 +232,9 @@
     private string toggleConversionTableIcon = Icons.Material.Filled.KeyboardArrowDown;
     private bool showConversionTable = false;
 
+    private string togglePackageDetailsIcon = Icons.Material.Filled.KeyboardArrowDown;
+    private bool showPackageDetails = false;
+
     private bool isSubmitEnabled = false;
     private IEnumerable<string> errorMessages = [];
 
@@ -233,6 +261,12 @@
             await IngredientService.UpdateIngredient(IngredientModel.Links.First(l => l.Rel == HateoasConstants.Update).Href, IngredientModel.Item.ToUpdateModel());
         }
         errorMessages = IngredientService.ResponseBody.GetAllErrors();
+    }
+
+    private void TogglePackageDetails()
+    {
+        showPackageDetails = !showPackageDetails;
+        togglePackageDetailsIcon = showPackageDetails ? Icons.Material.Filled.KeyboardArrowUp : Icons.Material.Filled.KeyboardArrowDown;
     }
 
     private async Task<IEnumerable<IngredientCategoryForDropdownModel>> SearchCategories(string value, CancellationToken cancellationToken)

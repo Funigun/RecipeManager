@@ -14,6 +14,8 @@ public sealed class IngredientForManageModel
 
     public NutritionalValuesModel NutritionalValues { get; set; } = new();
 
+    public IngredientPackageModel IngredientPackage { get; set; } = new();
+
     public Collection<IngredientCategoryForDropdownModel> Categories { get; set; } = [];
 
     public Collection<RecipeForDropdownModel> Recipes { get; set; } = [];

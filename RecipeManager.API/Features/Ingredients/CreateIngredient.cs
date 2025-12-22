@@ -14,6 +14,7 @@ namespace RecipeManager.Api.Features.Ingredients;
 public static class CreateIngredient
 {
     public sealed record NutritionalValueDto(int Calories, double Proteins, double Fats, double Carbohydrates, int IngredientAmount, Guid IngredientUnitId);
+
     public sealed record IngredientUnitConvertionDto(Guid UnitToConvertId, double Ratio);
 
     public sealed record IngredientPackageDto(Guid PackageUnitId, int PackageSize, Guid PackageSizeUnitId);
