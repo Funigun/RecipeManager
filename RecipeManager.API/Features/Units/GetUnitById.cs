@@ -16,7 +16,7 @@ namespace RecipeManager.Api.Features.Units;
 
 public static class GetUnitById
 {
-    public sealed record Response(Guid UnitId, string Name, string? ShortName, int Group, Guid? PrimaryUnit, int ConversionFactor);
+    public sealed record Response(Guid UnitId, string Name, string? ShortName, string PluralName, string? PluralShortName, int Group, bool IsBaseUnit, Guid? PrimaryUnit, int ConversionFactor);
 
     [GroupEndpoint("Units")]
     public class Enpoint : IEndpoint
@@ -56,7 +56,10 @@ public static class GetUnitById
             unit.Id.Value,
             unit.Name,
             unit.ShortName,
+            unit.PluralName,
+            unit.PluralShortName,
             (int)unit.Group,
+            unit.IsBaseUnit,
             unit.PrimaryUnit?.Value ?? null,
             unit.ConversionFactor
         );

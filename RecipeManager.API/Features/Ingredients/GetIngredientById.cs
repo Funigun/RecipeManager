@@ -3,7 +3,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RecipeManager.Api.Application.Abstractions;
 using RecipeManager.Api.Application.Exceptions;
+using RecipeManager.Api.Domain.Common;
 using RecipeManager.Api.Domain.Ingredients;
+using RecipeManager.Api.Domain.Units;
 using RecipeManager.Api.Shared.Contracts.Authorization;
 using RecipeManager.Api.Shared.Endpoint;
 using RecipeManager.Api.Shared.Hateoas.Builder;
@@ -19,13 +21,19 @@ public static class GetIngredientById
     {
     }
 
+    public sealed record NutritionalValueDto(int Calories, double Proteins, double Fats, double Carbohydrates, int IngredientAmount, Guid IngredientUnitId);
+
     public sealed record IngredientRecipeDto(Guid Id, string Title);
 
     public sealed record IngredientCategoryDto(Guid Id, string Name);
 
-    public sealed record IngredientDto(Guid Id, string Name, IEnumerable<IngredientRecipeDto> Recipes, IEnumerable<IngredientCategoryDto> Categories);
+    public sealed record IngredientUnitConvertionDto(Guid UnitToConvertId, double Ratio);
 
-    public sealed record Response(Guid Id, string Name, IEnumerable<HateoasResponse<IngredientRecipeDto>> Recipes, IEnumerable<IngredientCategoryDto> Categories);
+    public sealed record IngredientPackageDto(Guid PackageUnitId, int PackageSize, Guid PackageSizeUnitId);
+
+    public sealed record IngredientDto(Guid Id, string Name, NutritionalValueDto NutritionalValues, Guid BaseUnit, IngredientPackageDto IngredientPackage, IEnumerable<IngredientUnitConvertionDto> IngredientUnitConvertions, IngredientCategoryDto ShoppingListCategory, IEnumerable<IngredientRecipeDto> Recipes, IEnumerable<IngredientCategoryDto> Categories);
+
+    public sealed record Response(Guid Id, string Name, NutritionalValueDto NutritionalValues, Guid BaseUnit, IngredientPackageDto IngredientPackage, IEnumerable<IngredientUnitConvertionDto> IngredientUnitConvertions, IngredientCategoryDto ShoppingListCategory, IEnumerable<HateoasResponse<IngredientRecipeDto>> Recipes, IEnumerable<IngredientCategoryDto> Categories);
 
     [GroupEndpoint("Ingredients")]
     public sealed class Endpoint : IEndpoint
@@ -48,7 +56,12 @@ public static class GetIngredientById
         IEnumerable<IngredientRecipeDto> recipes = await GetIngredientRecipes(dbContext, ingredient, cancellationToken);
         IEnumerable<IngredientCategoryDto> categories = await GetIngredientCategories(dbContext, ingredient, cancellationToken);
 
-        IngredientDto ingredientDto = MapToIngredientDto(ingredient, recipes, categories);
+        IngredientDto ingredientDto = MapToIngredientDto(
+            ingredient,
+            categories.FirstOrDefault(c => c.Id == ingredient.ShoppingListCategoryId?.Value),
+            recipes,
+            categories.Where(c => c.Id != ingredient.ShoppingListCategoryId?.Value)
+        );
 
         bool isIngredientCreator = ingredient.CreatedBy == currentUser.Id;
         HateoasResponse<Response> hateoasResponse = MapToHateoasResponse(ingredientDto, hateoasBuilderFactory, isIngredientCreator);
@@ -61,6 +74,8 @@ public static class GetIngredientById
         return await dbContext.Ingredients.AsNoTracking()
                                           .Include(i => i.Categories)
                                           .Include(i => i.Recipes)
+                                          .Include(i => i.IngredientPackage)
+                                          .AsSplitQuery()
                                           .FirstOrDefaultAsync(i => i.Id == ingredientId, cancellationToken);
     }
 
@@ -76,17 +91,36 @@ public static class GetIngredientById
 
     private static async Task<IEnumerable<IngredientCategoryDto>> GetIngredientCategories(IAppDbContext dbContext, Ingredient ingredient, CancellationToken cancellationToken)
     {
-        return ingredient.Categories.Any()
+        return ingredient.Categories.Any() || ingredient.ShoppingListCategoryId is not null
              ? await dbContext.IngredientCategories.AsNoTracking()
-                                      .Where(c => ingredient.Categories.Contains(c.Id))
+                                      .Where(c => ingredient.Categories.Contains(c.Id) || c.Id == ingredient.ShoppingListCategoryId)
                                       .Select(r => new IngredientCategoryDto(r.Id, r.Name))
                                       .ToListAsync(cancellationToken)
              : [];
     }
 
-    private static IngredientDto MapToIngredientDto(Ingredient ingredient, IEnumerable<IngredientRecipeDto> recipes, IEnumerable<IngredientCategoryDto> categories)
+    private static IngredientDto MapToIngredientDto(Ingredient ingredient, IngredientCategoryDto? shoppingListCategory, IEnumerable<IngredientRecipeDto> recipes, IEnumerable<IngredientCategoryDto> categories)
     {
-        return new IngredientDto(ingredient.Id.Value, ingredient.Name, recipes, categories);
+        return new IngredientDto(
+            ingredient.Id.Value,
+            ingredient.Name,
+            MapToNutritionalValuesDto(ingredient.NutritionalValue),
+            ingredient.BaseUnit!.Value,
+            new IngredientPackageDto(
+                ingredient.IngredientPackage.PackageUnitId.Value,
+                ingredient.IngredientPackage.PackageSize,
+                ingredient.IngredientPackage.PackageSizeUnitId.Value
+            ),
+            ingredient.IngredientUnitConvertions.Select(c => new IngredientUnitConvertionDto(c.UnitToConvertId.Value, c.Ratio)),
+            shoppingListCategory ?? default!,
+            recipes,
+            categories
+        );
+    }
+
+    private static NutritionalValueDto MapToNutritionalValuesDto(NutritionalValue nutritionalValue)
+    {
+        return new NutritionalValueDto(nutritionalValue.Calories, nutritionalValue.Proteins, nutritionalValue.Fats, nutritionalValue.Carbohydrates, nutritionalValue.IngredientAmount, nutritionalValue.IngredientUnit);
     }
 
     private static HateoasResponse<Response> MapToHateoasResponse(IngredientDto ingredientDto, IHateoasBuilderFactory hateoasBuilderFactory, bool isIngredientCreator)
@@ -96,13 +130,23 @@ public static class GetIngredientById
         recipesBuilder.WithCollectionLink()
                       .WithGet(LinkOptions.Create("GetRecipeById", HateoasRelConstants.Self, true), recipe => new { recipeId = recipe.Id });
 
-        Response response = new(ingredientDto.Id, ingredientDto.Name, recipesBuilder.Build().Items, ingredientDto.Categories);
+        Response response = new(
+            ingredientDto.Id,
+            ingredientDto.Name,
+            ingredientDto.NutritionalValues,
+            ingredientDto.BaseUnit,
+            ingredientDto.IngredientPackage,
+            ingredientDto.IngredientUnitConvertions,
+            ingredientDto.ShoppingListCategory,
+            recipesBuilder.Build().Items,
+            ingredientDto.Categories
+        );
 
         HateoasResponseBuilder<Response> responseBuilder = hateoasBuilderFactory.ForItem(response);
 
         responseBuilder.AddGet(LinkOptions.Create("GetIngredientById", HateoasRelConstants.Self, true), new { ingredientId = ingredientDto.Id })
                        .AddPut(LinkOptions.Create("UpdateIngredient", HateoasRelConstants.Update, isIngredientCreator), new { ingredientId = ingredientDto.Id })
-                       .AddDelete(LinkOptions.Create("UpdateIngredient", HateoasRelConstants.Delete, isIngredientCreator), new { ingredientId = ingredientDto.Id });
+                       .AddDelete(LinkOptions.Create("DeleteIngredient", HateoasRelConstants.Delete, isIngredientCreator), new { ingredientId = ingredientDto.Id });
 
         return responseBuilder.Build();
     }

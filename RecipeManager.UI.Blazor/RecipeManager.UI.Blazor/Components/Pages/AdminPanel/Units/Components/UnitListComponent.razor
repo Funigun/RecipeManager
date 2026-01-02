@@ -1,0 +1,65 @@
+﻿@using RecipeManager.UI.Blazor.Brokers.HateoasModel
+@using RecipeManager.UI.Blazor.Components.Common
+@using RecipeManager.UI.Blazor.Components.Common.DialogMessage
+@using RecipeManager.UI.Blazor.Features.Units.GetUnits
+@using RecipeManager.UI.Blazor.Features.Units.Services
+@using RecipeManager.UI.Blazor.Features.Units.UpdateUnit
+
+@inject ISnackbar Snackbar
+@inject IUnitService UnitService
+@inject NavigationManager NavigationManager
+@inject IDialogMessageService DialogService
+
+
+<MudTable T="HateoasResponse<UnitModel>" Items="Items.Items" Loading="ShowLoadingBar" LoadingProgressColor="Color.Info">
+    <HeaderContent>
+        <MudTh>Name</MudTh>
+        <MudTh>Plural Name</MudTh>
+        <MudTh>Short Name</MudTh>
+        <MudTh>Plural Short Name</MudTh>
+        <MudTh>Group</MudTh>
+        <MudTh>Primary Unit</MudTh>
+        <MudTh>Conversion Factor</MudTh>
+        <MudTh>Actions</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="Name">@context.Item.Name</MudTd>
+        <MudTd DataLabel="Plural Name">@context.Item.PluralName</MudTd>
+        <MudTd DataLabel="Short Name">@context.Item.ShortName</MudTd>
+        <MudTd DataLabel="Plural Short Name">@context.Item.PluralShortName</MudTd>
+        <MudTd DataLabel="Group">@context.Item.Group</MudTd>
+        <MudTd DataLabel="Primary Unit">@context.Item.PrimaryUnit?.Name</MudTd>
+        <MudTd DataLabel="Conversion Factor">@(GetConversionFactorDisplay(context.Item))</MudTd>
+        <MudTd DataLabel="Actions">
+            <MudIconButton Disabled="@(!context.Links.Any(link => link.Rel == HateoasConstants.Update))" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Small" Icon="@Icons.Material.Filled.Edit" OnClick="() => UpdateUnit(context)"></MudIconButton>
+            <MudIconButton Disabled="@(!context.Links.Any(link => link.Rel == HateoasConstants.Delete))" Variant="Variant.Filled" Color="Color.Error" Size="Size.Small" Icon="@Icons.Material.Filled.Delete" OnClick="() => DeleteUnit(context)"></MudIconButton>
+        </MudTd>
+    </RowTemplate>
+</MudTable>
+
+@code {
+    [Parameter]
+    public HateoasCollectionResponse<UnitModel> Items { get; set; } = new();
+
+    [Parameter]
+    public bool ShowLoadingBar { get; set; } = true;
+
+    private async Task DeleteUnit(HateoasResponse<UnitModel> selectedItem)
+    {
+        if (await DialogService.ShowDeleteConfirmationMessage())
+        {
+            await UnitService.DeleteUnit(selectedItem.Links.First(link => link.Rel == HateoasConstants.Delete).Href);
+        }
+    }
+
+    private Task UpdateUnit(HateoasResponse<UnitModel> selectedItem)
+    {
+        string updateLink = selectedItem.Links.First(link => link.Rel == HateoasConstants.Update).Href;
+
+        UnitService.OpenUpdateUnitPage(selectedItem.Item.UnitId);
+
+        return Task.CompletedTask;
+    }
+
+    private string GetConversionFactorDisplay(UnitModel model) => model.PrimaryUnit is not null ? model.PrimaryUnit.ConversionFactory.ToString() : "";
+}

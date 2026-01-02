@@ -1,8 +1,7 @@
 ﻿using RecipeManager.UI.Blazor.Brokers.HateoasModel;
 using RecipeManager.UI.Blazor.Components.Common;
-using RecipeManager.UI.Blazor.Features.Ingredients.CreateIngredient;
 using RecipeManager.UI.Blazor.Features.Ingredients.GetIngredients;
-using RecipeManager.UI.Blazor.Features.Ingredients.UpdateIngredient;
+using RecipeManager.UI.Blazor.Features.Ingredients.Manage;
 
 namespace RecipeManager.UI.Blazor.Features.Ingredients.Services;
 
@@ -17,6 +16,8 @@ public interface IIngredientService
     Task<HateoasResponse<IngredientForManageModel>> GetIngredientById(string id, CancellationToken cancellationToken = default);
 
     Task<IEnumerable<IngredientForDropdownModel>> GetIngredientsForDropdownModel(string ingredientName, CancellationToken cancellationToken = default);
+
+    Task<ShoppingListResponse> GetIngredientsForShoppingList(ShoppingListRequest shoppingListDetails, CancellationToken cancellationToken = default);
 
     Task UpdateIngredient(string relativeUri, IngredientForUpdateModel ingredientForUpdate, CancellationToken cancellationToken = default);
 

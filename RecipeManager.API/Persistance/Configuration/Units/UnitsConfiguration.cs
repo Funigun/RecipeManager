@@ -21,6 +21,17 @@ public class UnitsConfiguration : IEntityTypeConfiguration<Unit>
                .HasMaxLength(UnitDomainValidator.UnitShortNameMaxLength)
                .IsRequired(false);
 
+        builder.Property(unit => unit.PluralName)
+               .HasMaxLength(UnitDomainValidator.UnitPluralNameMaxLength)
+               .IsRequired(true);
+
+        builder.Property(unit => unit.PluralShortName)
+               .HasMaxLength(UnitDomainValidator.UnitPluralShortNameMaxLength)
+               .IsRequired(false);
+
+        builder.Property(unit => unit.IsBaseUnit)
+               .IsRequired(true);
+
         builder.HasOne<Unit>()
                .WithMany()
                .HasForeignKey(unit => unit.PrimaryUnit)

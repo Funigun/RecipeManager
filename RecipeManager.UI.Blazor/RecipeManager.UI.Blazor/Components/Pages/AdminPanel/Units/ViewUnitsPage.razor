@@ -1,0 +1,36 @@
+﻿@using RecipeManager.UI.Blazor.Brokers.HateoasModel
+@using RecipeManager.UI.Blazor.Components.Pages.AdminPanel.Units.Components
+@using RecipeManager.UI.Blazor.Features.Units.GetUnits
+@using RecipeManager.UI.Blazor.Features.Units.Services
+
+@page "/admin/measurement-units"
+
+@inject IUnitService UnitService
+
+<MudPaper Class="mt-6" Width="1000px">
+    <MudText Typo="Typo.h6" Align="Align.Center">Units</MudText>
+
+    <div class="d-flex justify-end">
+        <MudIconButton Disabled="@isAddDisabled" Icon="@Icons.Material.Filled.Add" Color="Color.Primary" Edge="Edge.End" OnClick="OpenCreateView" />
+    </div>
+
+    <UnitListComponent Items="units" ShowLoadingBar=!unitsLoaded/>
+</MudPaper>
+
+@code {
+    private HateoasCollectionResponse<UnitModel> units = new();
+    private bool unitsLoaded = false;
+    private bool isAddDisabled = false;
+
+    override protected async Task OnInitializedAsync()
+    {
+        units = await UnitService.GetUnits();
+        unitsLoaded = true;
+        isAddDisabled = !units.Links.Any(link => link.Rel == HateoasConstants.Create);
+    }
+
+    private void OpenCreateView()
+    {
+        UnitService.OpenCreateUnitPage();
+    }
+}

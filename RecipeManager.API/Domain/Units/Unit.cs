@@ -11,7 +11,13 @@ public sealed class Unit : AuditableEntity, IEntity<UnitId>
 
     public string? ShortName { get; set; }
 
+    public string PluralName { get; set; }
+
+    public string? PluralShortName { get; set; }
+
     public UnitGroup Group { get; set; }
+
+    public bool IsBaseUnit { get; set; }
 
     public UnitId? PrimaryUnit { get; set; }
 
@@ -21,23 +27,29 @@ public sealed class Unit : AuditableEntity, IEntity<UnitId>
     {
     }
 
-    public static Unit Create(string name, string? shortName, UnitGroup group, UnitId? primaryUnitId, int conversionFactory)
+    public static Unit Create(string name, string? shortName, string pluralName, string? pluralShortName, UnitGroup group, bool isBaseUnit, UnitId? primaryUnitId, int conversionFactory)
     {
         return new()
         {
             Name = name,
             ShortName = shortName,
+            PluralName = pluralName,
+            PluralShortName = pluralShortName,
             Group = group,
+            IsBaseUnit = isBaseUnit,
             PrimaryUnit = primaryUnitId,
             ConversionFactor = conversionFactory
         };
     }
 
-    public void Update(string name, string? shortName, UnitGroup group, UnitId? primaryUnitId, int conversionFactory)
+    public void Update(string name, string? shortName, string pluralName, string? pluralShortName, UnitGroup group, bool isBaseUnit, UnitId? primaryUnitId, int conversionFactory)
     {
         Name = name;
         ShortName = shortName;
+        PluralName = pluralName;
+        PluralShortName = pluralShortName;
         Group = group;
+        IsBaseUnit = isBaseUnit;
         PrimaryUnit = primaryUnitId;
         ConversionFactor = conversionFactory;
     }

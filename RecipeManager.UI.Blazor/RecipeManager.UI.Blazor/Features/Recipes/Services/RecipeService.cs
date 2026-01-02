@@ -95,6 +95,21 @@ public sealed class RecipeService(IRecipeApi recipeApi, ISnackbar snackbar, IJSR
         return [];
     }
 
+    public async Task<IEnumerable<RecipeForMealPlanModel>> GetRecipesForMealPlan(string recipeName, int numberOfRecipesToLoad)
+    {
+        string requestUrl = $"{RecipesApiUrl}/mealPlan?recipeName={recipeName}&numberOfRecipesToLoad={numberOfRecipesToLoad}";
+
+        HttpResponseMessage response = await recipeApi.GetAll(new Uri(requestUrl, UriKind.Relative));
+
+        if (response.IsSuccessStatusCode)
+        {
+            return (await response.Content.ReadFromJsonAsync<IEnumerable<RecipeForMealPlanModel>>())!;
+        }
+
+        ResponseBody = (await response.Content.ReadFromJsonAsync<ApiResponseBody>())!;
+        return [];
+    }
+
     public async Task UpdateRecipe(string relativeUri, RecipeForManageModel recipe)
     {
         HttpResponseMessage response = await recipeApi.Update(new Uri(relativeUri), recipe);

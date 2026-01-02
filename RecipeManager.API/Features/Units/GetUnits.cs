@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using RecipeManager.Api.Application.Abstractions;
 using RecipeManager.Api.Domain.Units;
 using RecipeManager.Api.Domain.Units.Enums;
+using RecipeManager.Api.Persistance.Migrations;
 using RecipeManager.Api.Shared.Contracts.Authorization;
 using RecipeManager.Api.Shared.Endpoint;
 using RecipeManager.Api.Shared.Hateoas.Builder;
@@ -18,7 +19,16 @@ public static class GetUnits
 {
     public sealed record PrimaryUnitDto(Guid Id, string Name, int ConversionFactory);
 
-    public sealed record Response(Guid UnitId, string Name, string? ShortName, string Group, PrimaryUnitDto? PrimaryUnit);
+    public sealed record Response(
+        Guid UnitId,
+        string Name,
+        string? ShortName,
+        string PluralName,
+        string? PluralShortName,
+        string Group,
+        bool IsBaseUnit,
+        PrimaryUnitDto? PrimaryUnit
+    );
 
     [GroupEndpoint("Units")]
     public class Enpoint : IEndpoint
@@ -40,7 +50,7 @@ public static class GetUnits
                                                          .ThenBy(unit => unit.Name)
                                                        .ToListAsync(cancellationToken);
 
-        IEnumerable<Response> responses = units.Select(ToGetResponse);
+        IEnumerable<Response> responses = units.Select(unit => unit.ToGetResponse(units));
 
         bool isActionAllowed = currentUser.HasRole(UserRoles.Admin);
 
@@ -55,15 +65,20 @@ public static class GetUnits
         return TypedResults.Ok(responseBuilder.Build());
     }
 
-    internal static Response ToGetResponse(this Unit unit)
+    internal static Response ToGetResponse(this Unit unit, IEnumerable<Unit> units)
     {
+        Unit? primaryUnit = unit.PrimaryUnit == null ? null : units.First(u => u.Id == unit.PrimaryUnit);
+
         return new Response
         (
             unit.Id.Value,
             unit.Name,
             unit.ShortName,
+            unit.PluralName,
+            unit.PluralShortName,
             unit.Group.ToFriendlyString(),
-            unit.PrimaryUnit is not null ? new PrimaryUnitDto(unit.PrimaryUnit.Value, unit.Name, unit.ConversionFactor) : null
+            unit.IsBaseUnit,
+            primaryUnit is not null ? new PrimaryUnitDto(primaryUnit.Id.Value, primaryUnit.Name, unit.ConversionFactor) : null
         );
     }
 }

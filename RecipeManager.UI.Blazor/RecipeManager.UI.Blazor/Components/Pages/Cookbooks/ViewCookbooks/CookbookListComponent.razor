@@ -1,5 +1,6 @@
 ﻿@using MudBlazor
 @using RecipeManager.UI.Blazor.Brokers.HateoasModel
+@using RecipeManager.UI.Blazor.Components.Common
 @using RecipeManager.UI.Blazor.Features.Cookbooks.GetCookbooks
 @using RecipeManager.UI.Blazor.Features.Cookbooks.Services
 
@@ -7,7 +8,7 @@
 
 <style>
     .cookbooks-grid {
-        width: 1300px;
+        width: 1500px;
         min-height: 450px;
         max-height: 2500px;
         margin-top: 30px;
@@ -22,24 +23,23 @@
         padding: 0px
     }
 
-    .recipe-step-container {
-        border: none;
+    .cookbook-container {
         padding: 0px !important
     }
 
     .cookbook-title {
-        width: 300px;
+        width: 350px;
         text-align: center;
         text-wrap: wrap;
     }
 
     .cookbook-cover-image {
-        width: 75px;
-        height: 150px;
+        width: 150px;
+        height: 200px;
         align-self: center;
     }
 
-    .recipes-pagination {
+    .cookbooks-pagination {
         justify-self: center !important;
         justify-content: center !important;
         margin-top: 25px;
@@ -47,14 +47,14 @@
 </style>
 
 <MudGrid T="HateoasResponse<CookbooksPage>" Items="CookbooksPage.Item.Recipes" Loading="ShowLoadingBar"
-         Virtualize="true" FixedHeader="true"  Class="mt-6 recipes-grid">
+         Virtualize="true" FixedHeader="true" Class="mt-6 cookbooks-grid">
 
     @for(int i = 0; i < CookbooksPage.Item.Cookbooks.Count; i++)
     {
         HateoasResponse<CookbookModel> cookbook = CookbooksPage.Item.Cookbooks[i];
             
         <MudItem Class="cookbook-item">
-            <MudPaper Class="d-flex align-center justify-center mud-width-full py-8 recipe-step-container" Outlined=true>
+            <MudPaper Class="d-flex align-center justify-center mud-width-full py-8 cookbook-container" Outlined=true>
                 <MudStack Spacing="5">
                     @if (!string.IsNullOrEmpty(cookbook.Item.CoverImageUrl))
                     {
@@ -62,7 +62,7 @@
                     }
                     else
                     {
-                        <MudIconButton Icon="@Icons.Material.Filled.QuestionMark" Size="Size.Large" Class="recipe-step-image"
+                        <MudIconButton Icon="@Icons.Material.Filled.QuestionMark" Size="Size.Large" Class="cookbook-cover-image"
                                        Color="Color.Primary" OnClick="(() => OpenCookbook(cookbook))"></MudIconButton>
                     }
                     <MudText Typo="Typo.h6" Class="cookbook-title">@cookbook.Item.Title</MudText>
@@ -72,7 +72,7 @@
     }
 </MudGrid>
 
-<MudPagination Class="d-flex align-center recipes-pagination" SelectedChanged="PageChanged"
+<MudPagination Class="d-flex align-center cookbooks-pagination" SelectedChanged="PageChanged"
                Selected="CookbooksPage.Item.Page"
                Count="CookbooksPage.Item.TotalCount / CookbooksPage.Item.PageSize"
                ShowPreviousButton="CookbooksPage.Links.Any(link => link.Rel == HateoasConstants.Previous)"

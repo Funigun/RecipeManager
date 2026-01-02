@@ -1,0 +1,104 @@
+﻿@using RecipeManager.UI.Blazor.Brokers.HateoasModel
+@using RecipeManager.UI.Blazor.Components.Common
+@using RecipeManager.UI.Blazor.Components.Extensions
+@using RecipeManager.UI.Blazor.Features.Units
+@using RecipeManager.UI.Blazor.Features.Units.Manage
+@using RecipeManager.UI.Blazor.Features.Units.Services
+
+@inject IUnitService UnitService
+
+@if (primaryUnits.Any())
+{
+   
+<MudForm Model="@UnitModel.Item" Validation="@(validator.ValidateValue)" @bind-IsValid="@isSubmitEnabled" ReadOnly="Mode.IsViewMode()">
+    <MudText Typo="Typo.h5" Class="mb-4">Create Unit</MudText>
+
+    <MudStack Spacing="3">
+        <MudStack Row="true">
+            <MudTextField Label="Name" For="@(() => UnitModel.Item.Name)" @bind-Value="UnitModel.Item.Name" Required="true" MaxLength="50" />
+
+            <MudTextField Label="Short Name" For="@(() => UnitModel.Item.ShortName)" @bind-Value="UnitModel.Item.ShortName" MaxLength="25" />
+        </MudStack>
+
+        <MudStack Row="true">
+            <MudTextField Label="Plural Name" For="@(() => UnitModel.Item.PluralName)" @bind-Value="UnitModel.Item.PluralName" Required="true" MaxLength="55" />
+
+            <MudTextField Label="Plural Short Name" For="@(() => UnitModel.Item.PluralShortName)" @bind-Value="UnitModel.Item.PluralShortName" MaxLength="30" />
+        </MudStack>
+
+        <MudSelect T="UnitGroup" Label="Group" @bind-Value="UnitModel.Item.Group" Required="true">
+            @foreach (var key in unitGroups)
+            {
+                <MudSelectItem Value="@key.Key">@key.Value</MudSelectItem>
+            }
+        </MudSelect>
+
+        <MudSelect T="Guid?" Label="Primary Unit" Required="false" @bind-Value="UnitModel.Item.PrimaryUnit">
+            @foreach (var unit in primaryUnits)
+            {
+                <MudSelectItem Value="@unit.UnitId">@unit.Name</MudSelectItem>
+            }
+        </MudSelect>
+
+        <MudTextField T="int" Label="Conversion Factor" For="@(() => UnitModel.Item.ConversionFactor)" @bind-Value="UnitModel.Item.ConversionFactor" Required="false" />
+
+        <MudGrid Class="mt-4">
+            <MudItem xs="6">
+                <MudButton Variant="Variant.Outlined" Color="Color.Default" OnClick="GoBack" FullWidth="false">
+                    Back
+                </MudButton>
+            </MudItem>
+            @if (Mode.IsCreateOrEditMode())
+            {
+                <MudItem xs="6" Class="d-flex justify-end">
+                    <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="SubmitUnit">
+                        Save
+                    </MudButton>
+                </MudItem>
+            }
+        </MudGrid>
+
+        <CustomValidationSummary ErrorMessages="@errorMessages" />
+    </MudStack>
+
+</MudForm>
+}
+
+@code {
+    [Parameter]
+    public FormMode Mode { get; set; } = FormMode.View;
+
+    [Parameter]
+    public HateoasResponse<UnitForManageModel> UnitModel { get; set; } = new();
+    private readonly UnitForManageValidator validator = new();
+
+    private readonly Dictionary<UnitGroup, string> unitGroups = UnitExtensions.GetUnitGroups();
+    private bool isSubmitEnabled = false;
+    private IEnumerable<string> errorMessages = [];
+    private IEnumerable<PrimaryUnitDto> primaryUnits { get; set; } = [];
+
+    override protected async Task OnInitializedAsync()
+    {
+        primaryUnits = await UnitService.GetPrimaryUnits();
+        StateHasChanged();
+    }
+
+    private void GoBack()
+    {
+        UnitService.OpenIndexPage();
+    }
+
+    private async Task SubmitUnit()
+    {
+        if (Mode.IsCreateMode())
+        {
+            await UnitService.CreateUnit(UnitModel.Item);
+        }
+        else
+        {
+            await UnitService.UpdateUnit(UnitModel.Links.First(link => link.Rel == HateoasConstants.Update).Href, UnitModel.Item);
+        }
+
+        errorMessages = UnitService.ResponseBody.GetAllErrors();
+    }
+}

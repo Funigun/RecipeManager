@@ -24,10 +24,10 @@
         </div>
 
         <div style="margin-right: 10px; width: 150px !important">
-            <MudSelect T="UnitForDropdownModel" Label="Unit*" @bind-Value="newIngredient.Unit">
-                @foreach (var unit in Units)
+            <MudSelect T="Guid" Label="Unit*" @bind-Value="newIngredient.Unit.Id">
+                @foreach (var unit in newIngredient.Ingredient.AvailableUnits)
                 {
-                    <MudSelectItem Value="@unit">@unit.Name</MudSelectItem>
+                    <MudSelectItem Value="@unit.Id">@unit.Name</MudSelectItem>
                 }
             </MudSelect>
         </div>
@@ -57,9 +57,6 @@
 
     [Parameter]
     public EventCallback<ICollection<RecipeIngredientModel>> OnDataChanged { get; set; }
-
-    [Parameter]
-    public IEnumerable<UnitForDropdownModel> Units { get; set; } = [];
 
     [CascadingParameter]
     public FormMode Mode { get; set; }

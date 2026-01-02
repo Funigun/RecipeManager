@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore.Storage;
 using RecipeManager.Api.Domain.Cookbooks;
 using RecipeManager.Api.Domain.Ingredients;
+using RecipeManager.Api.Domain.MealPlan;
 using RecipeManager.Api.Domain.Recipes;
 using RecipeManager.Api.Domain.Units;
 
@@ -22,6 +23,8 @@ public interface IAppDbContext
     DbSet<CookbookCategory> CookbookCategories { get; set; }
 
     DbSet<Cookbook> Cookbooks { get; set; }
+
+    DbSet<MealPlan> MealPlans { get; set; }
 
     Task<int> SaveChangesAsync(CancellationToken cancellationToken);
 

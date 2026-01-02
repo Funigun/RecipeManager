@@ -17,12 +17,12 @@ namespace RecipeManager.Integration.Tests.CoreApi.TestFixtures;
 
 public sealed class WebApiFactory : WebApplicationFactory<IAssemblyMarker>, IAsyncLifetime
 {
-    private readonly MsSqlContainer _sqlContainer = new MsSqlBuilder().WithImage("mcr.microsoft.com/mssql/server:2022-latest")
+    private readonly MsSqlContainer _sqlContainer = new MsSqlBuilder().WithImage("mcr.microsoft.com/mssql/server:2025-latest")
                                                                       .WithPassword("Str0ng_P@ssw0rd4Tests")
                                                                       .WithPortBinding(1433)
                                                                       .WithEnvironment("ACCEPT_EULA", "Y")
                                                                       .WithName("MealsManagerTestDb")
-                                                                      .WithWaitStrategy(Wait.ForUnixContainer().UntilExternalTcpPortIsAvailable(1433))
+                                                                      .WithWaitStrategy(Wait.ForUnixContainer().UntilInternalTcpPortIsAvailable(1433))
                                                                       .Build();
 
     public AppDbContext DbContext { get; private set; } = default!;
@@ -42,7 +42,7 @@ public sealed class WebApiFactory : WebApplicationFactory<IAssemblyMarker>, IAsy
 
             services.AddDbContext<AppDbContext>(options =>
             {
-                options.UseSqlServer(_sqlContainer.GetConnectionString());
+                options.UseSqlServer(_sqlContainer.GetConnectionString(), o => o.UseCompatibilityLevel(170));
                 options.EnableDetailedErrors();
                 options.EnableSensitiveDataLogging();
             });

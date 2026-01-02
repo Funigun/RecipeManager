@@ -26,13 +26,14 @@
 
     .page-container {
         min-height: calc(100dvh - var(--mud-appbar-height));
-        border: none;
-        width: 1300px;
+        width: 1500px;
     }
 </style>
 
-<MudPaper Class="mt-6 page-container" Outlined=true>
-    <MudGrid Style="width:1300px;">
+<MudOverlay @bind-Visible="overlayVisible" DarkBackground AutoClose="true" OnClosed="OnOverlayClosed" />
+
+<MudPaper Class="mt-6 page-container" Outlined="true">
+    <MudGrid Style="width:1500px;">
         <MudItem Style="display: flex; width:inherit;">
             <MudStack Row="true" Style="gap: 12px; width:inherit; justify-items:center; justify-content:center">
                 @if(filtersCount > 0)
@@ -87,6 +88,7 @@
     private HateoasResponse<RecipesPageModel> recipesPage { get; set; } = new();
     private Dictionary<RecipeCategoryType, IEnumerable<RecipeCategoryForDropdownModel>> categoryDropdowns { get; set; } = new();
     private IEnumerable<RecipeCategoryForDropdownModel> selectedCategories => categoryDropdowns.Values.SelectMany(s => s);
+    private bool overlayVisible = false;
     private bool recipesLoaded = false;
     private bool isAddDisabled = false;
     private bool isDrawerOpen = false;
@@ -95,6 +97,12 @@
     private void ToggleDrawer() 
     {
         isDrawerOpen = !isDrawerOpen;
+        overlayVisible = isDrawerOpen;
+    }
+
+    public void OnOverlayClosed()
+    {
+        ToggleDrawer();
     }
 
     private void CreateNewRecipe()

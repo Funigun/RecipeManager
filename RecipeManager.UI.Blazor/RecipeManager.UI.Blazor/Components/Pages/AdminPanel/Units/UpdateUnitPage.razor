@@ -1,0 +1,30 @@
+﻿@page "/admin/measurement-units/update/{RawGuid}"
+
+@using RecipeManager.UI.Blazor.Brokers.HateoasModel
+@using RecipeManager.UI.Blazor.Components.Common
+@using RecipeManager.UI.Blazor.Components.Pages.AdminPanel.Units.Components
+@using RecipeManager.UI.Blazor.Features.Units.Manage
+@using RecipeManager.UI.Blazor.Features.Units.Services
+@using RecipeManager.UI.Blazor.Features.Units.UpdateUnit
+
+@inject IUnitService UnitService
+
+<MudPaper Class="pa-6 mx-auto">
+    @if (unitToUpdate is not null)
+    {
+        <UnitForm Mode="FormMode.Edit" UnitModel="unitToUpdate" />
+    }
+</MudPaper>
+
+@code {
+    [Parameter]
+    public string RawGuid { get; set; } = "";
+
+    private HateoasResponse<UnitForManageModel> unitToUpdate = default!;
+
+    override protected async Task OnInitializedAsync()
+    {
+        unitToUpdate = await UnitService.GetUnitById(Guid.Parse(RawGuid));
+        StateHasChanged();
+    }
+}

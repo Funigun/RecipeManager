@@ -48,6 +48,7 @@ public sealed class CreateRecipeTests : BaseIntegrationTest
         CreateRecipe.RecipeIngredientDto ingredientDto = new(new(ingredientId.Value, null), new(unitId.Value), 10d);
         CreateRecipe.RecipeSectionDto ingredientsPreparation = new((int)RecipeSectionType.IngredientsPreparation, [new CreateRecipe.RecipeStepDto(1, "Test", null)]);
         CreateRecipe.RecipeSectionDto cooking = new((int)RecipeSectionType.Cooking, [new CreateRecipe.RecipeStepDto(1, "Test 2", null)]);
+        CreateRecipe.NutritionalValueDto nutritionalValue = new(1, 1, 1, 1, 1, unitId.Value);
 
         return new CreateRecipe.Request
         (
@@ -58,6 +59,7 @@ public sealed class CreateRecipeTests : BaseIntegrationTest
             amount,
             1,
             (int)RecipeDifficulty.Easy,
+            nutritionalValue,
             [ingredientDto],
             [ingredientsPreparation, cooking],
             [],

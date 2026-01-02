@@ -1,0 +1,380 @@
+﻿@using RecipeManager.UI.Blazor.Components.Common.DialogMessage
+@using RecipeManager.UI.Blazor.Components.Pages.MealPlan.Components
+@using RecipeManager.UI.Blazor.Features.Ingredients
+@using RecipeManager.UI.Blazor.Features.Ingredients.Services
+@using RecipeManager.UI.Blazor.Features.MealPlan.Models
+@using RecipeManager.UI.Blazor.Features.MealPlan.Services
+@using RecipeManager.UI.Blazor.Features.Recipes
+@using RecipeManager.UI.Blazor.Features.Recipes.Services
+
+@page "/meal-planner"
+
+@inject IMealPlanService MealPlanService
+@inject IRecipeService RecipeService
+@inject IIngredientService IngredientService
+@inject IDialogMessageService DialogMessageService
+@inject IDialogService DialogService
+
+<style>
+    .meal-plan-header-row {
+        margin-top: 25px;
+        padding: 0px;
+        display: flex;
+    }
+
+    .meal-plan-header-item {
+        border: solid 1px black;
+        padding: 0px !important;
+        margin-left: 5px;
+        margin-right: 5px;
+        justify-self: center;
+        justify-content: center;
+        align-self: center;
+        display: flex;
+        width: inherit;
+    }
+
+    .meal-plan-row {
+        height: 600px;
+        margin-top: 10px;
+        padding: 0px;
+        display: flex;
+    }
+
+    .meal-plan-day {
+        border: solid 1px black;
+        padding: 0px !important;
+        margin-left: 5px;
+        margin-right: 5px;
+        justify-self: center;
+        justify-content: center;
+        align-self: center;
+        display: flex;
+        width: inherit;
+    }
+
+    .meal-plan-day-selected {
+        background: lightBlue;
+    }
+
+    .meal-plan-day-shadowed {
+        border: solid 1px black;
+        padding: 0px !important;
+        margin-left: 5px;
+        margin-right: 5px;
+        background: grey;
+        opacity: 0.5;
+        justify-self: center;
+        justify-content: center;
+        align-self: center;
+        display: flex;
+        width: inherit;
+    }
+
+    .recipe-container {
+        height: 475px;
+        overflow: hidden;
+    }
+
+    .recipe-container:hover {
+        overflow-y: auto;
+    }
+
+    .recipe-image {
+        width: 150px;
+        height: 150px;
+        align-self: center;
+    }
+</style>
+
+@if (MealPlanner is not null && MealPlanner.Weeks.Any())
+{
+    <MudPaper Class="mt-6" style="padding-bottom: 50px;" Outlined=true>
+        <MudGrid Style="width:1800px;">
+            <MudItem Style="display: flex; width:inherit; justify-content:center">
+                <MudStack>
+                    <MudStack Row="true" Class="d-flex align-center justify-center">
+                        <MudText Typo="Typo.h4">Meal Planner</MudText>
+                        <MudTooltip Text="Generate shopping list">
+                            <MudIconButton Icon="@Icons.Material.Filled.FormatListBulleted" Color="Color.Primary" OnClick="@(() => GenerateShoppingListByDays())"/>
+                        </MudTooltip>
+                        <MudTooltip Text="Save updated days">
+                            <MudIconButton Icon="@Icons.Material.Filled.Save" Color="Color.Primary" OnClick="@(() => SaveMealPlan())" />
+                        </MudTooltip>
+                    </MudStack>
+                    <MudStack Row="true" Class="d-flex align-center justify-center">    
+                        <MudAutocomplete T="RecipeForMealPlanModel" ResetValueOnEmptyText="true" ShowProgressIndicator="true" MaxItems="10" Placeholder="Find recipe to add"
+                                         SearchFunc="SearchRecipes" ToStringFunc="@(e => e == null ? null : e.Title)" ValueChanged="OnSelectedRecipeChanged"
+                                         Style="margin-top: 15px">
+                        </MudAutocomplete>
+    
+                        <MudTooltip Text="Add recipe to selected days">
+                            <MudIconButton Icon="@Icons.Material.Filled.Add" Color="Color.Primary" OnClick="AddRecipe" Disabled="IsAddRecipeDisabled" />
+                        </MudTooltip>
+                    </MudStack>
+                </MudStack>
+            </MudItem>
+    
+            <MudItem Class="meal-plan-header-row">
+                @foreach(var weekDay in days)
+                {
+                    <MudPaper Outlined="false" Class="meal-plan-header-item">
+                        <MudStack Spacing="3">
+                            <MudText Typo="Typo.h6" Class="d-flex align-center justify-center" Style="width: 240px;">
+                                @weekDay
+                            </MudText>
+                        </MudStack>
+                    </MudPaper>
+                }
+            </MudItem>
+    
+            @foreach(var weekplan in MealPlanner.Weeks)
+            {
+                <MudItem Class="meal-plan-row">
+                    @foreach(var day in weekplan.Days)
+                    {
+                        
+                        <MudPaper Class="@DetermineDayClass(day)" onclick="@(() => DayPlanSelectedChanged(@day))">
+                            
+                            <MudMenu ActivationEvent="@MouseEvent.RightClick" PositionAtCursor>
+                                <ActivatorContent>
+                                    
+                            <MudStack Spacing="3">
+                                
+                                 <MudText Class="d-flex align-center justify-center" Style="border-bottom: 1px solid black" Typo="Typo.h6">
+                                     <MudStack Row="true" Style="display: flex; align-items: center" Spacing="5">
+                                         @day.Header
+                                            <MudBadge Origin="Origin.CenterRight" Color="Color.Primary" Visible="@day.Recipes.Any()" Content="@day.Recipes.Count" />
+                                         
+                                         @if (copiedPlanDay != null && copiedPlanDay.FrontId == day.FrontId)
+                                         {
+                                             <MudTooltip Text="Currently copied day plan">
+                                                 <MudIcon Style="display: flex;" Icon="@Icons.Material.Filled.ContentCopy" Color="Color.Primary" />
+                                             </MudTooltip>
+                                         }
+
+                                         @if(@day.HasChanges)
+                                         {
+                                             <MudTooltip Text="Day has unsaved changes">
+                                                <MudIcon Style="display: flex;" Icon="@Icons.Material.Filled.Warning" Color="Color.Warning"/>
+                                             </MudTooltip>
+                                         }
+                                     </MudStack>
+                                 </MudText>
+                                
+                                <div class="recipe-container">
+                                    @foreach (var meal in day.Recipes)
+                                    {
+                                       <MudStack>
+                                            <MudStack Row="true" Spacing="5" Class="d-flex align-center justify-center" Style="margin-top: 5px;">
+                                                <MudCheckBox T="bool" @bind-Value="@meal.IsSelected"></MudCheckBox>
+                                            
+                                                <MudTooltip Text="@meal.Title">
+                                                    @if (!string.IsNullOrEmpty(meal.ImageUrl))
+                                                    {
+                                                        <MudImage Image="recipe.Item.ImageUrl" Class="recipe-image" />
+                                                    }
+                                                    else
+                                                    {
+                                                        <MudIconButton Icon="@Icons.Material.Filled.QuestionMark" Size="Size.Large" Class="recipe-image"
+                                                                       Color="Color.Primary"></MudIconButton>
+                                                    }
+                                                </MudTooltip>
+                                            </MudStack>
+                                            <MudStack Spacing="1">
+                                                <span style="border-top: solid 0.75px black; max-width: 240px; width: 240px;" />
+                                                <MudText Class="align-center justify-center" Style="font-size: 12px; margin-left: 5px; width: 230px; text-align:left; overflow-wrap: break-word; white-space: nowrap;overflow: hidden; text-overflow: ellipsis;" Typo="Typo.h6" Lines="1">@meal.Title</MudText>
+                                                <MudText Class="align-center justify-center" Style="font-size: 12px; margin-left: 5px; width: 230px; text-align:left" Typo="Typo.h6">Kcal: @meal.NutritionalValues.Calories</MudText>
+                                                <span style="border-bottom: solid 0.75px black; max-width: 240px; width: 240px;" />
+                                             </MudStack>
+                                       </MudStack>
+                                    }
+                                </div>
+                                <MudText Class="d-flex align-center justify-center" Style="font-size: 12px; border-top: solid 0.75px black; width: 240px; text-align:center" Typo="Typo.h6">Kcal: @day.NutritionalValues.Calories</MudText>
+                                <MudStack class="align-center justify-center" Row="true" Style="width: 240px;">                                
+                                    <MudText Style="font-size: 12px;" Typo="Typo.h6">C: @day.NutritionalValues.Carbohydrates</MudText>
+                                    <MudText Style="font-size: 12px; margin-left: 1px; margin-right: 1px;" Typo="Typo.h6">|</MudText>
+                                    <MudText Style="font-size: 12px;" Typo="Typo.h6">P: @day.NutritionalValues.Proteins</MudText>
+                                    <MudText Style="font-size: 12px; margin-left: 1px; margin-right: 1px;" Typo="Typo.h6">|</MudText>
+                                    <MudText Style="font-size: 12px;" Typo="Typo.h6">F: @day.NutritionalValues.Fats</MudText>
+                                </MudStack>
+                            </MudStack>                                
+                            </ActivatorContent>
+                            <ChildContent>
+                                    <MudStack class="align-center justify-center">
+                                        <MudTooltip Text="Copy plan for selected day">
+                                            <MudIconButton Icon="@Icons.Material.Filled.CopyAll" Color="Color.Primary" OnClick="@(() => CopyDayPlan(day))" />
+                                        </MudTooltip>
+                                        @if (copiedPlanDay != null && day.FrontId != copiedPlanDay.FrontId)
+                                        {
+                                            <MudTooltip Text="Add copied day plan">
+                                                <MudIconButton Icon="@Icons.Material.Filled.ContentPaste" Color="Color.Primary" OnClick="@(() => PasteDayPlan(day))" />
+                                            </MudTooltip>
+                                        }
+                                        <MudTooltip Text="Generate shopping list">
+                                            <MudIconButton Icon="@Icons.Material.Filled.FormatListBulleted" Color="Color.Primary" OnClick="@(() => GenerateShoppingListForDay(day))" />
+                                        </MudTooltip>
+                                        <MudTooltip Text="Remove selected recipes">
+                                            <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Error" OnClick="@(() => day.RemoveSelectedRecipes())" />
+                                        </MudTooltip>
+                                        <MudTooltip Text="Remove all recipes">
+                                            <MudIconButton Icon="@Icons.Material.Filled.ClearAll" Color="Color.Error" OnClick="@(() => day.ClearRecipes())" />
+                                        </MudTooltip>
+                                    </MudStack>
+                            </ChildContent>
+                            </MudMenu>
+                        </MudPaper>
+                    }
+                </MudItem>
+            }
+        </MudGrid>
+    </MudPaper>
+}
+
+@code {
+    private readonly IEnumerable<string> days = [ "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday","Sunday" ];
+    private MealPlannerMonth MealPlanner = new();
+    private RecipeForMealPlanModel selectedRecipe = default!;
+
+    private MealPlannerDay? copiedPlanDay;
+
+    private bool IsAddRecipeDisabled
+    {
+        get => selectedRecipe == null;
+    }
+
+    private void DayPlanSelectedChanged(MealPlannerDay day)
+    {
+        day.IsSelected = !day.IsSelected;
+        StateHasChanged();
+    }
+
+    private void CopyDayPlan(MealPlannerDay day)
+    {
+        copiedPlanDay = day;
+        StateHasChanged();
+    }
+
+    private void PasteDayPlan(MealPlannerDay day)
+    {
+        day.CopyPlanFromOtherDay(copiedPlanDay!);
+        copiedPlanDay = null;
+
+        StateHasChanged();
+    }
+
+    private async Task GenerateShoppingListForDay(MealPlannerDay selectedDay)
+    {
+        IEnumerable<RecipeForMealPlanModel> recipesToProcess = selectedDay.Recipes.Any(r => r.IsSelected)
+                                                             ? selectedDay.Recipes.Where(r => r.IsSelected)
+                                                             : selectedDay.Recipes;
+
+        IEnumerable<RecipeForShoppingListModel> recipes = recipesToProcess.Select(r => new RecipeForShoppingListModel
+        {
+            Id = r.Id,
+            Title = r.Title,
+            NumberOfServings = 1,
+        });
+
+        DialogParameters parameters = new DialogParameters<RecipesForShoppingListModal>
+        {
+            { nameof(RecipesForShoppingListModal.Recipes), recipes }
+        };
+
+        IDialogReference dialog = await DialogService.ShowAsync<RecipesForShoppingListModal>("Generate Shopping List", parameters);
+        DialogResult result = (await dialog.Result)!;
+
+        if (result.Canceled)
+        {
+            return;
+        }
+
+        ShoppingListResponse shoppingList = await IngredientService.GetIngredientsForShoppingList((ShoppingListRequest)result.Data!);
+
+        DialogParameters shoppingListParameters = new DialogParameters<ShoppingListResponse>
+        {
+            { nameof(ShoppingListComponent.ShoppingList), shoppingList }
+        };
+
+        IDialogReference shoppingListDialog = await DialogService.ShowAsync<ShoppingListComponent>("Shopping list", shoppingListParameters);
+        await shoppingListDialog.Result;
+    }
+
+    private async Task GenerateShoppingListByDays()
+    {
+        IEnumerable<MealPlannerDay> daysToProcess = MealPlanner.Weeks
+            .SelectMany(week => week.Days)
+            .Where(day => day.IsSelected);
+
+        List<RecipeForShoppingListModel> recipes = daysToProcess.SelectMany(days => days.Recipes)
+                                                                .GroupBy(r => r.Id)
+                                                                .Select(group => new RecipeForShoppingListModel
+                                                                {
+                                                                    Id = group.First().Id,
+                                                                    Title = group.First().Title,
+                                                                    ImageUrl = group.First().ImageUrl,
+                                                                    NumberOfServings = group.Count()
+                                                                })
+                                                                .ToList();
+
+        DialogParameters parameters = new DialogParameters<RecipesForShoppingListModal>
+        {
+            { nameof(RecipesForShoppingListModal.Recipes), recipes }
+        };
+
+        IDialogReference dialog = await DialogService.ShowAsync<RecipesForShoppingListModal>("Generate Shopping List", parameters);
+        DialogResult result = (await dialog.Result)!;
+
+        if (result.Canceled)
+        {
+            return;
+        }
+
+        ShoppingListResponse shoppingList = await IngredientService.GetIngredientsForShoppingList((ShoppingListRequest)result.Data!);
+
+        DialogParameters shoppingListParameters = new DialogParameters<ShoppingListResponse>
+        {
+            { nameof(ShoppingListComponent.ShoppingList), shoppingList }
+        };
+
+        IDialogReference shoppingListDialog = await DialogService.ShowAsync<ShoppingListComponent>("Shopping list", shoppingListParameters);
+        await shoppingListDialog.Result;
+    }
+
+    private string DetermineDayClass(MealPlannerDay day)
+    {
+        string applicableClasses = day.IsSelected ? "meal-plan-day-selected " : string.Empty;
+        applicableClasses += day.Date.Month == DateTimeOffset.Now.Month ? " meal-plan-day" : " meal-plan-day-shadowed";
+
+        return applicableClasses;
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        MealPlanner = await MealPlanService.GetMonthlyMealPlan(DateTimeOffset.UtcNow);
+        MealPlanner.SetSupportingFields();
+        StateHasChanged();
+    }
+
+    private void AddRecipe()
+    {
+        MealPlanner.AddRecipe(selectedRecipe);
+        StateHasChanged();
+    }
+
+    private async Task<IEnumerable<RecipeForMealPlanModel>> SearchRecipes(string value, CancellationToken cancellationToken)
+    {
+        return await RecipeService.GetRecipesForMealPlan(value, 25);
+    }
+
+    private void OnSelectedRecipeChanged(RecipeForMealPlanModel value)
+    {
+        selectedRecipe = value;
+        StateHasChanged();
+    }
+
+    private async Task SaveMealPlan()
+    {
+        await MealPlanService.UpdateMealPlan(MealPlanner.GetPlansToUpdate());
+    }
+}

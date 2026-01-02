@@ -1,0 +1,29 @@
+﻿@page "/ingredients/update/{RawGuid}"
+
+@using RecipeManager.UI.Blazor.Brokers.HateoasModel
+@using RecipeManager.UI.Blazor.Components.Common
+@using RecipeManager.UI.Blazor.Components.Pages.Ingredients.Components
+@using RecipeManager.UI.Blazor.Features.Ingredients.Manage
+@using RecipeManager.UI.Blazor.Features.Ingredients.Services
+
+@inject IIngredientService IngredientService
+ 
+<MudPaper Class="pa-6 mx-auto" Style="width:750px" Outlined="true">
+    @if(ingredientModel is not null)
+    {
+        <IngredientForm IngredientModel="ingredientModel" Mode="FormMode.Edit" />
+    }
+</MudPaper>
+
+    @code {
+    [Parameter]
+    public string RawGuid { get; set; } = "";
+
+    private HateoasResponse<IngredientForManageModel> ingredientModel = default!;
+
+    protected override async Task OnInitializedAsync()
+    {
+        ingredientModel = await IngredientService.GetIngredientById(RawGuid);
+        StateHasChanged();
+    }
+}

@@ -39,6 +39,7 @@ public sealed class UpdateRecipeTests : BaseIntegrationTest
             new UpdateRecipe.RecipeAmountDto(500d, new(recipe.Amount.UnitId.Value)),
             5,
             (int)recipe.Difficulty,
+            new(1, 2, 1, 1, 1, recipe.NutritionalValue.IngredientUnit),
             recipe.Ingredients.Select(ingredient => new UpdateRecipe.RecipeIngredientDto(new(ingredient.IngredientId, null), new(ingredient.UnitId), ingredient.Amount)).ToList(),
             recipe.Sections.Select(section => new UpdateRecipe.RecipeSectionDto((int)section.Type, section.Steps.Select(step => new UpdateRecipe.RecipeStepDto(step.Order, step.Description, null)).ToList())).ToList(),
             [],

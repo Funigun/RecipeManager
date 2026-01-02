@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RecipeManager.Api.Application.Abstractions;
 using RecipeManager.Api.Domain.Ingredients;
+using RecipeManager.Api.Domain.Units;
 using RecipeManager.Api.Persistance.Extensions;
 using RecipeManager.Api.Shared.Contracts.Authorization;
 using RecipeManager.Api.Shared.Endpoint;
@@ -19,7 +20,11 @@ public static class GetIngredients
     [BindProperties]
     public sealed record GetIngredientsFilterParameters(string Category = "", int Page = 1, int PageSize = 10) : PagedParameters(Page, PageSize);
 
-    public sealed record IngredientDto(Guid Id, string Name);
+    public sealed record NutritionalValueDto(int Calories, double Proteins, double Fats, double Carbohydrates, int IngredientAmount, string IngredientUnit);
+
+    public sealed record IngredientUnitConvertionDto(string UnitToConvert, double Ratio);
+
+    public sealed record IngredientDto(Guid Id, string Name, string BaseUnit, IEnumerable<IngredientUnitConvertionDto> IngredientUnitConvertions, NutritionalValueDto NutritionalValues);
 
     public sealed record Response(int Page, int PageSize, int TotalCount, IEnumerable<HateoasResponse<IngredientDto>> Ingredients) : PagedResult(Page, PageSize, TotalCount);
 
@@ -37,13 +42,27 @@ public static class GetIngredients
     public static async Task<Results<Ok<HateoasResponse<Response>>, BadRequest>> Handler([AsParameters] GetIngredientsFilterParameters filter, [FromServices] IHateoasBuilderFactory hateoasBuilderFactory, [FromServices] ICurrentUser currentUser, [FromServices] IAppDbContext dbContext, CancellationToken cancellationToken)
     {
         IEnumerable<IngredientCategoryId> categoryIds = await GetFilteredCategories(filter.Category, dbContext, cancellationToken);
+        Dictionary<UnitId, Unit> units = await dbContext.Units.AsNoTracking().ToDictionaryAsync(u => u.Id, cancellationToken);
 
         IQueryable<Ingredient> query = PrepareIngredientsQuery(dbContext, categoryIds, currentUser.Id);
 
         int totalCount = await query.CountAsync(cancellationToken);
 
         List<Ingredient> ingredients = await query.SetPage(filter).ToListAsync(cancellationToken);
-        List<IngredientDto> ingredientDtos = ingredients.Select(ingredient => new IngredientDto(ingredient.Id.Value, ingredient.Name)).ToList();
+        List<IngredientDto> ingredientDtos = ingredients.Select(ingredient => new IngredientDto(
+            ingredient.Id.Value,
+            ingredient.Name,
+            ingredient.BaseUnit != null ? units[ingredient.BaseUnit].Name : string.Empty,
+            ingredient.IngredientUnitConvertions.Select(c => new IngredientUnitConvertionDto(units[c.UnitToConvertId].Name, c.Ratio)),
+            new NutritionalValueDto(
+                ingredient.NutritionalValue.Calories,
+                ingredient.NutritionalValue.Proteins,
+                ingredient.NutritionalValue.Fats,
+                ingredient.NutritionalValue.Carbohydrates,
+                ingredient.NutritionalValue.IngredientAmount,
+                units[ingredient.NutritionalValue.IngredientUnit].Name
+            )
+        )).ToList();
 
         IEnumerable<HateoasResponse<IngredientDto>> ingredientHateoas = MapIngredientsToHateoasResponse(ingredientDtos, hateoasBuilderFactory);
         HateoasResponse<Response> response = MapToHateoasResponse(filter, totalCount, ingredientHateoas, hateoasBuilderFactory);

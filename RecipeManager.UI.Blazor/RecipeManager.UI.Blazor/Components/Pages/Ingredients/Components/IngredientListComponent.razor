@@ -1,0 +1,99 @@
+﻿@using MudBlazor
+@using RecipeManager.UI.Blazor.Brokers.HateoasModel
+@using RecipeManager.UI.Blazor.Components.Common.DialogMessage
+@using RecipeManager.UI.Blazor.Features.Ingredients.GetIngredients
+@using RecipeManager.UI.Blazor.Features.Ingredients.Services
+
+@inject IIngredientService IngredientService;
+@inject IDialogMessageService DialogService;
+    
+<MudTable T="HateoasResponse<IngredientModel>" ServerData="RefreshTable" Loading="ShowLoadingBar" Virtualize="true" FixedHeader="true" @ref="@table">
+    <ToolBarContent>
+        <div style="margin-right: 10px">
+            <MudIconButton Variant="Variant.Filled" Color="Color.Primary" Size="Size.Small" Icon="@Icons.Material.Filled.Search" OnClick="() => OnSearchClick()"></MudIconButton>
+        </div>
+        <MudTextField @bind-Value="categoryToSearch" Placeholder="Search" Class="mt-0"></MudTextField>
+    </ToolBarContent>
+    <HeaderContent>
+        <MudTh>Name</MudTh>
+        <MudTh>Base unit</MudTh>
+        <MudTh>Calories</MudTh>
+        <MudTh>Carbohydrates</MudTh>
+        <MudTh>Proteins</MudTh>
+        <MudTh>Fats</MudTh>
+        <MudTh>Nutritional value weight</MudTh>
+        <MudTh>Nutritional value unit</MudTh>
+        <MudTh>Actions</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="Name">@context.Item.Name</MudTd>
+        <MudTd DataLabel="Base unit">@context.Item.BaseUnit</MudTd>
+        <MudTd DataLabel="Calories">@context.Item.NutritionalValues.Calories</MudTd>
+        <MudTd DataLabel="Carbohydrates">@context.Item.NutritionalValues.Carbohydrates</MudTd>
+        <MudTd DataLabel="Proteins">@context.Item.NutritionalValues.Proteins</MudTd>
+        <MudTd DataLabel="Fats">@context.Item.NutritionalValues.Fats</MudTd>
+        <MudTd DataLabel="Nutritional value weight">@context.Item.NutritionalValues.IngredientAmount</MudTd>
+        <MudTd DataLabel="Nutritional value unit">@context.Item.NutritionalValues.IngredientUnit</MudTd>
+        <MudTd DataLabel="Actions">
+            <MudIconButton Variant="Variant.Filled" Color="Color.Primary" Size="Size.Small" Icon="@Icons.Material.Filled.Calculate" OnClick="() => ShowConversionsTable(context)"></MudIconButton>
+            <MudIconButton Disabled="@(!context.Links.Any(link => link.Rel == HateoasConstants.Update))" Variant="Variant.Filled" Color="Color.Primary" Size="Size.Small" Icon="@Icons.Material.Filled.Edit" OnClick="() => UpdateIngredient(context)"></MudIconButton>
+            <MudIconButton Disabled="@(!context.Links.Any(link => link.Rel == HateoasConstants.Delete))" Variant="Variant.Filled" Color="Color.Error" Size="Size.Small" Icon="@Icons.Material.Filled.Delete" OnClick="() => DeleteIngredient(context)"></MudIconButton>
+        </MudTd>
+    </RowTemplate>
+    <NoRecordsContent>
+        <MudText>No matching records found</MudText>
+    </NoRecordsContent>
+    <LoadingContent>
+        <MudText>Loading...</MudText>
+    </LoadingContent>
+    <PagerContent>
+        <div class="d-flex flex-column align-center">
+            <MudTablePager>
+                
+            </MudTablePager>
+        </div>
+    </PagerContent>
+</MudTable>
+
+@code {
+    [Parameter]
+    public HateoasResponse<IngredientsPageModel> IngredientsPage { get; set; } = new();
+
+    [Parameter]
+    public bool ShowLoadingBar { get; set; } = true;
+
+    private MudTable<HateoasResponse<IngredientModel>> table = default!;
+    private string categoryToSearch = "";
+
+    private void ShowConversionsTable(HateoasResponse<IngredientModel> selectedItem)
+    {
+  
+    }
+
+    public async Task UpdateIngredient(HateoasResponse<IngredientModel> selectedItem)
+    {
+        IngredientService.OpenUpdateIngredientPage(selectedItem.Item.Id);
+    }
+
+    private async Task DeleteIngredient(HateoasResponse<IngredientModel> selectedItem)
+    {
+        if (await DialogService.ShowDeleteConfirmationMessage())
+        {
+            await IngredientService.DeleteIngredient(selectedItem.Links.First(link => link.Rel == HateoasConstants.Delete).Href);
+        }
+    }
+
+    private async Task<TableData<HateoasResponse<IngredientModel>>> RefreshTable(TableState state, CancellationToken cancellationToken)
+    {
+        ShowLoadingBar = true;
+        IngredientsPage = await IngredientService.GetIngredientsPage(state.Page + 1, state.PageSize, categoryToSearch);
+        ShowLoadingBar = false;
+
+        return new TableData<HateoasResponse<IngredientModel>>() { TotalItems = IngredientsPage.Item.TotalCount, Items = IngredientsPage.Item.Ingredients };
+    }
+
+    private async Task OnSearchClick()
+    {
+        await table.ReloadServerData();
+    }
+}

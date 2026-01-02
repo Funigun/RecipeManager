@@ -35,6 +35,29 @@ public sealed class RecipeConfiguration : IEntityTypeConfiguration<Recipe>
                .HasForeignKey(recipe => recipe.IngredientId)
                .OnDelete(DeleteBehavior.SetNull);
 
+        builder.ComplexProperty(recipe => recipe.NutritionalValue, nutritionalValue =>
+        {
+            nutritionalValue.Property(c => c.Calories)
+                            .IsRequired(true);
+
+            nutritionalValue.Property(c => c.Carbohydrates)
+                            .IsRequired(true);
+
+            nutritionalValue.Property(c => c.Fats)
+                            .IsRequired(true);
+
+            nutritionalValue.Property(c => c.Proteins)
+                            .IsRequired(true);
+
+            nutritionalValue.Property(c => c.IngredientAmount)
+                            .IsRequired(true);
+
+            nutritionalValue.Property(c => c.IngredientUnit)
+                            .IsRequired(true);
+
+            nutritionalValue.ToJson();
+        });
+
         builder.OwnsOne(recipe => recipe.Amount, recipeAmount =>
         {
             recipeAmount.Property(amount => amount.Amount)

@@ -22,7 +22,7 @@ public sealed class UpdateUnitTests : BaseIntegrationTest
         HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", TokenMockFactory.GenerateJwtToken(UserMockFactory.CreateMockedUser()));
 
         Guid unitId = Guid.CreateVersion7();
-        UpdateUnit.Request updateUnitRequest = new("Updated Unit", "UU", 0, null, 1);
+        UpdateUnit.Request updateUnitRequest = new("Updated Unit", "UU", "Updated Units", "UUs", 0, true, null, 1);
         using StringContent content = new(JsonSerializer.Serialize(updateUnitRequest), Encoding.UTF8, "application/json");
 
         // Act
@@ -33,16 +33,16 @@ public sealed class UpdateUnitTests : BaseIntegrationTest
     }
 
     [Theory]
-    [InlineData("", "TU", 1, "Missing Unit Name")]
-    [InlineData("Test", "", 1, "Missing Short Name")]
-    [InlineData("Another Unit", "AU", 100, "Invalid Unit Group")]
-    public async Task UpdateUnit_ShouldReturn_BadRequest_ForInvalidInput(string unitName, string? shortName, int group, string justification)
+    [InlineData("", "TU", "", "", 1, true, "Missing Unit Name")]
+    [InlineData("Test", "", "Tests", "", 1, true, "Missing Short Name")]
+    [InlineData("Another Unit", "AU", "Another Units", "AUs", 100, true, "Invalid Unit Group")]
+    public async Task UpdateUnit_ShouldReturn_BadRequest_ForInvalidInput(string unitName, string? shortName, string pluralName, string? pluralShortName, int group, bool isBaseUnit, string justification)
     {
         // Arrange
         HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", TokenMockFactory.GenerateJwtToken(UserMockFactory.CreateMockedAdmin()));
 
         Guid unitId = await DbContext.Units.AsNoTracking().Select(unit => unit.Id.Value).FirstAsync(TestContext.Current.CancellationToken);
-        UpdateUnit.Request updateUnitRequest = new(unitName, shortName, group, null, 1);
+        UpdateUnit.Request updateUnitRequest = new(unitName, shortName, pluralName, pluralShortName, group, isBaseUnit, null, 1);
         using StringContent content = new(JsonSerializer.Serialize(updateUnitRequest), Encoding.UTF8, "application/json");
 
         // Act
@@ -59,7 +59,7 @@ public sealed class UpdateUnitTests : BaseIntegrationTest
         HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", TokenMockFactory.GenerateJwtToken(UserMockFactory.CreateMockedAdmin()));
 
         Guid unitId = (await DbContext.Units.AsNoTracking().FirstAsync(unit => unit.Name != "Duplicated Name", TestContext.Current.CancellationToken)).Id.Value;
-        UpdateUnit.Request updateUnitRequest = new("Duplicated Name", "shortName", 1, null, 1);
+        UpdateUnit.Request updateUnitRequest = new("Duplicated Name", "shortName", "Duplicated Names", "shortNames", 1, true, null, 1);
         using StringContent content = new(JsonSerializer.Serialize(updateUnitRequest), Encoding.UTF8, "application/json");
 
         // Act
@@ -76,7 +76,7 @@ public sealed class UpdateUnitTests : BaseIntegrationTest
         HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", TokenMockFactory.GenerateJwtToken(UserMockFactory.CreateMockedAdmin()));
 
         Guid unitId = (await DbContext.Units.AsNoTracking().FirstAsync(unit => unit.ShortName != "Duplicated Short Name", TestContext.Current.CancellationToken)).Id.Value;
-        UpdateUnit.Request updateUnitRequest = new("Duplicated", "Duplicated Short Name", 1, null, 1);
+        UpdateUnit.Request updateUnitRequest = new("Duplicated", "Duplicated Short Name", "Duplicateds", "Duplicated Short Names", 1, true, null, 1);
         using StringContent content = new(JsonSerializer.Serialize(updateUnitRequest), Encoding.UTF8, "application/json");
 
         // Act
@@ -93,10 +93,10 @@ public sealed class UpdateUnitTests : BaseIntegrationTest
         HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", TokenMockFactory.GenerateJwtToken(UserMockFactory.CreateMockedAdmin()));
 
         Guid unitId = await DbContext.Units.AsNoTracking().Where(unit => unit.Name == "To Update").Select(unit => unit.Id.Value).FirstAsync(TestContext.Current.CancellationToken);
-        UpdateUnit.Request updateUnitRequest = new("Updated Unit", "UU", 0, null, 1);
+        UpdateUnit.Request updateUnitRequest = new("Updated Unit", "UU", "Updated Units", "UUs", 0, true, null, 1);
         using StringContent content = new(JsonSerializer.Serialize(updateUnitRequest), Encoding.UTF8, "application/json");
 
-        // ActW
+        // Act
         HttpResponseMessage response = await HttpClient.PutAsync($"/api/units/{unitId}", content, TestContext.Current.CancellationToken);
 
         // Assert

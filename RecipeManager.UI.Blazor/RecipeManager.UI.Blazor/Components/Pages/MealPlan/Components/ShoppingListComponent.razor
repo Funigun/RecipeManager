@@ -1,0 +1,38 @@
+﻿@using RecipeManager.UI.Blazor.Features.Ingredients
+
+<MudDialog Style="width: 750px; max-height: 600px;">
+    <DialogContent>
+        <MudForm T="ShoppingListResponse">
+            <MudStack Spacing="7">
+                <div style="max-height: 500px; overflow-y: auto">
+                    @foreach (var ingredient in ShoppingList.Ingredients)
+                    {
+                        <MudStack Spacing="5">
+                            <MudText Typo="Typo.body1">@ingredient.Key</MudText>
+
+                            @foreach (var ingredient in ingredient.Value)
+                            {
+                                <MudStack Row="true" JustifyContent="SpaceBetween" Style="padding: 10px; border-bottom: 1px solid lightgray;">
+                                    <MudText Typo="Typo.body1">@ingredient.Name</MudText>
+                                    <MudText Typo="Typo.body1">@ingredient.Quantity</MudText>
+                                    <MudText Typo="Typo.body1">@ingredient.Unit</MudText>
+                                </MudStack>
+                            }
+                        </MudStack>
+                    }
+                </div>
+            </MudStack>
+        </MudForm> 
+    </DialogContent>
+    <DialogActions>
+        <MudButton Color="Color.Primary" OnClick="() => MudDialog.Cancel()">Close</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter]
+    private IMudDialogInstance MudDialog { get; set; }
+
+    [Parameter]
+    public ShoppingListResponse ShoppingList { get; set; } = new();
+}
