@@ -28,6 +28,9 @@ public sealed class IngredientForManageModel
         {
             Name = Name,
             NutritionalValues = NutritionalValues,
+            IngredientPackage = IngredientPackage,
+            BaseUnit = (Guid)BaseUnit!,
+            IngredientUnitConvertions = Convertions,
             ShoppingListCategoryId = ShoppingListCategory.Id,
             Categories = new(Categories.Select(c => c.Id).ToList()),
             Recipes = new(Recipes.Select(r => r.Id).ToList())
@@ -40,9 +43,12 @@ public sealed class IngredientForManageModel
         {
             Name = Name,
             NutritionalValues = NutritionalValues,
+            IngredientPackage = IngredientPackage,
+            BaseUnit = (Guid)BaseUnit!,
+            IngredientUnitConvertions = Convertions,
             ShoppingListCategoryId = ShoppingListCategory.Id,
             Categories = new(Categories.Select(c => c.Id).ToList()),
-            Recipes = new(Recipes.Select(r => r.Id).ToList())
+            Recipes = new(Recipes.Select(r => r.Id).ToList()),
         };
     }
 }

@@ -140,7 +140,7 @@ public static class GenerateShoppingList
         Dictionary<string, List<IngredientDto>> groupedIngredients = ingredientsByBaseUnitAmount.Select(group => new IngredientDto
                                                                                (
                                                                                    ingredients[group.IngredientId].Name,
-                                                                                   group.Amount,
+                                                                                   Math.Round(group.Amount, 2),
                                                                                    group.UnitDisplayName,
                                                                                    ingredientCategories[ingredients[group.IngredientId].GetShoppingListGroupId()].Name
                                                                                ))
@@ -211,7 +211,6 @@ public static class GenerateShoppingList
                                                    .ToListAsync(cancellationToken);
     }
 
-
     private static IEnumerable<RecipeDao> PrepareScalledRecipes(Request request, IEnumerable<Recipe> recipes, Dictionary<IngredientId, Ingredient> ingredients, Dictionary<RecipeId, Recipe> nestedRecipes)
     {
         List<RecipeDao> result = [];
@@ -244,7 +243,7 @@ public static class GenerateShoppingList
             if (ingredient.Recipes.Any())
             {
                 Recipe nestedRecipe = nestedRecipes[ingredient.Recipes.First()];
-                double nestedRecipeScalingFactorByAmount = (nestedRecipe.Amount.Amount * scalingFactorByRecipeAmount) / recipeIngredient.Amount;
+                double nestedRecipeScalingFactorByAmount = nestedRecipe.Amount.Amount * scalingFactorByRecipeAmount / recipeIngredient.Amount;
                 results.AddRange(GetScalledIngredients(recipeDto, nestedRecipe, ingredients, nestedRecipes, nestedRecipeScalingFactorByAmount).ToList());
             }
             else

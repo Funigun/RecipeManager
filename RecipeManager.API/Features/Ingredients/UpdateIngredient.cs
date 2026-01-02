@@ -144,7 +144,12 @@ public static class UpdateIngredient
     {
         IngredientId id = new(ingredientId.Id);
 
-        Ingredient? ingredient = await dbContext.Ingredients.FirstOrDefaultAsync(i => i.Id == id && i.CreatedBy == currentUser.Id, cancellationToken)
+        Ingredient? ingredient = await dbContext.Ingredients
+                                                .Include(i => i.IngredientPackage)
+                                                .Include(i => i.Categories)
+                                                .Include(i => i.Recipes)
+                                                .Include(i => i.IngredientUnitConvertions)
+                                                .FirstOrDefaultAsync(i => i.Id == id && i.CreatedBy == currentUser.Id, cancellationToken)
                               ?? throw new EntityNotFoundException<Ingredient, IngredientId>(id);
 
         ingredient.Update

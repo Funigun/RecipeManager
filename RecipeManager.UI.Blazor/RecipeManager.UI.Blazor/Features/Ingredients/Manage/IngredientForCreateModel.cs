@@ -8,6 +8,12 @@ public sealed class IngredientForCreateModel
 
     public NutritionalValuesModel NutritionalValues { get; set; } = new();
 
+    public Guid BaseUnit { get; set; }
+
+    public IngredientPackageModel IngredientPackage { get; set; } = new();
+
+    public IEnumerable<IngredientUnitConvertionModel> IngredientUnitConvertions { get; set; } = [];
+
     public Guid? ShoppingListCategoryId { get; set; }
 
     public Collection<Guid> Categories { get; set; } = [];

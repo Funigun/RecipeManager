@@ -1,4 +1,7 @@
 ﻿@using RecipeManager.UI.Blazor.Components.Common.DialogMessage
+@using RecipeManager.UI.Blazor.Components.Pages.MealPlan.Components
+@using RecipeManager.UI.Blazor.Features.Ingredients
+@using RecipeManager.UI.Blazor.Features.Ingredients.Services
 @using RecipeManager.UI.Blazor.Features.MealPlan.Models
 @using RecipeManager.UI.Blazor.Features.MealPlan.Services
 @using RecipeManager.UI.Blazor.Features.Recipes
@@ -8,7 +11,9 @@
 
 @inject IMealPlanService MealPlanService
 @inject IRecipeService RecipeService
+@inject IIngredientService IngredientService
 @inject IDialogMessageService DialogMessageService
+@inject IDialogService DialogService
 
 <style>
     .meal-plan-header-row {
@@ -91,7 +96,7 @@
                     <MudStack Row="true" Class="d-flex align-center justify-center">
                         <MudText Typo="Typo.h4">Meal Planner</MudText>
                         <MudTooltip Text="Generate shopping list">
-                            <MudIconButton Icon="@Icons.Material.Filled.FormatListBulleted" Color="Color.Primary" />
+                            <MudIconButton Icon="@Icons.Material.Filled.FormatListBulleted" Color="Color.Primary" OnClick="@(() => GenerateShoppingListByDays())"/>
                         </MudTooltip>
                         <MudTooltip Text="Save updated days">
                             <MudIconButton Icon="@Icons.Material.Filled.Save" Color="Color.Primary" OnClick="@(() => SaveMealPlan())" />
@@ -207,7 +212,7 @@
                                             </MudTooltip>
                                         }
                                         <MudTooltip Text="Generate shopping list">
-                                            <MudIconButton Icon="@Icons.Material.Filled.FormatListBulleted" Color="Color.Primary" />
+                                            <MudIconButton Icon="@Icons.Material.Filled.FormatListBulleted" Color="Color.Primary" OnClick="@(() => GenerateShoppingListForDay(day))" />
                                         </MudTooltip>
                                         <MudTooltip Text="Remove selected recipes">
                                             <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Error" OnClick="@(() => day.RemoveSelectedRecipes())" />
@@ -256,6 +261,84 @@
         copiedPlanDay = null;
 
         StateHasChanged();
+    }
+
+    private async Task GenerateShoppingListForDay(MealPlannerDay selectedDay)
+    {
+        IEnumerable<RecipeForMealPlanModel> recipesToProcess = selectedDay.Recipes.Any(r => r.IsSelected)
+                                                             ? selectedDay.Recipes.Where(r => r.IsSelected)
+                                                             : selectedDay.Recipes;
+
+        IEnumerable<RecipeForShoppingListModel> recipes = recipesToProcess.Select(r => new RecipeForShoppingListModel
+        {
+            Id = r.Id,
+            Title = r.Title,
+            NumberOfServings = 1,
+        });
+
+        DialogParameters parameters = new DialogParameters<RecipesForShoppingListModal>
+        {
+            { nameof(RecipesForShoppingListModal.Recipes), recipes }
+        };
+
+        IDialogReference dialog = await DialogService.ShowAsync<RecipesForShoppingListModal>("Generate Shopping List", parameters);
+        DialogResult result = (await dialog.Result)!;
+
+        if (result.Canceled)
+        {
+            return;
+        }
+
+        ShoppingListResponse shoppingList = await IngredientService.GetIngredientsForShoppingList((ShoppingListRequest)result.Data!);
+
+        DialogParameters shoppingListParameters = new DialogParameters<ShoppingListResponse>
+        {
+            { nameof(ShoppingListComponent.ShoppingList), shoppingList }
+        };
+
+        IDialogReference shoppingListDialog = await DialogService.ShowAsync<ShoppingListComponent>("Shopping list", shoppingListParameters);
+        await shoppingListDialog.Result;
+    }
+
+    private async Task GenerateShoppingListByDays()
+    {
+        IEnumerable<MealPlannerDay> daysToProcess = MealPlanner.Weeks
+            .SelectMany(week => week.Days)
+            .Where(day => day.IsSelected);
+
+        List<RecipeForShoppingListModel> recipes = daysToProcess.SelectMany(days => days.Recipes)
+                                                                .GroupBy(r => r.Id)
+                                                                .Select(group => new RecipeForShoppingListModel
+                                                                {
+                                                                    Id = group.First().Id,
+                                                                    Title = group.First().Title,
+                                                                    ImageUrl = group.First().ImageUrl,
+                                                                    NumberOfServings = group.Count()
+                                                                })
+                                                                .ToList();
+
+        DialogParameters parameters = new DialogParameters<RecipesForShoppingListModal>
+        {
+            { nameof(RecipesForShoppingListModal.Recipes), recipes }
+        };
+
+        IDialogReference dialog = await DialogService.ShowAsync<RecipesForShoppingListModal>("Generate Shopping List", parameters);
+        DialogResult result = (await dialog.Result)!;
+
+        if (result.Canceled)
+        {
+            return;
+        }
+
+        ShoppingListResponse shoppingList = await IngredientService.GetIngredientsForShoppingList((ShoppingListRequest)result.Data!);
+
+        DialogParameters shoppingListParameters = new DialogParameters<ShoppingListResponse>
+        {
+            { nameof(ShoppingListComponent.ShoppingList), shoppingList }
+        };
+
+        IDialogReference shoppingListDialog = await DialogService.ShowAsync<ShoppingListComponent>("Shopping list", shoppingListParameters);
+        await shoppingListDialog.Result;
     }
 
     private string DetermineDayClass(MealPlannerDay day)

@@ -55,10 +55,10 @@ public sealed class ShoppingListTests(WebApiFactory webApiFactory) : BaseIntegra
         Recipe recipe = await DbContext.Recipes.AsNoTracking().FirstAsync(r => r.Title == "Simple tomato mix", TestContext.Current.CancellationToken);
 
         // Test scaling down to 1 serving
-        GenerateShoppingList.Request requestDtoDown = new GenerateShoppingList.Request([
+        GenerateShoppingList.Request requestDtoDown = new([
             new GenerateShoppingList.RecipeDto(recipe.Id.Value, 1)
         ]);
-        using StringContent contentDown = new StringContent(JsonSerializer.Serialize(requestDtoDown), System.Text.Encoding.UTF8, "application/json");
+        using StringContent contentDown = new(JsonSerializer.Serialize(requestDtoDown), System.Text.Encoding.UTF8, "application/json");
         HttpResponseMessage responseDown = await HttpClient.PutAsync("/api/ingredients/generate-shopping-list", contentDown, TestContext.Current.CancellationToken);
         responseDown.EnsureSuccessStatusCode();
         string responseBodyDown = await responseDown.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
@@ -76,10 +76,10 @@ public sealed class ShoppingListTests(WebApiFactory webApiFactory) : BaseIntegra
         Assert.Contains("kg", saltDown.Unit, StringComparison.OrdinalIgnoreCase);
 
         // Test scaling up to 3 servings
-        GenerateShoppingList.Request requestDtoUp = new GenerateShoppingList.Request([
+        GenerateShoppingList.Request requestDtoUp = new([
             new GenerateShoppingList.RecipeDto(recipe.Id.Value, 3)
         ]);
-        using StringContent contentUp = new StringContent(JsonSerializer.Serialize(requestDtoUp), System.Text.Encoding.UTF8, "application/json");
+        using StringContent contentUp = new(JsonSerializer.Serialize(requestDtoUp), System.Text.Encoding.UTF8, "application/json");
         HttpResponseMessage responseUp = await HttpClient.PutAsync("/api/ingredients/generate-shopping-list", contentUp, TestContext.Current.CancellationToken);
         responseUp.EnsureSuccessStatusCode();
         string responseBodyUp = await responseUp.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
@@ -105,11 +105,11 @@ public sealed class ShoppingListTests(WebApiFactory webApiFactory) : BaseIntegra
         Recipe simpleTomatoMix = await DbContext.Recipes.AsNoTracking().FirstAsync(r => r.Title == "Simple tomato mix", TestContext.Current.CancellationToken);
         Recipe complexTomatoMix = await DbContext.Recipes.AsNoTracking().FirstAsync(r => r.Title == "Complex tomato mix", TestContext.Current.CancellationToken);
 
-        GenerateShoppingList.Request requestDto = new GenerateShoppingList.Request([
+        GenerateShoppingList.Request requestDto = new([
             new GenerateShoppingList.RecipeDto(simpleTomatoMix.Id.Value, simpleTomatoMix.NumberOfServings),
             new GenerateShoppingList.RecipeDto(complexTomatoMix.Id.Value, complexTomatoMix.NumberOfServings)
         ]);
-        using StringContent content = new StringContent(JsonSerializer.Serialize(requestDto), System.Text.Encoding.UTF8, "application/json");
+        using StringContent content = new(JsonSerializer.Serialize(requestDto), System.Text.Encoding.UTF8, "application/json");
 
         // Act
         HttpResponseMessage response = await HttpClient.PutAsync("/api/ingredients/generate-shopping-list", content, TestContext.Current.CancellationToken);
@@ -139,12 +139,12 @@ public sealed class ShoppingListTests(WebApiFactory webApiFactory) : BaseIntegra
         Recipe burgerBuns = await DbContext.Recipes.AsNoTracking().FirstAsync(r => r.Title == "Burger buns", TestContext.Current.CancellationToken);
 
         // Use their original servings to pick the intended ingredient quantities
-        GenerateShoppingList.Request requestDto = new GenerateShoppingList.Request([
+        GenerateShoppingList.Request requestDto = new([
             new GenerateShoppingList.RecipeDto(pizzaDough.Id.Value, pizzaDough.NumberOfServings),
             new GenerateShoppingList.RecipeDto(burgerBuns.Id.Value, burgerBuns.NumberOfServings)
         ]);
 
-        using StringContent content = new StringContent(JsonSerializer.Serialize(requestDto), System.Text.Encoding.UTF8, "application/json");
+        using StringContent content = new(JsonSerializer.Serialize(requestDto), System.Text.Encoding.UTF8, "application/json");
 
         // Act
         HttpResponseMessage response = await HttpClient.PutAsync("/api/ingredients/generate-shopping-list", content, TestContext.Current.CancellationToken);
@@ -177,10 +177,10 @@ public sealed class ShoppingListTests(WebApiFactory webApiFactory) : BaseIntegra
         HttpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", TokenMockFactory.GenerateJwtToken(UserMockFactory.CreateMockedAdmin()));
         Recipe mexicanSoup = await DbContext.Recipes.AsNoTracking().FirstAsync(r => r.Title == "Mexican soup", TestContext.Current.CancellationToken);
 
-        GenerateShoppingList.Request requestDto = new GenerateShoppingList.Request([
+        GenerateShoppingList.Request requestDto = new([
             new GenerateShoppingList.RecipeDto(mexicanSoup.Id.Value, servings)
         ]);
-        using StringContent content = new StringContent(JsonSerializer.Serialize(requestDto), System.Text.Encoding.UTF8, "application/json");
+        using StringContent content = new(JsonSerializer.Serialize(requestDto), System.Text.Encoding.UTF8, "application/json");
 
         // Act
         HttpResponseMessage response = await HttpClient.PutAsync("/api/ingredients/generate-shopping-list", content, TestContext.Current.CancellationToken);

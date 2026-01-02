@@ -59,7 +59,9 @@ public sealed class Ingredient : AuditableEntity, IEntity<IngredientId>
         NutritionalValue.IngredientAmount = nutritionalValue.IngredientAmount;
         NutritionalValue.IngredientUnit = nutritionalValue.IngredientUnit;
         BaseUnit = baseUnit;
-        IngredientPackage = ingredientPackage;
+        IngredientPackage.PackageUnitId = ingredientPackage.PackageUnitId;
+        IngredientPackage.PackageSize = ingredientPackage.PackageSize;
+        IngredientPackage.PackageSizeUnitId = ingredientPackage.PackageSizeUnitId;
         _ingredientUnitConvertions = ingredientUnitConvertions.ToList();
         _categories = categoryIds.ToList();
         _recipes = recipeIds.ToList();
@@ -68,7 +70,21 @@ public sealed class Ingredient : AuditableEntity, IEntity<IngredientId>
     public IngredientCategoryId GetShoppingListGroupId()
     {
         return ShoppingListCategoryId is not null
-                                      ? ShoppingListCategoryId! 
+                                      ? ShoppingListCategoryId!
                                       : _categories.FirstOrDefault() ?? Guid.Empty;
+    }
+
+    public IEnumerable<UnitId> GetAvailableUnits()
+    {
+        List<UnitId> availableUnits = [];
+
+        if (BaseUnit is not null)
+        {
+            availableUnits.Add(BaseUnit);
+        }
+
+        availableUnits.AddRange(_ingredientUnitConvertions.Select(convertion => convertion.UnitToConvertId));
+
+        return availableUnits;
     }
 }

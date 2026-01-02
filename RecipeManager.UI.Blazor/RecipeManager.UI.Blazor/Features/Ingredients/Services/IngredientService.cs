@@ -1,5 +1,4 @@
 ﻿using System.Text.Json;
-using System.Threading;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
 using RecipeManager.UI.Blazor.Brokers.HateoasModel;
@@ -8,6 +7,7 @@ using RecipeManager.UI.Blazor.Components.Common;
 using RecipeManager.UI.Blazor.Components.Extensions;
 using RecipeManager.UI.Blazor.Features.Ingredients.GetIngredients;
 using RecipeManager.UI.Blazor.Features.Ingredients.Manage;
+using RecipeManager.UI.Blazor.Features.Recipes;
 
 namespace RecipeManager.UI.Blazor.Features.Ingredients.Services;
 
@@ -50,7 +50,7 @@ public sealed class IngredientService(IRecipeApi recipeApi, NavigationManager na
         }
 
         ResponseBody = (await response.Content.ReadFromJsonAsync<ApiResponseBody>(cancellationToken: cancellationToken))!;
-          throw new Exception(JsonSerializer.Serialize(ResponseBody));
+        throw new Exception(JsonSerializer.Serialize(ResponseBody));
     }
 
     public async Task<HateoasResponse<IngredientForManageModel>> GetIngredientById(string id, CancellationToken cancellationToken = default)
@@ -74,6 +74,20 @@ public sealed class IngredientService(IRecipeApi recipeApi, NavigationManager na
         if (response.IsSuccessStatusCode)
         {
             List<IngredientForDropdownModel> ingredients = (await response.Content.ReadFromJsonAsync<List<IngredientForDropdownModel>>(cancellationToken: cancellationToken))!;
+            return ingredients;
+        }
+
+        ResponseBody = (await response.Content.ReadFromJsonAsync<ApiResponseBody>(cancellationToken: cancellationToken))!;
+        throw new Exception(JsonSerializer.Serialize(ResponseBody));
+    }
+
+    public async Task<ShoppingListResponse> GetIngredientsForShoppingList(ShoppingListRequest shoppingListDetails, CancellationToken cancellationToken = default)
+    {
+        HttpResponseMessage response = await recipeApi.Update(new Uri($"{IngredientsApiUrl}/generate-shopping-list", UriKind.Relative), shoppingListDetails);
+
+        if (response.IsSuccessStatusCode)
+        {
+            ShoppingListResponse ingredients = (await response.Content.ReadFromJsonAsync<ShoppingListResponse>(cancellationToken: cancellationToken))!;
             return ingredients;
         }
 

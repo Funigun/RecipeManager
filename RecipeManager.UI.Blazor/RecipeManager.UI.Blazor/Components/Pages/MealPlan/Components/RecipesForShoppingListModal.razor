@@ -1,0 +1,54 @@
+﻿@using RecipeManager.UI.Blazor.Components.Common
+@using RecipeManager.UI.Blazor.Features.Ingredients
+@using RecipeManager.UI.Blazor.Features.Recipes
+
+<MudDialog Style="width: 750px; max-height: 600px;">
+    <DialogContent>
+        <MudForm T="ShoppingListRequest">
+            <MudStack>
+                <MudStack Row="true">                
+                    <MudText Typo="Typo.h6" Style="width: 450px;">Title</MudText>
+                    <MudText Typo="Typo.h6" Style="width: 250px;">Number of servings</MudText>
+                </MudStack>
+
+                <div style="max-height: 450px; overflow-y: auto">
+                    @foreach (var recipe in ShoppingListRequest.Recipes)
+                    {
+                        <MudStack Row="true">
+                            <ImageComponent ImageSource="@recipe.ImageUrl" MaxHeight="75" MaxWidth="75" ImageStyle="align-self: center; margin-top: 15px;" />
+                            <MudText Typo="Typo.h6" Style="width: 375px; margin-top: 10px;">@recipe.Title</MudText>
+                            <MudTextField T="int" For="@(() => recipe.NumberOfServings)" @bind-Value="@recipe.NumberOfServings" Style="width: 250px; margin-top: 15px;" />
+                        </MudStack>
+                    }
+                </div>
+            </MudStack>
+        </MudForm> 
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Cancel</MudButton>
+        <MudButton Color="Color.Primary" OnClick="Close">OK</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter]
+    private IMudDialogInstance MudDialog { get; set; }
+
+    [Parameter]
+    public IEnumerable<RecipeForShoppingListModel> Recipes { get; set; } = [];
+
+    private ShoppingListRequest ShoppingListRequest { get; set; } = new();
+
+    protected override void OnInitialized()
+    {
+        ShoppingListRequest.Recipes = Recipes.ToList();
+        base.OnInitialized();
+    }
+
+    private void Close() 
+    {
+        MudDialog.Close(DialogResult.Ok(ShoppingListRequest));
+    }
+
+    private void Cancel() => MudDialog.Cancel();
+}

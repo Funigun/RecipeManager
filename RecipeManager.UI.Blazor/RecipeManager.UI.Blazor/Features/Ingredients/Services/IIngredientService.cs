@@ -17,6 +17,8 @@ public interface IIngredientService
 
     Task<IEnumerable<IngredientForDropdownModel>> GetIngredientsForDropdownModel(string ingredientName, CancellationToken cancellationToken = default);
 
+    Task<ShoppingListResponse> GetIngredientsForShoppingList(ShoppingListRequest shoppingListDetails, CancellationToken cancellationToken = default);
+
     Task UpdateIngredient(string relativeUri, IngredientForUpdateModel ingredientForUpdate, CancellationToken cancellationToken = default);
 
     Task DeleteIngredient(string relativeUri);

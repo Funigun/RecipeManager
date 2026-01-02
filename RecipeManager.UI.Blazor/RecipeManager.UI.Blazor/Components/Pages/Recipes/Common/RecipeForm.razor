@@ -62,8 +62,8 @@
                     <MudStack Spacing="5">
                         <MudTextField AutoGrow Label="Description" MaxLength="500" For="@(() => RecipeModel.Item.Description)" @bind-Value="RecipeModel.Item.Description" />
                         
-                            <MudAutocomplete T="IngredientForDropdownModel" Label="Assigned ingredient" @bind-Value="RecipeModel.Item.Ingredient" ShowProgressIndicator="true"
-                                             SearchFunc="SearchIngredients" ToStringFunc="@(e => e == null ? null : e.Name)" style="width: 300px; padding-top: 15px;" Clearable=true/>
+                        <MudAutocomplete T="IngredientForDropdownModel" Label="Assigned ingredient" @bind-Value="RecipeModel.Item.Ingredient" ShowProgressIndicator="true"
+                                         SearchFunc="SearchIngredients" ToStringFunc="@(e => e == null ? null : e.Name)" style="width: 300px; padding-top: 15px;" Clearable=true/>
 
                         <MudStack Row="true" Style="padding-top: 15px;">
                             <MudText Style="align-content: end" Color="@(categoriesMessages != null && categoriesMessages.Any() ? Color.Error : Color.Default)">Categories*</MudText>
@@ -108,9 +108,19 @@
                         </MudItem>
                         <MudItem xs="3">
                             <MudSelect T="Guid" Label="Unit*" For="@(() => RecipeModel.Item.Amount.Unit.Id)" @bind-value="RecipeModel.Item.Amount.Unit.Id">
-                                @foreach (var unit in units)
+                                @if (RecipeModel.Item.Ingredient == null)
                                 {
-                                    <MudSelectItem Value="@unit.Id">@unit.Name</MudSelectItem>
+                                    @foreach (var unit in units)
+                                    {
+                                        <MudSelectItem Value="@unit.Id">@unit.Name</MudSelectItem>
+                                    }
+                                }
+                                else
+                                {
+                                    @foreach (var unit in RecipeModel.Item.Ingredient.AvailableUnits)
+                                    {
+                                        <MudSelectItem Value="@unit.Id">@unit.Name</MudSelectItem>
+                                    }
                                 }
                             </MudSelect>
                         </MudItem>
@@ -139,7 +149,7 @@
 
         <MudPaper Outlined="true" Style="margin-top: 25px">
             <MudExpansionPanel Text="Ingredients" >
-                <RecipeIngredientsListComponent Ingredients="RecipeModel.Item.Ingredients" Units="units" OnDataChanged="HandleIngredientsChanged"></RecipeIngredientsListComponent>
+                <RecipeIngredientsListComponent Ingredients="RecipeModel.Item.Ingredients" OnDataChanged="HandleIngredientsChanged"></RecipeIngredientsListComponent>
             </MudExpansionPanel>
         </MudPaper>
 
