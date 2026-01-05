@@ -1,4 +1,5 @@
-﻿using RecipeManager.Api.Application.Database;
+﻿using Microsoft.EntityFrameworkCore;
+using RecipeManager.Api.Application.Database;
 using RecipeManager.Api.Domain.Common.Abstractions;
 using RecipeManager.Api.Shared.Contracts.Authorization;
 using RecipeManager.Api.Shared.Hateoas.Models;
@@ -7,7 +8,7 @@ namespace RecipeManager.Api.Persistance.Repositories;
 
 public abstract class BaseRepository<TEntity, TKey>(AppDbContext dbContext, ICurrentUser currentUser) : IBaseRepository<TEntity, TKey>
                 where TEntity : class, IEntity<TKey>
-                where TKey : IEntityId
+                where TKey : class, IEntityId
 {
     public async Task Add(TEntity entity, CancellationToken cancellationToken = default)
     {
@@ -38,7 +39,7 @@ public abstract class BaseRepository<TEntity, TKey>(AppDbContext dbContext, ICur
 
     public async Task<TEntity?> GetByIdAsync(TKey id, CancellationToken cancellationToken = default)
     {
-        return await dbContext.Set<TEntity>().FindAsync([id], cancellationToken);
+        return await dbContext.Set<TEntity>().AsNoTracking().FirstOrDefaultAsync(t => t.Id == id, cancellationToken);
     }
 
     public Task Update(TEntity entity, CancellationToken cancellationToken = default)
