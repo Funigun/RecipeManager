@@ -16,7 +16,9 @@ public abstract class BaseRepository<TEntity, TKey>(AppDbContext dbContext, ICur
 
     public Task Delete(TEntity entity, CancellationToken cancellationToken = default)
     {
-        throw new NotImplementedException();
+        dbContext.Set<TEntity>().Remove(entity);
+
+        return Task.CompletedTask;
     }
 
     public Task<bool> ExistsAsync(Func<TEntity>? predicate = null, CancellationToken cancellationToken = default)
@@ -34,9 +36,9 @@ public abstract class BaseRepository<TEntity, TKey>(AppDbContext dbContext, ICur
         throw new NotImplementedException();
     }
 
-    public Task<TEntity?> GetByIdAsync(TKey id, CancellationToken cancellationToken = default)
+    public async Task<TEntity?> GetByIdAsync(TKey id, CancellationToken cancellationToken = default)
     {
-        throw new NotImplementedException();
+        return await dbContext.Set<TEntity>().FindAsync([id], cancellationToken);
     }
 
     public Task Update(TEntity entity, CancellationToken cancellationToken = default)

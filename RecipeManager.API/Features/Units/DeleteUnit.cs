@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using RecipeManager.Api.Application.Abstractions;
+using RecipeManager.Api.Application.Database;
 using RecipeManager.Api.Application.Exceptions;
 using RecipeManager.Api.Domain.Units;
 using RecipeManager.Api.Shared.Contracts.Authorization;
@@ -35,15 +36,15 @@ public static class DeleteUnit
         }
     }
 
-    public static async Task<Results<NoContent, NotFound>> Handler(Request unitId, [FromServices] IAppDbContext dbContext, CancellationToken cancellationToken)
+    public static async Task<Results<NoContent, NotFound>> Handler(Request unitId, [FromServices] IUnitOfWork unitOfWork, CancellationToken cancellationToken)
     {
         UnitId id = new(unitId.Id);
 
-        Unit? unit = await dbContext.Units.FindAsync([id], cancellationToken)
+        Unit? unit = await unitOfWork.Units.GetByIdAsync(id, cancellationToken)
                   ?? throw new EntityNotFoundException<Unit, UnitId>(id);
 
-        dbContext.Units.Remove(unit);
-        await dbContext.SaveChangesAsync(cancellationToken);
+        await unitOfWork.Units.Delete(unit, cancellationToken);
+        await unitOfWork.SaveChangesAsync(cancellationToken);
 
         return TypedResults.NoContent();
     }
