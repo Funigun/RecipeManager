@@ -2,8 +2,10 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RecipeManager.Api.Application.Abstractions;
+using RecipeManager.Api.Application.Database;
 using RecipeManager.Api.Domain.Units;
 using RecipeManager.Api.Domain.Units.Enums;
+using RecipeManager.Api.Persistance.Extensions;
 using RecipeManager.Api.Persistance.Migrations;
 using RecipeManager.Api.Shared.Contracts.Authorization;
 using RecipeManager.Api.Shared.Endpoint;
@@ -41,14 +43,9 @@ public static class GetUnits
         }
     }
 
-    internal static async Task<Results<Ok<HateoasCollectionResponse<Response>>, NotFound>> Handler([FromServices] ICurrentUser currentUser, [FromServices] IAppDbContext dbContext, [FromServices] IHateoasBuilderFactory hateoasBuilderFactory, CancellationToken cancellationToken)
+    internal static async Task<Results<Ok<HateoasCollectionResponse<Response>>, NotFound>> Handler([FromServices] ICurrentUser currentUser, [FromServices] IUnitOfWork unitOfWork, [FromServices] IHateoasBuilderFactory hateoasBuilderFactory, CancellationToken cancellationToken)
     {
-        IEnumerable<Unit> units = await dbContext.Units.AsNoTracking()
-                                                       .OrderBy(unit => unit.Group)
-                                                         .ThenBy(unit => unit.PrimaryUnit == null ? 1 : 2)
-                                                         .ThenBy(unit => unit.PrimaryUnit != null ? unit.ConversionFactor : 1000)
-                                                         .ThenBy(unit => unit.Name)
-                                                       .ToListAsync(cancellationToken);
+        IEnumerable<Unit> units = await unitOfWork.Units.GetAsync(null, q => q.DefaultOrder(), null, cancellationToken);
 
         IEnumerable<Response> responses = units.Select(unit => unit.ToGetResponse(units));
 

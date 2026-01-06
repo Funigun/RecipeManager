@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.Linq.Expressions;
+using Microsoft.EntityFrameworkCore;
 using RecipeManager.Api.Application.Database;
 using RecipeManager.Api.Domain.Common.Abstractions;
 using RecipeManager.Api.Shared.Contracts.Authorization;
@@ -32,9 +33,26 @@ public abstract class BaseRepository<TEntity, TKey>(AppDbContext dbContext, ICur
         throw new NotImplementedException();
     }
 
-    public Task<IEnumerable<TEntity>> GetAsync(Func<TEntity>? filters = null, Func<TEntity>? order = null, PagedParameters? paging = null, CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<TEntity>> GetAsync(Expression<Func<TEntity, bool>>? filters = null, Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? order = null, PagedParameters? paging = null, CancellationToken cancellationToken = default)
     {
-        throw new NotImplementedException();
+        IQueryable<TEntity> query = dbContext.Set<TEntity>().AsNoTracking();
+
+        if (filters is not null)
+        {
+            query = query.Where(filters);
+        }
+
+        if (order is not null)
+        {
+            query = order(query);
+        }
+
+        if (paging is not null)
+        {
+            query = query.Skip((paging.Page - 1) * paging.PageSize).Take(paging.PageSize);
+        }
+
+        return await query.ToListAsync(cancellationToken);
     }
 
     public async Task<TEntity?> GetByIdAsync(TKey id, CancellationToken cancellationToken = default)
@@ -42,8 +60,16 @@ public abstract class BaseRepository<TEntity, TKey>(AppDbContext dbContext, ICur
         return await dbContext.Set<TEntity>().AsNoTracking().FirstOrDefaultAsync(t => t.Id == id, cancellationToken);
     }
 
+    public async Task<bool> ExistsAsync(Expression<Func<TEntity, bool>>? predicate = null, CancellationToken cancellationToken = default)
+    {
+        return predicate is null
+            ? await dbContext.Set<TEntity>().AnyAsync(cancellationToken)
+            : await dbContext.Set<TEntity>().AnyAsync(predicate, cancellationToken);
+    }
+
     public Task Update(TEntity entity, CancellationToken cancellationToken = default)
     {
-        throw new NotImplementedException();
+        dbContext.Set<TEntity>().Update(entity);
+        return Task.CompletedTask;
     }
 }

@@ -8,14 +8,14 @@ namespace RecipeManager.Api.Persistance.Repositories;
 public class UnitRepository(AppDbContext dbContext, ICurrentUser currentUser)
            : BaseRepository<Unit, UnitId>(dbContext, currentUser), IUnitRepository
 {
-    public Task<bool> AnyByNameAsync(string name, UnitId excludedId = null, CancellationToken cancellationToken = default)
+    public async Task<bool> AnyByNameAsync(string name, UnitId excludedId = null, CancellationToken cancellationToken = default)
     {
-        throw new NotImplementedException();
+        return await dbContext.Units.AnyAsync(unit => unit.Name == name && unit.Id != excludedId, cancellationToken);
     }
 
-    public Task<bool> AnyByShortNameAsync(string name, UnitId excludedId = null, CancellationToken cancellationToken = default)
+    public async Task<bool> AnyByShortNameAsync(string name, UnitId excludedId = null, CancellationToken cancellationToken = default)
     {
-        throw new NotImplementedException();
+        return await dbContext.Units.AnyAsync(unit => unit.ShortName == name && unit.Id != excludedId, cancellationToken);
     }
 
     public async Task<IEnumerable<Unit>> GetPrimaryUnitsAsync(CancellationToken cancellationToken = default)
