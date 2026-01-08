@@ -23,7 +23,7 @@ public sealed class Unit : AuditableEntity, IEntity<UnitId>
 
     public int ConversionFactor { get; set; }
 
-    private Unit()
+    public Unit()
     {
     }
 

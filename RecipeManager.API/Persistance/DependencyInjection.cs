@@ -17,6 +17,7 @@ public static class DependencyInjection
 
         services.AddScoped<IAppDbContext, AppDbContext>();
         services.AddScoped<IUnitRepository, UnitRepository>();
+        services.Decorate<IUnitRepository, CachedUnitRepository>();
         services.AddScoped<IUnitOfWork, UnitOfWork>();
 
         return services;
