@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RecipeManager.Api.Application.Abstractions;
+using RecipeManager.Api.Application.Database;
 using RecipeManager.Api.Domain.Ingredients;
 using RecipeManager.Api.Domain.Units;
 using RecipeManager.Api.Shared.Contracts.Authorization;
@@ -26,7 +27,7 @@ public static class GetIngredientsForDropdown
         }
     }
 
-    public static async Task<Results<Ok<IEnumerable<Response>>, NotFound>> Handler([FromQuery] string? ingredientName, [FromServices] IAppDbContext dbContext, [FromServices] ICurrentUser currentUser, CancellationToken cancellationToken)
+    public static async Task<Results<Ok<IEnumerable<Response>>, NotFound>> Handler([FromQuery] string? ingredientName, [FromServices] IAppDbContext dbContext, [FromServices] IUnitOfWork unitOfWork, [FromServices] ICurrentUser currentUser, CancellationToken cancellationToken)
     {
         IQueryable<Ingredient> query = dbContext.Ingredients.AsNoTracking()
                                                             .Include(ingredient => ingredient.IngredientUnitConvertions)
@@ -40,7 +41,7 @@ public static class GetIngredientsForDropdown
 
         IEnumerable<Ingredient> ingredients = await query.ToListAsync(cancellationToken);
 
-        IEnumerable<Unit> units = await dbContext.Units.AsNoTracking().ToListAsync(cancellationToken);
+        IEnumerable<Unit> units = await unitOfWork.Units.GetAllAsync(cancellationToken);
 
         IEnumerable<Response> results = ingredients.OrderBy(ingredient => ingredient.Name)
                                                    .Select(ingredient => new Response

@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RecipeManager.Api.Application.Abstractions;
+using RecipeManager.Api.Application.Database;
 using RecipeManager.Api.Domain.Ingredients;
 using RecipeManager.Api.Domain.Units;
 using RecipeManager.Api.Persistance.Extensions;
@@ -39,10 +40,10 @@ public static class GetIngredients
         }
     }
 
-    public static async Task<Results<Ok<HateoasResponse<Response>>, BadRequest>> Handler([AsParameters] GetIngredientsFilterParameters filter, [FromServices] IHateoasBuilderFactory hateoasBuilderFactory, [FromServices] ICurrentUser currentUser, [FromServices] IAppDbContext dbContext, CancellationToken cancellationToken)
+    public static async Task<Results<Ok<HateoasResponse<Response>>, BadRequest>> Handler([AsParameters] GetIngredientsFilterParameters filter, [FromServices] IHateoasBuilderFactory hateoasBuilderFactory, [FromServices] ICurrentUser currentUser, [FromServices] IAppDbContext dbContext, [FromServices] IUnitOfWork unitOfWork, CancellationToken cancellationToken)
     {
         IEnumerable<IngredientCategoryId> categoryIds = await GetFilteredCategories(filter.Category, dbContext, cancellationToken);
-        Dictionary<UnitId, Unit> units = await dbContext.Units.AsNoTracking().ToDictionaryAsync(u => u.Id, cancellationToken);
+        Dictionary<UnitId, Unit> units = (await unitOfWork.Units.GetAllAsync(cancellationToken)).ToDictionary(u => u.Id);
 
         IQueryable<Ingredient> query = PrepareIngredientsQuery(dbContext, categoryIds, currentUser.Id);
 

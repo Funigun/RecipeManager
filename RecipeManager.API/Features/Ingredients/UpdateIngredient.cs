@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RecipeManager.Api.Application.Abstractions;
+using RecipeManager.Api.Application.Database;
 using RecipeManager.Api.Application.Exceptions;
 using RecipeManager.Api.Domain.Common;
 using RecipeManager.Api.Domain.Ingredients;
@@ -46,7 +47,7 @@ public static class UpdateIngredient
 
     public sealed class Validator : AbstractValidator<IngredientDto>
     {
-        public Validator(IAppDbContext dbContext)
+        public Validator(IAppDbContext dbContext, IUnitOfWork unitOfWork)
         {
             RuleFor(x => x.Name).SetValidator(new IngredientNameValidator());
 
@@ -59,24 +60,24 @@ public static class UpdateIngredient
             RuleFor(x => x.NutritionalValues.IngredientUnitId).MustAsync(async (ingredientUnitId, cancellationToken) =>
             {
                 UnitId unitId = new(ingredientUnitId);
-                return await dbContext.Units.AsNoTracking().AnyAsync(unit => unit.Id == unitId, cancellationToken);
+                return await unitOfWork.Units.AnyByIdAsync(unitId, cancellationToken);
             }).WithMessage("Ingredient unit does not exist");
 
             RuleFor(x => x.BaseUnit).MustAsync(async (baseUnitId, cancellationToken) =>
             {
                 UnitId unitId = new(baseUnitId);
-                return await dbContext.Units.AsNoTracking().AnyAsync(unit => unit.Id == unitId, cancellationToken);
+                return await unitOfWork.Units.AnyByIdAsync(unitId, cancellationToken);
             }).WithMessage("Base unit does not exist");
 
             RuleFor(x => x.IngredientPackage.PackageUnitId)
-                .MustAsync(async (unitId, cancellationToken) => await dbContext.Units.AnyAsync(u => u.Id == new UnitId(unitId), cancellationToken))
+                .MustAsync(async (unitId, cancellationToken) => await unitOfWork.Units.AnyByIdAsync(new UnitId(unitId), cancellationToken))
                 .WithMessage("Package unit does not exist");
 
             RuleFor(x => x.IngredientPackage.PackageSize)
                 .GreaterThan(0).WithMessage("Package size must be greater than 0");
 
             RuleFor(x => x.IngredientPackage.PackageSizeUnitId)
-                .MustAsync(async (unitId, cancellationToken) => await dbContext.Units.AnyAsync(u => u.Id == new UnitId(unitId), cancellationToken))
+                .MustAsync(async (unitId, cancellationToken) => await unitOfWork.Units.AnyByIdAsync(new UnitId(unitId), cancellationToken))
                 .WithMessage("Package size unit does not exist");
 
             RuleForEach(x => x.IngredientUnitConvertions).ChildRules(convertion =>
@@ -84,7 +85,7 @@ public static class UpdateIngredient
                 convertion.RuleFor(c => c.UnitToConvertId).MustAsync(async (unitToConvertId, cancellationToken) =>
                 {
                     UnitId unitId = new(unitToConvertId);
-                    return await dbContext.Units.AsNoTracking().AnyAsync(unit => unit.Id == unitId, cancellationToken);
+                    return await unitOfWork.Units.AnyByIdAsync(unitId, cancellationToken);
                 }).WithMessage("Unit to convert does not exist");
                 convertion.RuleFor(c => c.Ratio).GreaterThan(0).WithMessage("Ratio must be greater than 0");
             });

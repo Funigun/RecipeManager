@@ -9,4 +9,6 @@ public interface IUnitRepository : IBaseRepository<Unit, UnitId>
     Task<bool> AnyByShortNameAsync(string name, UnitId excludedId = null, CancellationToken cancellationToken = default);
 
     Task<IEnumerable<Unit>> GetPrimaryUnitsAsync(CancellationToken cancellationToken = default);
+
+    Task<bool> AnyByIdAsync(UnitId id, CancellationToken cancellationToken = default);
 }

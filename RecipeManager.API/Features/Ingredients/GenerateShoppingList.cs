@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RecipeManager.Api.Application.Abstractions;
+using RecipeManager.Api.Application.Database;
 using RecipeManager.Api.Domain.Ingredients;
 using RecipeManager.Api.Domain.Recipes;
 using RecipeManager.Api.Domain.Units;
@@ -73,9 +74,9 @@ public static class GenerateShoppingList
         }
     }
 
-    public static async Task<Results<Ok<Response>, BadRequest>> Handler(Request request, [FromServices] IAppDbContext dbContext, CancellationToken cancellationToken)
+    public static async Task<Results<Ok<Response>, BadRequest>> Handler(Request request, [FromServices] IAppDbContext dbContext, [FromServices] IUnitOfWork unitOfWork, CancellationToken cancellationToken)
     {
-        Dictionary<UnitId, Unit> units = await GetUnits(dbContext, cancellationToken);
+        Dictionary<UnitId, Unit> units = await GetUnits(unitOfWork, cancellationToken);
 
         IEnumerable<Recipe> recipes = await GetRecipes(request.Recipes.Select(r => r.Id), dbContext, cancellationToken);
         IEnumerable<Recipe> nestedRecipes = await GetNestedRecipes(recipes, dbContext, cancellationToken);
@@ -108,11 +109,11 @@ public static class GenerateShoppingList
                                                                                                Ingredient ingredient = ingredients[group.Key];
                                                                                                Unit ingredientBaseUnit = units[ingredient.BaseUnit ?? throw new InvalidOperationException("Ingredient base unit is null")];
                                                                                                return new RecipeIngredientDao
-                                                                                               {
-                                                                                                   IngredientId = group.Key,
-                                                                                                   Amount = group.Sum(i => i.Amount),
-                                                                                                   UnitId = ingredientBaseUnit.Id,
-                                                                                               };
+                                                                                                   {
+                                                                                                       IngredientId = group.Key,
+                                                                                                       Amount = group.Sum(i => i.Amount),
+                                                                                                       UnitId = ingredientBaseUnit.Id,
+                                                                                                   };
                                                                                            })
                                                                                            .ToList();
 
@@ -182,10 +183,10 @@ public static class GenerateShoppingList
         return results;
     }
 
-    private static async Task<Dictionary<UnitId, Unit>> GetUnits(IAppDbContext dbContext, CancellationToken cancellationToken)
+    private static async Task<Dictionary<UnitId, Unit>> GetUnits(IUnitOfWork unitOfWork, CancellationToken cancellationToken)
     {
-        return await dbContext.Units.AsNoTracking()
-                                    .ToDictionaryAsync(unit => unit.Id, unit => unit, cancellationToken);
+        return (await unitOfWork.Units.GetAllAsync(cancellationToken))
+                                    .ToDictionary(unit => unit.Id, unit => unit);
     }
 
     private static async Task<IEnumerable<Ingredient>> GetIngredients(IEnumerable<IngredientId> ingredientIds, IAppDbContext dbContext, CancellationToken cancellationToken)

@@ -24,4 +24,9 @@ public class UnitRepository(AppDbContext dbContext, ICurrentUser currentUser)
                               .Where(unit => unit.PrimaryUnit == null)
                               .ToListAsync(cancellationToken);
     }
+
+    public async Task<bool> AnyByIdAsync(UnitId id, CancellationToken cancellationToken = default)
+    {
+        return await dbContext.Units.AnyAsync(unit => unit.Id == id, cancellationToken);
+    }
 }

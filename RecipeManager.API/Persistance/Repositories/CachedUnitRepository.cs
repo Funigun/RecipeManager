@@ -17,6 +17,11 @@ public class CachedUnitRepository(IUnitRepository decorated, ICacheService cache
         await RemoveCache(entity, cancellationToken);
     }
 
+    public async Task<bool> AnyByIdAsync(UnitId id, CancellationToken cancellationToken = default)
+    {
+        return await decorated.AnyByIdAsync(id, cancellationToken);
+    }
+
     public async Task<bool> AnyByNameAsync(string name, UnitId excludedId = null, CancellationToken cancellationToken = default)
     {
         return await decorated.AnyByNameAsync(name, excludedId, cancellationToken);
