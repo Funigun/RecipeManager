@@ -11,7 +11,7 @@ Features overview:
 ---
 
 ## Project History & Key Points
-This project was created as part of a "WEB API Masters" course from Szko³a Dotneta platform.
+This project was created as part of a "WEB API Masters" course from Szkola Dotneta platform.
 
 - **September 2024**: Project started, following the course with controllers, clean architecture, CQRS, and the MediatR library.
 - **May 2025**: Refactored to Minimal API with Vertical Slice architecture; removed MediatR.
