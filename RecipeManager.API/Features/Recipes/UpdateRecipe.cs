@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RecipeManager.Api.Application.Abstractions;
+using RecipeManager.Api.Application.Database;
 using RecipeManager.Api.Application.Exceptions;
 using RecipeManager.Api.Domain.Common;
 using RecipeManager.Api.Domain.Ingredients;
@@ -49,7 +50,7 @@ public static class UpdateRecipe
 
     public sealed class Validator : AbstractValidator<RecipeDto>
     {
-        public Validator(IAppDbContext dbContext)
+        public Validator(IAppDbContext dbContext, IUnitOfWork unitOfWork)
         {
             RuleFor(x => x.Title).SetValidator(new RecipeTitleValidator());
             RuleFor(x => x.Description).SetValidator(new RecipeDescriptionValidator());
@@ -59,8 +60,7 @@ public static class UpdateRecipe
             RuleFor(x => x.Amount.Unit.Id).NotEmpty()
                 .MustAsync(async (unitId, cancellationToken) =>
                 {
-                    return await dbContext.Units.AsNoTracking()
-                                                .AnyAsync(unit => unit.Id == new UnitId(unitId), cancellationToken);
+                    return await unitOfWork.Units.AnyByIdAsync(new UnitId(unitId), cancellationToken);
                 })
                 .WithMessage("Provided invalid UnitId for recipe amount");
 
@@ -75,7 +75,7 @@ public static class UpdateRecipe
             RuleFor(x => x.NutritionalValues.Proteins).SetValidator(new IngredientNutritionalProteinsValueValidator());
             RuleFor(x => x.NutritionalValues.IngredientAmount).SetValidator(new IngredientNutritionalAmountValidator());
 
-            RuleFor(x => x.Ingredients).SetValidator(new RecipeIngredientsValidator(dbContext));
+            RuleFor(x => x.Ingredients).SetValidator(new RecipeIngredientsValidator(dbContext, unitOfWork));
             RuleFor(x => x.Sections).SetValidator(new RecipeSectionsValidator());
 
             RuleFor(x => x.Categories)
@@ -110,12 +110,7 @@ public static class UpdateRecipe
                 }).WithMessage("Provided invalid IngredientId for recipe")
                 .Must((request, ingredientId) =>
                 {
-                    if (ingredientId is null)
-                    {
-                        return true;
-                    }
-
-                    return !request.Ingredients.Any(ingredient => ingredient.Ingredient.Id == ingredientId.Value);
+                    return ingredientId is null || !request.Ingredients.Any(ingredient => ingredient.Ingredient.Id == ingredientId.Value);
                 })
                 .WithMessage("List of ingredients can not contain an ingredient for which this recipe is designed");
         }
@@ -123,7 +118,7 @@ public static class UpdateRecipe
 
     public sealed class RecipeIngredientsValidator : AbstractValidator<IEnumerable<RecipeIngredientDto>>
     {
-        public RecipeIngredientsValidator(IAppDbContext dbContext)
+        public RecipeIngredientsValidator(IAppDbContext dbContext, IUnitOfWork unitOfWork)
         {
             RuleFor(ingredients => ingredients)
                 .NotEmpty()
@@ -140,10 +135,7 @@ public static class UpdateRecipe
                 {
                     IEnumerable<UnitId> unitIds = ingredients.Select(i => new UnitId(i.Unit.Id)).Distinct();
 
-                    return await dbContext.Units.AsNoTracking()
-                                                .Where(unit => unitIds.Contains(unit.Id))
-                                                .CountAsync(cancellationToken) == unitIds.Count();
-
+                    return await unitOfWork.Units.AreIdsValidAsync(unitIds, cancellationToken);
                 })
                 .WithMessage("Some of units does not exist")
                 .Must(ingredients =>

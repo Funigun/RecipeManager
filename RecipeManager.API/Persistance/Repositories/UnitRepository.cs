@@ -29,4 +29,11 @@ public class UnitRepository(AppDbContext dbContext, ICurrentUser currentUser)
     {
         return await dbContext.Units.AnyAsync(unit => unit.Id == id, cancellationToken);
     }
+
+    public async Task<bool> AreIdsValidAsync(IEnumerable<UnitId> ids, CancellationToken cancellationToken = default)
+    {
+        return !ids.Any() || await dbContext.Units.AsNoTracking()
+                              .Where(unit => ids.Contains(unit.Id))
+                              .CountAsync(cancellationToken) == ids.Count();
+    }
 }

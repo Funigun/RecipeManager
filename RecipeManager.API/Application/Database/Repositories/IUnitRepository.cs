@@ -11,4 +11,6 @@ public interface IUnitRepository : IBaseRepository<Unit, UnitId>
     Task<IEnumerable<Unit>> GetPrimaryUnitsAsync(CancellationToken cancellationToken = default);
 
     Task<bool> AnyByIdAsync(UnitId id, CancellationToken cancellationToken = default);
+
+    Task<bool> AreIdsValidAsync(IEnumerable<UnitId> ids, CancellationToken cancellationToken = default);
 }

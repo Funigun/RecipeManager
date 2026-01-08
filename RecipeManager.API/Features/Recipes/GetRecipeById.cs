@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RecipeManager.Api.Application.Abstractions;
+using RecipeManager.Api.Application.Database;
 using RecipeManager.Api.Application.Exceptions;
 using RecipeManager.Api.Domain.Common;
 using RecipeManager.Api.Domain.Ingredients;
@@ -52,12 +53,12 @@ public static class GetRecipeById
         }
     }
 
-    public static async Task<Results<Ok<HateoasResponse<Response>>, BadRequest>> Handler(Request id, [FromServices] ICurrentUser currentUser, [FromServices] IAppDbContext dbContext, [FromServices] IHateoasBuilderFactory hateoasBuilderFactory, CancellationToken cancellationToken)
+    public static async Task<Results<Ok<HateoasResponse<Response>>, BadRequest>> Handler(Request id, [FromServices] ICurrentUser currentUser, [FromServices] IAppDbContext dbContext, [FromServices] IUnitOfWork unitOfWork, [FromServices] IHateoasBuilderFactory hateoasBuilderFactory, CancellationToken cancellationToken)
     {
         Recipe? recipe = await GetRecipe(new RecipeId(id.Id), dbContext, cancellationToken);
 
         IEnumerable<Ingredient> recipeIngredients = await GetRecipeIngredients(recipe!, dbContext, cancellationToken);
-        IEnumerable<Unit> units = await dbContext.Units.AsNoTracking().ToListAsync(cancellationToken);
+        IEnumerable<Unit> units = await unitOfWork.Units.GetAllAsync(cancellationToken);
         IEnumerable<RecipeCategory> categories = recipe!.Categories.Count > 0
                                                ? await dbContext.RecipeCategories.Where(category => recipe.Categories.Contains(category.Id))
                                                                                  .AsNoTracking()

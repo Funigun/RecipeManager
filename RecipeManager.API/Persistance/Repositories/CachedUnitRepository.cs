@@ -32,6 +32,11 @@ public class CachedUnitRepository(IUnitRepository decorated, ICacheService cache
         return await decorated.AnyByShortNameAsync(name, excludedId, cancellationToken);
     }
 
+    public async Task<bool> AreIdsValidAsync(IEnumerable<UnitId> ids, CancellationToken cancellationToken = default)
+    {
+        return await decorated.AreIdsValidAsync(ids, cancellationToken);
+    }
+
     public async Task Delete(Unit entity, CancellationToken cancellationToken = default)
     {
         await decorated.Delete(entity, cancellationToken);
