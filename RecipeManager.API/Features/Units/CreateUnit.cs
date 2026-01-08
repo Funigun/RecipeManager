@@ -1,7 +1,6 @@
 ﻿using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using RecipeManager.Api.Application.Abstractions;
+using RecipeManager.Api.Application.Database;
 using RecipeManager.Api.Domain.Units;
 using RecipeManager.Api.Domain.Units.Enums;
 using RecipeManager.Api.Shared.Contracts.Authorization;
@@ -38,13 +37,13 @@ public static class CreateUnit
 
     public sealed class Validator : AbstractValidator<Request>
     {
-        public Validator(IAppDbContext dbContext)
+        public Validator(IUnitOfWork unitOfWork)
         {
             RuleFor(x => x.Name)
                 .SetValidator(new UnitNameValidator())
                 .MustAsync(async (name, cancellationToken) =>
                 {
-                    return !await dbContext.Units.AnyAsync(unit => unit.Name == name, cancellationToken);
+                    return !await unitOfWork.Units.AnyByNameAsync(name, cancellationToken: cancellationToken);
                 }).WithMessage("Unit Name must be unique");
 
             When(x => x.ShortName is not null, () =>
@@ -53,7 +52,7 @@ public static class CreateUnit
                     .SetValidator(new UnitShortNameValidator())
                     .MustAsync(async (shortName, cancellationToken) =>
                     {
-                        return !await dbContext.Units.AnyAsync(unit => unit.ShortName == shortName, cancellationToken);
+                        return !await unitOfWork.Units.AnyByShortNameAsync(shortName, cancellationToken: cancellationToken);
                     }).WithMessage("Unit Short Name must be unique");
             });
 
@@ -80,7 +79,7 @@ public static class CreateUnit
                     .MustAsync(async (primaryUnitId, cancellationToken) =>
                     {
                         UnitId id = new(primaryUnitId!.Value);
-                        return await dbContext.Units.AnyAsync(unit => unit.Id == id, cancellationToken);
+                        return await unitOfWork.Units.GetByIdAsync(id, cancellationToken) is not null;
                     }).WithMessage("Primary Unit must reference an existing unit");
 
                 RuleFor(x => x.ConversionFactor)
@@ -109,13 +108,13 @@ public static class CreateUnit
         }
     }
 
-    public static async Task<IResult> Handler(Request request, [FromServices] IAppDbContext dbContext, CancellationToken cancellationToken)
+    public static async Task<IResult> Handler(Request request, [FromServices] IUnitOfWork unitOfWork, CancellationToken cancellationToken)
     {
         Unit unit = request.ToUnit();
 
-        dbContext.Units.Add(unit);
+        await unitOfWork.Units.Add(unit, cancellationToken);
 
-        await dbContext.SaveChangesAsync(cancellationToken);
+        await unitOfWork.SaveChangesAsync(cancellationToken);
 
         return Results.Created($"/api/units/{unit.Id}", unit.ToPostResponse());
     }

@@ -1,8 +1,7 @@
 ﻿using FluentValidation;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using RecipeManager.Api.Application.Abstractions;
+using RecipeManager.Api.Application.Database;
 using RecipeManager.Api.Application.Exceptions;
 using RecipeManager.Api.Domain.Units;
 using RecipeManager.Api.Domain.Units.Enums;
@@ -28,7 +27,7 @@ public static class UpdateUnit
 
     public sealed class Validator : AbstractValidator<Request>
     {
-        public Validator(IAppDbContext dbContext, IHttpContextAccessor context)
+        public Validator(IUnitOfWork unitOfWork, IHttpContextAccessor context)
         {
             RuleFor(x => x.Name)
                 .SetValidator(new UnitNameValidator())
@@ -36,7 +35,7 @@ public static class UpdateUnit
                 {
                     string id = context.HttpContext!.GetRouteData().Values["unitId"]!.ToString()!;
                     UnitId unitId = new(Guid.Parse(id));
-                    return !await dbContext.Units.AnyAsync(unit => unit.Name == name && unit.Id != unitId, cancellationToken);
+                    return !await unitOfWork.Units.AnyByNameAsync(name, unitId, cancellationToken);
                 }).WithMessage("Unit Name must be unique");
 
             When(x => x.ShortName is not null, () =>
@@ -47,7 +46,7 @@ public static class UpdateUnit
                     {
                         string id = context.HttpContext!.GetRouteData().Values["unitId"]!.ToString()!;
                         UnitId unitId = new(Guid.Parse(id));
-                        return !await dbContext.Units.AnyAsync(unit => unit.ShortName == shortName && unit.Id != unitId, cancellationToken);
+                        return !await unitOfWork.Units.AnyByShortNameAsync(shortName, unitId, cancellationToken);
                     }).WithMessage("Unit Short Name must be unique");
             });
 
@@ -74,7 +73,7 @@ public static class UpdateUnit
                     .MustAsync(async (primaryUnitId, cancellationToken) =>
                     {
                         UnitId id = new(primaryUnitId!.Value);
-                        return await dbContext.Units.AnyAsync(unit => unit.Id == id, cancellationToken);
+                        return await unitOfWork.Units.ExistsAsync(unit => unit.Id == id, cancellationToken);
                     }).WithMessage("Primary Unit must reference an existing unit");
 
                 RuleFor(x => x.ConversionFactor)
@@ -103,11 +102,11 @@ public static class UpdateUnit
         }
     }
 
-    internal static async Task<Results<NoContent, NotFound, BadRequest>> Handler(Guid unitId, [FromBody] Request request, [FromServices] IAppDbContext dbContext, CancellationToken cancellationToken)
+    internal static async Task<Results<NoContent, NotFound, BadRequest>> Handler(Guid unitId, [FromBody] Request request, [FromServices] IUnitOfWork unitOfWork, CancellationToken cancellationToken)
     {
         UnitId id = new(unitId);
 
-        Unit? unit = await dbContext.Units.FindAsync([id], cancellationToken)
+        Unit? unit = await unitOfWork.Units.GetByIdAsync(id, cancellationToken)
                   ?? throw new EntityNotFoundException<Unit, UnitId>(id);
 
         unit.Update(
@@ -121,7 +120,8 @@ public static class UpdateUnit
             request.ConversionFactor
         );
 
-        await dbContext.SaveChangesAsync(cancellationToken);
+        await unitOfWork.Units.Update(unit, cancellationToken);
+        await unitOfWork.SaveChangesAsync(cancellationToken);
 
         return TypedResults.NoContent();
     }

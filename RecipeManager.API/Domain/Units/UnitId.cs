@@ -1,6 +1,8 @@
-﻿namespace RecipeManager.Api.Domain.Units;
+﻿using RecipeManager.Api.Domain.Common.Abstractions;
 
-public record UnitId(Guid Value)
+namespace RecipeManager.Api.Domain.Units;
+
+public record UnitId(Guid Value) : IEntityId
 {
     public static implicit operator Guid(UnitId id) => id.Value;
 

@@ -1,12 +1,16 @@
 using System.Reflection;
 using System.Text.Json.Serialization.Metadata;
 using FluentValidation;
+using Microsoft.Extensions.Caching.Hybrid;
+using RecipeManager.Api.Application.Abstractions;
 using RecipeManager.Api.Persistance;
+using RecipeManager.Api.Persistance.Cache;
 using RecipeManager.Api.Presentation;
 using RecipeManager.Api.Shared;
 using RecipeManager.ServiceDefaults;
 using Scalar.AspNetCore;
 using Serilog;
+using StackExchange.Redis;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
@@ -55,9 +59,35 @@ try
                     .AddAuthorizationPolicies(assembly)
                     .AddValidatorsFromAssembly(assembly)
                     .AddValidatorsFromAssembly(contractsAssembly);
-                    //.AddScoped<IRedisService, RedisService>();
 
     builder.Services.AddPersistance(builder.Configuration);
+
+    builder.AddRedisClient("Cache");
+    IConnectionMultiplexer? redis = null;
+
+    try
+    {
+        redis = builder.Services.BuildServiceProvider().GetService<IConnectionMultiplexer>();
+    }
+    catch(Exception e)
+    {
+
+    }
+
+    if (redis is not null)
+    {
+        builder.Services.AddStackExchangeRedisCache(opt => opt.ConnectionMultiplexerFactory = () => Task.FromResult(redis));
+        builder.Services.AddHybridCache(options => options.DefaultEntryOptions = new HybridCacheEntryOptions
+        {
+            Flags = HybridCacheEntryFlags.DisableLocalCache
+        });
+    }
+    else
+    {
+        builder.Services.AddHybridCache();
+    }
+
+    builder.Services.AddSingleton<ICacheService, HybridCacheService>();
 
     builder.Services.ConfigureAuthentication(builder.Configuration)
                     .AddAuthorizationBuilder()
@@ -65,8 +95,6 @@ try
                     {
                         policy.RequireAuthenticatedUser();
                     });
-
-    //builder.AddRedisClient("Cache");
 
     WebApplication app = builder.Build();
 

@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using RecipeManager.Api.Application.Abstractions;
+using RecipeManager.Api.Application.Database;
 using RecipeManager.Api.Domain.Units;
 using RecipeManager.Api.Shared.Endpoint;
 
@@ -23,11 +22,9 @@ public static class GetPrimaryUnits
         }
     }
 
-    internal static async Task<Results<Ok<IEnumerable<Response>>, BadRequest>> Handler([FromServices] IAppDbContext dbContext, CancellationToken cancellationToken)
+    internal static async Task<Results<Ok<IEnumerable<Response>>, BadRequest>> Handler([FromServices] IUnitOfWork unitOfWork, CancellationToken cancellationToken)
     {
-        IEnumerable<Unit> primaryUnits = await dbContext.Units.AsNoTracking()
-                                                              .Where(unit => unit.PrimaryUnit == null)
-                                                              .ToListAsync(cancellationToken);
+        IEnumerable<Unit> primaryUnits = await unitOfWork.Units.GetPrimaryUnitsAsync(cancellationToken);
 
         IEnumerable<Response> response = primaryUnits.Select(u => new Response(u.Id, u.Name));
 

@@ -1,15 +1,21 @@
 ﻿using System.Net.Http.Headers;
 using DotNet.Testcontainers.Builders;
+using DotNet.Testcontainers.Images;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Hybrid;
+using Microsoft.Extensions.Caching.StackExchangeRedis;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using RecipeManager.Api.Persistance;
 using RecipeManager.Api.Presentation;
 using RecipeManager.Integration.Tests.Common.Users;
 using RecipeManager.Integration.Tests.CoreApi.TestFixtures;
+using StackExchange.Redis;
 using Testcontainers.MsSql;
+using Testcontainers.Redis;
 
 [assembly: AssemblyFixture(typeof(WebApiFactory))]
 
@@ -17,13 +23,15 @@ namespace RecipeManager.Integration.Tests.CoreApi.TestFixtures;
 
 public sealed class WebApiFactory : WebApplicationFactory<IAssemblyMarker>, IAsyncLifetime
 {
-    private readonly MsSqlContainer _sqlContainer = new MsSqlBuilder().WithImage("mcr.microsoft.com/mssql/server:2025-latest")
+    private readonly MsSqlContainer _sqlContainer = new MsSqlBuilder("mcr.microsoft.com/mssql/server:2025-latest")
                                                                       .WithPassword("Str0ng_P@ssw0rd4Tests")
                                                                       .WithPortBinding(1433)
                                                                       .WithEnvironment("ACCEPT_EULA", "Y")
-                                                                      .WithName("MealsManagerTestDb")
+                                                                      .WithName("RecipesManagerTestDb")
                                                                       .WithWaitStrategy(Wait.ForUnixContainer().UntilInternalTcpPortIsAvailable(1433))
                                                                       .Build();
+
+    private readonly RedisContainer _redisContainer = new RedisBuilder("redis:7.0").Build();
 
     public AppDbContext DbContext { get; private set; } = default!;
 
@@ -47,6 +55,20 @@ public sealed class WebApiFactory : WebApplicationFactory<IAssemblyMarker>, IAsy
                 options.EnableSensitiveDataLogging();
             });
 
+            services.RemoveAll(typeof(RedisCacheOptions));
+            services.RemoveAll(typeof(IConnectionMultiplexer));
+            services.RemoveAll(typeof(HybridCacheEntryOptions));
+            services.RemoveAll(typeof(HybridCache));
+
+            IConnectionMultiplexer redis = ConnectionMultiplexer.Connect(_redisContainer.GetConnectionString());
+            services.AddSingleton<IConnectionMultiplexer>(redis);
+            services.AddStackExchangeRedisCache(opt => opt.ConnectionMultiplexerFactory = () => Task.FromResult(redis));
+
+            services.AddHybridCache(options => options.DefaultEntryOptions = new HybridCacheEntryOptions
+            {
+                Flags = HybridCacheEntryFlags.DisableLocalCache
+            });
+
             services.Configure<JwtBearerOptions>(JwtBearerDefaults.AuthenticationScheme, options =>
             {
                 options.Configuration = new() { Issuer = TokenMockFactory.Issuer };
@@ -63,6 +85,7 @@ public sealed class WebApiFactory : WebApplicationFactory<IAssemblyMarker>, IAsy
     async ValueTask IAsyncLifetime.InitializeAsync()
     {
         await _sqlContainer.StartAsync();
+        await _redisContainer.StartAsync();
 
         DbContextOptions<AppDbContext> options = new DbContextOptionsBuilder<AppDbContext>()
                                                  .UseSqlServer(_sqlContainer.GetConnectionString())
@@ -85,6 +108,10 @@ public sealed class WebApiFactory : WebApplicationFactory<IAssemblyMarker>, IAsy
         await DbContext.DisposeAsync();
         await _sqlContainer.StopAsync();
         await _sqlContainer.DisposeAsync();
+
+        await _redisContainer.StopAsync();
+        await _redisContainer.DisposeAsync();
+
         await base.DisposeAsync();
     }
 }

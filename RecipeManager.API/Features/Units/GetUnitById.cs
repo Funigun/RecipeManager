@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RecipeManager.Api.Application.Abstractions;
+using RecipeManager.Api.Application.Database;
 using RecipeManager.Api.Application.Exceptions;
 using RecipeManager.Api.Domain.Units;
 using RecipeManager.Api.Shared.Contracts.Authorization;
@@ -29,15 +30,10 @@ public static class GetUnitById
         }
     }
 
-    internal static async Task<Results<Ok<HateoasResponse<Response>>, NotFound>> Handler(Guid unitId, [FromServices] ICurrentUser currentUser, [FromServices] IAppDbContext dbContext, [FromServices] IHateoasBuilderFactory hateoasBuilderFactory, CancellationToken cancellationToken)
+    internal static async Task<Results<Ok<HateoasResponse<Response>>, NotFound>> Handler(Guid unitId, [FromServices] ICurrentUser currentUser, [FromServices] IUnitOfWork unitOfWork, [FromServices] IHateoasBuilderFactory hateoasBuilderFactory, CancellationToken cancellationToken)
     {
         UnitId id = new(unitId);
-        Unit? unit = await dbContext.Units.AsNoTracking().FirstOrDefaultAsync(unit => unit.Id == id, cancellationToken);
-
-        if (unit is null)
-        {
-            throw new EntityNotFoundException<Unit, UnitId>(new(unitId));
-        }
+        Unit? unit = await unitOfWork.Units.GetByIdAsync(id, cancellationToken) ?? throw new EntityNotFoundException<Unit, UnitId>(new(unitId));
 
         bool isActionAllowed = currentUser.HasRole(UserRoles.Admin);
 
