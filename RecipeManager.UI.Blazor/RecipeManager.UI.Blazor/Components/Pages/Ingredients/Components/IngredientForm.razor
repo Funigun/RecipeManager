@@ -16,19 +16,73 @@
 @inject IRecipeService RecipeService;
 @inject IUnitService UnitService;
 
+<style>
+    .form-title {
+        text-align: center;
+    }
+
+    .ingredient-name-container {
+        margin-top: 15px; 
+        margin-bottom: 20px;
+    }
+
+    .ingredient-name {
+        margin-top: 15px;
+    }
+
+    .form-section-title {
+        align-content: center; 
+        width: calc(100% - 60px);
+    }
+    
+    .form-section-row {
+        align-items: end;
+    }
+
+    .base-unit-select {
+        width: 125px;
+    }
+    
+    .package-unit-select {
+        width: 125px;
+    }
+
+    .conversion-unit-select {
+        width: 125px;
+    }
+    
+    .nutritional-unit-select {
+        align-self: end; 
+        width: 125px;
+    }
+
+    .nutritional-values-contains-label {
+        align-content: end;
+    }
+
+    .conversion-table {
+        margin-top: 15px;
+    }
+    
+    .chipset-container {
+        max-height: 80px; 
+        overflow-y:auto;
+    }
+</style>
+
 @if (_availableBaseUnits.Any() && _availableUnits.Any())
 {
 <MudForm Model="@IngredientModel" Validation="@(validator.ValidateValue)" @bind-IsValid="@isSubmitEnabled">
-    <MudText Typo="Typo.h5" Class="mb-4" Style="text-align: center">@formTitle</MudText>
+    <MudText Typo="Typo.h5" Class="mb-4 form-title">@formTitle</MudText>
 
     <MudStack Spacing="5">        
         <MudStack Row="true">
             <ImageComponent ImageSource="" MaxHeight="75" MaxWidth="75" ImageStyle="margin-top: 20px;"/>
             <MudTextField Label="Name" For="@(() => IngredientModel.Item.Name)" @bind-Value="IngredientModel.Item.Name" Required="true" />
-            <MudIconButton Icon="@Icons.Material.Filled.FileUpload" Color="Color.Primary" Style="margin-top: 15px;" />
+            <MudIconButton Icon="@Icons.Material.Filled.FileUpload" Color="Color.Primary" Class="ingredient-name" />
         </MudStack>
 
-        <MudStack Row="true" Style="align-items: end;">
+        <MudStack Row="true" Class="form-section-row">
             <MudTooltip Text="Category where ingredient will be placed while creating shopping list, however if this is not specified then first assigned category will be used.">
                 <MudAutocomplete T="IngredientCategoryForDropdownModel" Label="Shoping List Category" ResetValueOnEmptyText="true" ShowProgressIndicator="true"
                                  SearchFunc="SearchCategories" ToStringFunc="@(e => e == null ? null : e.Name)" @bind-Value="IngredientModel.Item.ShoppingListCategory"
@@ -36,7 +90,7 @@
             </MudTooltip>
 
             <MudTooltip Text="Base unit ingredient will be used during shopping list calculations, it should refer to most common measurement for specific ingredient">
-                <MudSelect T="Guid?" @bind-Value="IngredientModel.Item.BaseUnit" Label="Base Unit" Required="true" Style="width: 125px;">
+                <MudSelect T="Guid?" @bind-Value="IngredientModel.Item.BaseUnit" Label="Base Unit" Required="true" Class="base-unit-select">
                     @foreach (var unit in _availableBaseUnits)
                     {
                         <MudSelectItem Value="@unit.UnitId">@unit.Name</MudSelectItem>
@@ -46,12 +100,12 @@
         </MudStack>
 
         <MudStack Row="true">
-            <MudText Typo="Typo.subtitle1" Style="align-content: center; width: calc(100% - 60px)">Package details</MudText>
+            <MudText Typo="Typo.subtitle1" Class="form-section-title">Package details</MudText>
             <MudIconButton Icon="@togglePackageDetailsIcon" Color="Color.Primary" Edge="Edge.End" OnClick="TogglePackageDetails" />
         </MudStack>
 
         <MudCollapse Expanded="@showPackageDetails">
-                <MudStack Row="true" Style="align-items: end;" Spacing="5">
+                <MudStack Row="true" Class="form-section-row" Spacing="5">
                     <MudSelect T="Guid" @bind-Value="IngredientModel.Item.IngredientPackage.PackageUnitId" Label="Package unit" Required="true">
                         @foreach (var unit in _availableUnits)
                         {
@@ -59,9 +113,9 @@
                         }
                     </MudSelect>
 
-                    <MudTextField T="int" Label="Package size" @bind-value="IngredientModel.Item.IngredientPackage.PackageSize" for="@(() => IngredientModel.Item.IngredientPackage.PackageSize)" Typo="Typo.h5" Style="width: 125px;" />
+                    <MudTextField T="int" Label="Package size" @bind-value="IngredientModel.Item.IngredientPackage.PackageSize" for="@(() => IngredientModel.Item.IngredientPackage.PackageSize)" Typo="Typo.h5" Class="package-unit-select" />
 
-                    <MudSelect T="Guid" @bind-Value="IngredientModel.Item.IngredientPackage.PackageSizeUnitId" Label="Package size unit" Required="true" Style="width: 125px;">
+                    <MudSelect T="Guid" @bind-Value="IngredientModel.Item.IngredientPackage.PackageSizeUnitId" Label="Package size unit" Required="true" Class="package-unit-select">
                         @foreach (var unit in _availableUnits)
                         {
                             <MudSelectItem Value="@unit.Id">@unit.Name</MudSelectItem>
@@ -71,24 +125,24 @@
         </MudCollapse>
         
         <MudStack Row="true">
-            <MudText Typo="Typo.subtitle1" Style="align-content: center; width: calc(100% - 60px)">Conversion table</MudText>
+            <MudText Typo="Typo.subtitle1" Class="form-section-title">Conversion table</MudText>
             <MudIconButton Icon="@toggleConversionTableIcon" Color="Color.Primary" Edge="Edge.End" OnClick="ToggleConversionTable" />
         </MudStack>
 
         <MudCollapse Expanded="@showConversionTable">
-            <MudStack Row="true" Style="align-items: end;">
-                <MudSelect T="Guid" @bind-Value="selectedUnitToConvert.UnitToConvertId" Label="Unit to convert" Required="true" Style="width: 125px;">
+            <MudStack Row="true" Class="form-section-row">
+                <MudSelect T="Guid" @bind-Value="selectedUnitToConvert.UnitToConvertId" Label="Unit to convert" Required="true" Class="conversion-unit-select">
                     @foreach (var unit in _availableUnits)
                     {
                         <MudSelectItem Value="@unit.Id">@unit.Name</MudSelectItem>
                     }
                 </MudSelect>
 
-                <MudTextField T="double" Label="Conversion ratio" @bind-value="selectedUnitToConvert.Ratio" for="@(() => selectedUnitToConvert.Ratio)" Typo="Typo.h5" Style="width: 125px;" />
+                <MudTextField T="double" Label="Conversion ratio" @bind-value="selectedUnitToConvert.Ratio" for="@(() => selectedUnitToConvert.Ratio)" Typo="Typo.h5" Class="conversion-unit-select" />
                 <MudIconButton Icon="@Icons.Material.Filled.Add" Color="Color.Primary" Edge="Edge.End" OnClick="AddUnitConversion" Disabled="@CanAddConversionUnit()" />
             </MudStack>
 
-            <MudTable T="IngredientUnitConvertionModel" Items="IngredientModel.Item.Convertions" Style="margin-top: 15px;">
+            <MudTable T="IngredientUnitConvertionModel" Items="IngredientModel.Item.Convertions" Class="conversion-table">
                 <HeaderContent>
                     <MudTh>Unit Name</MudTh>
                     <MudTh>Ratio</MudTh>
@@ -105,21 +159,21 @@
         </MudCollapse>
         
         <MudStack Row="true">
-            <MudText Typo="Typo.subtitle1" Style="align-content: center; width: calc(100% - 60px)">Nutritional Values</MudText>
+            <MudText Typo="Typo.subtitle1" Class="form-section-title">Nutritional Values</MudText>
             <MudIconButton Icon="@toggleRecipesIcon" Color="Color.Primary" Edge="Edge.End" OnClick="ToggleNutritionalValues" />
         </MudStack>
 
         <MudCollapse Expanded="@showNutritionalValues">
             <MudStack Row="true">
                 <MudTextField Label="Amount" For="@(() => IngredientModel.Item.NutritionalValues.IngredientAmount)" @bind-Value="IngredientModel.Item.NutritionalValues.IngredientAmount" Required="true" />
-                <MudSelect T="Guid?" @bind-Value="IngredientModel.Item.NutritionalValues.IngredientUnitId" Label="Nutritional Units" Required="true" Style="align-self: end; width: 125px;">
+                <MudSelect T="Guid?" @bind-Value="IngredientModel.Item.NutritionalValues.IngredientUnitId" Label="Nutritional Units" Required="true" Class="nutritional-unit-select">
                     @foreach (var unit in _availableBaseUnits)
                     {
                         <MudSelectItem Value="@unit.UnitId">@unit.Name</MudSelectItem>
                     }
                 </MudSelect>
                 
-                <MudText Style="align-content: end;"> contains:</MudText>
+                <MudText Class="nutritional-values-contains-label"> contains:</MudText>
             </MudStack>
             <MudTextField T="int" Label="Calories" For="@(() => IngredientModel.Item.NutritionalValues.Calories)" @bind-Value="IngredientModel.Item.NutritionalValues.Calories" Required="true" />
             <MudTextField T="double" Label="Carbohydrates" For="@(() => IngredientModel.Item.NutritionalValues.Carbohydrates)" @bind-Value="IngredientModel.Item.NutritionalValues.Carbohydrates" Required="true" />
@@ -128,7 +182,7 @@
         </MudCollapse>
 
         <MudStack Row="true">
-            <MudText Typo="Typo.subtitle1" Style="align-content: center; width: calc(100% - 60px)">Categories</MudText>
+            <MudText Typo="Typo.subtitle1" Class="form-section-title">Categories</MudText>
             <MudIconButton Icon="@toggleCategoriesIcon" Color="Color.Primary" OnClick="ToggleCategories" />
         </MudStack>
 
@@ -144,7 +198,7 @@
                         </MudStack>
                     }
 
-                    <div style="max-height: 80px; overflow-y:auto">
+                    <div class="chipset-container">
                     <MudChipSet T="IngredientCategoryForDropdownModel" AllClosable="@Mode.IsCreateOrEditMode()" OnClose="RemoveCategory">
                         @foreach (var category in IngredientModel.Item.Categories)
                             {
@@ -156,7 +210,7 @@
         </MudCollapse>
         
         <MudStack Row="true">
-            <MudText Typo="Typo.subtitle1" Style="align-content: center; width: calc(100% - 60px)">Recipes</MudText>
+            <MudText Typo="Typo.subtitle1" Class="form-section-title">Recipes</MudText>
             <MudIconButton Icon="@toggleRecipesIcon" Color="Color.Primary" Edge="Edge.End" OnClick="ToggleRecipes" />
         </MudStack>
 
@@ -172,7 +226,7 @@
                     </MudStack>
                 }
 
-                <div style="max-height: 80px; overflow-y:auto">
+                <div class="chipset-container">
                     <MudChipSet T="RecipeForDropdownModel" AllClosable="@Mode.IsCreateOrEditMode()" OnClose="RemoveRecipe">
                         @foreach (var recipe in IngredientModel.Item.Recipes)
                         {

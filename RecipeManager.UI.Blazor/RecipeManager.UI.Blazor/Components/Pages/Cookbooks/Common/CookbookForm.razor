@@ -14,25 +14,129 @@
 @inject IDialogMessageService DialogService
 @inject NavigationManager NavigationManager
 
+<style>
+    .form-container {
+        align-self: center; 
+        width: 95%;
+    }
+
+    .form-grid {
+        width: 100%;
+    }
+
+    .cover-image-container {
+        width: 25%;
+    }
+
+    .cover-image-wrapper {
+        width: 150px; 
+        height: 250px; 
+        justify-self:left;
+    }
+
+    .cover-image {
+        max-width: 150px; 
+        max-height:250px; 
+        margin-top: 15px;
+    }
+
+    .cover-image-placeholder {
+        width:150px; 
+        height: 250px; 
+        border: 1px solid; 
+        margin-top: 15px;
+    }
+
+    .details-container {
+        width: 65%;
+    }
+
+    .details-header {
+        margin-top: 15px;
+    }
+
+    .content-grid {
+        margin-top: 25px;
+    }
+
+    .categories-column {
+        padding-top: 0px; 
+        width: 45%;
+    }
+
+    .recipes-column {
+        margin-left: 25px; 
+        width: 45%; 
+        border-left: solid 0.6px gray; 
+        padding-top: 0px;
+    }
+
+    .add-recipe-row {
+        align-items:center;
+    }
+
+    .add-recipe-autocomplete {
+        margin-top: 15px;
+    }
+
+    .recipes-list {
+        margin-left: 5px; 
+        margin-top: 5px;
+    }
+
+    .single-recipe-stack {
+        width: 100%;
+    }
+
+    .single-recipe-item {
+        width: 100%;
+    }
+
+    .single-recipe-image {
+        max-width: 100px; 
+        max-height:100px; 
+        margin-top: 10px; 
+        margin-bottom: 10px;
+    }
+
+    .single-recipe-image-placeholder {
+        width:100px; 
+        height: 100px; 
+        border: 1px solid; 
+        margin-top: 10px; 
+        margin-bottom: 10px;
+    }
+
+    .single-recipe-title {
+        display:flex; 
+        margin-left: 5px; 
+        align-items: center;
+    }
+
+    .delete-button {
+        margin-right: 20px;
+    }
+</style>
+
 <MudForm @ref="Form" Model="CookbookModel" Validation="@(validator.ValidateValue)" @bind-IsValid="@isSubmitEnabled" @rendermode="RenderMode.InteractiveAuto">
     <MudStack Spacing="5">
-        <div style="align-self: center; width: 95%">
-            <MudGrid Style="width: 100%">
-                <MudItem Style="width: 25%;">
-                    <div style="width: 150px; height: 250px; justify-self:left;">
+        <div class="form-container">
+            <MudGrid Class="form-grid">
+                <MudItem Class="cover-image-container">
+                    <div class="cover-image-wrapper">
                         @if (CookbookModel.Item.CoverImageUrl != null)
                         {
-                            <MudImage Src="CookbookModel.Item.CoverImageUrl" Style="max-width: 150px; max-height:250px; margin-top: 15px;" />
+                            <MudImage Src="CookbookModel.Item.CoverImageUrl" Class="cover-image" />
                         }
                         else
                         {
-                            <MudIcon Icon="@Icons.Material.Filled.QuestionMark" Style="width:150px; height: 250px; border: 1px solid; margin-top: 15px;" />
+                            <MudIcon Icon="@Icons.Material.Filled.QuestionMark" Class="cover-image-placeholder" />
                         }
                     </div>
                 </MudItem>
 
-                <MudItem Style=" width: 65%;">
-                    <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Style="margin-top: 15px;">
+                <MudItem Class="details-container">
+                    <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center" Class="details-header">
                         <MudTextField ReadOnly="Mode.IsViewMode()" Required Label="Title" For="@(() => CookbookModel.Item.Title)" @bind-Value="CookbookModel.Item.Title" />
 
                         @if (Mode.IsViewMode() && @CookbookModel.Links.FirstOrDefault(link => link.Rel == HateoasConstants.Update) != null)
@@ -49,8 +153,8 @@
                 </MudItem>
             </MudGrid>
 
-            <MudGrid Style="margin-top: 25px;">                    
-                <MudItem Style="padding-top: 0px; width: 45%;">
+            <MudGrid Class="content-grid">                    
+                <MudItem Class="categories-column">
                     <MudStack>
                         @if (Mode.IsCreateOrEditMode())
                         {
@@ -73,14 +177,14 @@
                     </MudStack>
                 </MudItem>
                    
-                <MudItem Style="margin-left: 25px; width: 45%; border-left: solid 0.6px gray; padding-top: 0px;">
+                <MudItem Class="recipes-column">
                     <MudStack>
                         @if(Mode.IsCreateOrEditMode())
                         {
-                            <MudStack Row=true Style="align-items:center">
+                            <MudStack Row=true Class="add-recipe-row">
                                 <MudAutocomplete T="RecipeForDropdownModel" ResetValueOnEmptyText="true" ShowProgressIndicator="true" MaxItems="10" Placeholder="Find recipe to add"
                                                  SearchFunc="SearchRecipes" ToStringFunc="@(e => e == null ? null : e.Title)" ValueChanged="OnSelectedRecipeChanged"
-                                                 Style="margin-top: 15px">
+                                                 Class="add-recipe-autocomplete">
                                 </MudAutocomplete>
 
                                 <MudTooltip Text="Add recipe to selected category">
@@ -91,24 +195,24 @@
 
                         @if (selectedBookCategory != null && selectedBookCategory.Recipes.Any())
                         {
-                            <MudGrid T="CookbookRecipeForManageModel" Items="selectedBookCategory.Recipes" Style="margin-left: 5px; margin-top: 5px;">
+                            <MudGrid T="CookbookRecipeForManageModel" Items="selectedBookCategory.Recipes" Class="recipes-list">
                                 @for (int i = 0; i < selectedBookCategory.Recipes.Count; i++)
                                 {
                                     var recipe = selectedBookCategory.Recipes[i];
 
-                                    <MudStack Style="width: 100%">
-                                        <MudItem Style="width: 100%">
+                                    <MudStack Class="single-recipe-stack">
+                                        <MudItem Class="single-recipe-item">
                                             <MudStack Row=true>
                                                 @if (!string.IsNullOrEmpty(@recipe.Item.ImageUrl))
                                                 {
-                                                    <MudImage Src="@recipe.Item.ImageUrl" Style="max-width: 100px; max-height:100px; margin-top: 10px; margin-bottom: 10px;" />
+                                                    <MudImage Src="@recipe.Item.ImageUrl" Class="single-recipe-image" />
                                                 }
                                                 else
                                                 {
-                                                    <MudIcon Icon="@Icons.Material.Filled.QuestionMark" Style="width:100px; height: 100px; border: 1px solid; margin-top: 10px; margin-bottom: 10px;" />
+                                                    <MudIcon Icon="@Icons.Material.Filled.QuestionMark" Class="single-recipe-image-placeholder" />
                                                 }
 
-                                                <MudText Style="display:flex; margin-left: 5px; align-items: center">@recipe.Item.Title</MudText>
+                                                <MudText Class="single-recipe-title">@recipe.Item.Title</MudText>
 
                                                 <MudIconButton Icon="@Icons.Material.Filled.OpenInNew" Color="Color.Primary" OnClick="@(() => ShowRecipe(@recipe))" />
 
@@ -139,7 +243,7 @@
             <MudItem xs="6" Class="d-flex justify-end">
                 @if (Mode.IsEditMode() && @CookbookModel.Links.FirstOrDefault(link => link.Rel == HateoasConstants.Delete) != null)
                 {
-                    <MudButton Variant="Variant.Filled" Color="Color.Error" OnClick="DeleteCookbook" Style="margin-right: 20px">
+                    <MudButton Variant="Variant.Filled" Color="Color.Error" OnClick="DeleteCookbook" Class="delete-button">
                         Delete
                     </MudButton>
                 }

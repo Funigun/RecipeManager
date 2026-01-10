@@ -23,14 +23,9 @@ public abstract class BaseRepository<TEntity, TKey>(AppDbContext dbContext, ICur
         return Task.CompletedTask;
     }
 
-    public Task<bool> ExistsAsync(Func<TEntity>? predicate = null, CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<TEntity>> GetAllAsync(CancellationToken cancellationToken = default)
     {
-        throw new NotImplementedException();
-    }
-
-    public Task<IEnumerable<TEntity>> GetAllAsync(CancellationToken cancellationToken = default)
-    {
-        throw new NotImplementedException();
+        return await dbContext.Set<TEntity>().AsNoTracking().ToListAsync(cancellationToken);
     }
 
     public async Task<IEnumerable<TEntity>> GetAsync(Expression<Func<TEntity, bool>>? filters = null, Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? order = null, PagedParameters? paging = null, CancellationToken cancellationToken = default)

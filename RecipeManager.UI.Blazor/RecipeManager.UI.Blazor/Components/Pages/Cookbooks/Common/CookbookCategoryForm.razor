@@ -12,6 +12,12 @@
         background-color: white;
     }
 
+    .category-paper {
+        margin-top: 15px; 
+        margin-bottom: 10px; 
+        border: none;
+    }
+
     .category-title-with-children-1 {
         margin-left: 5px
     }
@@ -42,7 +48,7 @@
 </style>
 
 
-<MudPaper Elevation="@CookbookCategory.DepthLevel" Class="@(CookbookCategory.IsSelected  ? "category-selected" : "category-default")" Style="margin-top: 15px; margin-bottom: 10px; border: none" Outlined=true>
+<MudPaper Elevation="@CookbookCategory.DepthLevel" Class="@(CookbookCategory.IsSelected  ? "category-selected category-paper" : "category-default category-paper")" Outlined=true>
     <MudForm Model="CookbookCategory">
         <MudStack Row=true >
             <MudCheckBox T="bool" ReadOnly="false" ValueChanged="SelectCategory"></MudCheckBox>
