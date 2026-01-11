@@ -30,7 +30,11 @@
                             <MudIconButton Icon="@Icons.Material.Filled.Save" Color="Color.Primary" OnClick="@(() => SaveMealPlan())" />
                         </MudTooltip>
                     </MudStack>
-                    <MudStack Row="true" Class="d-flex align-center justify-center">    
+                    <MudStack Row="true" Class="d-flex align-center justify-center">
+                        <MudIconButton Icon="@Icons.Material.Filled.ArrowLeft" Color="Color.Primary" OnClick="@(() => MoveToThePreviousMonth())"/>
+                        <MudText Typo="Typo.h6" >@selectedPeriod.Month @selectedPeriod.Year</MudText>
+                        <MudIconButton Icon="@Icons.Material.Filled.ArrowRight" Color="Color.Primary" OnClick="@(() => MoveToTheNextMonth())"/>
+
                         <MudAutocomplete T="RecipeForMealPlanModel" ResetValueOnEmptyText="true" ShowProgressIndicator="true" MaxItems="10" Placeholder="Find recipe to add"
                                          SearchFunc="SearchRecipes" ToStringFunc="@(e => e == null ? null : e.Title)" ValueChanged="OnSelectedRecipeChanged"
                                          Style="margin-top: 15px">
@@ -165,10 +169,35 @@
     private RecipeForMealPlanModel selectedRecipe = default!;
 
     private MealPlannerDay? copiedPlanDay;
+    private DateTimeOffset selectedPeriod = DateTimeOffset.UtcNow;
 
     private bool IsAddRecipeDisabled
     {
         get => selectedRecipe == null;
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await RefreshPlanner();
+    }
+
+    private async Task RefreshPlanner()
+    {
+        MealPlanner = await MealPlanService.GetMonthlyMealPlan(selectedPeriod);
+        MealPlanner.SetSupportingFields();
+        StateHasChanged();
+    }
+
+    private async Task MoveToThePreviousMonth()
+    {
+        selectedPeriod = selectedPeriod.AddMonths(-1);
+        await RefreshPlanner();
+    }
+
+    private async Task MoveToTheNextMonth()
+    {
+        selectedPeriod = selectedPeriod.AddMonths(1);
+        await RefreshPlanner();
     }
 
     private void DayPlanSelectedChanged(MealPlannerDay day)
@@ -272,16 +301,9 @@
     private string DetermineDayClass(MealPlannerDay day)
     {
         string applicableClasses = day.IsSelected ? "meal-plan-day-selected " : string.Empty;
-        applicableClasses += day.Date.Month == DateTimeOffset.Now.Month ? " meal-plan-day" : " meal-plan-day-shadowed";
+        applicableClasses += day.Date.Month == selectedPeriod.Month ? " meal-plan-day" : " meal-plan-day-shadowed";
 
         return applicableClasses;
-    }
-
-    protected override async Task OnInitializedAsync()
-    {
-        MealPlanner = await MealPlanService.GetMonthlyMealPlan(DateTimeOffset.UtcNow);
-        MealPlanner.SetSupportingFields();
-        StateHasChanged();
     }
 
     private void AddRecipe()
