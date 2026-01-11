@@ -9,7 +9,7 @@
 
 @inject IUnitService UnitService
 
-<MudPaper Class="pa-6 mx-auto">
+<MudPaper Class="common-page-container" Outlined="true">
     @if (unitToUpdate is not null)
     {
         <UnitForm Mode="FormMode.Edit" UnitModel="unitToUpdate" />

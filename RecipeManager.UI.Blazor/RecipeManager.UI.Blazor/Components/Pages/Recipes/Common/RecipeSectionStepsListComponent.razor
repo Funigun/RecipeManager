@@ -7,40 +7,34 @@
     @if (Mode.IsCreateOrEditMode())
     {
         <MudStack Row=true Spacing="3">
-            <div style="margin-right: 10px; margin-left: 50px; width: 620px !important">
-                <MudTextField T="string" Label="Step Description*" @bind-Value="newStep.Description" style="width: 620px"></MudTextField>
+            <div class="step-input-container">
+                <MudTextField T="string" Label="Step Description*" @bind-Value="newStep.Description" Class="step-input"></MudTextField>
             </div>
         
-            <MudIconButton Icon="@Icons.Material.Filled.Add" Color="Color.Primary" OnClick="AddStep" Disabled="@(string.IsNullOrEmpty(newStep.Description))" style="margin-right: 10px"></MudIconButton>
-            <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Error" OnClick="RemoveSelectedSteps" Disabled="!selectedSteps.Any()" style="margin-right: 10px"></MudIconButton>
+            <MudIconButton Icon="@Icons.Material.Filled.Add" Color="Color.Primary" OnClick="AddStep" Disabled="@(string.IsNullOrEmpty(newStep.Description))" Class="action-button"></MudIconButton>
+            <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Error" OnClick="RemoveSelectedSteps" Disabled="!selectedSteps.Any()" Class="action-button"></MudIconButton>
         </MudStack>
     }
     <MudTable T="RecipeStepModel" Items="RecipeSection.Steps" @bind-selectedItems="selectedSteps" FixedHeader="true" MultiSelection="@Mode.IsCreateOrEditMode()" SelectionChangeable="@Mode.IsCreateOrEditMode()">
         <HeaderContent>
             @if(Mode.IsCreateOrEditMode())
             {
-                <MudTh Style="width:850px">Details</MudTh>
+                <MudTh Class="step-details-header">Details</MudTh>
             }
             else
             {
-                <MudTh Style="width:850px; border: none; height: 0px;"></MudTh>
+                <MudTh Class="step-details-header-empty"></MudTh>
             }
         </HeaderContent>
         <RowTemplate>
             <MudTd>
-                <div style="display: flex; gap: 1rem;">
+                <div class="step-row-container">
                     <span><strong>@context.Order.</strong></span>
                     <span>@context.Description</span>
                 </div>
 
-                <div style="width: 500px; height: 500px; justify-self:center; margin-top: 15px;">
-                    @if (!string.IsNullOrEmpty(@context.ImageUrl))
-                    {
-                        <MudImage Src="@context.ImageUrl" Alt="Image" Style="width:500px; height: 500px; border: 1px solid; margin-top: 15px;" />
-                    }
-                    else
-                    {
-                        <MudIcon Icon="@Icons.Material.Filled.QuestionMark" Style="width:500px; height: 500px; border: 1px solid; margin-top: 15px;" />                   }
+                <div class="step-image-container">
+                    <ImageComponent ImageSource="@context.ImageUrl" MaxHeight="500" MaxWidth="500" ImageStyle="margin-top: 15px;"/>
                 </div>
             </MudTd>
         </RowTemplate>

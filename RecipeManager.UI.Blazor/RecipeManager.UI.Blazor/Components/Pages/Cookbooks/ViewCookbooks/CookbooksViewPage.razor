@@ -6,12 +6,14 @@
 
 @inject ICookbookService CookbookService;
 
-<MudPaper Class="mt-6 page-container" Outlined="true">
-    <MudGrid Style="width:1500px;">
-        <MudItem Style="display: flex; width:inherit;">
-            <MudStack Row="true" Style="gap: 12px; width:inherit; justify-items:center; justify-content:center">
-                <MudText Typo="Typo.h6" Style="align-content: center">Cookbooks</MudText>
-                <MudIconButton Icon="@Icons.Material.Filled.Add" Color="Color.Primary" Style="justify-self:center"
+
+
+<MudPaper Class="common-page-container" Outlined="true">
+    <MudGrid Class="main-grid">
+        <MudItem Class="header-item">
+            <MudStack Row="true" Class="header-row">
+                <MudText Typo="Typo.h6" Class="header-text">Cookbooks</MudText>
+                <MudIconButton Icon="@Icons.Material.Filled.Add" Color="Color.Primary" Class="add-button"
                                OnClick="@(() => CreateNewCookbook())" Disabled="@isAddDisabled" />
             </MudStack>
         </MudItem>

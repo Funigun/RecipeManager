@@ -10,32 +10,12 @@
 @inject IRecipeService RecipeService
 @inject IRecipeCategoryService RecipeCategoryService
 
-<style>
-    .top-drawer {
-        position: absolute;
-        top: 150px;
-        left: 0;
-        right: 0;
-        z-index: 1000;
-        border: none;
-        max-height: 500px;
-        width: 1300px;
-        justify-self: center;
-        background: var(--mud-palette-background);
-    }
-
-    .page-container {
-        min-height: calc(100dvh - var(--mud-appbar-height));
-        width: 1500px;
-    }
-</style>
-
 <MudOverlay @bind-Visible="overlayVisible" DarkBackground AutoClose="true" OnClosed="OnOverlayClosed" />
 
-<MudPaper Class="mt-6 page-container" Outlined="true">
-    <MudGrid Style="width:1500px;">
-        <MudItem Style="display: flex; width:inherit;">
-            <MudStack Row="true" Style="gap: 12px; width:inherit; justify-items:center; justify-content:center">
+<MudPaper Class="common-page-container" Outlined="true">
+    <MudGrid Style="width:1800px;">
+        <MudItem Style="display: flex; width:inherit;" Class="recipe-image-container">
+            <MudStack Row="true" class="recipe-image-stack">
                 @if(filtersCount > 0)
                 {
                     <MudBadge Content="filtersCount" Overlap="true" Class="mx-6 my-4">
@@ -59,8 +39,8 @@
                 <div class="blocker">
                 @foreach (var categoryType in categoryDropdowns.Keys)
                 {
-                    <MudItem Style="display: flex; width:1200px; margin: 25px 0px 0px 25px;">
-                        <MudText Typo="Typo.subtitle2" Style="width: 150px;" Class="d-flex align-center">@categoryType.ToFriendlyString():</MudText>
+                    <MudItem class="recipe-category-item">
+                        <MudText Typo="Typo.subtitle2" Class="d-flex align-center recipe-category-item-title">@categoryType.ToFriendlyString():</MudText>
                         <MudChipSet T="RecipeCategoryForDropdownModel" Variant="Variant.Text" AllClosable="false" CheckMark="false" SelectionMode="SelectionMode.MultiSelection"
                                     Color="Color.Primary">
                             @foreach (var category in categoryDropdowns[categoryType])
@@ -71,7 +51,7 @@
                     </MudItem>
                 }
 
-                <MudItem Style="display: flex; margin: 25px; width:1200px">
+                <MudItem class="recipe-ingredients-title">
                     <MudText Typo="Typo.subtitle2">Ingredients</MudText>
                 </MudItem>
 

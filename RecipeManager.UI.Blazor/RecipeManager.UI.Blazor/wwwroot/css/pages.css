@@ -1,0 +1,8 @@
+/* Global custom styles for RecipeManager */
+.common-page-container {
+    margin-top: 1.5rem;
+    padding-bottom: 50px;
+    min-height: calc(100vh - 64px); /* assuming 64px header height */
+    justify-self: center;
+    width: 1800px;
+}

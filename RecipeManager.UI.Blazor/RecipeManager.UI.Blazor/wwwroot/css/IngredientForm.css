@@ -1,0 +1,51 @@
+.form-title {
+    text-align: center;
+}
+
+.ingredient-name-container {
+    margin-top: 15px; 
+    margin-bottom: 20px;
+}
+
+.ingredient-name {
+    margin-top: 15px;
+}
+
+.form-section-title {
+    align-content: center; 
+    width: calc(100% - 60px);
+}
+
+.form-section-row {
+    align-items: end;
+}
+
+.base-unit-select {
+    width: 125px;
+}
+
+.package-unit-select {
+    width: 125px;
+}
+
+.conversion-unit-select {
+    width: 125px;
+}
+
+.nutritional-unit-select {
+    align-self: end; 
+    width: 125px;
+}
+
+.nutritional-values-contains-label {
+    align-content: end;
+}
+
+.conversion-table {
+    margin-top: 15px;
+}
+
+.chipset-container {
+    max-height: 80px; 
+    overflow-y: auto;
+}

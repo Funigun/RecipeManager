@@ -1,0 +1,35 @@
+.step-input-container {
+    margin-right: 10px; 
+    margin-left: 50px; 
+    width: 620px !important;
+}
+
+.step-input {
+    width: 620px;
+}
+
+.action-button {
+    margin-right: 10px;
+}
+
+.step-details-header {
+    width: 850px;
+}
+
+.step-details-header-empty {
+    width: 850px; 
+    border: none; 
+    height: 0px;
+}
+
+.step-row-container {
+    display: flex; 
+    gap: 1rem;
+}
+
+.step-image-container {
+    width: 500px; 
+    height: 500px; 
+    justify-self: center; 
+    margin-top: 15px;
+}

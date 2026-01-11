@@ -8,7 +8,7 @@
 
 @inject IIngredientService IngredientService
  
-<MudPaper Class="pa-6 mx-auto" Style="width:750px" Outlined="true">
+<MudPaper Class="common-page-container" Outlined="true">
     @if(ingredientModel is not null)
     {
         <IngredientForm IngredientModel="ingredientModel" Mode="FormMode.Edit" />

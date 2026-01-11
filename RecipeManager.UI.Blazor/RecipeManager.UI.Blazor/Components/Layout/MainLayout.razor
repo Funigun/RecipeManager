@@ -33,7 +33,7 @@
 
     @if (isUserAuthenticated)
     {
-        <MudDrawer @bind-Open="showSideMenu" Overlay="false" ClipMode="DrawerClipMode.Always" Elevation="0" Variant="@DrawerVariant.Temporary">
+        <MudDrawer @bind-Open="showSideMenu" Overlay="false" ClipMode="DrawerClipMode.Docked" Elevation="1" Variant="@DrawerVariant.Mini" Breakpoint="Breakpoint.Md">
             <NavMenu />
         </MudDrawer>
     }
@@ -50,7 +50,7 @@
 </MudLayout>
 
 @code {
-    bool showSideMenu = false;
+    bool showSideMenu = true;
     bool isUserAuthenticated = false;
     string user = "";
 

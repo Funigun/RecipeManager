@@ -10,20 +10,19 @@
 @inject ISnackbar Snackbar
 @inject IDialogMessageService DialogService
 
-
 @if (Mode.IsCreateOrEditMode())
 {
-    <MudStack Row=true Spacing="3" Style="margin-bottom: 25px; width: 800px; justify-self: end; margin-left: 20px">
-        <div style="margin-right: 10px; width: 350px">
+    <MudStack Row=true Spacing="3" Class="add-ingredient-container">
+        <div class="ingredient-selector-container">
             <MudAutocomplete T="IngredientForDropdownModel" Label="Ingredient" @bind-Value="newIngredient.Ingredient" ShowProgressIndicator="true"
-                             SearchFunc="SearchIngredients" ToStringFunc="@(e => e == null ? null : e.Name)" style="width: 300px" />
+                             SearchFunc="SearchIngredients" ToStringFunc="@(e => e == null ? null : e.Name)" Class="ingredient-selector" />
         </div>
 
-        <div style="margin-right: 10px; width: 150px !important">
+        <div class="amount-input-container">
             <MudTextField T="double" Label="Amount" @bind-Value="newIngredient.Amount" Required="true"></MudTextField>
         </div>
 
-        <div style="margin-right: 10px; width: 150px !important">
+        <div class="unit-selector-container">
             <MudSelect T="Guid" Label="Unit*" @bind-Value="newIngredient.Unit.Id">
                 @foreach (var unit in newIngredient.Ingredient.AvailableUnits)
                 {
@@ -32,8 +31,8 @@
             </MudSelect>
         </div>
 
-        <MudIconButton Icon="@Icons.Material.Filled.Add" Color="Color.Primary" OnClick="AddIngredient" Disabled="@isAddIngredientDisabled" style="margin-right: 10px"></MudIconButton>
-        <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Error" OnClick="RemoveSelectedIngredients" Disabled="!selectedIngredients.Any()" style="margin-right: 10px"></MudIconButton>
+        <MudIconButton Icon="@Icons.Material.Filled.Add" Color="Color.Primary" OnClick="AddIngredient" Disabled="@isAddIngredientDisabled" Class="action-button"></MudIconButton>
+        <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Error" OnClick="RemoveSelectedIngredients" Disabled="!selectedIngredients.Any()" Class="action-button"></MudIconButton>
     </MudStack>
 }
 

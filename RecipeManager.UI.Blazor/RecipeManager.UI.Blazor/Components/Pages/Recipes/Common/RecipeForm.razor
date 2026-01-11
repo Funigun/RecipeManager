@@ -23,10 +23,9 @@
 @inject IDialogMessageService DialogService
 @inject NavigationManager NavigationManager
 
-
 <MudForm @ref="Form" Model="RecipeModel" ReadOnly="Mode.IsViewMode()" Validation="@(validator.ValidateValue)" @bind-IsValid="@isSubmitEnabled" @rendermode="RenderMode.InteractiveAuto">
     <MudStack Spacing="5">
-        <div style="align-self: center; width: 100%;">
+        <div class="recipe-header-container">
             <MudStack Row="true" Justify="Justify.SpaceBetween" AlignItems="AlignItems.Center">
                 <MudTextField Required Label="Title" For="@(() => RecipeModel.Item.Title)" @bind-Value="RecipeModel.Item.Title" />
 
@@ -47,35 +46,28 @@
                 }
             </MudStack>
 
-            <MudStack Row="true" Style="margin-top: 25px; max-height:500px">
-                <div style="width: 500px; height: 500px; justify-self:center;">
-                    @if(RecipeModel.Item.ImageUrl != null)
-                    {
-                        <MudImage Src="RecipeModel.Item.ImageURL" Alt="Recipe Image" Style="max-width: 500px; max-height:500px; margin-top: 15px;" />
-                    }
-                    else
-                    {
-                        <MudIcon Icon="@Icons.Material.Filled.QuestionMark" Style="width:500px; height: 500px; border: 1px solid; margin-top: 15px;" />
-                    }
+            <MudStack Row="true" Class="recipe-main-row">
+                <div class="recipe-image-wrapper">
+                    <ImageComponent ImageSource="@RecipeModel.Item.ImageUrl" MaxWidth="500" MaxHeight="500" ImageStyle="margin-top: 15px;" />
                 </div>
-                <div style="margin-top: 10px; width: 700px; overflow-y: auto">
+                <div class="recipe-description-container">
                     <MudStack Spacing="5">
                         <MudTextField AutoGrow Label="Description" MaxLength="500" For="@(() => RecipeModel.Item.Description)" @bind-Value="RecipeModel.Item.Description" />
                         
                         <MudAutocomplete T="IngredientForDropdownModel" Label="Assigned ingredient" @bind-Value="RecipeModel.Item.Ingredient" ShowProgressIndicator="true"
-                                         SearchFunc="SearchIngredients" ToStringFunc="@(e => e == null ? null : e.Name)" style="width: 300px; padding-top: 15px;" Clearable=true/>
+                                         SearchFunc="SearchIngredients" ToStringFunc="@(e => e == null ? null : e.Name)" Class="assigned-ingredient-autocomplete" Clearable=true/>
 
-                        <MudStack Row="true" Style="padding-top: 15px;">
-                            <MudText Style="align-content: end" Color="@(categoriesMessages != null && categoriesMessages.Any() ? Color.Error : Color.Default)">Categories*</MudText>
+                        <MudStack Row="true" Class="categories-row">
+                            <MudText Class="categories-label" Color="@(categoriesMessages != null && categoriesMessages.Any() ? Color.Error : Color.Default)">Categories*</MudText>
 
                             @if (Mode.IsCreateOrEditMode())
                             {
-                                <MudGrid Style="padding: 0px; margin-left: 20px;">
-                                    <MudItem xs="9" Style="padding: 0px">
+                                <MudGrid Class="categories-selection-container">
+                                    <MudItem xs="9" Class="categories-autocomplete-item">
                                         <MudAutocomplete T="RecipeCategoryForDropdownModel" Label="Find category" ResetValueOnEmptyText="true" ShowProgressIndicator="true"
                                                          SearchFunc="SearchCategories" ToStringFunc="@(e => e == null ? null : e.Name)" ValueChanged="OnSelectedCategoryChanged" />
                                     </MudItem>
-                                    <MudItem xs="3" Style="padding: 0px">
+                                    <MudItem xs="3" Class="categories-add-button-item">
                                         <MudIconButton Disabled="@isAddCategoryDisabled" Icon="@Icons.Material.Filled.Add" Color="Color.Primary" Edge="Edge.End" OnClick="AddCategory" />
                                     </MudItem>
                                 </MudGrid>
@@ -83,7 +75,7 @@
                         </MudStack>
 
                         <MudStack Spacing="5">
-                            <div style="max-height: 80px; overflow-y:auto">
+                            <div class="categories-chipset-container">
                                 <MudChipSet T="RecipeCategoryForDropdownModel" AllClosable="@Mode.IsCreateOrEditMode()" OnClose="RemoveCategory">
                                     @foreach (var category in RecipeModel.Item.Categories)
                                     {
@@ -99,7 +91,7 @@
             </MudStack>
         </div>
 
-        <MudPaper Outlined="true" Style="margin-top: 25px">
+        <MudPaper Outlined="true" Class="content-section">
             <MudExpansionPanel Text="Recipe Details" >
                 <MudStack Spacing="5">
                     <MudGrid>
@@ -137,7 +129,7 @@
                         </MudItem>
                     </MudGrid>
 
-                    <MudGrid Style="margin-top: 15px;">
+                    <MudGrid Class="recipe-details-grid">
                         <MudItem xs="3"><MudTextField T="int" For="@(() => RecipeModel.Item.NutritionalValues.Calories)" @bind-Value="RecipeModel.Item.NutritionalValues.Calories" Label="Kcal"/></MudItem>
                         <MudItem xs="3"><MudTextField T="double" For="@(() => RecipeModel.Item.NutritionalValues.Carbohydrates)" @bind-Value="RecipeModel.Item.NutritionalValues.Carbohydrates" Label="Carbohydrates"/></MudItem>
                         <MudItem xs="3"><MudTextField T="double" For="@(() => RecipeModel.Item.NutritionalValues.Proteins)" @bind-Value="RecipeModel.Item.NutritionalValues.Proteins" Label="Proteins"/></MudItem>
@@ -147,15 +139,15 @@
             </MudExpansionPanel>
         </MudPaper>
 
-        <MudPaper Outlined="true" Style="margin-top: 25px">
+        <MudPaper Outlined="true" Class="content-section">
             <MudExpansionPanel Text="Ingredients" >
                 <RecipeIngredientsListComponent Ingredients="RecipeModel.Item.Ingredients" OnDataChanged="HandleIngredientsChanged"></RecipeIngredientsListComponent>
             </MudExpansionPanel>
         </MudPaper>
 
 
-        <MudTabs Outlined="true" Position="Position.Top" Style="margin-top: 25px;" Centered="true" Rounded="true" Border="true"
-                 ApplyEffectsToContainer="true" Class="mt-8" PanelClass="pa-6">
+        <MudTabs Outlined="true" Position="Position.Top" Class="content-section mt-8" Centered="true" Rounded="true" Border="true"
+                 ApplyEffectsToContainer="true" PanelClass="pa-6">
             @foreach (RecipeSectionModel recipeSection in RecipeModel.Item.Sections)
             {
                     <MudTabPanel Text="@recipeSection.SectionHeader">
@@ -179,7 +171,7 @@
                 <MudItem xs="6" Class="d-flex justify-end">
                     @if (Mode.IsEditMode() && @RecipeModel.Links.FirstOrDefault(link => link.Rel == HateoasConstants.Delete) != null)
                     {
-                        <MudButton Variant="Variant.Filled" Color="Color.Error" OnClick="DeleteRecipe" Style="margin-right: 20px">
+                        <MudButton Variant="Variant.Filled" Color="Color.Error" OnClick="DeleteRecipe" Class="delete-button">
                             Delete
                         </MudButton>
                     }
