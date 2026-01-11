@@ -3,51 +3,6 @@
 @using RecipeManager.UI.Blazor.Features.Recipes.Models
 @using RecipeManager.UI.Blazor.Features.Recipes.Validators
 
-<style>
-    .step-input-container {
-        margin-right: 10px; 
-        margin-left: 50px; 
-        width: 620px !important;
-    }
-
-    .step-input {
-        width: 620px;
-    }
-
-    .action-button {
-        margin-right: 10px;
-    }
-
-    .step-details-header {
-        width:850px;
-    }
-
-    .step-details-header-empty {
-        width:850px; 
-        border: none; 
-        height: 0px;
-    }
-
-    .step-row-container {
-        display: flex; 
-        gap: 1rem;
-    }
-    
-    .step-image-container {
-        width: 500px; 
-        height: 500px; 
-        justify-self:center; 
-        margin-top: 15px;
-    }
-
-    .step-image {
-        width:500px; 
-        height: 500px; 
-        border: 1px solid; 
-        margin-top: 15px;
-    }
-</style>
-
 <MudForm T="RecipeSectionModel" Model="RecipeSection">
     @if (Mode.IsCreateOrEditMode())
     {
@@ -79,13 +34,7 @@
                 </div>
 
                 <div class="step-image-container">
-                    @if (!string.IsNullOrEmpty(@context.ImageUrl))
-                    {
-                        <MudImage Src="@context.ImageUrl" Alt="Image" Class="step-image" />
-                    }
-                    else
-                    {
-                        <MudIcon Icon="@Icons.Material.Filled.QuestionMark" Class="step-image" />                   }
+                    <ImageComponent ImageSource="@context.ImageUrl" MaxHeight="500" MaxWidth="500" ImageStyle="margin-top: 15px;"/>
                 </div>
             </MudTd>
         </RowTemplate>

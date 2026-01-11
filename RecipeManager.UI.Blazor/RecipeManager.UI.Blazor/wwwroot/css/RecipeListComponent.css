@@ -1,0 +1,35 @@
+.recipes-grid {
+    width: 1500px !important; 
+    min-height: 450px; 
+    max-height: 2500px; 
+    justify-self:center !important; 
+    overflow-y: hidden;
+}
+
+.recipe-step-item {
+    width: 350px;
+    margin-top: 25px;
+    padding: 0px
+}
+
+.recipe-step-container {
+    padding: 0px !important;
+}
+
+.recipe-step-description {
+    width: 350px;
+    text-align: center;
+    text-wrap: wrap;
+}
+
+.recipe-step-image {
+    width: 350px;
+    height: 350px;
+    align-self: center;
+}
+
+.recipes-pagination {
+    justify-self: center !important;
+    justify-content: center !important;
+    margin-top: 25px !important;
+}

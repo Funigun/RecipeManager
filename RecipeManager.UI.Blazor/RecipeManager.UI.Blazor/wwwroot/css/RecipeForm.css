@@ -1,0 +1,64 @@
+.recipe-header-container {
+    align-self: center; 
+    width: 100%;
+}
+
+.recipe-image-wrapper {
+    width: 500px; 
+    height: 500px; 
+    justify-self: center;
+}
+
+.recipe-description-container {
+    margin-top: 10px; 
+    width: 700px; 
+    overflow-y: auto;
+}
+
+.assigned-ingredient-autocomplete {
+    width: 300px; 
+    padding-top: 15px;
+}
+
+.categories-label {
+    align-content: end;
+}
+
+.categories-selection-container {
+    padding: 0px; 
+    margin-left: 20px;
+}
+
+.categories-add-button-item {
+    padding: 0px;
+}
+
+.categories-chipset-container {
+    max-height: 80px; 
+    overflow-y: auto;
+}
+
+.content-section {
+    margin-top: 25px;
+}
+
+.recipe-details-grid {
+    margin-top: 15px;
+}
+
+.delete-button {
+    margin-right: 20px;
+}
+
+.recipe-main-row {
+    margin-top: 25px; 
+    max-height: 500px;
+}
+
+.categories-row {
+    padding-top: 15px;
+}
+
+.categories-autocomplete-item {
+    padding: 0px;
+}

@@ -1,6 +1,17 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 	
 	<ItemGroup>
+	  <None Include="wwwroot\css\CookbookForm.css" />
+	  <None Include="wwwroot\css\CookbookListComponent.css" />
+	  <None Include="wwwroot\css\CookbooksViewPage.css" />
+	  <None Include="wwwroot\css\IngredientForm.css" />
+	  <None Include="wwwroot\css\MealPlannerIndex.css" />
+	  <None Include="wwwroot\css\RecipeForm.css" />
+	  <None Include="wwwroot\css\RecipeIngredientsListComponent.css" />
+	  <None Include="wwwroot\css\RecipeSectionStepsListComponent.css" />
+	</ItemGroup>
+	
+	<ItemGroup>
 	  <ProjectReference Include="..\..\RecipeManager.ServiceDefaults\RecipeManager.ServiceDefaults.csproj" />
 	  <ProjectReference Include="..\..\RecipeManager.Shared.Contracts\RecipeManager.Shared.Contracts.csproj" />
 	  <ProjectReference Include="..\RecipeManager.UI.Blazor.Client\RecipeManager.UI.Blazor.Client.csproj" />

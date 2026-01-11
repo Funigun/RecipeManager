@@ -23,86 +23,6 @@
 @inject IDialogMessageService DialogService
 @inject NavigationManager NavigationManager
 
-<style>
-    .recipe-header-container {
-        align-self: center; 
-        width: 100%;
-    }
-
-    .recipe-image-wrapper {
-        width: 500px; 
-        height: 500px; 
-        justify-self:center;
-    }
-
-    .recipe-image {
-        max-width: 500px; 
-        max-height:500px; 
-        margin-top: 15px;
-    }
-
-    .recipe-image-placeholder {
-        width:500px; 
-        height: 500px; 
-        border: 1px solid; 
-        margin-top: 15px;
-    }
-
-    .recipe-description-container {
-        margin-top: 10px; 
-        width: 700px; 
-        overflow-y: auto;
-    }
-
-    .assigned-ingredient-autocomplete {
-        width: 300px; 
-        padding-top: 15px;
-    }
-
-    .categories-label {
-        align-content: end;
-    }
-
-    .categories-selection-container {
-        padding: 0px; 
-        margin-left: 20px;
-    }
-    
-    .categories-add-button-item {
-        padding: 0px;
-    }
-
-    .categories-chipset-container {
-        max-height: 80px; 
-        overflow-y:auto;
-    }
-
-    .content-section {
-        margin-top: 25px;
-    }
-    
-    .recipe-details-grid {
-        margin-top: 15px;
-    }
-
-    .delete-button {
-        margin-right: 20px;
-    }
-
-    .recipe-main-row {
-        margin-top: 25px; 
-        max-height:500px;
-    }
-    
-    .categories-row {
-        padding-top: 15px;
-    }
-
-    .categories-autocomplete-item{
-        padding: 0px;
-    }
-</style>
-
 <MudForm @ref="Form" Model="RecipeModel" ReadOnly="Mode.IsViewMode()" Validation="@(validator.ValidateValue)" @bind-IsValid="@isSubmitEnabled" @rendermode="RenderMode.InteractiveAuto">
     <MudStack Spacing="5">
         <div class="recipe-header-container">
@@ -128,14 +48,7 @@
 
             <MudStack Row="true" Class="recipe-main-row">
                 <div class="recipe-image-wrapper">
-                    @if(RecipeModel.Item.ImageUrl != null)
-                    {
-                        <MudImage Src="RecipeModel.Item.ImageURL" Alt="Recipe Image" Class="recipe-image" />
-                    }
-                    else
-                    {
-                        <MudIcon Icon="@Icons.Material.Filled.QuestionMark" Class="recipe-image-placeholder" />
-                    }
+                    <ImageComponent ImageSource="@RecipeModel.Item.ImageUrl" MaxWidth="500" MaxHeight="500" ImageStyle="margin-top: 15px;" />
                 </div>
                 <div class="recipe-description-container">
                     <MudStack Spacing="5">

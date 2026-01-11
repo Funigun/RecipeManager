@@ -10,38 +10,6 @@
 @inject ISnackbar Snackbar
 @inject IDialogMessageService DialogService
 
-<style>
-    .add-ingredient-container {
-        margin-bottom: 25px; 
-        width: 800px; 
-        justify-self: end; 
-        margin-left: 20px;
-    }
-
-    .ingredient-selector-container {
-        margin-right: 10px; 
-        width: 350px;
-    }
-
-    .ingredient-selector {
-        width: 300px;
-    }
-
-    .amount-input-container {
-        margin-right: 10px; 
-        width: 150px !important;
-    }
-
-    .unit-selector-container {
-        margin-right: 10px; 
-        width: 150px !important;
-    }
-
-    .action-button {
-        margin-right: 10px;
-    }
-</style>
-
 @if (Mode.IsCreateOrEditMode())
 {
     <MudStack Row=true Spacing="3" Class="add-ingredient-container">
