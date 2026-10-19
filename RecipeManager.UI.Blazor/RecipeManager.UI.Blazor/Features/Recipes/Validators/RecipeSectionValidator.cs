@@ -1,6 +1,5 @@
 ﻿using FluentValidation;
 using RecipeManager.UI.Blazor.Contracts.Recipes;
-using RecipeManager.UI.Blazor.Brokers.HateoasModel;
 using RecipeManager.UI.Blazor.Components.Common;
 using RecipeManager.UI.Blazor.Features.Recipes.Models;
 

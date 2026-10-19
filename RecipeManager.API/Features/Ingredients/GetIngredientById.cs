@@ -5,7 +5,6 @@ using RecipeManager.Api.Application.Abstractions;
 using RecipeManager.Api.Application.Exceptions;
 using RecipeManager.Api.Domain.Common;
 using RecipeManager.Api.Domain.Ingredients;
-using RecipeManager.Api.Domain.Units;
 using RecipeManager.Api.Shared.Contracts.Authorization;
 using RecipeManager.Api.Shared.Endpoint;
 using RecipeManager.Api.Shared.Hateoas.Builder;

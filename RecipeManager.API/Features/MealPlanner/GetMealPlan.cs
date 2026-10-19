@@ -1,15 +1,12 @@
 ﻿using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.VisualBasic;
 using RecipeManager.Api.Application.Abstractions;
 using RecipeManager.Api.Domain.MealPlan;
 using RecipeManager.Api.Domain.Recipes;
 using RecipeManager.Api.Shared.Contracts.Authorization;
 using RecipeManager.Api.Shared.Endpoint;
 using RecipeManager.Api.Shared.Hateoas.Builder;
-using RecipeManager.Api.Shared.Hateoas.Models;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace RecipeManager.Api.Features.MealPlanner;
 

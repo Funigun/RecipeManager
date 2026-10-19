@@ -1,6 +1,5 @@
 ﻿using System.Net.Http.Headers;
 using DotNet.Testcontainers.Builders;
-using DotNet.Testcontainers.Images;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
