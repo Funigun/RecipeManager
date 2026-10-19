@@ -7,6 +7,7 @@ using RecipeManager.Api.Application.Database;
 using RecipeManager.Api.Domain.Ingredients;
 using RecipeManager.Api.Domain.Recipes;
 using RecipeManager.Api.Domain.Units;
+using RecipeManager.Api.Features.Validation;
 using RecipeManager.Api.Shared.Endpoint;
 
 namespace RecipeManager.Api.Features.Ingredients;
@@ -48,18 +49,10 @@ public static class GenerateShoppingList
             RuleFor(request => request.Recipes)
                 .NotEmpty()
                     .WithMessage("At least one recipe ID must be provided.")
-
-                .MustAsync(async (recipes, cancellationToken) =>
-                {
-                    IEnumerable<RecipeId> recipeIds = recipes.Select(r => new RecipeId(r.Id));
-
-                    int numberOfExistingRecipes = await dbContext.Recipes
-                        .Where(recipe => recipeIds.Contains(recipe.Id))
-                        .Select(recipe => recipe.Id.Value)
-                        .CountAsync(cancellationToken);
-
-                    return numberOfExistingRecipes == recipeIds.Distinct().Count();
-                }).WithMessage("Some of the provided recipe IDs do not exist.");
+                .MustReferenceExistingRecipes(
+                    dbContext,
+                    recipes => recipes.Select(recipe => recipe.Id).Distinct(),
+                    "Some of the provided recipe IDs do not exist.");
         }
     }
 

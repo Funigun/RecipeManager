@@ -10,10 +10,9 @@ using RecipeManager.Api.Domain.Recipes;
 using RecipeManager.Api.Domain.Recipes.Enums;
 using RecipeManager.Api.Domain.Recipes.ValueObjects;
 using RecipeManager.Api.Domain.Units;
+using RecipeManager.Api.Features.Validation;
 using RecipeManager.Api.Shared.Contracts.Authorization;
 using RecipeManager.Api.Shared.Endpoint;
-using RecipeManager.Api.Contracts.Ingredients;
-using RecipeManager.Api.Contracts.Recipes;
 
 namespace RecipeManager.Api.Features.Recipes;
 
@@ -52,62 +51,37 @@ public static class UpdateRecipe
     {
         public Validator(IAppDbContext dbContext, IUnitOfWork unitOfWork)
         {
-            RuleFor(x => x.Title).SetValidator(new RecipeTitleValidator());
-            RuleFor(x => x.Description).SetValidator(new RecipeDescriptionValidator());
-            RuleFor(x => x.ImageUrl).SetValidator(new RecipeImageUrlValidator());
-            RuleFor(x => x.VideoUrl).SetValidator(new RecipeVideoUrlValidator());
-            RuleFor(x => x.Amount.Amount).SetValidator(new RecipeAmountValidator());
+            RuleFor(x => x.Title).ValidateRecipeTitle();
+            RuleFor(x => x.Description).ValidateRecipeDescription();
+            RuleFor(x => x.ImageUrl).ValidateRecipeImageUrl();
+            RuleFor(x => x.VideoUrl).ValidateRecipeVideoUrl();
+            RuleFor(x => x.Amount.Amount).ValidateRecipeAmount();
             RuleFor(x => x.Amount.Unit.Id).NotEmpty()
-                .MustAsync(async (unitId, cancellationToken) =>
-                {
-                    return await unitOfWork.Units.AnyByIdAsync(new UnitId(unitId), cancellationToken);
-                })
-                .WithMessage("Provided invalid UnitId for recipe amount");
+                .MustReferenceExistingUnit(unitOfWork, "Provided invalid UnitId for recipe amount");
 
-            RuleFor(x => x.NumberOfServings).SetValidator(new RecipeNumberOfServingsValidator());
+            RuleFor(x => x.NumberOfServings).ValidateRecipeNumberOfServings();
             RuleFor(x => x.Difficulty)
                 .Must(difficulty => difficulty.IsRecipeDifficulty())
                 .WithMessage("Provided invalid recipe difficulty level");
 
-            RuleFor(x => x.NutritionalValues.Calories).SetValidator(new IngredientNutritionalCaloriesValueValidator());
-            RuleFor(x => x.NutritionalValues.Carbohydrates).SetValidator(new IngredientNutritionalCarbohydratesValueValidator());
-            RuleFor(x => x.NutritionalValues.Fats).SetValidator(new IngredientNutritionalFatsValueValidator());
-            RuleFor(x => x.NutritionalValues.Proteins).SetValidator(new IngredientNutritionalProteinsValueValidator());
-            RuleFor(x => x.NutritionalValues.IngredientAmount).SetValidator(new IngredientNutritionalAmountValidator());
+            RuleFor(x => x.NutritionalValues.Calories).ValidateNutritionalCalories();
+            RuleFor(x => x.NutritionalValues.Carbohydrates).ValidateNutritionalCarbohydrates();
+            RuleFor(x => x.NutritionalValues.Fats).ValidateNutritionalFats();
+            RuleFor(x => x.NutritionalValues.Proteins).ValidateNutritionalProteins();
+            RuleFor(x => x.NutritionalValues.IngredientAmount).ValidateNutritionalAmount();
 
             RuleFor(x => x.Ingredients).SetValidator(new RecipeIngredientsValidator(dbContext, unitOfWork));
             RuleFor(x => x.Sections).SetValidator(new RecipeSectionsValidator());
 
             RuleFor(x => x.Categories)
-                .Must(ids => ids.Distinct().Count() == ids.Count())
-                    .WithMessage("Duplicate categories are not allowed.")
-                .MustAsync(async (categoryIds, cancellationToken) =>
-                {
-                    if (!categoryIds.Any())
-                    {
-                        return true;
-                    }
-
-                    IEnumerable<RecipeCategoryId> recipeCategoryIds = categoryIds.Select(c => new RecipeCategoryId(c.Id));
-
-                    return await dbContext.RecipeCategories.AsNoTracking()
-                                                            .Where(category => recipeCategoryIds.Contains(category.Id))
-                                                            .CountAsync(cancellationToken) == categoryIds.Count();
-                }).WithMessage("Some of recipe categories does not exist");
+                .MustHaveUniqueIds(category => category.Id, "Duplicate categories are not allowed.")
+                .MustReferenceExistingRecipeCategories(
+                    dbContext,
+                    categories => categories.Select(category => category.Id),
+                    "Some of recipe categories does not exist");
 
             RuleFor(x => x.IngredientId)
-                .MustAsync(async (ingredientId, cancellationToken) =>
-                {
-                    if (ingredientId is null)
-                    {
-                        return true;
-                    }
-
-                    IngredientId id = new(ingredientId.Value);
-
-                    return await dbContext.Ingredients.AsNoTracking()
-                                                      .AnyAsync(ingredient => ingredient.Id == id, cancellationToken);
-                }).WithMessage("Provided invalid IngredientId for recipe")
+                .MustReferenceExistingIngredient(dbContext, "Provided invalid IngredientId for recipe")
                 .Must((request, ingredientId) =>
                 {
                     return ingredientId is null || !request.Ingredients.Any(ingredient => ingredient.Ingredient.Id == ingredientId.Value);
@@ -122,34 +96,20 @@ public static class UpdateRecipe
         {
             RuleFor(ingredients => ingredients)
                 .NotEmpty()
-                .MustAsync(async (ingredients, cancellationToken) =>
-                {
-                    IEnumerable<IngredientId> ingredientIds = ingredients.Select(i => new IngredientId(i.Ingredient.Id));
-
-                    return await dbContext.Ingredients.AsNoTracking()
-                                                       .Where(ingredient => ingredientIds.Contains(ingredient.Id))
-                                                       .CountAsync(cancellationToken) == ingredients.Count();
-                })
-                .WithMessage("Some of ingredients does not exist")
-                .MustAsync(async (ingredients, cancellationToken) =>
-                {
-                    IEnumerable<UnitId> unitIds = ingredients.Select(i => new UnitId(i.Unit.Id)).Distinct();
-
-                    return await unitOfWork.Units.AreIdsValidAsync(unitIds, cancellationToken);
-                })
-                .WithMessage("Some of units does not exist")
-                .Must(ingredients =>
-                {
-                    return ingredients.Select(i => i.Ingredient.Id).Distinct().Count() == ingredients.Count();
-                })
-                .WithMessage("Duplicate ingredients are not allowed");
-
-            RecipeAmountValidator amountValidator = new();
+                .MustReferenceExistingIngredients(
+                    dbContext,
+                    ingredients => ingredients.Select(ingredient => ingredient.Ingredient.Id),
+                    "Some of ingredients does not exist")
+                .MustReferenceExistingUnits(
+                    unitOfWork,
+                    ingredient => ingredient.Unit.Id,
+                    "Some of units does not exist")
+                .MustHaveUniqueIds(ingredient => ingredient.Ingredient.Id, "Duplicate ingredients are not allowed");
 
             RuleForEach(x => x)
                 .ChildRules(ingredient =>
                 {
-                    ingredient.RuleFor(i => i.Amount).SetValidator(amountValidator);
+                    ingredient.RuleFor(i => i.Amount).ValidateRecipeAmount();
                 });
         }
     }
@@ -198,8 +158,8 @@ public static class UpdateRecipe
                            .ChildRules(step =>
                            {
                                step.RuleFor(s => s.Order).GreaterThan(0);
-                               step.RuleFor(s => s.Description).SetValidator(new RecipeStepDescriptionValidator());
-                               step.RuleFor(s => s.ImageUrl).SetValidator(new RecipeImageUrlValidator());
+                               step.RuleFor(s => s.Description).ValidateRecipeStepDescription();
+                               step.RuleFor(s => s.ImageUrl).ValidateRecipeImageUrl();
                            });
                 });
         }

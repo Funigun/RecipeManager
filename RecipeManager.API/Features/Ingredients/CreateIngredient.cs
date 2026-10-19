@@ -1,14 +1,13 @@
-﻿using FluentValidation;
+using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using RecipeManager.Api.Application.Abstractions;
 using RecipeManager.Api.Application.Database;
 using RecipeManager.Api.Domain.Common;
 using RecipeManager.Api.Domain.Ingredients;
 using RecipeManager.Api.Domain.Recipes;
 using RecipeManager.Api.Domain.Units;
+using RecipeManager.Api.Features.Validation;
 using RecipeManager.Api.Shared.Endpoint;
-using RecipeManager.Api.Contracts.Ingredients;
 
 namespace RecipeManager.Api.Features.Ingredients;
 
@@ -37,56 +36,40 @@ public static class CreateIngredient
     {
         public Validator(IAppDbContext dbContext, IUnitOfWork unitOfWork)
         {
-            RuleFor(x => x.Name).SetValidator(new IngredientNameValidator());
+            RuleFor(x => x.Name).ValidateIngredientName();
 
-            RuleFor(x => x.NutritionalValues.Calories).SetValidator(new IngredientNutritionalCaloriesValueValidator());
-            RuleFor(x => x.NutritionalValues.Carbohydrates).SetValidator(new IngredientNutritionalCarbohydratesValueValidator());
-            RuleFor(x => x.NutritionalValues.Fats).SetValidator(new IngredientNutritionalFatsValueValidator());
-            RuleFor(x => x.NutritionalValues.Proteins).SetValidator(new IngredientNutritionalProteinsValueValidator());
-            RuleFor(x => x.NutritionalValues.IngredientAmount).SetValidator(new IngredientNutritionalAmountValidator());
+            RuleFor(x => x.NutritionalValues.Calories).ValidateNutritionalCalories();
+            RuleFor(x => x.NutritionalValues.Carbohydrates).ValidateNutritionalCarbohydrates();
+            RuleFor(x => x.NutritionalValues.Fats).ValidateNutritionalFats();
+            RuleFor(x => x.NutritionalValues.Proteins).ValidateNutritionalProteins();
+            RuleFor(x => x.NutritionalValues.IngredientAmount).ValidateNutritionalAmount();
 
-            RuleFor(x => x.NutritionalValues.IngredientUnitId).MustAsync(async (ingredientUnitId, cancellationToken) =>
-            {
-                UnitId unitId = new(ingredientUnitId);
-                return await unitOfWork.Units.AnyByIdAsync(unitId, cancellationToken);
-            }).WithMessage("Ingredient unit does not exist");
+            RuleFor(x => x.NutritionalValues.IngredientUnitId)
+                .MustReferenceExistingUnit(unitOfWork, "Ingredient unit does not exist");
 
-            RuleFor(x => x.BaseUnit).MustAsync(async (baseUnitId, cancellationToken) =>
-            {
-                UnitId unitId = new(baseUnitId);
-                return await unitOfWork.Units.AnyByIdAsync(unitId, cancellationToken);
-            }).WithMessage("Base unit does not exist");
+            RuleFor(x => x.BaseUnit)
+                .MustReferenceExistingUnit(unitOfWork, "Base unit does not exist");
 
             RuleFor(x => x.IngredientPackage.PackageUnitId)
-                .MustAsync(async (unitId, cancellationToken) => await unitOfWork.Units.AnyByIdAsync(new UnitId(unitId), cancellationToken))
-                .WithMessage("Package unit does not exist");
+                .MustReferenceExistingUnit(unitOfWork, "Package unit does not exist");
 
             RuleFor(x => x.IngredientPackage.PackageSize)
                 .GreaterThan(0).WithMessage("Package size must be greater than 0");
 
             RuleFor(x => x.IngredientPackage.PackageSizeUnitId)
-                .MustAsync(async (unitId, cancellationToken) => await unitOfWork.Units.AnyByIdAsync(new UnitId(unitId), cancellationToken))
-                .WithMessage("Package size unit does not exist");
+                .MustReferenceExistingUnit(unitOfWork, "Package size unit does not exist");
 
             RuleForEach(x => x.IngredientUnitConvertions).ChildRules(convertion =>
             {
-                convertion.RuleFor(c => c.UnitToConvertId).MustAsync(async (unitToConvertId, cancellationToken) =>
-                {
-                    UnitId unitId = new(unitToConvertId);
-                    return await unitOfWork.Units.AnyByIdAsync(unitId, cancellationToken);
-                }).WithMessage("Unit to convert does not exist");
+                convertion.RuleFor(c => c.UnitToConvertId)
+                    .MustReferenceExistingUnit(unitOfWork, "Unit to convert does not exist");
                 convertion.RuleFor(c => c.Ratio).GreaterThan(0).WithMessage("Ratio must be greater than 0");
             });
 
             When(x => x.ShoppingListCategoryId.HasValue, () =>
             {
                 RuleFor(x => x.ShoppingListCategoryId)
-                    .MustAsync(async (shoppingListCategoryId, cancellationToken) =>
-                    {
-                        IngredientCategoryId ingredientCategoryId = new(shoppingListCategoryId!.Value);
-                        return await dbContext.IngredientCategories.AsNoTracking()
-                                                                   .AnyAsync(category => category.Id == ingredientCategoryId, cancellationToken);
-                    }).WithMessage("Shopping list category does not exist")
+                    .MustReferenceExistingIngredientCategory(dbContext, "Shopping list category does not exist")
                     .Must((request, shoppingListCategoryId) => !request.Categories.Contains(shoppingListCategoryId!.Value))
                         .WithMessage("Categories can not include the ShoppingListCategoryId.");
             });
@@ -94,27 +77,15 @@ public static class CreateIngredient
             When(request => request.Categories.Any(), () =>
             {
                 RuleFor(x => x.Categories)
-                    .MustAsync(async (categories, cancellationToken) =>
-                    {
-                        IEnumerable<IngredientCategoryId> categoryIds = categories.Select(c => new IngredientCategoryId(c));
-
-                        return await dbContext.IngredientCategories.AsNoTracking()
-                                                                   .Where(category => categoryIds.Contains(category.Id))
-                                                                   .CountAsync(cancellationToken) == categories.Count();
-                    }).WithMessage("Some of categories does not exist");
+                    .MustHaveUniqueIds(categoryId => categoryId, "Duplicate categories are not allowed.")
+                    .MustReferenceExistingIngredientCategories(dbContext, categories => categories, "Some of categories does not exist");
             });
 
             When(request => request.Recipes.Any(), () =>
             {
                 RuleFor(x => x.Recipes)
-                    .MustAsync(async (recipes, cancellationToken) =>
-                    {
-                        IEnumerable<RecipeId> recipeIds = recipes.Select(r => new RecipeId(r));
-
-                        return await dbContext.Recipes.AsNoTracking()
-                                                      .Where(recipe => recipeIds.Contains(recipe.Id))
-                                                      .CountAsync(cancellationToken) == recipes.Count();
-                    }).WithMessage("Some of recipes does not exist");
+                    .MustHaveUniqueIds(recipeId => recipeId, "Duplicate recipes are not allowed.")
+                    .MustReferenceExistingRecipes(dbContext, recipes => recipes, "Some of recipes does not exist");
             });
         }
     }

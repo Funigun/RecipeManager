@@ -1,12 +1,11 @@
 ﻿using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using RecipeManager.Api.Application.Abstractions;
 using RecipeManager.Api.Domain.Recipes;
 using RecipeManager.Api.Domain.Recipes.Enums;
+using RecipeManager.Api.Features.Validation;
 using RecipeManager.Api.Shared.Contracts.Authorization;
 using RecipeManager.Api.Shared.Endpoint;
-using RecipeManager.Api.Contracts.RecipeCategories;
 
 namespace RecipeManager.Api.Features.RecipeCategories;
 
@@ -21,11 +20,8 @@ public static class CreateRecipeCategory
         public Validator(IAppDbContext dbContext)
         {
             RuleFor(x => x.Name)
-                .SetValidator(new RecipeCategoryNameValidator())
-                .MustAsync(async (name, cancellationToken) =>
-                {
-                    return !await dbContext.RecipeCategories.AnyAsync(category => category.Name == name, cancellationToken);
-                }).WithMessage("Recipe category must be unique");
+                .ValidateRecipeCategoryName()
+                .MustHaveUniqueRecipeCategoryName(dbContext, "Recipe category must be unique");
 
             RuleFor(x => x.CategoryType)
                 .Must(difficulty => difficulty.IsRecipeCategoryType())

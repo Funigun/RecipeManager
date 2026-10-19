@@ -1,11 +1,10 @@
 ﻿using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using RecipeManager.Api.Application.Abstractions;
 using RecipeManager.Api.Domain.Ingredients;
+using RecipeManager.Api.Features.Validation;
 using RecipeManager.Api.Shared.Contracts.Authorization;
 using RecipeManager.Api.Shared.Endpoint;
-using RecipeManager.Api.Contracts.IngredientCategories;
 
 namespace RecipeManager.Api.Features.IngredientCategories;
 
@@ -20,11 +19,8 @@ public static class CreateIngredientCategory
         public Validator(IAppDbContext dbContext)
         {
             RuleFor(x => x.Name)
-                .SetValidator(new IngredientCategoryNameValidator())
-                .MustAsync(async (name, cancellationToken) =>
-                {
-                    return !await dbContext.IngredientCategories.AnyAsync(category => category.Name == name, cancellationToken);
-                }).WithMessage("Ingredient category must be unique");
+                .ValidateIngredientCategoryName()
+                .MustHaveUniqueIngredientCategoryName(dbContext, "Ingredient category must be unique");
         }
     }
 

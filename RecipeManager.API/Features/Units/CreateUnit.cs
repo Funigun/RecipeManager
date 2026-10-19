@@ -3,9 +3,9 @@ using Microsoft.AspNetCore.Mvc;
 using RecipeManager.Api.Application.Database;
 using RecipeManager.Api.Domain.Units;
 using RecipeManager.Api.Domain.Units.Enums;
+using RecipeManager.Api.Features.Validation;
 using RecipeManager.Api.Shared.Contracts.Authorization;
 using RecipeManager.Api.Shared.Endpoint;
-using RecipeManager.Api.Contracts.Units;
 
 namespace RecipeManager.Api.Features.Units;
 
@@ -39,33 +39,27 @@ public static class CreateUnit
         public Validator(IUnitOfWork unitOfWork)
         {
             RuleFor(x => x.Name)
-                .SetValidator(new UnitNameValidator())
-                .MustAsync(async (name, cancellationToken) =>
-                {
-                    return !await unitOfWork.Units.AnyByNameAsync(name, cancellationToken: cancellationToken);
-                }).WithMessage("Unit Name must be unique");
+                .ValidateUnitName()
+                .MustHaveUniqueUnitName(unitOfWork, "Unit Name must be unique");
 
             When(x => x.ShortName is not null, () =>
             {
                 RuleFor(x => x.ShortName)
-                    .SetValidator(new UnitShortNameValidator())
-                    .MustAsync(async (shortName, cancellationToken) =>
-                    {
-                        return !await unitOfWork.Units.AnyByShortNameAsync(shortName, cancellationToken: cancellationToken);
-                    }).WithMessage("Unit Short Name must be unique");
+                    .ValidateUnitShortName()
+                    .MustHaveUniqueUnitShortName(unitOfWork, "Unit Short Name must be unique");
             });
 
             RuleFor(x => x.PluralName)
-                .SetValidator(new UnitPluralNameValidator());
+                .ValidateUnitPluralName();
 
             When(x => x.PluralShortName is not null, () =>
             {
                 RuleFor(x => x.PluralShortName)
-                    .SetValidator(new UnitPluralShortNameValidator());
+                    .ValidateUnitPluralShortName();
             });
 
             RuleFor(x => x.IsBaseUnit)
-                .SetValidator(new UnitIsBaseUnitValidator());
+                .ValidateUnitIsBaseUnit();
 
             RuleFor(x => x.Group)
                 .Must(group => group.IsUnitGroup())
@@ -75,11 +69,7 @@ public static class CreateUnit
             When(x => x.PrimaryUnit is not null, () =>
             {
                 RuleFor(x => x.PrimaryUnit)
-                    .MustAsync(async (primaryUnitId, cancellationToken) =>
-                    {
-                        UnitId id = new(primaryUnitId!.Value);
-                        return await unitOfWork.Units.GetByIdAsync(id, cancellationToken) is not null;
-                    }).WithMessage("Primary Unit must reference an existing unit");
+                    .MustReferenceExistingUnit(unitOfWork, "Primary Unit must reference an existing unit");
 
                 RuleFor(x => x.ConversionFactor)
                     .GreaterThan(1)

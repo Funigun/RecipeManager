@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using RecipeManager.Api.Application.Abstractions;
 using RecipeManager.Api.Domain.MealPlan;
 using RecipeManager.Api.Domain.Recipes;
+using RecipeManager.Api.Features.Validation;
 using RecipeManager.Api.Shared.Contracts.Authorization;
 using RecipeManager.Api.Shared.Endpoint;
 
@@ -50,23 +51,14 @@ public static class UpdateMealPlan
             })
             .WithMessage("Some of meal plans to update do not exist.");
 
-            RuleFor(request => request).MustAsync(async (request, cancellationToken) =>
-            {
-                IEnumerable<Guid> recipeIds = request.MealPlans.SelectMany(plan => plan.RecipeIds).Distinct();
+            RuleFor(request => request.MealPlans)
+                .MustReferenceExistingRecipes(
+                    appDbContext,
+                    plans => plans.SelectMany(plan => plan.RecipeIds).Distinct(),
+                    "Some of provided recipes do not exist.");
 
-                int numberOfExistingPlans = await appDbContext.Recipes.AsNoTracking()
-                                                                      .Where(plan => recipeIds.Contains(plan.Id))
-                                                                      .CountAsync(cancellationToken);
-
-                return numberOfExistingPlans == recipeIds.Count();
-            })
-            .WithMessage("Some of provided recipes do not exist.");
-
-            RuleFor(request => request).Must(request =>
-            {
-                return request.MealPlans.Count() == request.MealPlans.Select(plan => plan.Date.Date).Distinct().Count();
-            })
-            .WithMessage("Meal plan dates must be unique.");
+            RuleFor(request => request.MealPlans)
+                .MustHaveUniqueDates(plan => plan.Date.Date, "Meal plan dates must be unique.");
         }
     }
 

@@ -5,9 +5,9 @@ using RecipeManager.Api.Application.Database;
 using RecipeManager.Api.Application.Exceptions;
 using RecipeManager.Api.Domain.Units;
 using RecipeManager.Api.Domain.Units.Enums;
+using RecipeManager.Api.Features.Validation;
 using RecipeManager.Api.Shared.Contracts.Authorization;
 using RecipeManager.Api.Shared.Endpoint;
-using RecipeManager.Api.Contracts.Units;
 
 namespace RecipeManager.Api.Features.Units;
 
@@ -28,38 +28,34 @@ public static class UpdateUnit
     {
         public Validator(IUnitOfWork unitOfWork, IHttpContextAccessor context)
         {
+            UnitId GetExcludedId()
+            {
+                string routeUnitId = context.HttpContext!.GetRouteData().Values["unitId"]!.ToString()!;
+                return new UnitId(Guid.Parse(routeUnitId));
+            }
+
             RuleFor(x => x.Name)
-                .SetValidator(new UnitNameValidator())
-                .MustAsync(async (name, cancellationToken) =>
-                {
-                    string id = context.HttpContext!.GetRouteData().Values["unitId"]!.ToString()!;
-                    UnitId unitId = new(Guid.Parse(id));
-                    return !await unitOfWork.Units.AnyByNameAsync(name, unitId, cancellationToken);
-                }).WithMessage("Unit Name must be unique");
+                .ValidateUnitName()
+                .MustHaveUniqueUnitName(unitOfWork, GetExcludedId, "Unit Name must be unique");
 
             When(x => x.ShortName is not null, () =>
             {
                 RuleFor(x => x.ShortName)
-                    .SetValidator(new UnitShortNameValidator())
-                    .MustAsync(async (shortName, cancellationToken) =>
-                    {
-                        string id = context.HttpContext!.GetRouteData().Values["unitId"]!.ToString()!;
-                        UnitId unitId = new(Guid.Parse(id));
-                        return !await unitOfWork.Units.AnyByShortNameAsync(shortName, unitId, cancellationToken);
-                    }).WithMessage("Unit Short Name must be unique");
+                    .ValidateUnitShortName()
+                    .MustHaveUniqueUnitShortName(unitOfWork, GetExcludedId, "Unit Short Name must be unique");
             });
 
             RuleFor(x => x.PluralName)
-                .SetValidator(new UnitPluralNameValidator());
+                .ValidateUnitPluralName();
 
             When(x => x.PluralShortName is not null, () =>
             {
                 RuleFor(x => x.PluralShortName)
-                    .SetValidator(new UnitPluralShortNameValidator());
+                    .ValidateUnitPluralShortName();
             });
 
             RuleFor(x => x.IsBaseUnit)
-                .SetValidator(new UnitIsBaseUnitValidator());
+                .ValidateUnitIsBaseUnit();
 
             RuleFor(x => x.Group)
                 .Must(group => group.IsUnitGroup())
@@ -69,11 +65,7 @@ public static class UpdateUnit
             When(x => x.PrimaryUnit is not null, () =>
             {
                 RuleFor(x => x.PrimaryUnit)
-                    .MustAsync(async (primaryUnitId, cancellationToken) =>
-                    {
-                        UnitId id = new(primaryUnitId!.Value);
-                        return await unitOfWork.Units.ExistsAsync(unit => unit.Id == id, cancellationToken);
-                    }).WithMessage("Primary Unit must reference an existing unit");
+                    .MustReferenceExistingUnit(unitOfWork, "Primary Unit must reference an existing unit");
 
                 RuleFor(x => x.ConversionFactor)
                     .GreaterThan(1)

@@ -3,8 +3,8 @@ using Microsoft.AspNetCore.Mvc;
 using RecipeManager.Api.Application.Abstractions;
 using RecipeManager.Api.Domain.Cookbooks;
 using RecipeManager.Api.Domain.Recipes;
+using RecipeManager.Api.Features.Validation;
 using RecipeManager.Api.Shared.Endpoint;
-using RecipeManager.Api.Contracts.Cookbooks;
 
 namespace RecipeManager.Api.Features.Cookbooks;
 
@@ -22,42 +22,13 @@ public static class CreateCookbook
     // ToDo: validate recipe ids within whole cookbook
     public sealed class Validator : AbstractValidator<Request>
     {
-        public Validator(IAppDbContext dbContext)
+        public Validator()
         {
-            RuleFor(x => x.Title).SetValidator(new CookbookTitleValidator());
-            RuleFor(x => x.Description).SetValidator(new CookbookDescriptionValidator());
+            RuleFor(x => x.Title).ValidateCookbookTitle();
+            RuleFor(x => x.Description).ValidateCookbookDescription();
 
-            When(request => request.Categories.Any(), () =>
-            {
-                CookbookCategoryValidator categoryCategoryValidator = new(dbContext);
-
-                RuleForEach(request => request.Categories).SetValidator(categoryCategoryValidator);
-            });
-        }
-    }
-
-    private static IEnumerable<string> GetCategoryNames(CookbookCategoryDto category)
-    {
-        List<string> names = [category.Name];
-
-        if (category.Subcategories.Any())
-        {
-            names.AddRange(category.Subcategories.SelectMany(GetCategoryNames));
-        }
-
-        return names;
-    }
-
-    public sealed class CookbookCategoryValidator : AbstractValidator<CookbookCategoryDto>
-    {
-        public CookbookCategoryValidator(IAppDbContext dbContext)
-        {
-            RuleFor(x => x.Name).SetValidator(new CookbookCategoryNameValidator());
-
-            When(category => category.Subcategories.Any(), () =>
-            {
-                RuleForEach(x => x.Subcategories).SetValidator(this);
-            });
+            RuleFor(x => x.Categories)
+                .ValidateCookbookCategoryNames(category => category.Name, category => category.Subcategories);
         }
     }
 
