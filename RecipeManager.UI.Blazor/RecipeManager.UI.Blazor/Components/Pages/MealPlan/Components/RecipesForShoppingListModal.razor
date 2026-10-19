@@ -12,10 +12,6 @@
         width: 450px;
     }
     
-    .servings-header {
-        width: 250px;
-    }
-
     .recipes-list {
         max-height: 450px; 
         overflow-y: auto;
@@ -27,13 +23,8 @@
     }
 
     .recipe-title {
-        width: 375px; 
+        width: 600px;
         margin-top: 10px;
-    }
-
-    .servings-input {
-        width: 250px; 
-        margin-top: 15px;
     }
 </style>
 
@@ -43,7 +34,6 @@
             <MudStack>
                 <MudStack Row="true">                
                     <MudText Typo="Typo.h6" Class="title-header">Title</MudText>
-                    <MudText Typo="Typo.h6" Class="servings-header">Number of servings</MudText>
                 </MudStack>
 
                 <div class="recipes-list">
@@ -52,7 +42,6 @@
                         <MudStack Row="true">
                             <ImageComponent ImageSource="@recipe.ImageUrl" MaxHeight="75" MaxWidth="75" ImageStyle="align-self: center; margin-top: 15px;" />
                             <MudText Typo="Typo.h6" Class="recipe-title">@recipe.Title</MudText>
-                            <MudTextField T="int" For="@(() => recipe.NumberOfServings)" @bind-Value="@recipe.NumberOfServings" Class="servings-input" />
                         </MudStack>
                     }
                 </div>

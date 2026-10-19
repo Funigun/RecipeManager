@@ -33,7 +33,7 @@ public static class GenerateShoppingList
         public RecipeDao? IngredientRecipe { get; set; }
     }
 
-    public sealed record RecipeDto(Guid Id, int NumberOfServings);
+    public sealed record RecipeDto(Guid Id);
 
     public sealed record Request(IEnumerable<RecipeDto> Recipes);
 
@@ -87,8 +87,8 @@ public static class GenerateShoppingList
         Dictionary<IngredientId, Ingredient> ingredients = (await GetIngredients(ingredientIds, dbContext, cancellationToken)).ToDictionary(i => i.Id);
         Dictionary<IngredientCategoryId, IngredientCategory> ingredientCategories = (await GetIngredientCategories(ingredients.Values, dbContext, cancellationToken)).ToDictionary(category => category.Id);
 
-        IEnumerable<RecipeDao>? scalledRecipes = PrepareScalledRecipes(request, recipes, ingredients, nestedRecipes.ToDictionary(r => r.Id));
-        IEnumerable<RecipeIngredientDao> ingredientsToProcess = scalledRecipes.SelectMany(r => r.Ingredients);
+        IEnumerable<RecipeDao> selectedRecipes = PrepareRecipes(request, recipes, ingredients, nestedRecipes.ToDictionary(r => r.Id));
+        IEnumerable<RecipeIngredientDao> ingredientsToProcess = selectedRecipes.SelectMany(r => r.Ingredients);
 
         foreach (RecipeIngredientDao recipeIngredient in ingredientsToProcess)
         {
@@ -212,7 +212,7 @@ public static class GenerateShoppingList
                                                    .ToListAsync(cancellationToken);
     }
 
-    private static IEnumerable<RecipeDao> PrepareScalledRecipes(Request request, IEnumerable<Recipe> recipes, Dictionary<IngredientId, Ingredient> ingredients, Dictionary<RecipeId, Recipe> nestedRecipes)
+    private static IEnumerable<RecipeDao> PrepareRecipes(Request request, IEnumerable<Recipe> recipes, Dictionary<IngredientId, Ingredient> ingredients, Dictionary<RecipeId, Recipe> nestedRecipes)
     {
         List<RecipeDao> result = [];
 
@@ -220,23 +220,19 @@ public static class GenerateShoppingList
         {
             Recipe recipe = recipes.First(r => r.Id.Value == recipeDto.Id);
 
-            RecipeDao recipeDao = new()
+            result.Add(new RecipeDao
             {
                 Id = recipe.Id.Value,
-                Ingredients = GetScalledIngredients(recipeDto, recipe, ingredients, nestedRecipes).ToList()
-            };
-
-            result.Add(recipeDao);
+                Ingredients = GetRecipeIngredients(recipe, ingredients, nestedRecipes).ToList()
+            });
         }
 
         return result;
     }
 
-    private static IEnumerable<RecipeIngredientDao> GetScalledIngredients(RecipeDto recipeDto, Recipe recipe, Dictionary<IngredientId, Ingredient> ingredients, Dictionary<RecipeId, Recipe> nestedRecipes, double scalingFactorByAmount = 0d)
+    private static IEnumerable<RecipeIngredientDao> GetRecipeIngredients(Recipe recipe, Dictionary<IngredientId, Ingredient> ingredients, Dictionary<RecipeId, Recipe> nestedRecipes, double nestedRecipeYieldFactor = 1d)
     {
         List<RecipeIngredientDao> results = [];
-        double scalingFactorByRecipeAmount = (double)recipeDto.NumberOfServings / recipe.NumberOfServings;
-        double finalScalingFactor = scalingFactorByAmount > 0 ? scalingFactorByAmount : scalingFactorByRecipeAmount;
 
         foreach (RecipeIngredient recipeIngredient in recipe.Ingredients)
         {
@@ -244,15 +240,15 @@ public static class GenerateShoppingList
             if (ingredient.Recipes.Any())
             {
                 Recipe nestedRecipe = nestedRecipes[ingredient.Recipes.First()];
-                double nestedRecipeScalingFactorByAmount = nestedRecipe.Amount.Amount * scalingFactorByRecipeAmount / recipeIngredient.Amount;
-                results.AddRange(GetScalledIngredients(recipeDto, nestedRecipe, ingredients, nestedRecipes, nestedRecipeScalingFactorByAmount).ToList());
+                double childRecipeYieldFactor = nestedRecipe.Amount.Amount * nestedRecipeYieldFactor / recipeIngredient.Amount;
+                results.AddRange(GetRecipeIngredients(nestedRecipe, ingredients, nestedRecipes, childRecipeYieldFactor));
             }
             else
             {
                 results.Add(new RecipeIngredientDao
                 {
                     IngredientId = recipeIngredient.IngredientId,
-                    Amount = recipeIngredient.Amount * finalScalingFactor,
+                    Amount = recipeIngredient.Amount * nestedRecipeYieldFactor,
                     UnitId = recipeIngredient.UnitId
                 });
             }
