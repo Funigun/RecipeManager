@@ -7,7 +7,6 @@ using RecipeManager.Api.Application.Exceptions;
 using RecipeManager.Api.Domain.Units;
 using RecipeManager.Api.Shared.Contracts.Authorization;
 using RecipeManager.Api.Shared.Endpoint;
-using RecipeManager.Shared.Contracts.Authorization;
 
 namespace RecipeManager.Api.Features.Units;
 

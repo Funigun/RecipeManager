@@ -5,8 +5,8 @@ using Microsoft.EntityFrameworkCore;
 using RecipeManager.Api.Shared.Endpoint;
 using RecipeManager.Identity.Api.Common.Exceptions;
 using RecipeManager.Identity.Api.Domain;
-using RecipeManager.Shared.Contracts.Authorization;
-using RecipeManager.Shared.Contracts.User.Registration;
+using RecipeManager.Api.Shared.Contracts.Authorization;
+using RecipeManager.Identity.Api.Contracts.User.Registration;
 
 namespace RecipeManager.Identity.Api.Features.Account;
 

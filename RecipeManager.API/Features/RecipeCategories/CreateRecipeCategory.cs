@@ -6,8 +6,7 @@ using RecipeManager.Api.Domain.Recipes;
 using RecipeManager.Api.Domain.Recipes.Enums;
 using RecipeManager.Api.Shared.Contracts.Authorization;
 using RecipeManager.Api.Shared.Endpoint;
-using RecipeManager.Shared.Contracts.Authorization;
-using RecipeManager.Shared.Contracts.RecipeCategories;
+using RecipeManager.Api.Contracts.RecipeCategories;
 
 namespace RecipeManager.Api.Features.RecipeCategories;
 

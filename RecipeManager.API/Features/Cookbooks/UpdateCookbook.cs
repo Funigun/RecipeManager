@@ -7,7 +7,7 @@ using RecipeManager.Api.Domain.Cookbooks;
 using RecipeManager.Api.Domain.Recipes;
 using RecipeManager.Api.Shared.Contracts.Authorization;
 using RecipeManager.Api.Shared.Endpoint;
-using RecipeManager.Shared.Contracts.Cookbooks;
+using RecipeManager.Api.Contracts.Cookbooks;
 
 namespace RecipeManager.Api.Features.Cookbooks;
 

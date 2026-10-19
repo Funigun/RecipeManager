@@ -5,8 +5,7 @@ using RecipeManager.Api.Application.Abstractions;
 using RecipeManager.Api.Domain.Ingredients;
 using RecipeManager.Api.Shared.Contracts.Authorization;
 using RecipeManager.Api.Shared.Endpoint;
-using RecipeManager.Shared.Contracts.Authorization;
-using RecipeManager.Shared.Contracts.IngredientCategories;
+using RecipeManager.Api.Contracts.IngredientCategories;
 
 namespace RecipeManager.Api.Features.IngredientCategories;
 

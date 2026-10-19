@@ -28,8 +28,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{3D592DCD
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RecipeManager.Integration.Tests", "RecipeManager.Tests\RecipeManager.Integration.Tests.csproj", "{99F5C032-9C9F-4CE8-8C9A-9A8319073C24}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RecipeManager.Shared.Contracts", "RecipeManager.Shared.Contracts\RecipeManager.Shared.Contracts.csproj", "{B33B9F52-4775-47A4-904A-CCFA463EE905}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Aspire", "Aspire", "{A6C0D147-828A-4386-95F4-41C15BE11F86}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RecipeManager.AppHost", "RecipeManager.AppHost\RecipeManager.AppHost.csproj", "{E046EEBB-F2CC-ECCA-B94B-2E5775C5C011}"
@@ -70,10 +68,6 @@ Global
 		{99F5C032-9C9F-4CE8-8C9A-9A8319073C24}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{99F5C032-9C9F-4CE8-8C9A-9A8319073C24}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{99F5C032-9C9F-4CE8-8C9A-9A8319073C24}.Release|Any CPU.Build.0 = Release|Any CPU
-		{B33B9F52-4775-47A4-904A-CCFA463EE905}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B33B9F52-4775-47A4-904A-CCFA463EE905}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B33B9F52-4775-47A4-904A-CCFA463EE905}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{B33B9F52-4775-47A4-904A-CCFA463EE905}.Release|Any CPU.Build.0 = Release|Any CPU
 		{E046EEBB-F2CC-ECCA-B94B-2E5775C5C011}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{E046EEBB-F2CC-ECCA-B94B-2E5775C5C011}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E046EEBB-F2CC-ECCA-B94B-2E5775C5C011}.Release|Any CPU.ActiveCfg = Release|Any CPU

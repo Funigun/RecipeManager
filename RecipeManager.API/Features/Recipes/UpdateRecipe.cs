@@ -12,8 +12,8 @@ using RecipeManager.Api.Domain.Recipes.ValueObjects;
 using RecipeManager.Api.Domain.Units;
 using RecipeManager.Api.Shared.Contracts.Authorization;
 using RecipeManager.Api.Shared.Endpoint;
-using RecipeManager.Shared.Contracts.Ingredients;
-using RecipeManager.Shared.Contracts.Recipes;
+using RecipeManager.Api.Contracts.Ingredients;
+using RecipeManager.Api.Contracts.Recipes;
 
 namespace RecipeManager.Api.Features.Recipes;
 

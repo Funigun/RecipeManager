@@ -15,7 +15,6 @@ using StackExchange.Redis;
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 Assembly assembly = Assembly.GetExecutingAssembly();
-Assembly contractsAssembly = Assembly.GetAssembly(typeof(RecipeManager.Shared.Contracts.AssemblyReader))!;
 
 Log.Logger = new LoggerConfiguration().ReadFrom
              .Configuration(new ConfigurationBuilder()
@@ -57,8 +56,7 @@ try
     builder.Services.AddSharedServices()
                     .AddEndpoints(assembly)
                     .AddAuthorizationPolicies(assembly)
-                    .AddValidatorsFromAssembly(assembly)
-                    .AddValidatorsFromAssembly(contractsAssembly);
+                    .AddValidatorsFromAssembly(assembly);
 
     builder.Services.AddPersistance(builder.Configuration);
 

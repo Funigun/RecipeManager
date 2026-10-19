@@ -13,7 +13,6 @@
 	
 	<ItemGroup>
 	  <ProjectReference Include="..\..\RecipeManager.ServiceDefaults\RecipeManager.ServiceDefaults.csproj" />
-	  <ProjectReference Include="..\..\RecipeManager.Shared.Contracts\RecipeManager.Shared.Contracts.csproj" />
 	  <ProjectReference Include="..\RecipeManager.UI.Blazor.Client\RecipeManager.UI.Blazor.Client.csproj" />
 	  <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" />
 	</ItemGroup>

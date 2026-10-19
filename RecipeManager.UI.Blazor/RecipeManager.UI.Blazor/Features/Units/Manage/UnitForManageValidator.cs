@@ -1,5 +1,5 @@
 ﻿using FluentValidation;
-using RecipeManager.Shared.Contracts.Units;
+using RecipeManager.UI.Blazor.Contracts.Units;
 using RecipeManager.UI.Blazor.Components.Common;
 
 namespace RecipeManager.UI.Blazor.Features.Units.Manage;

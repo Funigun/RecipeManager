@@ -7,7 +7,6 @@ using RecipeManager.Api.Shared.Endpoint;
 using RecipeManager.Api.Shared.Hateoas.Builder;
 using RecipeManager.Api.Shared.Hateoas.Common;
 using RecipeManager.Api.Shared.Hateoas.Models;
-using RecipeManager.Shared.Contracts.Authorization;
 using LinkOptions = RecipeManager.Api.Shared.Hateoas.Models.LinkOptions;
 
 namespace RecipeManager.Api.Features.IngredientCategories;

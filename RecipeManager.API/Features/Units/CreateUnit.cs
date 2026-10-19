@@ -5,8 +5,7 @@ using RecipeManager.Api.Domain.Units;
 using RecipeManager.Api.Domain.Units.Enums;
 using RecipeManager.Api.Shared.Contracts.Authorization;
 using RecipeManager.Api.Shared.Endpoint;
-using RecipeManager.Shared.Contracts.Authorization;
-using RecipeManager.Shared.Contracts.Units;
+using RecipeManager.Api.Contracts.Units;
 
 namespace RecipeManager.Api.Features.Units;
 
