@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 18
-VisualStudioVersion = 18.1.11312.151 d18.0
+VisualStudioVersion = 18.1.11312.151
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
 	ProjectSection(SolutionItems) = preProject
@@ -37,6 +37,23 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RecipeManager.Unit.Tests", "RecipeManager.Unit.Tests\RecipeManager.Unit.Tests.csproj", "{3B82400A-CF9C-4504-BF5E-84E9107C1013}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RecipeManager.Architecture.Tests", "RecipeManager.Architecture.Tests\RecipeManager.Architecture.Tests.csproj", "{9D84A62B-7693-4E7D-8055-FA8D3126A10A}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".github", ".github", "{D52EB4DB-F2DF-4441-9FF9-27A28C1E8663}"
+	ProjectSection(SolutionItems) = preProject
+		.github\copilot-instructions.md = .github\copilot-instructions.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "wiki", "wiki", "{50C12016-8A20-45AD-B6AE-F8B05EB7B665}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "domain", "domain", "{D4CDD4F9-D6D3-454B-851E-7B14B921270D}"
+	ProjectSection(SolutionItems) = preProject
+		.github\wiki\domain\0001-unit.md = .github\wiki\domain\0001-unit.md
+		.github\wiki\domain\0002-ingredient-and-category.md = .github\wiki\domain\0002-ingredient-and-category.md
+		.github\wiki\domain\0003-recipe-and-category.md = .github\wiki\domain\0003-recipe-and-category.md
+		.github\wiki\domain\0004-cookbooks.md = .github\wiki\domain\0004-cookbooks.md
+		.github\wiki\domain\0005-meal-planner.md = .github\wiki\domain\0005-meal-planner.md
+		.github\wiki\domain\0006-aggregate-relationships.md = .github\wiki\domain\0006-aggregate-relationships.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -99,6 +116,8 @@ Global
 		{57B28925-2D52-49E0-4EE0-10883C923647} = {A6C0D147-828A-4386-95F4-41C15BE11F86}
 		{3B82400A-CF9C-4504-BF5E-84E9107C1013} = {3D592DCD-C0CF-4CA5-8962-31BADC4819F1}
 		{9D84A62B-7693-4E7D-8055-FA8D3126A10A} = {3D592DCD-C0CF-4CA5-8962-31BADC4819F1}
+		{50C12016-8A20-45AD-B6AE-F8B05EB7B665} = {D52EB4DB-F2DF-4441-9FF9-27A28C1E8663}
+		{D4CDD4F9-D6D3-454B-851E-7B14B921270D} = {50C12016-8A20-45AD-B6AE-F8B05EB7B665}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {5E867AB8-9EB2-4C53-938B-EFE283FA361A}
