@@ -28,6 +28,7 @@
   <Folder Name="/UI/">
     <Project Path="RecipeManager.UI.Blazor/RecipeManager.UI.Blazor.Client/RecipeManager.UI.Blazor.Client.csproj" />
     <Project Path="RecipeManager.UI.Blazor/RecipeManager.UI.Blazor/RecipeManager.UI.Blazor.csproj" />
+    <Project Path="RecipeManager.UI/RecipeManager.UI.csproj" />
   </Folder>
   <Folder Name="/WebApi/">
     <Project Path="RecipeManager.Api.Shared/RecipeManager.Api.Shared.csproj" />

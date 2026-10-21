@@ -23,7 +23,7 @@ public static class GetRecipeForDropdownModel
         }
     }
 
-    internal static async Task<Results<Ok<IEnumerable<Response>>, BadRequest>> Handler([FromQuery] string recipeName, [FromQuery] int numberOfRecipesToLoad, [FromServices] IAppDbContext dbContext, ICurrentUser currentUser, CancellationToken cancellationToken)
+    internal static async Task<Results<Ok<IEnumerable<Response>>, BadRequest>> Handler([FromQuery] string recipeName, [FromQuery] int numberOfRecipesToLoad, [FromServices] IAppDbContext dbContext, [FromServices] ICurrentUser currentUser, CancellationToken cancellationToken)
     {
         IEnumerable<Recipe> recipes = await dbContext.Recipes.AsNoTracking()
                                                              .Where(recipe => recipe.Title.Contains(recipeName) && recipe.CreatedBy == currentUser.Id)

@@ -27,7 +27,7 @@ public static class GetRecipesForMealPlan
         }
     }
 
-    internal static async Task<Results<Ok<IEnumerable<Response>>, BadRequest>> Handler([AsParameters] Request request, [FromServices] IAppDbContext dbContext, ICurrentUser currentUser, CancellationToken cancellationToken)
+    internal static async Task<Results<Ok<IEnumerable<Response>>, BadRequest>> Handler([AsParameters] Request request, [FromServices] IAppDbContext dbContext, [FromServices] ICurrentUser currentUser, CancellationToken cancellationToken)
     {
         IEnumerable<Recipe> recipes = await dbContext.Recipes.AsNoTracking()
                                                              .Where(recipe => recipe.Title.Contains(request.RecipeName) && recipe.CreatedBy == currentUser.Id)
