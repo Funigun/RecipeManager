@@ -24,7 +24,7 @@ public sealed class CreateCategoryTests : BaseIntegrationTest
         using StringContent content = new(JsonSerializer.Serialize(createUnitRequest), Encoding.UTF8, "application/json");
 
         // Act
-        HttpResponseMessage response = await HttpClient.PostAsync("/api/recipeCategories", content, TestContext.Current.CancellationToken);
+        HttpResponseMessage response = await HttpClient.PostAsync(RecipeCategoriesGroup.Route, content, TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Equal(System.Net.HttpStatusCode.Forbidden, response.StatusCode);
@@ -43,7 +43,7 @@ public sealed class CreateCategoryTests : BaseIntegrationTest
         using StringContent content = new(JsonSerializer.Serialize(createCategoryRequest), Encoding.UTF8, "application/json");
 
         // Act
-        HttpResponseMessage response = await HttpClient.PostAsync("/api/recipeCategories", content, TestContext.Current.CancellationToken);
+        HttpResponseMessage response = await HttpClient.PostAsync(RecipeCategoriesGroup.Route, content, TestContext.Current.CancellationToken);
 
         // Assert
         Assert.True(response.StatusCode == System.Net.HttpStatusCode.BadRequest, $"Expected Bad Request, but got {response.StatusCode} for {justification}");
@@ -59,7 +59,7 @@ public sealed class CreateCategoryTests : BaseIntegrationTest
         using StringContent content = new(JsonSerializer.Serialize(createCategoryRequest), Encoding.UTF8, "application/json");
 
         // Act
-        HttpResponseMessage response = await HttpClient.PostAsync("/api/recipeCategories", content, TestContext.Current.CancellationToken);
+        HttpResponseMessage response = await HttpClient.PostAsync(RecipeCategoriesGroup.Route, content, TestContext.Current.CancellationToken);
         string responseBody = await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
         CreateRecipeCategory.Response? categoryId = JsonSerializer.Deserialize<CreateRecipeCategory.Response>(responseBody, JsonOptions);
 
@@ -68,6 +68,6 @@ public sealed class CreateCategoryTests : BaseIntegrationTest
         Assert.NotNull(categoryId);
         Assert.Equal(System.Net.HttpStatusCode.Created, response.StatusCode);
         Assert.NotNull(response.Headers.Location);
-        Assert.Contains($"/api/recipeCategories/{categoryId.Id}", response.Headers.Location!.ToString(), StringComparison.OrdinalIgnoreCase);
+        Assert.Contains(RecipeCategoriesGroup.CategoryById(categoryId.Id), response.Headers.Location!.ToString(), StringComparison.OrdinalIgnoreCase);
     }
 }

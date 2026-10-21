@@ -62,14 +62,16 @@ public static class UpdateMealPlan
         }
     }
 
-    [GroupEndpoint("MealPlans")]
     public sealed class Endpoint : IEndpoint
     {
         public void MapEndpoint(IEndpointRouteBuilder endpoints)
         {
-            endpoints.MapStandardAuthenticatedPut<Request, Request>(string.Empty, Handler)
+            endpoints.MapStandardAuthenticatedPut<Request, Request>(MealPlanGroup.Route, Handler)
                      .WithName("UpdateMealPlan")
-                     .WithDescription("Updates existing meal plans or creates new ones.");
+                     .WithDescription("Updates existing meal plans or creates new ones.")
+                     .WithTags(MealPlanGroup.Tag)
+                     .RequireAuthorization("RecipeManagerPolicy")
+                     .ProducesProblem(StatusCodes.Status401Unauthorized);
         }
     }
 

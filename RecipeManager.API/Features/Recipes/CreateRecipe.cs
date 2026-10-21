@@ -154,14 +154,16 @@ public static class CreateRecipe
         }
     }
 
-    [GroupEndpoint("Recipes")]
     public sealed class Endpoint : IEndpoint
     {
         public void MapEndpoint(IEndpointRouteBuilder endpoints)
         {
-            endpoints.MapStandardValidatedPost<Request, Response>(string.Empty, Handler)
+            endpoints.MapStandardValidatedPost<Request, Response>(RecipesGroup.Route, Handler)
                      .WithName("CreateRecipe")
-                     .WithDescription("Creates a new recipe");
+                     .WithDescription("Creates a new recipe")
+                     .WithTags(RecipesGroup.Tag)
+                     .RequireAuthorization("RecipeManagerPolicy")
+                     .ProducesProblem(StatusCodes.Status401Unauthorized);
         }
     }
 
@@ -172,7 +174,7 @@ public static class CreateRecipe
         dbContext.Recipes.Add(recipe);
         await dbContext.SaveChangesAsync(cancellationToken);
 
-        return Results.Created($"/api/recipes/{recipe.Id.Value}", new Response(recipe.Id.Value));
+        return Results.Created(RecipesGroup.RecipeById(recipe.Id.Value), new Response(recipe.Id.Value));
     }
 
     public static Recipe ToDomain(this Request request)

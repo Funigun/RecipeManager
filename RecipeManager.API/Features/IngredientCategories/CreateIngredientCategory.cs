@@ -32,14 +32,16 @@ public static class CreateIngredientCategory
         }
     }
 
-    [GroupEndpoint("IngredientCategories")]
     public sealed class Endpoint : IEndpoint
     {
         public void MapEndpoint(IEndpointRouteBuilder endpoints)
         {
-            endpoints.MapStandardAuthenticatedPost<Request, Response>(string.Empty, Handler)
+            endpoints.MapStandardAuthenticatedPost<Request, Response>(IngredientCategoryGroup.Route, Handler)
                      .WithName("CreateIngredientCategory")
-                     .WithDescription("Creates a new ingredient category with the specified name.");
+                     .WithDescription("Creates a new ingredient category with the specified name.")
+                     .WithTags(IngredientCategoryGroup.Tag)
+                     .RequireAuthorization("RecipeManagerPolicy")
+                     .ProducesProblem(StatusCodes.Status401Unauthorized);
         }
     }
 
@@ -50,6 +52,6 @@ public static class CreateIngredientCategory
         dbContext.IngredientCategories.Add(category);
         await dbContext.SaveChangesAsync(cancellationToken);
 
-        return Results.Created($"/api/ingredientCategories/{category.Id}", new Response(category.Id));
+        return Results.Created(IngredientCategoryGroup.CategoryById(category.Id.Value), new Response(category.Id));
     }
 }

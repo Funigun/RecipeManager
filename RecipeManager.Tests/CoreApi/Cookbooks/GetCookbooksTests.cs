@@ -19,7 +19,7 @@ public sealed class GetCookbooksTests : BaseIntegrationTest
         HttpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", TokenMockFactory.GenerateJwtToken(UserMockFactory.CreateMockedUser()));
 
         // Act
-        HttpResponseMessage response = await HttpClient.GetAsync("/api/cookbooks", TestContext.Current.CancellationToken);
+        HttpResponseMessage response = await HttpClient.GetAsync(CookbooksGroup.Route, TestContext.Current.CancellationToken);
         string responseContent = await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
         HateoasResponse<GetCookbooks.Response>? responseModel = System.Text.Json.JsonSerializer.Deserialize<HateoasResponse<GetCookbooks.Response>>(responseContent, JsonOptions);
 

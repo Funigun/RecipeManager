@@ -36,7 +36,7 @@ public sealed class CreateIngredientTests : BaseIntegrationTest
         using StringContent content = new(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json");
 
         // Act
-        HttpResponseMessage response = await HttpClient.PostAsync("/api/ingredients", content, TestContext.Current.CancellationToken);
+        HttpResponseMessage response = await HttpClient.PostAsync(IngredientsGroup.Route, content, TestContext.Current.CancellationToken);
         string responseBody = await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
         CreateIngredient.Response? ingredientId = JsonSerializer.Deserialize<CreateIngredient.Response>(responseBody, JsonOptions);
 
@@ -45,7 +45,7 @@ public sealed class CreateIngredientTests : BaseIntegrationTest
         Assert.NotNull(ingredientId);
         Assert.Equal(System.Net.HttpStatusCode.Created, response.StatusCode);
         Assert.NotNull(response.Headers.Location);
-        Assert.Contains($"/api/ingredients/{ingredientId.Id}", response.Headers.Location!.ToString(), StringComparison.OrdinalIgnoreCase);
+        Assert.Contains(IngredientsGroup.IngredientById(ingredientId.Id), response.Headers.Location!.ToString(), StringComparison.OrdinalIgnoreCase);
     }
 
     [Fact]
@@ -67,7 +67,7 @@ public sealed class CreateIngredientTests : BaseIntegrationTest
         using StringContent content = new(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json");
 
         // Act
-        HttpResponseMessage response = await HttpClient.PostAsync("/api/ingredients", content, TestContext.Current.CancellationToken);
+        HttpResponseMessage response = await HttpClient.PostAsync(IngredientsGroup.Route, content, TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Equal(System.Net.HttpStatusCode.BadRequest, response.StatusCode);
@@ -89,7 +89,7 @@ public sealed class CreateIngredientTests : BaseIntegrationTest
         using StringContent content = new(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json");
 
         // Act
-        HttpResponseMessage response = await HttpClient.PostAsync("/api/ingredients", content, TestContext.Current.CancellationToken);
+        HttpResponseMessage response = await HttpClient.PostAsync(IngredientsGroup.Route, content, TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Equal(System.Net.HttpStatusCode.BadRequest, response.StatusCode);
@@ -115,7 +115,7 @@ public sealed class CreateIngredientTests : BaseIntegrationTest
         using StringContent content = new(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json");
 
         // Act
-        HttpResponseMessage response = await HttpClient.PostAsync("/api/ingredients", content, TestContext.Current.CancellationToken);
+        HttpResponseMessage response = await HttpClient.PostAsync(IngredientsGroup.Route, content, TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Equal(System.Net.HttpStatusCode.BadRequest, response.StatusCode);
@@ -141,7 +141,7 @@ public sealed class CreateIngredientTests : BaseIntegrationTest
         using StringContent content = new(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json");
 
         // Act
-        HttpResponseMessage response = await HttpClient.PostAsync("/api/ingredients", content, TestContext.Current.CancellationToken);
+        HttpResponseMessage response = await HttpClient.PostAsync(IngredientsGroup.Route, content, TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Equal(System.Net.HttpStatusCode.BadRequest, response.StatusCode);
@@ -167,7 +167,7 @@ public sealed class CreateIngredientTests : BaseIntegrationTest
         using StringContent content = new(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json");
 
         // Act
-        HttpResponseMessage response = await HttpClient.PostAsync("/api/ingredients", content, TestContext.Current.CancellationToken);
+        HttpResponseMessage response = await HttpClient.PostAsync(IngredientsGroup.Route, content, TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Equal(System.Net.HttpStatusCode.BadRequest, response.StatusCode);
@@ -197,7 +197,7 @@ public sealed class CreateIngredientTests : BaseIntegrationTest
         using StringContent content = new(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json");
 
         // Act
-        HttpResponseMessage response = await HttpClient.PostAsync("/api/ingredients", content, TestContext.Current.CancellationToken);
+        HttpResponseMessage response = await HttpClient.PostAsync(IngredientsGroup.Route, content, TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Equal(System.Net.HttpStatusCode.BadRequest, response.StatusCode);

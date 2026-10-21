@@ -21,7 +21,7 @@ public sealed class GetRecipesTests : BaseIntegrationTest
         HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", TokenMockFactory.GenerateJwtToken(UserMockFactory.CreateMockedAdmin()));
 
         // Act
-        HttpResponseMessage response = await HttpClient.GetAsync("/api/recipes", TestContext.Current.CancellationToken);
+        HttpResponseMessage response = await HttpClient.GetAsync(RecipesGroup.Route, TestContext.Current.CancellationToken);
         string responseBody = await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
         HateoasResponse<GetRecipes.Response>? recipesResponse = JsonSerializer.Deserialize<HateoasResponse<GetRecipes.Response>>(responseBody, JsonOptions);
 

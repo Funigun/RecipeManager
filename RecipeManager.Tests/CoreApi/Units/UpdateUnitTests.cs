@@ -26,7 +26,7 @@ public sealed class UpdateUnitTests : BaseIntegrationTest
         using StringContent content = new(JsonSerializer.Serialize(updateUnitRequest), Encoding.UTF8, "application/json");
 
         // Act
-        HttpResponseMessage response = await HttpClient.PutAsync($"/api/units/{unitId}", content, TestContext.Current.CancellationToken);
+        HttpResponseMessage response = await HttpClient.PutAsync(UnitsGroup.UnitById(unitId), content, TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Equal(System.Net.HttpStatusCode.Forbidden, response.StatusCode);
@@ -46,7 +46,7 @@ public sealed class UpdateUnitTests : BaseIntegrationTest
         using StringContent content = new(JsonSerializer.Serialize(updateUnitRequest), Encoding.UTF8, "application/json");
 
         // Act
-        HttpResponseMessage response = await HttpClient.PutAsync($"/api/units/{unitId}", content, TestContext.Current.CancellationToken);
+        HttpResponseMessage response = await HttpClient.PutAsync(UnitsGroup.UnitById(unitId), content, TestContext.Current.CancellationToken);
 
         // Assert
         Assert.True(response.StatusCode == System.Net.HttpStatusCode.BadRequest, $"Expected BadRequest for justification: {justification}");
@@ -63,7 +63,7 @@ public sealed class UpdateUnitTests : BaseIntegrationTest
         using StringContent content = new(JsonSerializer.Serialize(updateUnitRequest), Encoding.UTF8, "application/json");
 
         // Act
-        HttpResponseMessage response = await HttpClient.PutAsync($"/api/units/{unitId}", content, TestContext.Current.CancellationToken);
+        HttpResponseMessage response = await HttpClient.PutAsync(UnitsGroup.UnitById(unitId), content, TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Equal(System.Net.HttpStatusCode.BadRequest, response.StatusCode);
@@ -80,7 +80,7 @@ public sealed class UpdateUnitTests : BaseIntegrationTest
         using StringContent content = new(JsonSerializer.Serialize(updateUnitRequest), Encoding.UTF8, "application/json");
 
         // Act
-        HttpResponseMessage response = await HttpClient.PutAsync($"/api/units/{unitId}", content, TestContext.Current.CancellationToken);
+        HttpResponseMessage response = await HttpClient.PutAsync(UnitsGroup.UnitById(unitId), content, TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Equal(System.Net.HttpStatusCode.BadRequest, response.StatusCode);
@@ -97,7 +97,7 @@ public sealed class UpdateUnitTests : BaseIntegrationTest
         using StringContent content = new(JsonSerializer.Serialize(updateUnitRequest), Encoding.UTF8, "application/json");
 
         // Act
-        HttpResponseMessage response = await HttpClient.PutAsync($"/api/units/{unitId}", content, TestContext.Current.CancellationToken);
+        HttpResponseMessage response = await HttpClient.PutAsync(UnitsGroup.UnitById(unitId), content, TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Equal(System.Net.HttpStatusCode.NoContent, response.StatusCode);

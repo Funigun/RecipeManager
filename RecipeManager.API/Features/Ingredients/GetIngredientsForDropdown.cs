@@ -16,14 +16,16 @@ public static class GetIngredientsForDropdown
 
     public sealed record Response(Guid Id, string Name, string? RecipeUrl, IEnumerable<UnitForDropdownDto> AvailableUnits);
 
-    [GroupEndpoint("Ingredients")]
     public sealed class Endpoint : IEndpoint
     {
         public void MapEndpoint(IEndpointRouteBuilder endpoints)
         {
-            endpoints.MapStandardGet<Response>("/dropdown", Handler)
+            endpoints.MapStandardGet<Response>(IngredientsGroup.DropdownRoute, Handler)
                      .WithName("GetIngredientsForDropdown")
-                     .WithDescription("Gets a list of ingredients for use in dropdowns.");
+                     .WithDescription("Gets a list of ingredients for use in dropdowns.")
+                     .WithTags(IngredientsGroup.Tag)
+                     .RequireAuthorization("RecipeManagerPolicy")
+                     .ProducesProblem(StatusCodes.Status401Unauthorized);
         }
     }
 

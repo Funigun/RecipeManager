@@ -23,14 +23,16 @@ public static class DeleteRecipeCategory
         }
     }
 
-    [GroupEndpoint("RecipeCategories")]
     public sealed class Endpoint : IEndpoint
     {
         public void MapEndpoint(IEndpointRouteBuilder endpoints)
         {
-            endpoints.MapStandardAuthenticatedDelete<AuthorizationPolicy, Request>("/{categoryId}", Handler)
+            endpoints.MapStandardAuthenticatedDelete<AuthorizationPolicy, Request>(RecipeCategoriesGroup.CategoryByIdRoute, Handler)
                      .WithName("DeleteRecipeCategory")
-                     .WithDescription("Deletes a recipe category");
+                     .WithDescription("Deletes a recipe category")
+                     .WithTags(RecipeCategoriesGroup.Tag)
+                     .RequireAuthorization("RecipeManagerPolicy")
+                     .ProducesProblem(StatusCodes.Status401Unauthorized);
         }
     }
 

@@ -47,14 +47,14 @@ public static class UserRegistration
         }
     }
 
-    [GroupEndpoint("Account")]
     public class Enpoint : IEndpoint
     {
         public void MapEndpoint(IEndpointRouteBuilder endpoints)
         {
-            endpoints.MapStandardValidatedPost<Request, string>("/register", Handler)
+            endpoints.MapStandardValidatedPost<Request, string>(AccountGroup.RegisterRoute, Handler)
                      .WithName("Register")
-                     .WithDescription("Creates new user account");
+                     .WithDescription("Creates new user account")
+                     .WithTags(AccountGroup.Tag);
         }
     }
 

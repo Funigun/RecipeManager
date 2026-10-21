@@ -1,7 +1,6 @@
 ﻿using System.Reflection;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -43,27 +42,6 @@ public static class DependencyInjection
         return services;
     }
 
-    public static IServiceCollection AddEndpoints(this IServiceCollection services, Assembly assembly)
-    {
-        IEnumerable<Type> endpoints = assembly.GetTypes()
-                                              .Where(type => typeof(IEndpoint).IsAssignableFrom(type) && !type.IsAbstract && !type.IsInterface);
-
-        foreach (Type endpointType in endpoints)
-        {
-            services.AddTransient(typeof(IEndpoint), endpointType);
-        }
-
-        IEnumerable<Type> groups = assembly.GetTypes()
-                                           .Where(type => typeof(IGroupEndpoint).IsAssignableFrom(type) && !type.IsAbstract && !type.IsInterface);
-
-        foreach (Type group in groups)
-        {
-            services.AddTransient(typeof(IGroupEndpoint), group);
-        }
-
-        return services;
-    }
-
     public static IApplicationBuilder UseMiddlewares(this IApplicationBuilder app)
     {
         app.UseMiddleware<ExceptionHandlingMiddleware>();
@@ -73,59 +51,14 @@ public static class DependencyInjection
         return app;
     }
 
-    public static WebApplication MapEndpoints(this WebApplication app)
+    public static WebApplication MapEndpoints(this WebApplication app, Assembly assembly)
     {
-        Dictionary<string, IGroupEndpoint> endpointGroups = app.Services.GetServices<IGroupEndpoint>()
-                                                                        .ToDictionary(g => g.GroupName);
+        IEnumerable<Type> endpointTypes = assembly.GetTypes()
+                                                  .Where(type => typeof(IEndpoint).IsAssignableFrom(type) && !type.IsAbstract && !type.IsInterface);
 
-        List<IEndpoint> endpoints = app.Services.GetServices<IEndpoint>().ToList();
-
-        Dictionary<string, List<IEndpoint>> groupedEndpoints = [];
-        List<IEndpoint> ungroupedEndpoints = [];
-
-        foreach (IEndpoint endpoint in endpoints)
+        foreach (Type endpointType in endpointTypes)
         {
-            GroupEndpointAttribute? attribute = endpoint.GetType().GetCustomAttribute<GroupEndpointAttribute>();
-
-            if (attribute != null)
-            {
-                if (!groupedEndpoints.TryGetValue(attribute.GroupName, out List<IEndpoint>? groupEndpoints))
-                {
-                    groupEndpoints = [];
-                    groupedEndpoints[attribute.GroupName] = groupEndpoints;
-                }
-
-                groupEndpoints.Add(endpoint);
-            }
-            else
-            {
-                ungroupedEndpoints.Add(endpoint);
-            }
-        }
-
-        foreach (KeyValuePair<string, List<IEndpoint>> group in groupedEndpoints)
-        {
-            string groupName = group.Key;
-            List<IEndpoint> groupEndpoints = group.Value;
-
-#pragma warning disable CA1308 // Normalize strings to uppercase
-            string groupRoute = $"api/{groupName.ToLowerInvariant()}";
-#pragma warning restore CA1308 // Normalize strings to uppercase
-            RouteGroupBuilder routeGroupBuilder = app.MapGroup(groupRoute);
-
-            if (endpointGroups.TryGetValue(groupName, out IGroupEndpoint? endpointGroup))
-            {
-                endpointGroup.Configure(routeGroupBuilder);
-            }
-
-            foreach (IEndpoint endpoint in groupEndpoints)
-            {
-                endpoint.MapEndpoint(routeGroupBuilder);
-            }
-        }
-
-        foreach (IEndpoint endpoint in ungroupedEndpoints)
-        {
+            IEndpoint endpoint = (IEndpoint)ActivatorUtilities.CreateInstance(app.Services, endpointType);
             endpoint.MapEndpoint(app);
         }
 

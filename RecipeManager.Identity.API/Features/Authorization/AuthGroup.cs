@@ -1,14 +1,10 @@
-﻿using RecipeManager.Api.Shared.Endpoint;
+﻿namespace RecipeManager.Identity.Api.Features.Authorization;
 
-namespace RecipeManager.Identity.Api.Features.Authorization;
-
-public class AuthGroup : IGroupEndpoint
+public static class AuthGroup
 {
-    public string GroupName => "Auth";
-
-    public void Configure(RouteGroupBuilder groupBuilder)
-    {
-        groupBuilder.WithDescription("Authorization group")
-                    .WithTags("auth");
-    }
+    public const string Route = "/api/auth";
+    public const string Tag = "auth";
+    public const string LogInRoute = $"{Route}/login";
+    public const string LogOutRoute = $"{Route}/logout";
+    public const string RefreshTokenRoute = $"{Route}/refresh-token";
 }

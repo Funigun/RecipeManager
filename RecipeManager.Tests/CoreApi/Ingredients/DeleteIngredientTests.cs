@@ -1,5 +1,6 @@
 ﻿using System.Net.Http.Headers;
 using Microsoft.EntityFrameworkCore;
+using RecipeManager.Api.Features.Ingredients;
 using RecipeManager.Integration.Tests.Common.Users;
 using RecipeManager.Integration.Tests.CoreApi.TestFixtures;
 
@@ -20,7 +21,7 @@ public sealed class DeleteIngredientTests : BaseIntegrationTest
         Guid ingredientId = (await DbContext.Ingredients.AsNoTracking().FirstAsync(ingredient => ingredient.Name == "To Delete", TestContext.Current.CancellationToken)).Id.Value;
 
         // Act
-        HttpResponseMessage deleteResponse = await HttpClient.DeleteAsync($"/api/ingredients/{ingredientId}", TestContext.Current.CancellationToken);
+        HttpResponseMessage deleteResponse = await HttpClient.DeleteAsync(IngredientsGroup.IngredientById(ingredientId), TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Equal(System.Net.HttpStatusCode.NoContent, deleteResponse.StatusCode);

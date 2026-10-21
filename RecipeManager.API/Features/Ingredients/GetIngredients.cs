@@ -29,14 +29,16 @@ public static class GetIngredients
 
     public sealed record Response(int Page, int PageSize, int TotalCount, IEnumerable<HateoasResponse<IngredientDto>> Ingredients) : PagedResult(Page, PageSize, TotalCount);
 
-    [GroupEndpoint("Ingredients")]
     public sealed class Endpoint : IEndpoint
     {
         public void MapEndpoint(IEndpointRouteBuilder endpoints)
         {
-            endpoints.MapStandardGet<Response>("/", Handler)
+            endpoints.MapStandardGet<Response>(IngredientsGroup.Route, Handler)
                      .WithName("GetIngredients")
-                     .WithDescription("Gets a paginated list of ingredients");
+                     .WithDescription("Gets a paginated list of ingredients")
+                     .WithTags(IngredientsGroup.Tag)
+                     .RequireAuthorization("RecipeManagerPolicy")
+                     .ProducesProblem(StatusCodes.Status401Unauthorized);
         }
     }
 

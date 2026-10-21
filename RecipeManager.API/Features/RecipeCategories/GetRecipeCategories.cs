@@ -22,14 +22,16 @@ public static class GetRecipeCategories
 
     public sealed record Response(int Page, int PageSize, int TotalCount, IEnumerable<HateoasResponse<CategoryDto>> Categories) : PagedResult(Page, PageSize, TotalCount);
 
-    [GroupEndpoint("RecipeCategories")]
     public sealed class Endpoint : IEndpoint
     {
         public void MapEndpoint(IEndpointRouteBuilder endpoints)
         {
-            endpoints.MapStandardGet<CategoryDto>(string.Empty, Handler)
+            endpoints.MapStandardGet<CategoryDto>(RecipeCategoriesGroup.Route, Handler)
                      .WithName("GetRecipeCategories")
-                     .WithDescription("Gets all recipe categories");
+                     .WithDescription("Gets all recipe categories")
+                     .WithTags(RecipeCategoriesGroup.Tag)
+                     .RequireAuthorization("RecipeManagerPolicy")
+                     .ProducesProblem(StatusCodes.Status401Unauthorized);
         }
     }
 

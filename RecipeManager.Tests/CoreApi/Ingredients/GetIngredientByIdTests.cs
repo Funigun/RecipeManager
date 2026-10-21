@@ -23,7 +23,7 @@ public sealed class GetIngredientByIdTests : BaseIntegrationTest
         Guid ingredientId = (await DbContext.Ingredients.AsNoTracking().FirstAsync(ingredient => ingredient.Name == "Existing Ingredient", TestContext.Current.CancellationToken)).Id.Value;
 
         // Act
-        HttpResponseMessage response = await HttpClient.GetAsync($"/api/ingredients/{ingredientId}", TestContext.Current.CancellationToken);
+        HttpResponseMessage response = await HttpClient.GetAsync(IngredientsGroup.IngredientById(ingredientId), TestContext.Current.CancellationToken);
         string responseBody = await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
         HateoasResponse<GetIngredientById.Response>? ingredientResponse = JsonSerializer.Deserialize<HateoasResponse<GetIngredientById.Response>>(responseBody, JsonOptions);
 

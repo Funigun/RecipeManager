@@ -22,7 +22,7 @@ public sealed class GetCookbookByIdTests : BaseIntegrationTest
         CookbookId cookbookId = (await DbContext.Cookbooks.AsNoTracking().Where(cookbook => cookbook.Title == "Test book").FirstAsync(TestContext.Current.CancellationToken)).Id;
 
         // Act
-        HttpResponseMessage response = await HttpClient.GetAsync($"/api/cookbooks/{cookbookId.Value}", TestContext.Current.CancellationToken);
+        HttpResponseMessage response = await HttpClient.GetAsync(CookbooksGroup.CookbookById(cookbookId.Value), TestContext.Current.CancellationToken);
         string responseContent = await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
         HateoasResponse<GetCookbookById.Response>? hateoasResponse = System.Text.Json.JsonSerializer.Deserialize<HateoasResponse<GetCookbookById.Response>>(responseContent, JsonOptions);
 

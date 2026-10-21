@@ -82,14 +82,16 @@ public static class UpdateUnit
         }
     }
 
-    [GroupEndpoint("Units")]
     public class Enpoint : IEndpoint
     {
         public void MapEndpoint(IEndpointRouteBuilder endpoints)
         {
-            endpoints.MapStandardAuthenticatedPut<Request, Request>("/{unitId}", Handler)
+            endpoints.MapStandardAuthenticatedPut<Request, Request>(UnitsGroup.UnitByIdRoute, Handler)
                      .WithName("UpdateMeasurementUnit")
-                     .WithDescription("Updates a measurement unit");
+                     .WithDescription("Updates a measurement unit")
+                     .WithTags(UnitsGroup.Tag)
+                     .RequireAuthorization("RecipeManagerPolicy")
+                     .ProducesProblem(StatusCodes.Status401Unauthorized);
         }
     }
 

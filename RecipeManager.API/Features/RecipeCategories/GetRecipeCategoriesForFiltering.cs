@@ -13,14 +13,16 @@ public static class GetRecipeCategoriesForFiltering
 
     public sealed record Response(Dictionary<int, IEnumerable<RecipeCategoryDto>> Categories);
 
-    [GroupEndpoint("RecipeCategories")]
     public sealed class Enpoint : IEndpoint
     {
         public void MapEndpoint(IEndpointRouteBuilder endpoints)
         {
-            endpoints.MapStandardGet<Response>("/filtering", Handler)
+            endpoints.MapStandardGet<Response>(RecipeCategoriesGroup.FilteringRoute, Handler)
                      .WithName("GetRecipeCategoriesForFiltering")
-                     .WithDescription("Get recipe categories grouped by category type for filtering purposes.");
+                     .WithDescription("Get recipe categories grouped by category type for filtering purposes.")
+                     .WithTags(RecipeCategoriesGroup.Tag)
+                     .RequireAuthorization("RecipeManagerPolicy")
+                     .ProducesProblem(StatusCodes.Status401Unauthorized);
         }
     }
 

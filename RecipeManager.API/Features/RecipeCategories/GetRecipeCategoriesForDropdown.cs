@@ -10,14 +10,16 @@ public static class GetRecipeCategoriesForDropdown
 {
     public sealed record Response(Guid Id, string Name);
 
-    [GroupEndpoint("RecipeCategories")]
     public sealed class Endpoint : IEndpoint
     {
         public void MapEndpoint(IEndpointRouteBuilder endpoints)
         {
-            endpoints.MapStandardGet<Response>("/dropdown", Handler)
+            endpoints.MapStandardGet<Response>(RecipeCategoriesGroup.DropdownRoute, Handler)
                      .WithName("GetRecipeCategoriesDropdown")
-                     .WithDescription("Gets all recipe categories");
+                     .WithDescription("Gets all recipe categories")
+                     .WithTags(RecipeCategoriesGroup.Tag)
+                     .RequireAuthorization("RecipeManagerPolicy")
+                     .ProducesProblem(StatusCodes.Status401Unauthorized);
         }
     }
 

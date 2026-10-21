@@ -21,7 +21,7 @@ public sealed class CreateCookbookTests : BaseIntegrationTest
         using StringContent content = new(System.Text.Json.JsonSerializer.Serialize(createCookbookRequest), System.Text.Encoding.UTF8, "application/json");
 
         // Act
-        HttpResponseMessage response = await HttpClient.PostAsync("/api/cookbooks", content, TestContext.Current.CancellationToken);
+        HttpResponseMessage response = await HttpClient.PostAsync(CookbooksGroup.Route, content, TestContext.Current.CancellationToken);
 
         // Assert
         response.EnsureSuccessStatusCode();

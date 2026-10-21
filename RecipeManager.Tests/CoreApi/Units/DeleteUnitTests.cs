@@ -1,5 +1,6 @@
 ﻿using System.Net.Http.Headers;
 using Microsoft.EntityFrameworkCore;
+using RecipeManager.Api.Features.Units;
 using RecipeManager.Integration.Tests.Common.Users;
 using RecipeManager.Integration.Tests.CoreApi.TestFixtures;
 
@@ -20,7 +21,7 @@ public sealed class DeleteUnitTests : BaseIntegrationTest
         Guid guid = Guid.CreateVersion7();
 
         // Act
-        HttpResponseMessage response = await HttpClient.DeleteAsync($"/api/units/{guid}", TestContext.Current.CancellationToken);
+        HttpResponseMessage response = await HttpClient.DeleteAsync(UnitsGroup.UnitById(guid), TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Equal(System.Net.HttpStatusCode.Forbidden, response.StatusCode);
@@ -34,7 +35,7 @@ public sealed class DeleteUnitTests : BaseIntegrationTest
         Guid guid = Guid.CreateVersion7();
 
         // Act
-        HttpResponseMessage response = await HttpClient.DeleteAsync($"/api/units/{guid}", TestContext.Current.CancellationToken);
+        HttpResponseMessage response = await HttpClient.DeleteAsync(UnitsGroup.UnitById(guid), TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Equal(System.Net.HttpStatusCode.NotFound, response.StatusCode);
@@ -49,7 +50,7 @@ public sealed class DeleteUnitTests : BaseIntegrationTest
         Guid unitId = (await DbContext.Units.AsNoTracking().FirstAsync(unit => unit.Name == "To Delete", TestContext.Current.CancellationToken)).Id.Value;
 
         // Act
-        HttpResponseMessage deleteResponse = await HttpClient.DeleteAsync($"/api/units/{unitId}", TestContext.Current.CancellationToken);
+        HttpResponseMessage deleteResponse = await HttpClient.DeleteAsync(UnitsGroup.UnitById(unitId), TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Equal(System.Net.HttpStatusCode.NoContent, deleteResponse.StatusCode);

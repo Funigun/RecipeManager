@@ -27,7 +27,7 @@ public sealed class CreateUnitTests : BaseIntegrationTest
         using StringContent content = new(JsonSerializer.Serialize(createUnitRequest), Encoding.UTF8, "application/json");
 
         // Act
-        HttpResponseMessage response = await HttpClient.PostAsync("/api/units", content, TestContext.Current.CancellationToken);
+        HttpResponseMessage response = await HttpClient.PostAsync(UnitsGroup.Route, content, TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Equal(System.Net.HttpStatusCode.Forbidden, response.StatusCode);
@@ -48,7 +48,7 @@ public sealed class CreateUnitTests : BaseIntegrationTest
         using StringContent content = new(JsonSerializer.Serialize(createUnitRequest), Encoding.UTF8, "application/json");
 
         // Act
-        HttpResponseMessage response = await HttpClient.PostAsync("/api/units", content, TestContext.Current.CancellationToken);
+        HttpResponseMessage response = await HttpClient.PostAsync(UnitsGroup.Route, content, TestContext.Current.CancellationToken);
 
         // Assert
         Assert.True(response.StatusCode == System.Net.HttpStatusCode.BadRequest, $"Expected BadRequest for justification: {justification}");
@@ -66,7 +66,7 @@ public sealed class CreateUnitTests : BaseIntegrationTest
         using StringContent content = new(JsonSerializer.Serialize(createUnitRequest), Encoding.UTF8, "application/json");
 
         // Act
-        HttpResponseMessage response = await HttpClient.PostAsync("/api/units", content, TestContext.Current.CancellationToken);
+        HttpResponseMessage response = await HttpClient.PostAsync(UnitsGroup.Route, content, TestContext.Current.CancellationToken);
         string responseContent = await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
         CreateUnit.Response? unitId = JsonSerializer.Deserialize<CreateUnit.Response?>(responseContent, JsonOptions);
 
@@ -75,7 +75,7 @@ public sealed class CreateUnitTests : BaseIntegrationTest
         Assert.NotNull(unitId);
         Assert.Equal(System.Net.HttpStatusCode.Created, response.StatusCode);
         Assert.NotNull(response.Headers.Location);
-        Assert.Contains($"/api/units/{unitId.Id}", response.Headers.Location!.ToString(), StringComparison.OrdinalIgnoreCase);
+        Assert.Contains(UnitsGroup.UnitById(unitId.Id), response.Headers.Location!.ToString(), StringComparison.OrdinalIgnoreCase);
         Assert.Equal("Valid Units", unitId.PluralName);
         Assert.Equal("VAs", unitId.PluralShortName);
         Assert.True(unitId.IsBaseUnit);

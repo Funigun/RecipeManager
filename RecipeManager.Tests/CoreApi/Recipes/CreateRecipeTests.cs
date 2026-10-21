@@ -27,7 +27,7 @@ public sealed class CreateRecipeTests : BaseIntegrationTest
         using StringContent content = new(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json");
 
         // Act
-        HttpResponseMessage response = await HttpClient.PostAsync("/api/recipes", content, TestContext.Current.CancellationToken);
+        HttpResponseMessage response = await HttpClient.PostAsync(RecipesGroup.Route, content, TestContext.Current.CancellationToken);
         string responseBody = await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
         CreateRecipe.Response? recipeId = JsonSerializer.Deserialize<CreateRecipe.Response>(responseBody, JsonOptions);
 
@@ -36,7 +36,7 @@ public sealed class CreateRecipeTests : BaseIntegrationTest
         Assert.NotNull(recipeId);
         Assert.Equal(System.Net.HttpStatusCode.Created, response.StatusCode);
         Assert.NotNull(response.Headers.Location);
-        Assert.Contains($"/api/recipes/{recipeId.Id}", response.Headers.Location!.ToString(), StringComparison.OrdinalIgnoreCase);
+        Assert.Contains(RecipesGroup.RecipeById(recipeId.Id), response.Headers.Location!.ToString(), StringComparison.OrdinalIgnoreCase);
     }
 
     private async Task<CreateRecipe.Request> CreateFakeRecipe()

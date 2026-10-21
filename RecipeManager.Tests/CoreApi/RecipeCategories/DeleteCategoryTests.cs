@@ -1,5 +1,6 @@
 ﻿using System.Net.Http.Headers;
 using Microsoft.EntityFrameworkCore;
+using RecipeManager.Api.Features.RecipeCategories;
 using RecipeManager.Integration.Tests.Common.Users;
 using RecipeManager.Integration.Tests.CoreApi.TestFixtures;
 
@@ -20,7 +21,7 @@ public sealed class DeleteCategoryTests : BaseIntegrationTest
         Guid guid = Guid.CreateVersion7();
 
         // Act
-        HttpResponseMessage response = await HttpClient.DeleteAsync($"/api/recipeCategories/{guid}", TestContext.Current.CancellationToken);
+        HttpResponseMessage response = await HttpClient.DeleteAsync(RecipeCategoriesGroup.CategoryById(guid), TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Equal(System.Net.HttpStatusCode.Forbidden, response.StatusCode);
@@ -34,7 +35,7 @@ public sealed class DeleteCategoryTests : BaseIntegrationTest
         Guid guid = Guid.CreateVersion7();
 
         // Act
-        HttpResponseMessage response = await HttpClient.DeleteAsync($"/api/recipeCategories/{guid}", TestContext.Current.CancellationToken);
+        HttpResponseMessage response = await HttpClient.DeleteAsync(RecipeCategoriesGroup.CategoryById(guid), TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Equal(System.Net.HttpStatusCode.NotFound, response.StatusCode);
@@ -48,7 +49,7 @@ public sealed class DeleteCategoryTests : BaseIntegrationTest
         Guid categoryId = (await DbContext.RecipeCategories.AsNoTracking().FirstAsync(category => category.Name == "To Delete", TestContext.Current.CancellationToken)).Id.Value;
 
         // Act
-        HttpResponseMessage deleteResponse = await HttpClient.DeleteAsync($"/api/recipeCategories/{categoryId}", TestContext.Current.CancellationToken);
+        HttpResponseMessage deleteResponse = await HttpClient.DeleteAsync(RecipeCategoriesGroup.CategoryById(categoryId), TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Equal(System.Net.HttpStatusCode.NoContent, deleteResponse.StatusCode);

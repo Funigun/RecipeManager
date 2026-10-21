@@ -15,14 +15,16 @@ public static class GetIngredientCategories
 {
     public sealed record Response(Guid Id, string Name);
 
-    [GroupEndpoint("IngredientCategories")]
     public sealed class Endpoint : IEndpoint
     {
         public void MapEndpoint(IEndpointRouteBuilder endpoints)
         {
-            endpoints.MapStandardGet<Response>(string.Empty, Handler)
+            endpoints.MapStandardGet<Response>(IngredientCategoryGroup.Route, Handler)
                      .WithName("GetIngredientCategories")
-                     .WithDescription("Gets all ingredient categories");
+                     .WithDescription("Gets all ingredient categories")
+                     .WithTags(IngredientCategoryGroup.Tag)
+                     .RequireAuthorization("RecipeManagerPolicy")
+                     .ProducesProblem(StatusCodes.Status401Unauthorized);
         }
     }
 

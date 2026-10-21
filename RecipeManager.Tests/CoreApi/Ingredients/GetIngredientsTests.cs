@@ -20,7 +20,7 @@ public sealed class GetIngredientsTests : BaseIntegrationTest
         HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", TokenMockFactory.GenerateJwtToken(UserMockFactory.CreateMockedUser()));
 
         // Act
-        HttpResponseMessage response = await HttpClient.GetAsync($"/api/ingredients", TestContext.Current.CancellationToken);
+        HttpResponseMessage response = await HttpClient.GetAsync(IngredientsGroup.Route, TestContext.Current.CancellationToken);
         string responseBody = await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
         GetIngredients.Response? ingredientResponse = JsonSerializer.Deserialize<GetIngredients.Response>(responseBody, JsonOptions);
 

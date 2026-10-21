@@ -103,14 +103,16 @@ public static class UpdateIngredient
         }
     }
 
-    [GroupEndpoint("Ingredients")]
     public sealed class Endpoint : IEndpoint
     {
         public void MapEndpoint(IEndpointRouteBuilder endpoints)
         {
-            endpoints.MapStandardAuthenticatedPut<Request, IngredientDto>("/{ingredientId}", Handler)
+            endpoints.MapStandardAuthenticatedPut<Request, IngredientDto>(IngredientsGroup.IngredientByIdRoute, Handler)
                      .WithName("UpdateIngredient")
-                     .WithDescription("Updates an existing ingredient");
+                     .WithDescription("Updates an existing ingredient")
+                     .WithTags(IngredientsGroup.Tag)
+                     .RequireAuthorization("RecipeManagerPolicy")
+                     .ProducesProblem(StatusCodes.Status401Unauthorized);
         }
     }
 

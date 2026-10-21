@@ -18,7 +18,7 @@ public sealed class GetCategoriesTests : BaseIntegrationTest
     public async Task GetRecipeCategories_ShouldReturn_NotAuthorized_WhenUserIsNotLoggedIn()
     {
         // Act
-        HttpResponseMessage response = await HttpClient.GetAsync("/api/recipeCategories", TestContext.Current.CancellationToken);
+        HttpResponseMessage response = await HttpClient.GetAsync(RecipeCategoriesGroup.Route, TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Equal(System.Net.HttpStatusCode.Unauthorized, response.StatusCode);
@@ -31,7 +31,7 @@ public sealed class GetCategoriesTests : BaseIntegrationTest
         HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", TokenMockFactory.GenerateJwtToken(UserMockFactory.CreateMockedUser()));
 
         // Act
-        HttpResponseMessage response = await HttpClient.GetAsync("/api/recipeCategories", TestContext.Current.CancellationToken);
+        HttpResponseMessage response = await HttpClient.GetAsync(RecipeCategoriesGroup.Route, TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Equal(System.Net.HttpStatusCode.OK, response.StatusCode);
@@ -58,7 +58,7 @@ public sealed class GetCategoriesTests : BaseIntegrationTest
         HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", TokenMockFactory.GenerateJwtToken(UserMockFactory.CreateMockedAdmin()));
 
         // Act
-        HttpResponseMessage response = await HttpClient.GetAsync("/api/recipeCategories", TestContext.Current.CancellationToken);
+        HttpResponseMessage response = await HttpClient.GetAsync(RecipeCategoriesGroup.Route, TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Equal(System.Net.HttpStatusCode.OK, response.StatusCode);

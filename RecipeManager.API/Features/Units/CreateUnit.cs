@@ -86,14 +86,16 @@ public static class CreateUnit
         }
     }
 
-    [GroupEndpoint("Units")]
     public sealed class Enpoint : IEndpoint
     {
         public void MapEndpoint(IEndpointRouteBuilder endpoints)
         {
-            endpoints.MapStandardAuthenticatedPost<Request, Response>(string.Empty, Handler)
+            endpoints.MapStandardAuthenticatedPost<Request, Response>(UnitsGroup.Route, Handler)
                      .WithName("CreateMeasurementUnit")
-                     .WithDescription("Creates new measurement unit");
+                     .WithDescription("Creates new measurement unit")
+                     .WithTags(UnitsGroup.Tag)
+                     .RequireAuthorization("RecipeManagerPolicy")
+                     .ProducesProblem(StatusCodes.Status401Unauthorized);
         }
     }
 
@@ -105,7 +107,7 @@ public static class CreateUnit
 
         await unitOfWork.SaveChangesAsync(cancellationToken);
 
-        return Results.Created($"/api/units/{unit.Id}", unit.ToPostResponse());
+        return Results.Created(UnitsGroup.UnitById(unit.Id.Value), unit.ToPostResponse());
     }
 
     private static Unit ToUnit(this Request request)

@@ -29,14 +29,14 @@ public static class LogIn
         }
     }
 
-    [GroupEndpoint("Auth")]
     public sealed class Enpoint : IEndpoint
     {
         public void MapEndpoint(IEndpointRouteBuilder endpoints)
         {
-            endpoints.MapStandardValidatedPost<Request, Response>("/login", Handler)
+            endpoints.MapStandardValidatedPost<Request, Response>(AuthGroup.LogInRoute, Handler)
                      .WithName("Login")
-                     .WithDescription("Signs user in");
+                     .WithDescription("Signs user in")
+                     .WithTags(AuthGroup.Tag);
         }
     }
 

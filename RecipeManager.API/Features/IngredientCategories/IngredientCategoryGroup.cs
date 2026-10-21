@@ -1,16 +1,11 @@
-﻿using RecipeManager.Api.Shared.Endpoint;
+﻿namespace RecipeManager.Api.Features.IngredientCategories;
 
-namespace RecipeManager.Api.Features.IngredientCategories;
-
-public sealed class IngredientCategoryGroup : IGroupEndpoint
+public static class IngredientCategoryGroup
 {
-    public string GroupName { get; } = "IngredientCategories";
+    public const string Route = "/api/ingredientcategories";
+    public const string Tag = "Ingredient Categories";
+    public const string CategoryByIdRoute = $"{Route}/{{categoryId}}";
+    public const string DropdownRoute = $"{Route}/dropdown";
 
-    public void Configure(RouteGroupBuilder groupBuilder)
-    {
-        groupBuilder.WithDescription("Ingredient categories features")
-                    .WithTags("Ingredient Categories")
-                    .RequireAuthorization("RecipeManagerPolicy")
-                    .ProducesProblem(StatusCodes.Status401Unauthorized);
-    }
+    public static string CategoryById(Guid categoryId) => $"{Route}/{categoryId}";
 }

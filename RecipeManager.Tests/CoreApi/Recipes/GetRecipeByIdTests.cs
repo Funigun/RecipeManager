@@ -24,7 +24,7 @@ public sealed class GetRecipeByIdTests : BaseIntegrationTest
         RecipeId recipeId = (await DbContext.Recipes.AsNoTracking().FirstAsync(recipe => recipe.Title == "Existing recipe", TestContext.Current.CancellationToken)).Id.Value;
 
         // Act
-        HttpResponseMessage response = await HttpClient.GetAsync($"/api/recipes/{recipeId}", TestContext.Current.CancellationToken);
+        HttpResponseMessage response = await HttpClient.GetAsync(RecipesGroup.RecipeById(recipeId), TestContext.Current.CancellationToken);
         string responseBody = await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
         HateoasResponse<GetRecipeById.Response>? recipeResponse = JsonSerializer.Deserialize<HateoasResponse<GetRecipeById.Response>>(responseBody, JsonOptions);
 

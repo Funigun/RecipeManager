@@ -56,14 +56,16 @@ public static class GenerateShoppingList
         }
     }
 
-    [GroupEndpoint("Ingredients")]
     public sealed class Endpoint : IEndpoint
     {
         public void MapEndpoint(IEndpointRouteBuilder endpoints)
         {
-            endpoints.MapStandardValidatedPut<Request>("generate-shopping-list", Handler)
+            endpoints.MapStandardValidatedPut<Request>(IngredientsGroup.GenerateShoppingListRoute, Handler)
                      .WithName("GenerateShoppingList")
-                     .WithDescription("Generates a shopping list based on the provided recipe IDs.");
+                     .WithDescription("Generates a shopping list based on the provided recipe IDs.")
+                     .WithTags(IngredientsGroup.Tag)
+                     .RequireAuthorization("RecipeManagerPolicy")
+                     .ProducesProblem(StatusCodes.Status401Unauthorized);
         }
     }
 

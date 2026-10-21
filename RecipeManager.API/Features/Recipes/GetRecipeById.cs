@@ -42,14 +42,16 @@ public static class GetRecipeById
     public sealed record Response(Guid Id, string Title, string Description, string? ImageUrl, string? VideoUrl, RecipeAmountDto Amount, byte NumberOfServings, int Difficulty, NutritionalValueDto NutritionalValues,
                                   IEnumerable<RecipeIngredientDto> Ingredients, IEnumerable<RecipeSectionDto> Sections, IEnumerable<RecipeCategoryDto> Categories, IngredientDto? Ingredient);
 
-    [GroupEndpoint("Recipes")]
     public sealed class Endpoint : IEndpoint
     {
         public void MapEndpoint(IEndpointRouteBuilder endpoints)
         {
-            endpoints.MapStandardGet<Response>("{id}", Handler)
+            endpoints.MapStandardGet<Response>(RecipesGroup.RecipeByIdRoute, Handler)
                      .WithName("GetRecipeById")
-                     .WithDescription("Get a recibe by id");
+                     .WithDescription("Get a recibe by id")
+                     .WithTags(RecipesGroup.Tag)
+                     .RequireAuthorization("RecipeManagerPolicy")
+                     .ProducesProblem(StatusCodes.Status401Unauthorized);
         }
     }
 

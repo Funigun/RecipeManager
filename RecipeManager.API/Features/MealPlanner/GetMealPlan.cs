@@ -22,14 +22,16 @@ public static class GetMealPlan
 
     public sealed record Response(ICollection<MealPlanWeekDto> Weeks);
 
-    [GroupEndpoint("MealPlans")]
     public sealed class Enpoint : IEndpoint
     {
         public void MapEndpoint(IEndpointRouteBuilder endpoints)
         {
-            endpoints.MapStandardGet<Response>("/monthly", Handler)
+            endpoints.MapStandardGet<Response>(MealPlanGroup.MonthlyRoute, Handler)
                      .WithName("GetMealPlanForMonth")
-                     .WithDescription("Returns meal plan for month including days before/after firts/last day of month to present whole week");
+                     .WithDescription("Returns meal plan for month including days before/after firts/last day of month to present whole week")
+                     .WithTags(MealPlanGroup.Tag)
+                     .RequireAuthorization("RecipeManagerPolicy")
+                     .ProducesProblem(StatusCodes.Status401Unauthorized);
         }
     }
 

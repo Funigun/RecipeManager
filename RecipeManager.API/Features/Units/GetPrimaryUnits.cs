@@ -10,14 +10,16 @@ public static class GetPrimaryUnits
 {
     public sealed record Response(Guid UnitId, string Name);
 
-    [GroupEndpoint("Units")]
     public sealed class Endpoint : IEndpoint
     {
         public void MapEndpoint(IEndpointRouteBuilder endpoints)
         {
-            endpoints.MapStandardGet<Response>("/primary-units", Handler)
+            endpoints.MapStandardGet<Response>(UnitsGroup.PrimaryUnitsRoute, Handler)
                      .WithName("GetPrimaryUnits")
-                     .WithDescription("Returns list of primary measurement units");
+                     .WithDescription("Returns list of primary measurement units")
+                     .WithTags(UnitsGroup.Tag)
+                     .RequireAuthorization("RecipeManagerPolicy")
+                     .ProducesProblem(StatusCodes.Status401Unauthorized);
 
         }
     }

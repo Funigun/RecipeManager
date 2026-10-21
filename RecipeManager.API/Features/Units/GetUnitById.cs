@@ -16,14 +16,16 @@ public static class GetUnitById
 {
     public sealed record Response(Guid UnitId, string Name, string? ShortName, string PluralName, string? PluralShortName, int Group, bool IsBaseUnit, Guid? PrimaryUnit, int ConversionFactor);
 
-    [GroupEndpoint("Units")]
     public class Enpoint : IEndpoint
     {
         public void MapEndpoint(IEndpointRouteBuilder endpoints)
         {
-            endpoints.MapStandardGet<Response>("/{unitId}", Handler)
+            endpoints.MapStandardGet<Response>(UnitsGroup.UnitByIdRoute, Handler)
                      .WithName("GetMeasurementUnit")
-                     .WithDescription("Gets all measurement units");
+                     .WithDescription("Gets all measurement units")
+                     .WithTags(UnitsGroup.Tag)
+                     .RequireAuthorization("RecipeManagerPolicy")
+                     .ProducesProblem(StatusCodes.Status401Unauthorized);
         }
     }
 

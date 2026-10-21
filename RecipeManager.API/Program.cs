@@ -54,7 +54,6 @@ try
     });
 
     builder.Services.AddSharedServices()
-                    .AddEndpoints(assembly)
                     .AddAuthorizationPolicies(assembly)
                     .AddValidatorsFromAssembly(assembly);
 
@@ -110,7 +109,7 @@ try
     app.UseSerilogRequestLogging();
     app.UseCors("RecipeManagerCorsPolicy");
     app.MapDefaultEndpoints();
-    app.MapEndpoints();
+    app.MapEndpoints(assembly);
     app.UseAuthorization();
 
     await app.RunAsync();

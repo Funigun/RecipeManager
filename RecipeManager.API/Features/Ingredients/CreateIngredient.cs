@@ -90,14 +90,16 @@ public static class CreateIngredient
         }
     }
 
-    [GroupEndpoint("Ingredients")]
     public sealed class Endpoint : IEndpoint
     {
         public void MapEndpoint(IEndpointRouteBuilder endpoints)
         {
-            endpoints.MapStandardValidatedPost<Request, Response>(string.Empty, Handler)
+            endpoints.MapStandardValidatedPost<Request, Response>(IngredientsGroup.Route, Handler)
                      .WithName("CreateIngredient")
-                     .WithDescription("Creates a new ingredient");
+                     .WithDescription("Creates a new ingredient")
+                     .WithTags(IngredientsGroup.Tag)
+                     .RequireAuthorization("RecipeManagerPolicy")
+                     .ProducesProblem(StatusCodes.Status401Unauthorized);
         }
     }
 
@@ -108,7 +110,7 @@ public static class CreateIngredient
         dbContext.Ingredients.Add(ingredient);
         await dbContext.SaveChangesAsync(cancellationToken);
 
-        return Results.Created($"/api/ingredients/{ingredient.Id}", new Response(ingredient.Id));
+        return Results.Created(IngredientsGroup.IngredientById(ingredient.Id.Value), new Response(ingredient.Id));
     }
 
     private static Ingredient ToIngredient(this Request request)

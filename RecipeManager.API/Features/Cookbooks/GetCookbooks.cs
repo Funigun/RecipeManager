@@ -21,14 +21,16 @@ public static class GetCookbooks
 
     public sealed record Response(int Page, int PageSize, int TotalCount, IEnumerable<HateoasResponse<CoookbookDto>> Cookbooks) : PagedResult(Page, PageSize, TotalCount);
 
-    [GroupEndpoint("Cookbooks")]
     public sealed class Endpoint : IEndpoint
     {
         public void MapEndpoint(IEndpointRouteBuilder endpoints)
         {
-            endpoints.MapStandardGet<Response>("/", Handler)
+            endpoints.MapStandardGet<Response>(CookbooksGroup.Route, Handler)
                      .WithName("GetCookbooks")
-                     .WithDescription("Get a list of cookbooks");
+                     .WithDescription("Get a list of cookbooks")
+                     .WithTags(CookbooksGroup.Tag)
+                     .RequireAuthorization("RecipeManagerPolicy")
+                     .ProducesProblem(StatusCodes.Status401Unauthorized);
         }
     }
 

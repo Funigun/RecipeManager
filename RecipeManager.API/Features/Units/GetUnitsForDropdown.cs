@@ -11,14 +11,16 @@ public static class GetUnitsForDropdown
 {
     public sealed record Response(Guid Id, string Name);
 
-    [GroupEndpoint("Units")]
     public class Endponint : IEndpoint
     {
         public void MapEndpoint(IEndpointRouteBuilder endpoints)
         {
-            endpoints.MapStandardGet<Response>("/dropdown", Handler)
+            endpoints.MapStandardGet<Response>(UnitsGroup.DropdownRoute, Handler)
                      .WithName("GetUnitsForDropdown")
-                     .WithDescription("Gets all measurement units for dropdown selection (Create/Update recipe)");
+                     .WithDescription("Gets all measurement units for dropdown selection (Create/Update recipe)")
+                     .WithTags(UnitsGroup.Tag)
+                     .RequireAuthorization("RecipeManagerPolicy")
+                     .ProducesProblem(StatusCodes.Status401Unauthorized);
         }
     }
 

@@ -49,7 +49,7 @@ public sealed class UpdateRecipeTests : BaseIntegrationTest
         using StringContent content = new(JsonSerializer.Serialize(recipeDto), Encoding.UTF8, "application/json");
 
         // Act
-        HttpResponseMessage response = await HttpClient.PutAsync($"/api/recipes/{recipe.Id.Value}", content, TestContext.Current.CancellationToken);
+        HttpResponseMessage response = await HttpClient.PutAsync(RecipesGroup.RecipeByRecipeId(recipe.Id.Value), content, TestContext.Current.CancellationToken);
 
         // Assert
         response.EnsureSuccessStatusCode();

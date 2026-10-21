@@ -5,14 +5,14 @@ namespace RecipeManager.Identity.Api.Features.Account;
 
 public static class ChangePassword
 {
-    [GroupEndpoint("Account")]
     public class Enpoint : IEndpoint
     {
         public void MapEndpoint(IEndpointRouteBuilder endpoints)
         {
-            endpoints.MapPut("/change-password/{userId}", Handler)
+            endpoints.MapPut(AccountGroup.ChangePasswordRoute, Handler)
                      .WithName("ChangePassword")
-                     .WithDescription("Changes account password");
+                     .WithDescription("Changes account password")
+                     .WithTags(AccountGroup.Tag);
         }
     }
 

@@ -1,14 +1,11 @@
-﻿using RecipeManager.Api.Shared.Endpoint;
+﻿namespace RecipeManager.Identity.Api.Features.Account;
 
-namespace RecipeManager.Identity.Api.Features.Account;
-
-public class AccountGroup : IGroupEndpoint
+public static class AccountGroup
 {
-    public string GroupName => "Account";
+    public const string Route = "/api/account";
+    public const string Tag = "account";
+    public const string RegisterRoute = $"{Route}/register";
+    public const string ChangePasswordRoute = $"{Route}/change-password/{{userId}}";
 
-    public void Configure(RouteGroupBuilder groupBuilder)
-    {
-        groupBuilder.WithDescription("Account management features")
-                    .WithTags("account");
-    }
+    public static string ChangePassword(Guid userId) => $"{Route}/change-password/{userId}";
 }

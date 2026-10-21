@@ -18,7 +18,7 @@ public sealed class GetUnitsTests : BaseIntegrationTest
     public async Task GetUnits_ShouldReturn_NotAuthorized_WhenUserIsNotLoggedIn()
     {
         // Act
-        HttpResponseMessage response = await HttpClient.GetAsync("/api/units", TestContext.Current.CancellationToken);
+        HttpResponseMessage response = await HttpClient.GetAsync(UnitsGroup.Route, TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Equal(System.Net.HttpStatusCode.Unauthorized, response.StatusCode);
@@ -31,7 +31,7 @@ public sealed class GetUnitsTests : BaseIntegrationTest
         HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", TokenMockFactory.GenerateJwtToken(UserMockFactory.CreateMockedUser()));
 
         // Act
-        HttpResponseMessage response = await HttpClient.GetAsync("/api/units", TestContext.Current.CancellationToken);
+        HttpResponseMessage response = await HttpClient.GetAsync(UnitsGroup.Route, TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Equal(System.Net.HttpStatusCode.OK, response.StatusCode);
@@ -51,7 +51,7 @@ public sealed class GetUnitsTests : BaseIntegrationTest
         HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", TokenMockFactory.GenerateJwtToken(UserMockFactory.CreateMockedAdmin()));
 
         // Act
-        HttpResponseMessage response = await HttpClient.GetAsync("/api/units", TestContext.Current.CancellationToken);
+        HttpResponseMessage response = await HttpClient.GetAsync(UnitsGroup.Route, TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Equal(System.Net.HttpStatusCode.OK, response.StatusCode);

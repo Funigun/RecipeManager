@@ -53,14 +53,16 @@ public static class GetRecipes
 
     public sealed record Response(int Page, int PageSize, int TotalCount, IEnumerable<HateoasResponse<RecipeDto>> Recipes) : PagedResult(Page, PageSize, TotalCount);
 
-    [GroupEndpoint("Recipes")]
     public sealed class Endpoint : IEndpoint
     {
         public void MapEndpoint(IEndpointRouteBuilder endpoints)
         {
-            endpoints.MapStandardGet<Response>("/", Handler)
+            endpoints.MapStandardGet<Response>(RecipesGroup.Route, Handler)
                      .WithName("GetRecipes")
-                     .WithDescription("Get a paginated list of recipes");
+                     .WithDescription("Get a paginated list of recipes")
+                     .WithTags(RecipesGroup.Tag)
+                     .RequireAuthorization("RecipeManagerPolicy")
+                     .ProducesProblem(StatusCodes.Status401Unauthorized);
         }
     }
 

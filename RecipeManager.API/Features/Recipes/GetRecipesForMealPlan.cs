@@ -16,14 +16,16 @@ public static class GetRecipesForMealPlan
 
     public sealed record Response(Guid Id, string Title, string? ImageUrl, NutritionalValueDto NutritionalValues);
 
-    [GroupEndpoint("Recipes")]
     public sealed class Endpoint : IEndpoint
     {
         public void MapEndpoint(IEndpointRouteBuilder endpoints)
         {
-            endpoints.MapStandardGet<Response>("/mealplan", Handler)
+            endpoints.MapStandardGet<Response>(RecipesGroup.MealPlanRoute, Handler)
                      .WithName("GetRecipesForMealPlan")
-                     .WithDescription("Get recipes for meal plan");
+                     .WithDescription("Get recipes for meal plan")
+                     .WithTags(RecipesGroup.Tag)
+                     .RequireAuthorization("RecipeManagerPolicy")
+                     .ProducesProblem(StatusCodes.Status401Unauthorized);
         }
     }
 

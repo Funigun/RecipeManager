@@ -1,16 +1,14 @@
-﻿using RecipeManager.Api.Shared.Endpoint;
+﻿namespace RecipeManager.Api.Features.Recipes;
 
-namespace RecipeManager.Api.Features.Recipes;
-
-public class RecipesGroup : IGroupEndpoint
+public static class RecipesGroup
 {
-    public string GroupName { get; } = "Recipes";
+    public const string Route = "/api/recipes";
+    public const string Tag = "Recipes";
+    public const string RecipeByIdRoute = $"{Route}/{{id}}";
+    public const string RecipeByRecipeIdRoute = $"{Route}/{{recipeId}}";
+    public const string MealPlanRoute = $"{Route}/mealplan";
+    public const string DropdownRoute = $"{Route}/dropdown";
 
-    public void Configure(RouteGroupBuilder groupBuilder)
-    {
-        groupBuilder.WithDescription("Recipes features")
-                    .WithTags("Recipes")
-                    .RequireAuthorization("RecipeManagerPolicy")
-                    .ProducesProblem(StatusCodes.Status401Unauthorized);
-    }
+    public static string RecipeById(Guid id) => $"{Route}/{id}";
+    public static string RecipeByRecipeId(Guid recipeId) => $"{Route}/{recipeId}";
 }

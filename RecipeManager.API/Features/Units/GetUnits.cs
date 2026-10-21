@@ -28,14 +28,16 @@ public static class GetUnits
         PrimaryUnitDto? PrimaryUnit
     );
 
-    [GroupEndpoint("Units")]
     public class Enpoint : IEndpoint
     {
         public void MapEndpoint(IEndpointRouteBuilder endpoints)
         {
-            endpoints.MapStandardGet<Response>(string.Empty, Handler)
+            endpoints.MapStandardGet<Response>(UnitsGroup.Route, Handler)
                      .WithName("GetMeasurementUnits")
-                     .WithDescription("Gets all measurement units");
+                     .WithDescription("Gets all measurement units")
+                     .WithTags(UnitsGroup.Tag)
+                     .RequireAuthorization("RecipeManagerPolicy")
+                     .ProducesProblem(StatusCodes.Status401Unauthorized);
         }
     }
 

@@ -24,14 +24,16 @@ public static class GetCookbookById
 
     public sealed record Response(Guid Id, string Title, string Description, string? CoverImageUrl, IEnumerable<CookbookCategoryDto> Categories);
 
-    [GroupEndpoint("Cookbooks")]
     public sealed class Endpoint : IEndpoint
     {
         public void MapEndpoint([FromServices] IEndpointRouteBuilder endpoints)
         {
-            endpoints.MapStandardGet<Response>("{cookbookId}", Handler)
+            endpoints.MapStandardGet<Response>(CookbooksGroup.CookbookByIdRoute, Handler)
                      .WithName("GetCookbookById")
-                     .WithDescription("Gets a cookbook by its id");
+                     .WithDescription("Gets a cookbook by its id")
+                     .WithTags(CookbooksGroup.Tag)
+                     .RequireAuthorization("RecipeManagerPolicy")
+                     .ProducesProblem(StatusCodes.Status401Unauthorized);
         }
     }
 

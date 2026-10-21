@@ -34,14 +34,16 @@ public static class GetIngredientById
 
     public sealed record Response(Guid Id, string Name, NutritionalValueDto NutritionalValues, Guid BaseUnit, IngredientPackageDto IngredientPackage, IEnumerable<IngredientUnitConvertionDto> IngredientUnitConvertions, IngredientCategoryDto ShoppingListCategory, IEnumerable<HateoasResponse<IngredientRecipeDto>> Recipes, IEnumerable<IngredientCategoryDto> Categories);
 
-    [GroupEndpoint("Ingredients")]
     public sealed class Endpoint : IEndpoint
     {
         public void MapEndpoint(IEndpointRouteBuilder endpoints)
         {
-            endpoints.MapStandardGet<Response>("/{ingredientId}", Handler)
+            endpoints.MapStandardGet<Response>(IngredientsGroup.IngredientByIdRoute, Handler)
                      .WithName("GetIngredientById")
-                     .WithDescription("Gets an ingredient by its ID");
+                     .WithDescription("Gets an ingredient by its ID")
+                     .WithTags(IngredientsGroup.Tag)
+                     .RequireAuthorization("RecipeManagerPolicy")
+                     .ProducesProblem(StatusCodes.Status401Unauthorized);
         }
     }
 

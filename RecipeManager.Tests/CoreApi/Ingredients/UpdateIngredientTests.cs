@@ -30,7 +30,7 @@ public sealed class UpdateIngredientTests : BaseIntegrationTest
         using StringContent content = new(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json");
 
         // Act
-        HttpResponseMessage response = await HttpClient.PutAsync($"/api/ingredients/{ingredientId}", content, TestContext.Current.CancellationToken);
+        HttpResponseMessage response = await HttpClient.PutAsync(IngredientsGroup.IngredientById(ingredientId), content, TestContext.Current.CancellationToken);
 
         // Assert
         response.EnsureSuccessStatusCode();

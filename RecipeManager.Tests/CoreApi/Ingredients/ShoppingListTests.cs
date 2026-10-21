@@ -21,7 +21,7 @@ public sealed class ShoppingListTests(WebApiFactory webApiFactory) : BaseIntegra
         using StringContent content = new(JsonSerializer.Serialize(requestDto), System.Text.Encoding.UTF8, "application/json");
 
         // Act
-        HttpResponseMessage response = await HttpClient.PutAsync("/api/ingredients/generate-shopping-list", content, TestContext.Current.CancellationToken);
+        HttpResponseMessage response = await HttpClient.PutAsync(IngredientsGroup.GenerateShoppingListRoute, content, TestContext.Current.CancellationToken);
         string responseBody = await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
         GenerateShoppingList.Response? shoppingListResponse = System.Text.Json.JsonSerializer.Deserialize<GenerateShoppingList.Response>(responseBody, JsonOptions);
 
@@ -60,7 +60,7 @@ public sealed class ShoppingListTests(WebApiFactory webApiFactory) : BaseIntegra
         using StringContent content = new(JsonSerializer.Serialize(requestDto), System.Text.Encoding.UTF8, "application/json");
 
         // Act
-        HttpResponseMessage response = await HttpClient.PutAsync("/api/ingredients/generate-shopping-list", content, TestContext.Current.CancellationToken);
+        HttpResponseMessage response = await HttpClient.PutAsync(IngredientsGroup.GenerateShoppingListRoute, content, TestContext.Current.CancellationToken);
         string responseBody = await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
         response.EnsureSuccessStatusCode();
         GenerateShoppingList.Response? shoppingListResponse = JsonSerializer.Deserialize<GenerateShoppingList.Response>(responseBody, JsonOptions);
@@ -94,7 +94,7 @@ public sealed class ShoppingListTests(WebApiFactory webApiFactory) : BaseIntegra
         using StringContent content = new(JsonSerializer.Serialize(requestDto), System.Text.Encoding.UTF8, "application/json");
 
         // Act
-        HttpResponseMessage response = await HttpClient.PutAsync("/api/ingredients/generate-shopping-list", content, TestContext.Current.CancellationToken);
+        HttpResponseMessage response = await HttpClient.PutAsync(IngredientsGroup.GenerateShoppingListRoute, content, TestContext.Current.CancellationToken);
         string responseBody = await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
         response.EnsureSuccessStatusCode();
         GenerateShoppingList.Response? shoppingListResponse = JsonSerializer.Deserialize<GenerateShoppingList.Response>(responseBody, JsonOptions);
@@ -129,7 +129,7 @@ public sealed class ShoppingListTests(WebApiFactory webApiFactory) : BaseIntegra
         using StringContent content = new(JsonSerializer.Serialize(requestDto), System.Text.Encoding.UTF8, "application/json");
 
         // Act
-        HttpResponseMessage response = await HttpClient.PutAsync("/api/ingredients/generate-shopping-list", content, TestContext.Current.CancellationToken);
+        HttpResponseMessage response = await HttpClient.PutAsync(IngredientsGroup.GenerateShoppingListRoute, content, TestContext.Current.CancellationToken);
         string responseBody = await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
         response.EnsureSuccessStatusCode();
 
@@ -162,7 +162,7 @@ public sealed class ShoppingListTests(WebApiFactory webApiFactory) : BaseIntegra
         using StringContent content = new(JsonSerializer.Serialize(requestDto), System.Text.Encoding.UTF8, "application/json");
 
         // Act
-        HttpResponseMessage response = await HttpClient.PutAsync("/api/ingredients/generate-shopping-list", content, TestContext.Current.CancellationToken);
+        HttpResponseMessage response = await HttpClient.PutAsync(IngredientsGroup.GenerateShoppingListRoute, content, TestContext.Current.CancellationToken);
         string responseBody = await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
         response.EnsureSuccessStatusCode();
         GenerateShoppingList.Response? shoppingListResponse = JsonSerializer.Deserialize<GenerateShoppingList.Response>(responseBody, JsonOptions);

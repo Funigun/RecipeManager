@@ -43,14 +43,16 @@ public static class UpdateCookbook
         }
     }
 
-    [GroupEndpoint("Cookbooks")]
     public sealed class Endpoint : IEndpoint
     {
         public void MapEndpoint(IEndpointRouteBuilder endpoints)
         {
-            endpoints.MapStandardAuthenticatedPut<Request, CookbookDto>("/{cookbookId}", Handler)
+            endpoints.MapStandardAuthenticatedPut<Request, CookbookDto>(CookbooksGroup.CookbookByIdRoute, Handler)
                      .WithName("UpdateCookbook")
-                     .WithDescription("Updates a cookbook");
+                     .WithDescription("Updates a cookbook")
+                     .WithTags(CookbooksGroup.Tag)
+                     .RequireAuthorization("RecipeManagerPolicy")
+                     .ProducesProblem(StatusCodes.Status401Unauthorized);
         }
     }
 

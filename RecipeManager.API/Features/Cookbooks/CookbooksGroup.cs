@@ -1,16 +1,10 @@
-﻿using RecipeManager.Api.Shared.Endpoint;
+﻿namespace RecipeManager.Api.Features.Cookbooks;
 
-namespace RecipeManager.Api.Features.Cookbooks;
-
-public sealed class CookbooksGroup : IGroupEndpoint
+public static class CookbooksGroup
 {
-    public string GroupName { get; } = "Cookbooks";
+    public const string Route = "/api/cookbooks";
+    public const string Tag = "Cookbooks";
+    public const string CookbookByIdRoute = $"{Route}/{{cookbookId}}";
 
-    public void Configure(RouteGroupBuilder groupBuilder)
-    {
-        groupBuilder.RequireAuthorization("RecipeManagerPolicy")
-                    .WithDescription("Cookbooks features")
-                    .WithTags("Cookbooks")
-                    .ProducesProblem(StatusCodes.Status401Unauthorized);
-    }
+    public static string CookbookById(Guid cookbookId) => $"{Route}/{cookbookId}";
 }

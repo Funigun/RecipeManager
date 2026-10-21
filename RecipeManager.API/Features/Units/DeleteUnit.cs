@@ -24,14 +24,16 @@ public static class DeleteUnit
         }
     }
 
-    [GroupEndpoint("Units")]
     public sealed class Enpoint : IEndpoint
     {
         public void MapEndpoint(IEndpointRouteBuilder endpoints)
         {
-            endpoints.MapStandardAuthenticatedDelete<AuthorizationPolicy, Request>("/{unitId}", Handler)
+            endpoints.MapStandardAuthenticatedDelete<AuthorizationPolicy, Request>(UnitsGroup.UnitByIdRoute, Handler)
                      .WithName("DeleteMeasurementUnit")
-                     .WithDescription("Deletes a measurement unit");
+                     .WithDescription("Deletes a measurement unit")
+                     .WithTags(UnitsGroup.Tag)
+                     .RequireAuthorization("RecipeManagerPolicy")
+                     .ProducesProblem(StatusCodes.Status401Unauthorized);
         }
     }
 

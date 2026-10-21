@@ -32,14 +32,16 @@ public static class CreateCookbook
         }
     }
 
-    [GroupEndpoint("Cookbooks")]
     public sealed class Endpoint : IEndpoint
     {
         public void MapEndpoint(IEndpointRouteBuilder endpoints)
         {
-            endpoints.MapStandardValidatedPost<Request, Response>(string.Empty, Handler)
+            endpoints.MapStandardValidatedPost<Request, Response>(CookbooksGroup.Route, Handler)
                      .WithName("CreateCookbook")
-                     .WithDescription("Creates a new cookbook");
+                     .WithDescription("Creates a new cookbook")
+                     .WithTags(CookbooksGroup.Tag)
+                     .RequireAuthorization("RecipeManagerPolicy")
+                     .ProducesProblem(StatusCodes.Status401Unauthorized);
         }
     }
 

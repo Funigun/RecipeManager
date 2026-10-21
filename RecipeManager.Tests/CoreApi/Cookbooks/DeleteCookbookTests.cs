@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using RecipeManager.Api.Domain.Cookbooks;
+using RecipeManager.Api.Features.Cookbooks;
 using RecipeManager.Integration.Tests.Common.Users;
 using RecipeManager.Integration.Tests.CoreApi.TestFixtures;
 
@@ -20,7 +21,7 @@ public sealed class DeleteCookbookTests : BaseIntegrationTest
         CookbookId cookbookId = (await DbContext.Cookbooks.AsNoTracking().Where(cookbook => cookbook.Title == "To Delete").FirstAsync(TestContext.Current.CancellationToken)).Id;
 
         // Act
-        HttpResponseMessage response = await HttpClient.DeleteAsync($"/api/cookbooks/{cookbookId.Value}", TestContext.Current.CancellationToken);
+        HttpResponseMessage response = await HttpClient.DeleteAsync(CookbooksGroup.CookbookById(cookbookId.Value), TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Equal(System.Net.HttpStatusCode.NoContent, response.StatusCode);

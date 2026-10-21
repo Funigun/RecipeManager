@@ -26,7 +26,7 @@ public sealed class UpdateCookbookTests : BaseIntegrationTest
         using StringContent content = new(JsonSerializer.Serialize(dto), Encoding.UTF8, "application/json");
 
         // Act
-        HttpResponseMessage response = await HttpClient.PutAsync($"/api/cookbooks/{cookbook.Id}", content, TestContext.Current.CancellationToken);
+        HttpResponseMessage response = await HttpClient.PutAsync(CookbooksGroup.CookbookById(cookbook.Id), content, TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Equal(System.Net.HttpStatusCode.OK, response.StatusCode);
