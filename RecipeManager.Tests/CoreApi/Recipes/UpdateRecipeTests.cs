@@ -4,6 +4,7 @@ using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using RecipeManager.Api.Domain.Recipes;
 using RecipeManager.Api.Features.Recipes;
+using RecipeManager.Api.Features.Recipes.Command.UpdateRecipe;
 using RecipeManager.Integration.Tests.Common.Users;
 using RecipeManager.Integration.Tests.CoreApi.TestFixtures;
 
@@ -30,18 +31,18 @@ public sealed class UpdateRecipeTests : BaseIntegrationTest
                                                .AsNoTracking()
                                                .FirstAsync(recipe => recipe.Title == "To Update", TestContext.Current.CancellationToken);
 
-        UpdateRecipe.RecipeDto recipeDto = new
+        UpdateRecipeRequest recipeDto = new
         (
             recipe.Title,
             "Updated description",
             null,
             null,
-            new UpdateRecipe.RecipeAmountDto(500d, new(recipe.Amount.UnitId.Value)),
+            new UpdateRecipeAmountDto(500d, new(recipe.Amount.UnitId.Value)),
             5,
             (int)recipe.Difficulty,
             new(1, 2, 1, 1, 1, recipe.NutritionalValue.IngredientUnit),
-            recipe.Ingredients.Select(ingredient => new UpdateRecipe.RecipeIngredientDto(new(ingredient.IngredientId, null), new(ingredient.UnitId), ingredient.Amount)).ToList(),
-            recipe.Sections.Select(section => new UpdateRecipe.RecipeSectionDto((int)section.Type, section.Steps.Select(step => new UpdateRecipe.RecipeStepDto(step.Order, step.Description, null)).ToList())).ToList(),
+            recipe.Ingredients.Select(ingredient => new UpdateRecipeIngredientDto(new(ingredient.IngredientId, null), new(ingredient.UnitId), ingredient.Amount)).ToList(),
+            recipe.Sections.Select(section => new UpdateRecipeSectionDto((int)section.Type, section.Steps.Select(step => new UpdateRecipeStepDto(step.Order, step.Description, null)).ToList())).ToList(),
             [],
             null
         );
@@ -49,7 +50,7 @@ public sealed class UpdateRecipeTests : BaseIntegrationTest
         using StringContent content = new(JsonSerializer.Serialize(recipeDto), Encoding.UTF8, "application/json");
 
         // Act
-        HttpResponseMessage response = await HttpClient.PutAsync($"/api/recipes/{recipe.Id.Value}", content, TestContext.Current.CancellationToken);
+        HttpResponseMessage response = await HttpClient.PutAsync(RecipesGroup.RecipeByRecipeId(recipe.Id.Value), content, TestContext.Current.CancellationToken);
 
         // Assert
         response.EnsureSuccessStatusCode();

@@ -2,7 +2,7 @@
 using System.Text;
 using System.Text.Json;
 using RecipeManager.Api.Features.IngredientCategories;
-using RecipeManager.Api.Features.RecipeCategories;
+using RecipeManager.Api.Features.IngredientCategories.Command.CreateIngredientCategory;
 using RecipeManager.Integration.Tests.Common.Users;
 using RecipeManager.Integration.Tests.CoreApi.TestFixtures;
 
@@ -21,11 +21,11 @@ public sealed class CreateIngredientCategoryTests : BaseIntegrationTest
         // Arrange
         HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", TokenMockFactory.GenerateJwtToken(UserMockFactory.CreateMockedUser()));
 
-        CreateIngredientCategory.Request createCategoryRequest = new("Ingredient category");
+        CreateIngredientCategoryRequest createCategoryRequest = new("Ingredient category");
         using StringContent content = new(JsonSerializer.Serialize(createCategoryRequest), Encoding.UTF8, "application/json");
 
         // Act
-        HttpResponseMessage response = await HttpClient.PostAsync("/api/ingredientCategories", content, TestContext.Current.CancellationToken);
+        HttpResponseMessage response = await HttpClient.PostAsync(IngredientCategoryGroup.Route, content, TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Equal(System.Net.HttpStatusCode.Forbidden, response.StatusCode);
@@ -39,11 +39,11 @@ public sealed class CreateIngredientCategoryTests : BaseIntegrationTest
         // Arrange
         HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", TokenMockFactory.GenerateJwtToken(UserMockFactory.CreateMockedAdmin()));
 
-        CreateIngredientCategory.Request createCategoryRequest = new(categoryName);
+        CreateIngredientCategoryRequest createCategoryRequest = new(categoryName);
         using StringContent content = new(JsonSerializer.Serialize(createCategoryRequest), Encoding.UTF8, "application/json");
 
         // Act
-        HttpResponseMessage response = await HttpClient.PostAsync("/api/ingredientCategories", content, TestContext.Current.CancellationToken);
+        HttpResponseMessage response = await HttpClient.PostAsync(IngredientCategoryGroup.Route, content, TestContext.Current.CancellationToken);
 
         // Assert
         Assert.True(response.StatusCode == System.Net.HttpStatusCode.BadRequest, $"Expected BadRequest but got {response.StatusCode} for justification: {justification}");
@@ -55,19 +55,19 @@ public sealed class CreateIngredientCategoryTests : BaseIntegrationTest
         // Arrange
         HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", TokenMockFactory.GenerateJwtToken(UserMockFactory.CreateMockedAdmin()));
 
-        CreateIngredientCategory.Request createCategoryRequest = new("New Recipe Category");
+        CreateIngredientCategoryRequest createCategoryRequest = new("New Recipe Category");
         using StringContent content = new(JsonSerializer.Serialize(createCategoryRequest), Encoding.UTF8, "application/json");
 
         // Act
-        HttpResponseMessage response = await HttpClient.PostAsync("/api/ingredientCategories", content, TestContext.Current.CancellationToken);
+        HttpResponseMessage response = await HttpClient.PostAsync(IngredientCategoryGroup.Route, content, TestContext.Current.CancellationToken);
         string responseBody = await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
-        CreateRecipeCategory.Response? categoryId = JsonSerializer.Deserialize<CreateRecipeCategory.Response>(responseBody, JsonOptions);
+        CreateIngredientCategoryResponse? categoryId = JsonSerializer.Deserialize<CreateIngredientCategoryResponse>(responseBody, JsonOptions);
 
         // Assert
         response.EnsureSuccessStatusCode();
         Assert.NotNull(categoryId);
         Assert.Equal(System.Net.HttpStatusCode.Created, response.StatusCode);
         Assert.NotNull(response.Headers.Location);
-        Assert.Contains($"/api/ingredientCategories/{categoryId.Id}", response.Headers.Location!.ToString(), StringComparison.OrdinalIgnoreCase);
+        Assert.Contains(IngredientCategoryGroup.CategoryById(categoryId.Id), response.Headers.Location!.ToString(), StringComparison.OrdinalIgnoreCase);
     }
 }

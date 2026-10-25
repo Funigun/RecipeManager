@@ -7,7 +7,6 @@ using RecipeManager.UI.Blazor.Components.Common;
 using RecipeManager.UI.Blazor.Components.Extensions;
 using RecipeManager.UI.Blazor.Features.Ingredients.GetIngredients;
 using RecipeManager.UI.Blazor.Features.Ingredients.Manage;
-using RecipeManager.UI.Blazor.Features.Recipes;
 
 namespace RecipeManager.UI.Blazor.Features.Ingredients.Services;
 

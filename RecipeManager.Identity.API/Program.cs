@@ -9,7 +9,6 @@ using Serilog;
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 Assembly apiAssembly = Assembly.GetExecutingAssembly();
-Assembly contractsAssembly = Assembly.GetAssembly(typeof(RecipeManager.Shared.Contracts.AssemblyReader))!;
 
 Log.Logger = new LoggerConfiguration().ReadFrom
              .Configuration(new ConfigurationBuilder()
@@ -45,10 +44,8 @@ try
     });
 
     builder.Services.AddSharedServices()
-                    .AddEndpoints(apiAssembly)
                     .AddAuthorizationPolicies(apiAssembly)
-                    .AddValidatorsFromAssembly(apiAssembly)
-                    .AddValidatorsFromAssembly(contractsAssembly);
+                    .AddValidatorsFromAssembly(apiAssembly);
 
     builder.Services.ConfigureIdentity()
                     .ConfigureDatabase(builder.Configuration);
@@ -76,7 +73,7 @@ try
     app.UseSerilogRequestLogging();
     app.UseCors("RecipeManagerCorsPolicy");
     app.MapDefaultEndpoints();
-    app.MapEndpoints();
+    app.MapEndpoints(apiAssembly);
     app.UseAuthorization();
 
     await app.InitDatabase();

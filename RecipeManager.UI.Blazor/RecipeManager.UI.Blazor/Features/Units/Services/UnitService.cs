@@ -7,7 +7,6 @@ using RecipeManager.UI.Blazor.Components.Common;
 using RecipeManager.UI.Blazor.Components.Extensions;
 using RecipeManager.UI.Blazor.Features.Units.GetUnits;
 using RecipeManager.UI.Blazor.Features.Units.Manage;
-using RecipeManager.UI.Blazor.Features.Units.UpdateUnit;
 
 namespace RecipeManager.UI.Blazor.Features.Units.Services;
 

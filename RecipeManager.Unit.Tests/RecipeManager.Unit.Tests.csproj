@@ -8,7 +8,6 @@
 		<ProjectReference Include="..\RecipeManager.Api.Shared\RecipeManager.Api.Shared.csproj" />
 		<ProjectReference Include="..\RecipeManager.API\RecipeManager.Api.csproj" />
 		<ProjectReference Include="..\RecipeManager.Identity.API\RecipeManager.Identity.Api.csproj" />
-		<ProjectReference Include="..\RecipeManager.Shared.Contracts\RecipeManager.Shared.Contracts.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>

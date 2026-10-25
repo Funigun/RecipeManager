@@ -1,6 +1,7 @@
 ﻿using System.Net.Http.Headers;
 using System.Text.Json;
 using RecipeManager.Api.Features.Recipes;
+using RecipeManager.Api.Features.Recipes.Query.GetRecipes;
 using RecipeManager.Api.Shared.Hateoas.Models;
 using RecipeManager.Integration.Tests.Common.Users;
 using RecipeManager.Integration.Tests.CoreApi.TestFixtures;
@@ -21,9 +22,9 @@ public sealed class GetRecipesTests : BaseIntegrationTest
         HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", TokenMockFactory.GenerateJwtToken(UserMockFactory.CreateMockedAdmin()));
 
         // Act
-        HttpResponseMessage response = await HttpClient.GetAsync("/api/recipes", TestContext.Current.CancellationToken);
+        HttpResponseMessage response = await HttpClient.GetAsync(RecipesGroup.Route, TestContext.Current.CancellationToken);
         string responseBody = await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
-        HateoasResponse<GetRecipes.Response>? recipesResponse = JsonSerializer.Deserialize<HateoasResponse<GetRecipes.Response>>(responseBody, JsonOptions);
+        HateoasResponse<GetRecipesResponse>? recipesResponse = JsonSerializer.Deserialize<HateoasResponse<GetRecipesResponse>>(responseBody, JsonOptions);
 
         // Assert
         response.EnsureSuccessStatusCode();

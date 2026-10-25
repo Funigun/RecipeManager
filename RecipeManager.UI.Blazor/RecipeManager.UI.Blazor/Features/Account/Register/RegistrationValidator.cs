@@ -1,5 +1,5 @@
 ﻿using FluentValidation;
-using RecipeManager.Shared.Contracts.User.Registration;
+using RecipeManager.UI.Blazor.Contracts.User.Registration;
 using RecipeManager.UI.Blazor.Components.Common;
 
 namespace RecipeManager.UI.Blazor.Features.Account.Register;

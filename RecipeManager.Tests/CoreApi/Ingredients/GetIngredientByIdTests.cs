@@ -2,6 +2,7 @@
 using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using RecipeManager.Api.Features.Ingredients;
+using RecipeManager.Api.Features.Ingredients.Query.GetIngredientById;
 using RecipeManager.Api.Shared.Hateoas.Models;
 using RecipeManager.Integration.Tests.Common.Users;
 using RecipeManager.Integration.Tests.CoreApi.TestFixtures;
@@ -23,9 +24,9 @@ public sealed class GetIngredientByIdTests : BaseIntegrationTest
         Guid ingredientId = (await DbContext.Ingredients.AsNoTracking().FirstAsync(ingredient => ingredient.Name == "Existing Ingredient", TestContext.Current.CancellationToken)).Id.Value;
 
         // Act
-        HttpResponseMessage response = await HttpClient.GetAsync($"/api/ingredients/{ingredientId}", TestContext.Current.CancellationToken);
+        HttpResponseMessage response = await HttpClient.GetAsync(IngredientsGroup.IngredientById(ingredientId), TestContext.Current.CancellationToken);
         string responseBody = await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
-        HateoasResponse<GetIngredientById.Response>? ingredientResponse = JsonSerializer.Deserialize<HateoasResponse<GetIngredientById.Response>>(responseBody, JsonOptions);
+        HateoasResponse<GetIngredientByIdResponse>? ingredientResponse = JsonSerializer.Deserialize<HateoasResponse<GetIngredientByIdResponse>>(responseBody, JsonOptions);
 
         // Assert
         response.EnsureSuccessStatusCode();

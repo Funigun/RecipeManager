@@ -21,12 +21,11 @@ public sealed class WebApplicationFixture
         System.Reflection.Assembly assembly = typeof(IAppDbContext).Assembly;
 
         Builder = WebApplication.CreateBuilder();
-        Builder.Services.AddEndpoints(assembly);
         Builder.Services.AddPersistance(Builder.Configuration);
 
         App = Builder.Build();
         App.UseRouting();
-        App.MapEndpoints();
+        App.MapEndpoints(assembly);
         App.Start();
 
         DataSource = App.Services.GetRequiredService<EndpointDataSource>();

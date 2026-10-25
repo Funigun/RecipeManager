@@ -1,7 +1,7 @@
 ﻿using System.Net.Http.Headers;
 using System.Text.Json;
 using RecipeManager.Api.Features.IngredientCategories;
-using RecipeManager.Api.Features.RecipeCategories;
+using RecipeManager.Api.Features.IngredientCategories.Query.GetIngredientCategories;
 using RecipeManager.Api.Shared.Hateoas.Models;
 using RecipeManager.Integration.Tests.Common.Users;
 using RecipeManager.Integration.Tests.CoreApi.TestFixtures;
@@ -19,7 +19,7 @@ public sealed class GetIngredientCategoriesTests : BaseIntegrationTest
     public async Task GetRecipeCategories_ShouldReturn_NotAuthorized_WhenUserIsNotLoggedIn()
     {
         // Act
-        HttpResponseMessage response = await HttpClient.GetAsync("/api/ingredientCategories", TestContext.Current.CancellationToken);
+        HttpResponseMessage response = await HttpClient.GetAsync(IngredientCategoryGroup.Route, TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Equal(System.Net.HttpStatusCode.Unauthorized, response.StatusCode);
@@ -32,14 +32,14 @@ public sealed class GetIngredientCategoriesTests : BaseIntegrationTest
         HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", TokenMockFactory.GenerateJwtToken(UserMockFactory.CreateMockedUser()));
 
         // Act
-        HttpResponseMessage response = await HttpClient.GetAsync("/api/ingredientCategories", TestContext.Current.CancellationToken);
+        HttpResponseMessage response = await HttpClient.GetAsync(IngredientCategoryGroup.Route, TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Equal(System.Net.HttpStatusCode.OK, response.StatusCode);
         string content = await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
         Assert.NotNull(content);
 
-        HateoasCollectionResponse<GetRecipeCategories.CategoryDto>? categories = JsonSerializer.Deserialize<HateoasCollectionResponse<GetRecipeCategories.CategoryDto>>(content, JsonOptions);
+        HateoasCollectionResponse<GetIngredientCategoriesResponse>? categories = JsonSerializer.Deserialize<HateoasCollectionResponse<GetIngredientCategoriesResponse>>(content, JsonOptions);
         Assert.NotNull(categories);
         Assert.NotEmpty(categories.Items);
         Assert.All(categories.Items, category =>
@@ -56,14 +56,14 @@ public sealed class GetIngredientCategoriesTests : BaseIntegrationTest
         HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", TokenMockFactory.GenerateJwtToken(UserMockFactory.CreateMockedAdmin()));
 
         // Act
-        HttpResponseMessage response = await HttpClient.GetAsync("/api/ingredientCategories", TestContext.Current.CancellationToken);
+        HttpResponseMessage response = await HttpClient.GetAsync(IngredientCategoryGroup.Route, TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Equal(System.Net.HttpStatusCode.OK, response.StatusCode);
         string content = await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
         Assert.NotNull(content);
 
-        HateoasCollectionResponse<GetIngredientCategories.Response>? categories = JsonSerializer.Deserialize<HateoasCollectionResponse<GetIngredientCategories.Response>>(content, JsonOptions);
+        HateoasCollectionResponse<GetIngredientCategoriesResponse>? categories = JsonSerializer.Deserialize<HateoasCollectionResponse<GetIngredientCategoriesResponse>>(content, JsonOptions);
         Assert.NotNull(categories);
         Assert.NotEmpty(categories.Links);
         Assert.NotEmpty(categories.Items);

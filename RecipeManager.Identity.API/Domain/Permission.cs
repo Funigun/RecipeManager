@@ -1,4 +1,4 @@
-﻿using RecipeManager.Shared.Contracts.Authorization;
+﻿using RecipeManager.Api.Shared.Contracts.Authorization;
 
 namespace RecipeManager.Identity.Api.Domain;
 

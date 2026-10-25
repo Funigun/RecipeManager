@@ -1,8 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using RecipeManager.Api.Application.Abstractions;
-using RecipeManager.Api.Application.Database;
-using RecipeManager.Api.Application.Database.Repositories;
-using RecipeManager.Api.Persistance.Repositories;
 
 namespace RecipeManager.Api.Persistance;
 
@@ -16,9 +13,6 @@ public static class DependencyInjection
         });
 
         services.AddScoped<IAppDbContext, AppDbContext>();
-        services.AddScoped<IUnitRepository, UnitRepository>();
-        services.Decorate<IUnitRepository, CachedUnitRepository>();
-        services.AddScoped<IUnitOfWork, UnitOfWork>();
 
         return services;
     }

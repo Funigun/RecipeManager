@@ -1,6 +1,5 @@
 ﻿using System.Net.Http.Headers;
 using DotNet.Testcontainers.Builders;
-using DotNet.Testcontainers.Images;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
@@ -9,6 +8,7 @@ using Microsoft.Extensions.Caching.Hybrid;
 using Microsoft.Extensions.Caching.StackExchangeRedis;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using RecipeManager.Api.Features.Units;
 using RecipeManager.Api.Persistance;
 using RecipeManager.Api.Presentation;
 using RecipeManager.Integration.Tests.Common.Users;
@@ -98,7 +98,7 @@ public sealed class WebApiFactory : WebApplicationFactory<IAssemblyMarker>, IAsy
         HttpClient = CreateClient();
 
         HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", TokenMockFactory.GenerateJwtToken(UserMockFactory.CreateMockedAdmin()));
-        _ = await HttpClient.GetAsync("/api/units", TestContext.Current.CancellationToken);
+        _ = await HttpClient.GetAsync(UnitsGroup.Route, TestContext.Current.CancellationToken);
 
         await DbContext.SeedAsync();
     }

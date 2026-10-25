@@ -14,7 +14,7 @@ public static class EndpointMappingExtensions
                                                   .ProducesProblem(StatusCodes.Status400BadRequest)
                                                   .ProducesProblem(StatusCodes.Status404NotFound)
                                                   .ProducesProblem(StatusCodes.Status500InternalServerError)
-                                                  .WithMetadata(typeof(TRequest).DeclaringType!);
+                                                  .WithMetadata(typeof(TRequest).DeclaringType ?? typeof(TRequest));
 
         return routeHandler;
     }
@@ -51,7 +51,7 @@ public static class EndpointMappingExtensions
                                                   .Produces<TResponse>(StatusCodes.Status200OK)
                                                   .ProducesProblem(StatusCodes.Status404NotFound)
                                                   .ProducesProblem(StatusCodes.Status500InternalServerError)
-                                                  .WithMetadata(typeof(TResponse).DeclaringType!);
+                                                  .WithMetadata(typeof(TResponse).DeclaringType ?? typeof(TResponse));
 
         return routeHandler;
     }
@@ -69,7 +69,7 @@ public static class EndpointMappingExtensions
                                                   .ProducesProblem(StatusCodes.Status400BadRequest)
                                                   .ProducesProblem(StatusCodes.Status404NotFound)
                                                   .ProducesProblem(StatusCodes.Status500InternalServerError)
-                                                  .WithMetadata(typeof(TRequest).DeclaringType!);
+                                                  .WithMetadata(typeof(TRequest).DeclaringType ?? typeof(TRequest));
 
         return routeHandler;
     }
@@ -93,7 +93,7 @@ public static class EndpointMappingExtensions
                                                   .Produces(StatusCodes.Status204NoContent)
                                                   .ProducesProblem(StatusCodes.Status404NotFound)
                                                   .ProducesProblem(StatusCodes.Status500InternalServerError)
-                                                  .WithMetadata(typeof(TRequest).DeclaringType!);
+                                                  .WithMetadata(typeof(TRequest).DeclaringType ?? typeof(TRequest));
 
         return routeHandler;
     }

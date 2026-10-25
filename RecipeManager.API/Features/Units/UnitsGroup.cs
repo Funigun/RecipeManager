@@ -1,16 +1,12 @@
-﻿using RecipeManager.Api.Shared.Endpoint;
+﻿namespace RecipeManager.Api.Features.Units;
 
-namespace RecipeManager.Api.Features.Units;
-
-public class UnitsGroup : IGroupEndpoint
+public static class UnitsGroup
 {
-    public string GroupName { get; } = "Units";
+    public const string Route = "/api/units";
+    public const string Tag = "Measurement Units";
+    public const string UnitByIdRoute = $"{Route}/{{unitId}}";
+    public const string DropdownRoute = $"{Route}/dropdown";
+    public const string PrimaryUnitsRoute = $"{Route}/primary-units";
 
-    public void Configure(RouteGroupBuilder groupBuilder)
-    {
-        groupBuilder.WithDescription("Measurement units features")
-                    .WithTags("Measurement Units")
-                    .RequireAuthorization("RecipeManagerPolicy")
-                    .ProducesProblem(StatusCodes.Status401Unauthorized);
-    }
+    public static string UnitById(Guid unitId) => $"{Route}/{unitId}";
 }

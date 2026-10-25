@@ -5,8 +5,8 @@ using Microsoft.EntityFrameworkCore;
 using RecipeManager.Api.Shared.Endpoint;
 using RecipeManager.Identity.Api.Common.Exceptions;
 using RecipeManager.Identity.Api.Domain;
-using RecipeManager.Shared.Contracts.Authorization;
-using RecipeManager.Shared.Contracts.User.Registration;
+using RecipeManager.Api.Shared.Contracts.Authorization;
+using RecipeManager.Identity.Api.Contracts.User.Registration;
 
 namespace RecipeManager.Identity.Api.Features.Account;
 
@@ -47,14 +47,14 @@ public static class UserRegistration
         }
     }
 
-    [GroupEndpoint("Account")]
     public class Enpoint : IEndpoint
     {
         public void MapEndpoint(IEndpointRouteBuilder endpoints)
         {
-            endpoints.MapStandardValidatedPost<Request, string>("/register", Handler)
+            endpoints.MapStandardValidatedPost<Request, string>(AccountGroup.RegisterRoute, Handler)
                      .WithName("Register")
-                     .WithDescription("Creates new user account");
+                     .WithDescription("Creates new user account")
+                     .WithTags(AccountGroup.Tag);
         }
     }
 

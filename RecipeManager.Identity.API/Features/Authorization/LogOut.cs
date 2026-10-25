@@ -8,14 +8,14 @@ namespace RecipeManager.Identity.Api.Features.Authorization;
 
 public static class LogOut
 {
-    [GroupEndpoint("Auth")]
     public sealed class Enpoint : IEndpoint
     {
         public void MapEndpoint(IEndpointRouteBuilder endpoints)
         {
-            endpoints.MapPost("/logout", Handler)
+            endpoints.MapPost(AuthGroup.LogOutRoute, Handler)
                      .WithName("Logout")
                      .WithDescription("Signs user out")
+                     .WithTags(AuthGroup.Tag)
                      .RequireAuthorization();
         }
     }

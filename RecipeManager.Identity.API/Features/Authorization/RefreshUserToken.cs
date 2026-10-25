@@ -30,14 +30,14 @@ public static class RefreshUserToken
         }
     }
 
-    [GroupEndpoint("Auth")]
     public sealed class Enpoint : IEndpoint
     {
         public void MapEndpoint(IEndpointRouteBuilder endpoints)
         {
-            endpoints.MapPost("/refresh-token", Handler)
+            endpoints.MapPost(AuthGroup.RefreshTokenRoute, Handler)
                      .WithName("RefreshToken")
                      .WithDescription("Refreshes user auth token")
+                     .WithTags(AuthGroup.Tag)
                      .RequireAuthorization();
         }
     }

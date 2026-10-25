@@ -1,16 +1,8 @@
-﻿using RecipeManager.Api.Shared.Endpoint;
+﻿namespace RecipeManager.Api.Features.MealPlanner;
 
-namespace RecipeManager.Api.Features.MealPlanner;
-
-public class MealPlanGroup : IGroupEndpoint
+public static class MealPlanGroup
 {
-    public string GroupName { get; } = "MealPlans";
-
-    public void Configure(RouteGroupBuilder groupBuilder)
-    {
-        groupBuilder.WithDescription("Endpoints for managing meal plans")
-                    .WithTags("Meal Plans")
-                    .RequireAuthorization("RecipeManagerPolicy")
-                    .ProducesProblem(StatusCodes.Status401Unauthorized);
-    }
+    public const string Route = "/api/mealplans";
+    public const string Tag = "Meal Plans";
+    public const string MonthlyRoute = $"{Route}/monthly";
 }

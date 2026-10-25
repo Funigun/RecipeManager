@@ -1,0 +1,38 @@
+<Solution>
+  <Folder Name="/.github/">
+    <File Path=".github/copilot-instructions.md" />
+  </Folder>
+  <Folder Name="/.github/wiki/" />
+  <Folder Name="/.github/wiki/domain/">
+    <File Path=".github/wiki/domain/0001-unit.md" />
+    <File Path=".github/wiki/domain/0002-ingredient-and-category.md" />
+    <File Path=".github/wiki/domain/0003-recipe-and-category.md" />
+    <File Path=".github/wiki/domain/0004-cookbooks.md" />
+    <File Path=".github/wiki/domain/0005-meal-planner.md" />
+    <File Path=".github/wiki/domain/0006-aggregate-relationships.md" />
+  </Folder>
+  <Folder Name="/Aspire/">
+    <Project Path="RecipeManager.AppHost/RecipeManager.AppHost.csproj" />
+    <Project Path="RecipeManager.ServiceDefaults/RecipeManager.ServiceDefaults.csproj" />
+  </Folder>
+  <Folder Name="/Solution Items/">
+    <File Path=".editorconfig" />
+    <File Path="Directory.Build.props" />
+    <File Path="Directory.Packages.props" />
+  </Folder>
+  <Folder Name="/Tests/">
+    <Project Path="RecipeManager.Architecture.Tests/RecipeManager.Architecture.Tests.csproj" />
+    <Project Path="RecipeManager.Tests/RecipeManager.Integration.Tests.csproj" />
+    <Project Path="RecipeManager.Unit.Tests/RecipeManager.Unit.Tests.csproj" />
+  </Folder>
+  <Folder Name="/UI/">
+    <Project Path="RecipeManager.UI.Blazor/RecipeManager.UI.Blazor.Client/RecipeManager.UI.Blazor.Client.csproj" />
+    <Project Path="RecipeManager.UI.Blazor/RecipeManager.UI.Blazor/RecipeManager.UI.Blazor.csproj" />
+    <Project Path="RecipeManager.UI/RecipeManager.UI.csproj" />
+  </Folder>
+  <Folder Name="/WebApi/">
+    <Project Path="RecipeManager.Api.Shared/RecipeManager.Api.Shared.csproj" />
+    <Project Path="RecipeManager.API/RecipeManager.Api.csproj" />
+    <Project Path="RecipeManager.Identity.API/RecipeManager.Identity.Api.csproj" />
+  </Folder>
+</Solution>

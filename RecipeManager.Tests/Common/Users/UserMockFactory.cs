@@ -1,6 +1,5 @@
-﻿using Moq;
+using Moq;
 using RecipeManager.Api.Shared.Contracts.Authorization;
-using RecipeManager.Shared.Contracts.Authorization;
 
 namespace RecipeManager.Integration.Tests.Common.Users;
 

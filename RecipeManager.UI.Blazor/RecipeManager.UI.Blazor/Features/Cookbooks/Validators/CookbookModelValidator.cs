@@ -1,4 +1,4 @@
-﻿using RecipeManager.Shared.Contracts.Cookbooks;
+﻿using RecipeManager.UI.Blazor.Contracts.Cookbooks;
 using RecipeManager.UI.Blazor.Brokers.HateoasModel;
 using RecipeManager.UI.Blazor.Components.Common;
 using RecipeManager.UI.Blazor.Features.Cookbooks.Models;

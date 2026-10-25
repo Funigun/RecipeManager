@@ -1,6 +1,7 @@
 ﻿using System.Net.Http.Headers;
 using Microsoft.EntityFrameworkCore;
 using RecipeManager.Api.Domain.Recipes;
+using RecipeManager.Api.Features.Recipes;
 using RecipeManager.Integration.Tests.Common.Users;
 using RecipeManager.Integration.Tests.CoreApi.TestFixtures;
 
@@ -21,7 +22,7 @@ public sealed class DeleteRecipeTests : BaseIntegrationTest
         RecipeId recipeId = (await DbContext.Recipes.AsNoTracking().FirstAsync(recipe => recipe.Title == "To Delete", TestContext.Current.CancellationToken)).Id.Value;
 
         // Act
-        HttpResponseMessage response = await HttpClient.DeleteAsync($"/api/recipes/{recipeId}", TestContext.Current.CancellationToken);
+        HttpResponseMessage response = await HttpClient.DeleteAsync(RecipesGroup.RecipeByRecipeId(recipeId), TestContext.Current.CancellationToken);
 
         // Assert
         response.EnsureSuccessStatusCode();

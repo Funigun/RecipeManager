@@ -11,6 +11,4 @@ public sealed class RecipeForShoppingListModel
 
     [JsonIgnore]
     public string? ImageUrl { get; set; }
-
-    public int NumberOfServings { get; set; }
 }

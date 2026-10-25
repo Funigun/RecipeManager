@@ -230,7 +230,6 @@
         {
             Id = r.Id,
             Title = r.Title,
-            NumberOfServings = 1,
         });
 
         DialogParameters parameters = new DialogParameters<RecipesForShoppingListModal>
@@ -263,14 +262,12 @@
             .SelectMany(week => week.Days)
             .Where(day => day.IsSelected);
 
-        List<RecipeForShoppingListModel> recipes = daysToProcess.SelectMany(days => days.Recipes)
-                                                                .GroupBy(r => r.Id)
-                                                                .Select(group => new RecipeForShoppingListModel
+        List<RecipeForShoppingListModel> recipes = daysToProcess.SelectMany(day => day.Recipes)
+                                                                .Select(recipe => new RecipeForShoppingListModel
                                                                 {
-                                                                    Id = group.First().Id,
-                                                                    Title = group.First().Title,
-                                                                    ImageUrl = group.First().ImageUrl,
-                                                                    NumberOfServings = group.Count()
+                                                                    Id = recipe.Id,
+                                                                    Title = recipe.Title,
+                                                                    ImageUrl = recipe.ImageUrl
                                                                 })
                                                                 .ToList();
 
