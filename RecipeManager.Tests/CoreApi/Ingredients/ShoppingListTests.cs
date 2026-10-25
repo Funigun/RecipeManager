@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using RecipeManager.Api.Domain.Recipes;
 using RecipeManager.Api.Features.Ingredients;
+using RecipeManager.Api.Features.Ingredients.Command.GenerateShoppingList;
 using RecipeManager.Integration.Tests.Common.Users;
 using RecipeManager.Integration.Tests.CoreApi.TestFixtures;
 
@@ -16,25 +17,25 @@ public sealed class ShoppingListTests(WebApiFactory webApiFactory) : BaseIntegra
         HttpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", TokenMockFactory.GenerateJwtToken(UserMockFactory.CreateMockedAdmin()));
         RecipeId recipeId = (await DbContext.Recipes.AsNoTracking().FirstAsync(recipe => recipe.Title == "Simple tomato mix", TestContext.Current.CancellationToken)).Id;
 
-        GenerateShoppingList.Request requestDto = new([new GenerateShoppingList.RecipeDto(recipeId.Value)]);
+        GenerateShoppingListRequest requestDto = new([new GenerateShoppingListRecipeDto(recipeId.Value)]);
 
         using StringContent content = new(JsonSerializer.Serialize(requestDto), System.Text.Encoding.UTF8, "application/json");
 
         // Act
         HttpResponseMessage response = await HttpClient.PutAsync(IngredientsGroup.GenerateShoppingListRoute, content, TestContext.Current.CancellationToken);
         string responseBody = await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
-        GenerateShoppingList.Response? shoppingListResponse = System.Text.Json.JsonSerializer.Deserialize<GenerateShoppingList.Response>(responseBody, JsonOptions);
+        GenerateShoppingListResponse? shoppingListResponse = System.Text.Json.JsonSerializer.Deserialize<GenerateShoppingListResponse>(responseBody, JsonOptions);
 
         // Assert
         response.EnsureSuccessStatusCode();
         Assert.NotNull(shoppingListResponse);
 
         // Simple tomato mix should have 2 ingredients: Canned tomatoes and Salt
-        List<GenerateShoppingList.IngredientDto>? allIngredients = shoppingListResponse.Ingredients.SelectMany(x => x.Value).ToList();
+        List<GenerateShoppingListIngredientDto>? allIngredients = shoppingListResponse.Ingredients.SelectMany(x => x.Value).ToList();
         Assert.Equal(2, allIngredients.Count);
 
-        GenerateShoppingList.IngredientDto? cannedTomatoes = allIngredients.FirstOrDefault(i => i.Name.Contains("Canned tomatoes"));
-        GenerateShoppingList.IngredientDto? salt = allIngredients.FirstOrDefault(i => i.Name.Contains("Salt"));
+        GenerateShoppingListIngredientDto? cannedTomatoes = allIngredients.FirstOrDefault(i => i.Name.Contains("Canned tomatoes"));
+        GenerateShoppingListIngredientDto? salt = allIngredients.FirstOrDefault(i => i.Name.Contains("Salt"));
 
         Assert.NotNull(cannedTomatoes);
         Assert.NotNull(salt);
@@ -53,9 +54,9 @@ public sealed class ShoppingListTests(WebApiFactory webApiFactory) : BaseIntegra
         HttpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", TokenMockFactory.GenerateJwtToken(UserMockFactory.CreateMockedAdmin()));
         Recipe recipe = await DbContext.Recipes.AsNoTracking().FirstAsync(r => r.Title == "Simple tomato mix", TestContext.Current.CancellationToken);
 
-        GenerateShoppingList.Request requestDto = new([
-            new GenerateShoppingList.RecipeDto(recipe.Id.Value),
-            new GenerateShoppingList.RecipeDto(recipe.Id.Value)
+        GenerateShoppingListRequest requestDto = new([
+            new GenerateShoppingListRecipeDto(recipe.Id.Value),
+            new GenerateShoppingListRecipeDto(recipe.Id.Value)
         ]);
         using StringContent content = new(JsonSerializer.Serialize(requestDto), System.Text.Encoding.UTF8, "application/json");
 
@@ -63,13 +64,13 @@ public sealed class ShoppingListTests(WebApiFactory webApiFactory) : BaseIntegra
         HttpResponseMessage response = await HttpClient.PutAsync(IngredientsGroup.GenerateShoppingListRoute, content, TestContext.Current.CancellationToken);
         string responseBody = await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
         response.EnsureSuccessStatusCode();
-        GenerateShoppingList.Response? shoppingListResponse = JsonSerializer.Deserialize<GenerateShoppingList.Response>(responseBody, JsonOptions);
+        GenerateShoppingListResponse? shoppingListResponse = JsonSerializer.Deserialize<GenerateShoppingListResponse>(responseBody, JsonOptions);
 
         // Assert
         Assert.NotNull(shoppingListResponse);
-        List<GenerateShoppingList.IngredientDto> allIngredients = shoppingListResponse.Ingredients.SelectMany(x => x.Value).ToList();
-        GenerateShoppingList.IngredientDto? cannedTomatoes = allIngredients.FirstOrDefault(i => i.Name.Contains("Canned tomatoes"));
-        GenerateShoppingList.IngredientDto? salt = allIngredients.FirstOrDefault(i => i.Name.Contains("Salt"));
+        List<GenerateShoppingListIngredientDto> allIngredients = shoppingListResponse.Ingredients.SelectMany(x => x.Value).ToList();
+        GenerateShoppingListIngredientDto? cannedTomatoes = allIngredients.FirstOrDefault(i => i.Name.Contains("Canned tomatoes"));
+        GenerateShoppingListIngredientDto? salt = allIngredients.FirstOrDefault(i => i.Name.Contains("Salt"));
 
         Assert.NotNull(cannedTomatoes);
         Assert.NotNull(salt);
@@ -87,9 +88,9 @@ public sealed class ShoppingListTests(WebApiFactory webApiFactory) : BaseIntegra
         Recipe simpleTomatoMix = await DbContext.Recipes.AsNoTracking().FirstAsync(r => r.Title == "Simple tomato mix", TestContext.Current.CancellationToken);
         Recipe complexTomatoMix = await DbContext.Recipes.AsNoTracking().FirstAsync(r => r.Title == "Complex tomato mix", TestContext.Current.CancellationToken);
 
-        GenerateShoppingList.Request requestDto = new([
-            new GenerateShoppingList.RecipeDto(simpleTomatoMix.Id.Value),
-            new GenerateShoppingList.RecipeDto(complexTomatoMix.Id.Value)
+        GenerateShoppingListRequest requestDto = new([
+            new GenerateShoppingListRecipeDto(simpleTomatoMix.Id.Value),
+            new GenerateShoppingListRecipeDto(complexTomatoMix.Id.Value)
         ]);
         using StringContent content = new(JsonSerializer.Serialize(requestDto), System.Text.Encoding.UTF8, "application/json");
 
@@ -97,12 +98,12 @@ public sealed class ShoppingListTests(WebApiFactory webApiFactory) : BaseIntegra
         HttpResponseMessage response = await HttpClient.PutAsync(IngredientsGroup.GenerateShoppingListRoute, content, TestContext.Current.CancellationToken);
         string responseBody = await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
         response.EnsureSuccessStatusCode();
-        GenerateShoppingList.Response? shoppingListResponse = JsonSerializer.Deserialize<GenerateShoppingList.Response>(responseBody, JsonOptions);
+        GenerateShoppingListResponse? shoppingListResponse = JsonSerializer.Deserialize<GenerateShoppingListResponse>(responseBody, JsonOptions);
         Assert.NotNull(shoppingListResponse);
-        List<GenerateShoppingList.IngredientDto> allIngredients = shoppingListResponse.Ingredients.SelectMany(x => x.Value).ToList();
+        List<GenerateShoppingListIngredientDto> allIngredients = shoppingListResponse.Ingredients.SelectMany(x => x.Value).ToList();
 
         // Assert: 3 cans of tomatoes (1 from Simple, 1.5 from Complex rounded up to 2)
-        GenerateShoppingList.IngredientDto? cannedTomatoes = allIngredients.FirstOrDefault(i => i.Name.Contains("Canned tomatoes"));
+        GenerateShoppingListIngredientDto? cannedTomatoes = allIngredients.FirstOrDefault(i => i.Name.Contains("Canned tomatoes"));
         Assert.NotNull(cannedTomatoes);
         Assert.Equal(3, cannedTomatoes.Quantity);
         Assert.Contains("can", cannedTomatoes.Unit, StringComparison.OrdinalIgnoreCase);
@@ -121,9 +122,9 @@ public sealed class ShoppingListTests(WebApiFactory webApiFactory) : BaseIntegra
         Recipe burgerBuns = await DbContext.Recipes.AsNoTracking().FirstAsync(r => r.Title == "Burger buns", TestContext.Current.CancellationToken);
 
         // Use their original servings to pick the intended ingredient quantities
-        GenerateShoppingList.Request requestDto = new([
-            new GenerateShoppingList.RecipeDto(pizzaDough.Id.Value),
-            new GenerateShoppingList.RecipeDto(burgerBuns.Id.Value)
+        GenerateShoppingListRequest requestDto = new([
+            new GenerateShoppingListRecipeDto(pizzaDough.Id.Value),
+            new GenerateShoppingListRecipeDto(burgerBuns.Id.Value)
         ]);
 
         using StringContent content = new(JsonSerializer.Serialize(requestDto), System.Text.Encoding.UTF8, "application/json");
@@ -133,15 +134,15 @@ public sealed class ShoppingListTests(WebApiFactory webApiFactory) : BaseIntegra
         string responseBody = await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
         response.EnsureSuccessStatusCode();
 
-        GenerateShoppingList.Response? shoppingListResponse = JsonSerializer.Deserialize<GenerateShoppingList.Response>(responseBody, JsonOptions);
+        GenerateShoppingListResponse? shoppingListResponse = JsonSerializer.Deserialize<GenerateShoppingListResponse>(responseBody, JsonOptions);
 
         // Assert
         Assert.NotNull(shoppingListResponse);
 
-        List<GenerateShoppingList.IngredientDto> allIngredients = shoppingListResponse.Ingredients.SelectMany(x => x.Value).ToList();
+        List<GenerateShoppingListIngredientDto> allIngredients = shoppingListResponse.Ingredients.SelectMany(x => x.Value).ToList();
 
         // Find flour ingredient which appears in both recipes but with different units (grams vs cups)
-        GenerateShoppingList.IngredientDto? flour = allIngredients.FirstOrDefault(i => i.Name.Contains("Flour", StringComparison.OrdinalIgnoreCase));
+        GenerateShoppingListIngredientDto? flour = allIngredients.FirstOrDefault(i => i.Name.Contains("Flour", StringComparison.OrdinalIgnoreCase));
         Assert.NotNull(flour);
 
         // Expected behavior: conversions applied (4 cups ->480g) +300g ->780g -> purchases in kilograms (package size1kg) -> rounded up to1
@@ -156,8 +157,8 @@ public sealed class ShoppingListTests(WebApiFactory webApiFactory) : BaseIntegra
         HttpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", TokenMockFactory.GenerateJwtToken(UserMockFactory.CreateMockedAdmin()));
         Recipe mexicanSoup = await DbContext.Recipes.AsNoTracking().FirstAsync(r => r.Title == "Mexican soup", TestContext.Current.CancellationToken);
 
-        GenerateShoppingList.Request requestDto = new([
-            new GenerateShoppingList.RecipeDto(mexicanSoup.Id.Value)
+        GenerateShoppingListRequest requestDto = new([
+            new GenerateShoppingListRecipeDto(mexicanSoup.Id.Value)
         ]);
         using StringContent content = new(JsonSerializer.Serialize(requestDto), System.Text.Encoding.UTF8, "application/json");
 
@@ -165,30 +166,30 @@ public sealed class ShoppingListTests(WebApiFactory webApiFactory) : BaseIntegra
         HttpResponseMessage response = await HttpClient.PutAsync(IngredientsGroup.GenerateShoppingListRoute, content, TestContext.Current.CancellationToken);
         string responseBody = await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
         response.EnsureSuccessStatusCode();
-        GenerateShoppingList.Response? shoppingListResponse = JsonSerializer.Deserialize<GenerateShoppingList.Response>(responseBody, JsonOptions);
+        GenerateShoppingListResponse? shoppingListResponse = JsonSerializer.Deserialize<GenerateShoppingListResponse>(responseBody, JsonOptions);
         Assert.NotNull(shoppingListResponse);
-        List<GenerateShoppingList.IngredientDto> allIngredients = shoppingListResponse.Ingredients.SelectMany(x => x.Value).ToList();
+        List<GenerateShoppingListIngredientDto> allIngredients = shoppingListResponse.Ingredients.SelectMany(x => x.Value).ToList();
 
         // Assert chicken (kg)
-        GenerateShoppingList.IngredientDto? chicken = allIngredients.FirstOrDefault(i => i.Name.Contains("chicken", StringComparison.OrdinalIgnoreCase));
+        GenerateShoppingListIngredientDto? chicken = allIngredients.FirstOrDefault(i => i.Name.Contains("chicken", StringComparison.OrdinalIgnoreCase));
         Assert.NotNull(chicken);
         Assert.Equal(1, chicken.Quantity, 2);
         Assert.Contains("kg", chicken.Unit, StringComparison.OrdinalIgnoreCase);
 
         // Assert carrot (g)
-        GenerateShoppingList.IngredientDto? carrot = allIngredients.FirstOrDefault(i => i.Name.Contains("carrot", StringComparison.OrdinalIgnoreCase));
+        GenerateShoppingListIngredientDto? carrot = allIngredients.FirstOrDefault(i => i.Name.Contains("carrot", StringComparison.OrdinalIgnoreCase));
         Assert.NotNull(carrot);
         Assert.Equal(1, carrot.Quantity, 2);
         Assert.Contains("kg", carrot.Unit, StringComparison.OrdinalIgnoreCase);
 
         // Assert onion (g)
-        GenerateShoppingList.IngredientDto? onion = allIngredients.FirstOrDefault(i => i.Name.Contains("onion", StringComparison.OrdinalIgnoreCase));
+        GenerateShoppingListIngredientDto? onion = allIngredients.FirstOrDefault(i => i.Name.Contains("onion", StringComparison.OrdinalIgnoreCase));
         Assert.NotNull(onion);
         Assert.Equal(1, onion.Quantity, 2);
         Assert.Contains("kg", onion.Unit, StringComparison.OrdinalIgnoreCase);
 
         // Assert water (L)
-        GenerateShoppingList.IngredientDto? water = allIngredients.FirstOrDefault(i => i.Name.Contains("water", StringComparison.OrdinalIgnoreCase));
+        GenerateShoppingListIngredientDto? water = allIngredients.FirstOrDefault(i => i.Name.Contains("water", StringComparison.OrdinalIgnoreCase));
         Assert.NotNull(water);
         Assert.Equal(2, water.Quantity, 2);
         Assert.Contains("l", water.Unit, StringComparison.OrdinalIgnoreCase);

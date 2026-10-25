@@ -1,4 +1,4 @@
-using RecipeManager.Api.Features.Cookbooks;
+using RecipeManager.Api.Features.Cookbooks.Command.CreateCookbook;
 
 namespace RecipeManager.Unit.Tests.RecipeApi;
 
@@ -7,8 +7,8 @@ public sealed class CookbookValidatorTests
     [Fact]
     public void Validator_ReportsInvalidNestedCategoryNameAtItsPath()
     {
-        CreateCookbook.Validator validator = new();
-        CreateCookbook.Request request = new(
+        CreateCookbookValidationPolicy validator = new();
+        CreateCookbookRequest request = new(
             "My Cookbook",
             "A cookbook description",
             null,

@@ -1,6 +1,7 @@
 ﻿using System.Net.Http.Headers;
 using System.Text.Json;
 using RecipeManager.Api.Features.RecipeCategories;
+using RecipeManager.Api.Features.RecipeCategories.Query.GetRecipeCategories;
 using RecipeManager.Api.Shared.Hateoas.Models;
 using RecipeManager.Integration.Tests.Common.Users;
 using RecipeManager.Integration.Tests.CoreApi.TestFixtures;
@@ -38,7 +39,7 @@ public sealed class GetCategoriesTests : BaseIntegrationTest
         string content = await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
         Assert.NotNull(content);
 
-        HateoasResponse<GetRecipeCategories.Response>? responseModel = JsonSerializer.Deserialize<HateoasResponse<GetRecipeCategories.Response>>(content, JsonOptions);
+        HateoasResponse<GetRecipeCategoriesResponse>? responseModel = JsonSerializer.Deserialize<HateoasResponse<GetRecipeCategoriesResponse>>(content, JsonOptions);
 
         Assert.NotNull(responseModel);
         Assert.NotEmpty(responseModel.Item.Categories);
@@ -65,7 +66,7 @@ public sealed class GetCategoriesTests : BaseIntegrationTest
         string content = await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
         Assert.NotNull(content);
 
-        HateoasResponse<GetRecipeCategories.Response>? categories = JsonSerializer.Deserialize<HateoasResponse<GetRecipeCategories.Response>>(content, JsonOptions);
+        HateoasResponse<GetRecipeCategoriesResponse>? categories = JsonSerializer.Deserialize<HateoasResponse<GetRecipeCategoriesResponse>>(content, JsonOptions);
         Assert.NotNull(categories.Item.Categories);
         Assert.Empty(categories.Links);
 

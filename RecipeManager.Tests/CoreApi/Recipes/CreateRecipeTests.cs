@@ -6,6 +6,7 @@ using RecipeManager.Api.Domain.Ingredients;
 using RecipeManager.Api.Domain.Recipes.Enums;
 using RecipeManager.Api.Domain.Units;
 using RecipeManager.Api.Features.Recipes;
+using RecipeManager.Api.Features.Recipes.Command.CreateRecipe;
 using RecipeManager.Integration.Tests.Common.Users;
 using RecipeManager.Integration.Tests.CoreApi.TestFixtures;
 
@@ -23,13 +24,13 @@ public sealed class CreateRecipeTests : BaseIntegrationTest
     {
         // Arrange
         HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", TokenMockFactory.GenerateJwtToken(UserMockFactory.CreateMockedAdmin()));
-        CreateRecipe.Request request = await CreateFakeRecipe();
+        CreateRecipeRequest request = await CreateFakeRecipe();
         using StringContent content = new(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json");
 
         // Act
         HttpResponseMessage response = await HttpClient.PostAsync(RecipesGroup.Route, content, TestContext.Current.CancellationToken);
         string responseBody = await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
-        CreateRecipe.Response? recipeId = JsonSerializer.Deserialize<CreateRecipe.Response>(responseBody, JsonOptions);
+        CreateRecipeResponse? recipeId = JsonSerializer.Deserialize<CreateRecipeResponse>(responseBody, JsonOptions);
 
         // Assert
         response.EnsureSuccessStatusCode();
@@ -39,18 +40,18 @@ public sealed class CreateRecipeTests : BaseIntegrationTest
         Assert.Contains(RecipesGroup.RecipeById(recipeId.Id), response.Headers.Location!.ToString(), StringComparison.OrdinalIgnoreCase);
     }
 
-    private async Task<CreateRecipe.Request> CreateFakeRecipe()
+    private async Task<CreateRecipeRequest> CreateFakeRecipe()
     {
         UnitId unitId = (await DbContext.Units.AsNoTracking().FirstAsync(TestContext.Current.CancellationToken)).Id;
         IngredientId ingredientId = (await DbContext.Ingredients.AsNoTracking().FirstAsync(TestContext.Current.CancellationToken)).Id;
 
-        CreateRecipe.RecipeAmountDto amount = new(10d, new(unitId.Value));
-        CreateRecipe.RecipeIngredientDto ingredientDto = new(new(ingredientId.Value, null), new(unitId.Value), 10d);
-        CreateRecipe.RecipeSectionDto ingredientsPreparation = new((int)RecipeSectionType.IngredientsPreparation, [new CreateRecipe.RecipeStepDto(1, "Test", null)]);
-        CreateRecipe.RecipeSectionDto cooking = new((int)RecipeSectionType.Cooking, [new CreateRecipe.RecipeStepDto(1, "Test 2", null)]);
-        CreateRecipe.NutritionalValueDto nutritionalValue = new(1, 1, 1, 1, 1, unitId.Value);
+        CreateRecipeAmountDto amount = new(10d, new(unitId.Value));
+        CreateRecipeIngredientDto ingredientDto = new(new(ingredientId.Value, null), new(unitId.Value), 10d);
+        CreateRecipeSectionDto ingredientsPreparation = new((int)RecipeSectionType.IngredientsPreparation, [new CreateRecipeStepDto(1, "Test", null)]);
+        CreateRecipeSectionDto cooking = new((int)RecipeSectionType.Cooking, [new CreateRecipeStepDto(1, "Test 2", null)]);
+        CreateRecipeNutritionalValueDto nutritionalValue = new(1, 1, 1, 1, 1, unitId.Value);
 
-        return new CreateRecipe.Request
+        return new CreateRecipeRequest
         (
             "New fake recipe",
             "This is a test recipe",

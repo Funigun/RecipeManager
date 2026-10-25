@@ -1,4 +1,5 @@
 ﻿using RecipeManager.Api.Features.Cookbooks;
+using RecipeManager.Api.Features.Cookbooks.Command.CreateCookbook;
 using RecipeManager.Integration.Tests.Common.Users;
 using RecipeManager.Integration.Tests.CoreApi.TestFixtures;
 
@@ -16,7 +17,7 @@ public sealed class CreateCookbookTests : BaseIntegrationTest
     {
         // Arrange
         HttpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", TokenMockFactory.GenerateJwtToken(UserMockFactory.CreateMockedAdmin()));
-        CreateCookbook.Request createCookbookRequest = new("New Cookbook", "Desc", null, []);
+        CreateCookbookRequest createCookbookRequest = new("New Cookbook", "Desc", null, []);
         using StringContent content = new(System.Text.Json.JsonSerializer.Serialize(createCookbookRequest), System.Text.Encoding.UTF8, "application/json");
 
         // Act
@@ -24,7 +25,7 @@ public sealed class CreateCookbookTests : BaseIntegrationTest
 
         // Assert
         response.EnsureSuccessStatusCode();
-        CreateCookbook.Response? responseData = await response.Content.ReadFromJsonAsync<CreateCookbook.Response>(cancellationToken: TestContext.Current.CancellationToken);
+        CreateCookbookResponse? responseData = await response.Content.ReadFromJsonAsync<CreateCookbookResponse>(cancellationToken: TestContext.Current.CancellationToken);
         Assert.NotNull(responseData);
         Assert.NotEqual(Guid.Empty, responseData.Id);
     }

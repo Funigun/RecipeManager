@@ -74,7 +74,7 @@ public sealed class EndpointArchitectureTests : IClassFixture<WebApplicationFixt
 
         return metadataType?.GetNestedType("Request", BindingFlags.Public | BindingFlags.NonPublic)
             ?? metadataType?.DeclaringType?.GetNestedType("Request", BindingFlags.Public | BindingFlags.NonPublic)
-            ?? (metadataType?.Name == "Request" ? metadataType : null);
+            ?? metadataType;
     }
 
     private static IEnumerable<Type> GetFeatureTypes(Type request)

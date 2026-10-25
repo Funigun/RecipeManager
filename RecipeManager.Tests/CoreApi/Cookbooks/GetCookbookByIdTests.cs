@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using RecipeManager.Api.Domain.Cookbooks;
 using RecipeManager.Api.Features.Cookbooks;
+using RecipeManager.Api.Features.Cookbooks.Query.GetCookbookById;
 using RecipeManager.Api.Shared.Hateoas.Models;
 using RecipeManager.Integration.Tests.Common.Users;
 using RecipeManager.Integration.Tests.CoreApi.TestFixtures;
@@ -24,7 +25,7 @@ public sealed class GetCookbookByIdTests : BaseIntegrationTest
         // Act
         HttpResponseMessage response = await HttpClient.GetAsync(CookbooksGroup.CookbookById(cookbookId.Value), TestContext.Current.CancellationToken);
         string responseContent = await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
-        HateoasResponse<GetCookbookById.Response>? hateoasResponse = System.Text.Json.JsonSerializer.Deserialize<HateoasResponse<GetCookbookById.Response>>(responseContent, JsonOptions);
+        HateoasResponse<GetCookbookByIdResponse>? hateoasResponse = System.Text.Json.JsonSerializer.Deserialize<HateoasResponse<GetCookbookByIdResponse>>(responseContent, JsonOptions);
 
         // Assert
         Assert.NotNull(hateoasResponse);

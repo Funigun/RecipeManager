@@ -1,7 +1,7 @@
 ﻿using System.Net.Http.Headers;
 using System.Text.Json;
 using RecipeManager.Api.Features.IngredientCategories;
-using RecipeManager.Api.Features.RecipeCategories;
+using RecipeManager.Api.Features.IngredientCategories.Query.GetIngredientCategories;
 using RecipeManager.Api.Shared.Hateoas.Models;
 using RecipeManager.Integration.Tests.Common.Users;
 using RecipeManager.Integration.Tests.CoreApi.TestFixtures;
@@ -39,7 +39,7 @@ public sealed class GetIngredientCategoriesTests : BaseIntegrationTest
         string content = await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
         Assert.NotNull(content);
 
-        HateoasCollectionResponse<GetRecipeCategories.CategoryDto>? categories = JsonSerializer.Deserialize<HateoasCollectionResponse<GetRecipeCategories.CategoryDto>>(content, JsonOptions);
+        HateoasCollectionResponse<GetIngredientCategoriesResponse>? categories = JsonSerializer.Deserialize<HateoasCollectionResponse<GetIngredientCategoriesResponse>>(content, JsonOptions);
         Assert.NotNull(categories);
         Assert.NotEmpty(categories.Items);
         Assert.All(categories.Items, category =>
@@ -63,7 +63,7 @@ public sealed class GetIngredientCategoriesTests : BaseIntegrationTest
         string content = await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
         Assert.NotNull(content);
 
-        HateoasCollectionResponse<GetIngredientCategories.Response>? categories = JsonSerializer.Deserialize<HateoasCollectionResponse<GetIngredientCategories.Response>>(content, JsonOptions);
+        HateoasCollectionResponse<GetIngredientCategoriesResponse>? categories = JsonSerializer.Deserialize<HateoasCollectionResponse<GetIngredientCategoriesResponse>>(content, JsonOptions);
         Assert.NotNull(categories);
         Assert.NotEmpty(categories.Links);
         Assert.NotEmpty(categories.Items);

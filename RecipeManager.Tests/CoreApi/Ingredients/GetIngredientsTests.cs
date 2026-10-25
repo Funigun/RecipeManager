@@ -1,6 +1,7 @@
 ﻿using System.Net.Http.Headers;
 using System.Text.Json;
 using RecipeManager.Api.Features.Ingredients;
+using RecipeManager.Api.Features.Ingredients.Query.GetIngredients;
 using RecipeManager.Integration.Tests.Common.Users;
 using RecipeManager.Integration.Tests.CoreApi.TestFixtures;
 
@@ -22,7 +23,7 @@ public sealed class GetIngredientsTests : BaseIntegrationTest
         // Act
         HttpResponseMessage response = await HttpClient.GetAsync(IngredientsGroup.Route, TestContext.Current.CancellationToken);
         string responseBody = await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
-        GetIngredients.Response? ingredientResponse = JsonSerializer.Deserialize<GetIngredients.Response>(responseBody, JsonOptions);
+        GetIngredientsResponse? ingredientResponse = JsonSerializer.Deserialize<GetIngredientsResponse>(responseBody, JsonOptions);
 
         // Assert
         response.EnsureSuccessStatusCode();
