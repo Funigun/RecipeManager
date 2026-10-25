@@ -1,7 +1,9 @@
 ﻿using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
+using Microsoft.AspNetCore.Mvc;
 using RecipeManager.Api.Features.Units;
+using RecipeManager.Api.Features.Units.Command.CreateUnit;
 using RecipeManager.Integration.Tests.Common.Users;
 using RecipeManager.Integration.Tests.CoreApi.TestFixtures;
 
@@ -21,7 +23,7 @@ public sealed class CreateUnitTests : BaseIntegrationTest
         // Arrange
         HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", TokenMockFactory.GenerateJwtToken(UserMockFactory.CreateMockedUser()));
 
-        CreateUnit.Request createUnitRequest = new(
+        CreateUnitRequest createUnitRequest = new(
             "Valid Unit", "VA", "Valid Units", "VAs", 0, true, null, 1
         );
         using StringContent content = new(JsonSerializer.Serialize(createUnitRequest), Encoding.UTF8, "application/json");
@@ -44,7 +46,7 @@ public sealed class CreateUnitTests : BaseIntegrationTest
         // Arrange
         HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", TokenMockFactory.GenerateJwtToken(UserMockFactory.CreateMockedAdmin()));
 
-        CreateUnit.Request createUnitRequest = new(unitName, shortName, pluralName, pluralShortName, group, isBaseUnit, null, 1);
+        CreateUnitRequest createUnitRequest = new(unitName, shortName, pluralName, pluralShortName, group, isBaseUnit, null, 1);
         using StringContent content = new(JsonSerializer.Serialize(createUnitRequest), Encoding.UTF8, "application/json");
 
         // Act
@@ -52,6 +54,9 @@ public sealed class CreateUnitTests : BaseIntegrationTest
 
         // Assert
         Assert.True(response.StatusCode == System.Net.HttpStatusCode.BadRequest, $"Expected BadRequest for justification: {justification}");
+        ValidationProblemDetails? problem = await response.Content.ReadFromJsonAsync<ValidationProblemDetails>(TestContext.Current.CancellationToken);
+        Assert.NotNull(problem);
+        Assert.NotEmpty(problem.Errors);
     }
 
     [Fact]
@@ -60,7 +65,7 @@ public sealed class CreateUnitTests : BaseIntegrationTest
         // Arrange
         HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", TokenMockFactory.GenerateJwtToken(UserMockFactory.CreateMockedAdmin()));
 
-        CreateUnit.Request createUnitRequest = new(
+        CreateUnitRequest createUnitRequest = new(
             "Valid Unit", "VA", "Valid Units", "VAs", 0, true, null, 1
         );
         using StringContent content = new(JsonSerializer.Serialize(createUnitRequest), Encoding.UTF8, "application/json");
@@ -68,7 +73,7 @@ public sealed class CreateUnitTests : BaseIntegrationTest
         // Act
         HttpResponseMessage response = await HttpClient.PostAsync(UnitsGroup.Route, content, TestContext.Current.CancellationToken);
         string responseContent = await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
-        CreateUnit.Response? unitId = JsonSerializer.Deserialize<CreateUnit.Response?>(responseContent, JsonOptions);
+        CreateUnitResponse? unitId = JsonSerializer.Deserialize<CreateUnitResponse?>(responseContent, JsonOptions);
 
         // Assert
         response.EnsureSuccessStatusCode();

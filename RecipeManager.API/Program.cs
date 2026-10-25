@@ -6,6 +6,13 @@ using RecipeManager.Api.Application.Abstractions;
 using RecipeManager.Api.Persistance;
 using RecipeManager.Api.Persistance.Cache;
 using RecipeManager.Api.Presentation;
+using RecipeManager.Api.Features.Units.Command.CreateUnit;
+using RecipeManager.Api.Features.Units.Command.DeleteUnit;
+using RecipeManager.Api.Features.Units.Command.UpdateUnit;
+using RecipeManager.Api.Features.Units.Query.GetAllUnits;
+using RecipeManager.Api.Features.Units.Query.GetPrimaryUnits;
+using RecipeManager.Api.Features.Units.Query.GetUnitById;
+using RecipeManager.Api.Features.Units.Query.GetUnitsForDropdown;
 using RecipeManager.Api.Shared;
 using RecipeManager.ServiceDefaults;
 using Scalar.AspNetCore;
@@ -56,6 +63,14 @@ try
     builder.Services.AddSharedServices()
                     .AddAuthorizationPolicies(assembly)
                     .AddValidatorsFromAssembly(assembly);
+
+    builder.Services.AddScoped<CreateUnitCommandHandler>();
+    builder.Services.AddScoped<DeleteUnitCommandHandler>();
+    builder.Services.AddScoped<UpdateUnitCommandHandler>();
+    builder.Services.AddScoped<GetAllUnitsQueryHandler>();
+    builder.Services.AddScoped<GetPrimaryUnitsQueryHandler>();
+    builder.Services.AddScoped<GetUnitByIdQueryHandler>();
+    builder.Services.AddScoped<GetUnitsForDropdownQueryHandler>();
 
     builder.Services.AddPersistance(builder.Configuration);
 

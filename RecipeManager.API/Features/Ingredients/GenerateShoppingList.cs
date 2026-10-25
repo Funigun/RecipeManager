@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RecipeManager.Api.Application.Abstractions;
-using RecipeManager.Api.Application.Database;
 using RecipeManager.Api.Domain.Ingredients;
 using RecipeManager.Api.Domain.Recipes;
 using RecipeManager.Api.Domain.Units;
@@ -14,6 +13,8 @@ namespace RecipeManager.Api.Features.Ingredients;
 
 public static class GenerateShoppingList
 {
+    private sealed record UnitData(UnitId Id, UnitId? PrimaryUnit, int ConversionFactor, string Name, string? ShortName);
+
     private sealed class RecipeDao()
     {
         public Guid Id { get; init; }
@@ -69,9 +70,9 @@ public static class GenerateShoppingList
         }
     }
 
-    public static async Task<Results<Ok<Response>, BadRequest>> Handler(Request request, [FromServices] IAppDbContext dbContext, [FromServices] IUnitOfWork unitOfWork, CancellationToken cancellationToken)
+    public static async Task<Results<Ok<Response>, BadRequest>> Handler(Request request, [FromServices] IAppDbContext dbContext, CancellationToken cancellationToken)
     {
-        Dictionary<UnitId, Unit> units = await GetUnits(unitOfWork, cancellationToken);
+        Dictionary<UnitId, UnitData> units = await GetUnits(dbContext, cancellationToken);
 
         IEnumerable<Recipe> recipes = await GetRecipes(request.Recipes.Select(r => r.Id), dbContext, cancellationToken);
         IEnumerable<Recipe> nestedRecipes = await GetNestedRecipes(recipes, dbContext, cancellationToken);
@@ -88,7 +89,7 @@ public static class GenerateShoppingList
         foreach (RecipeIngredientDao recipeIngredient in ingredientsToProcess)
         {
             Ingredient ingredient = ingredients[recipeIngredient.IngredientId];
-            Unit recipeIngredientUnit = units[recipeIngredient.UnitId];
+            UnitData recipeIngredientUnit = units[recipeIngredient.UnitId];
 
             // Convert recipe ingredient amount to ingredient base unit
             recipeIngredient.Amount = recipeIngredient.UnitId == ingredient.BaseUnit.Value
@@ -102,7 +103,7 @@ public static class GenerateShoppingList
                                                                                            .Select(group =>
                                                                                            {
                                                                                                Ingredient ingredient = ingredients[group.Key];
-                                                                                               Unit ingredientBaseUnit = units[ingredient.BaseUnit ?? throw new InvalidOperationException("Ingredient base unit is null")];
+                                                                                               UnitData ingredientBaseUnit = units[ingredient.BaseUnit ?? throw new InvalidOperationException("Ingredient base unit is null")];
                                                                                                return new RecipeIngredientDao
                                                                                                    {
                                                                                                        IngredientId = group.Key,
@@ -115,8 +116,8 @@ public static class GenerateShoppingList
         foreach (RecipeIngredientDao recipeIngredient in ingredientsByBaseUnitAmount)
         {
             Ingredient ingredient = ingredients[recipeIngredient.IngredientId];
-            Unit ingredientPackageUnit = units[ingredient.IngredientPackage.PackageUnitId];
-            Unit ingredientPackageSizeUnit = units[ingredient.IngredientPackage.PackageSizeUnitId];
+            UnitData ingredientPackageUnit = units[ingredient.IngredientPackage.PackageUnitId];
+            UnitData ingredientPackageSizeUnit = units[ingredient.IngredientPackage.PackageSizeUnitId];
 
             // Convert ingredient base amount to ingredient package size unit
             recipeIngredient.Amount = ingredient.IngredientPackage.PackageSizeUnitId == ingredient.BaseUnit
@@ -178,10 +179,11 @@ public static class GenerateShoppingList
         return results;
     }
 
-    private static async Task<Dictionary<UnitId, Unit>> GetUnits(IUnitOfWork unitOfWork, CancellationToken cancellationToken)
+    private static async Task<Dictionary<UnitId, UnitData>> GetUnits(IAppDbContext dbContext, CancellationToken cancellationToken)
     {
-        return (await unitOfWork.Units.GetAllAsync(cancellationToken))
-                                    .ToDictionary(unit => unit.Id, unit => unit);
+        return await dbContext.Units.AsNoTracking()
+            .Select(unit => new UnitData(unit.Id, unit.PrimaryUnit, unit.ConversionFactor, unit.Name, unit.ShortName))
+            .ToDictionaryAsync(unit => unit.Id, cancellationToken);
     }
 
     private static async Task<IEnumerable<Ingredient>> GetIngredients(IEnumerable<IngredientId> ingredientIds, IAppDbContext dbContext, CancellationToken cancellationToken)

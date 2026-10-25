@@ -1,8 +1,7 @@
-﻿using System.Reflection;
+using System.Reflection;
 using FluentValidation;
 using Microsoft.AspNetCore.Routing;
 using RecipeManager.Api.Shared.Contracts.Authorization;
-using RecipeManager.Api.Shared.Endpoint;
 using RecipeManager.Architecture.Tests.CoreApi.TestFixtures;
 
 namespace RecipeManager.Architecture.Tests.CoreApi;
@@ -18,7 +17,7 @@ public sealed class EndpointArchitectureTests : IClassFixture<WebApplicationFixt
     }
 
     [Fact]
-    public void All_ValidatedPostEndpoints_ShouldHave_NestedValidator()
+    public void All_ValidatedPostEndpoints_ShouldHave_FeatureValidator()
     {
         IEnumerable<RouteEndpoint> endpoints = _webApplicationFixture.DataSource.Endpoints.OfType<RouteEndpoint>();
 
@@ -26,25 +25,27 @@ public sealed class EndpointArchitectureTests : IClassFixture<WebApplicationFixt
         {
             if (endpoint.Metadata.OfType<string>().Any(data => data == "Uses validation filter"))
             {
-                Type endpointParent = endpoint.Metadata.OfType<Type>().FirstOrDefault(t => t.GetNestedTypes().Any(tt => typeof(IEndpoint).IsAssignableFrom(tt)))!;
-
-                Type? request = endpointParent.GetNestedType("Request", BindingFlags.Public | BindingFlags.NonPublic) ?? null;
+                Type? request = GetRequestType(endpoint);
 
                 if (request == null)
                 {
                     continue;
                 }
 
-                Type? validatorType = endpointParent.GetNestedTypes(BindingFlags.Public | BindingFlags.NonPublic)
-                                                    .FirstOrDefault(t => typeof(IValidator<>).MakeGenericType(request).IsAssignableFrom(t));
+                IEnumerable<Type> featureTypes = GetFeatureTypes(request);
+                Type? validatorType = featureTypes
+                    .FirstOrDefault(t => typeof(IValidator<>).MakeGenericType(request).IsAssignableFrom(t))
+                    ?? featureTypes
+                    .FirstOrDefault(t => t.GetInterfaces()
+                        .Any(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IValidator<>)));
 
-                Assert.True(validatorType != null, $"Validator for {endpointParent.FullName} is missing or is in wrong place");
+                Assert.True(validatorType != null, $"Validator for {request.FullName} is missing or is in the wrong feature");
             }
         }
     }
 
     [Fact]
-    public void All_AuthenticatedPostEndpoints_ShouldHave_NestedAuhorizationPolicy()
+    public void All_AuthenticatedPostEndpoints_ShouldHave_FeatureAuthorizationPolicy()
     {
         IEnumerable<RouteEndpoint> endpoints = _webApplicationFixture.DataSource.Endpoints.OfType<RouteEndpoint>();
 
@@ -52,20 +53,39 @@ public sealed class EndpointArchitectureTests : IClassFixture<WebApplicationFixt
         {
             if (endpoint.Metadata.OfType<string>().Any(data => data == "Uses authentication filter"))
             {
-                Type endpointParent = endpoint.Metadata.OfType<Type>().FirstOrDefault(t => t.GetNestedTypes().Any(tt => typeof(IEndpoint).IsAssignableFrom(tt)))!;
-
-                Type? request = endpointParent.GetNestedType("Request", BindingFlags.Public | BindingFlags.NonPublic) ?? null;
+                Type? request = GetRequestType(endpoint);
 
                 if (request == null)
                 {
                     continue;
                 }
 
-                Type? validatorType = endpointParent.GetNestedTypes(BindingFlags.Public | BindingFlags.NonPublic)
-                                                    .FirstOrDefault(t => typeof(IAuthorizationPolicy<>).MakeGenericType(request).IsAssignableFrom(t));
+                Type? policyType = GetFeatureTypes(request)
+                    .FirstOrDefault(t => typeof(IAuthorizationPolicy<>).MakeGenericType(request).IsAssignableFrom(t));
 
-                Assert.True(validatorType != null, $"Authorization Policy for {endpointParent.FullName} is missing or is in wrong place");
+                Assert.True(policyType != null, $"Authorization policy for {request.FullName} is missing or is in the wrong feature");
             }
         }
+    }
+
+    private static Type? GetRequestType(RouteEndpoint endpoint)
+    {
+        Type? metadataType = endpoint.Metadata.OfType<Type>().FirstOrDefault();
+
+        return metadataType?.GetNestedType("Request", BindingFlags.Public | BindingFlags.NonPublic)
+            ?? metadataType?.DeclaringType?.GetNestedType("Request", BindingFlags.Public | BindingFlags.NonPublic)
+            ?? (metadataType?.Name == "Request" ? metadataType : null);
+    }
+
+    private static IEnumerable<Type> GetFeatureTypes(Type request)
+    {
+        if (request.DeclaringType is Type featureContainer)
+        {
+            return featureContainer.GetNestedTypes(BindingFlags.Public | BindingFlags.NonPublic)
+                                  .Append(featureContainer);
+        }
+
+        return request.Assembly.GetTypes()
+                      .Where(type => !type.IsNested && type.Namespace == request.Namespace);
     }
 }

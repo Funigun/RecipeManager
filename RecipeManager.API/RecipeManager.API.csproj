@@ -1,5 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
+  <PropertyGroup>
+    <LangVersion>preview</LangVersion>
+  </PropertyGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\RecipeManager.Api.Shared\RecipeManager.Api.Shared.csproj" />
     <ProjectReference Include="..\RecipeManager.ServiceDefaults\RecipeManager.ServiceDefaults.csproj" />

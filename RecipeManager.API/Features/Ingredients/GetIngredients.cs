@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RecipeManager.Api.Application.Abstractions;
-using RecipeManager.Api.Application.Database;
 using RecipeManager.Api.Domain.Ingredients;
 using RecipeManager.Api.Domain.Units;
 using RecipeManager.Api.Persistance.Extensions;
@@ -42,10 +41,12 @@ public static class GetIngredients
         }
     }
 
-    public static async Task<Results<Ok<HateoasResponse<Response>>, BadRequest>> Handler([AsParameters] GetIngredientsFilterParameters filter, [FromServices] IHateoasBuilderFactory hateoasBuilderFactory, [FromServices] ICurrentUser currentUser, [FromServices] IAppDbContext dbContext, [FromServices] IUnitOfWork unitOfWork, CancellationToken cancellationToken)
+    public static async Task<Results<Ok<HateoasResponse<Response>>, BadRequest>> Handler([AsParameters] GetIngredientsFilterParameters filter, [FromServices] IHateoasBuilderFactory hateoasBuilderFactory, [FromServices] ICurrentUser currentUser, [FromServices] IAppDbContext dbContext, CancellationToken cancellationToken)
     {
         IEnumerable<IngredientCategoryId> categoryIds = await GetFilteredCategories(filter.Category, dbContext, cancellationToken);
-        Dictionary<UnitId, Unit> units = (await unitOfWork.Units.GetAllAsync(cancellationToken)).ToDictionary(u => u.Id);
+        Dictionary<UnitId, string> unitNames = await dbContext.Units.AsNoTracking()
+            .Select(unit => new { unit.Id, unit.Name })
+            .ToDictionaryAsync(unit => unit.Id, unit => unit.Name, cancellationToken);
 
         IQueryable<Ingredient> query = PrepareIngredientsQuery(dbContext, categoryIds, currentUser.Id);
 
@@ -55,15 +56,15 @@ public static class GetIngredients
         List<IngredientDto> ingredientDtos = ingredients.Select(ingredient => new IngredientDto(
             ingredient.Id.Value,
             ingredient.Name,
-            ingredient.BaseUnit != null ? units[ingredient.BaseUnit].Name : string.Empty,
-            ingredient.IngredientUnitConvertions.Select(c => new IngredientUnitConvertionDto(units[c.UnitToConvertId].Name, c.Ratio)),
+            ingredient.BaseUnit != null ? unitNames[ingredient.BaseUnit] : string.Empty,
+            ingredient.IngredientUnitConvertions.Select(c => new IngredientUnitConvertionDto(unitNames[c.UnitToConvertId], c.Ratio)),
             new NutritionalValueDto(
                 ingredient.NutritionalValue.Calories,
                 ingredient.NutritionalValue.Proteins,
                 ingredient.NutritionalValue.Fats,
                 ingredient.NutritionalValue.Carbohydrates,
                 ingredient.NutritionalValue.IngredientAmount,
-                units[ingredient.NutritionalValue.IngredientUnit].Name
+                unitNames[ingredient.NutritionalValue.IngredientUnit]
             )
         )).ToList();
 

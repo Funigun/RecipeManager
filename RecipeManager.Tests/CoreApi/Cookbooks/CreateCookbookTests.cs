@@ -1,5 +1,4 @@
-﻿using System.Net.Http.Json;
-using RecipeManager.Api.Features.Cookbooks;
+﻿using RecipeManager.Api.Features.Cookbooks;
 using RecipeManager.Integration.Tests.Common.Users;
 using RecipeManager.Integration.Tests.CoreApi.TestFixtures;
 

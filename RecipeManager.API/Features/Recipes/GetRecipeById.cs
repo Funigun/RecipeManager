@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RecipeManager.Api.Application.Abstractions;
-using RecipeManager.Api.Application.Database;
 using RecipeManager.Api.Application.Exceptions;
 using RecipeManager.Api.Domain.Common;
 using RecipeManager.Api.Domain.Ingredients;
@@ -21,6 +20,8 @@ namespace RecipeManager.Api.Features.Recipes;
 
 public static class GetRecipeById
 {
+    private sealed record UnitInfo(UnitId Id, string Name, string? ShortName);
+
     public record struct Request(Guid Id) : IRequestId<Request>;
 
     public sealed record RecipeIngredientDto(IngredientDto Ingredient, UnitDto Unit, double Amount);
@@ -55,12 +56,14 @@ public static class GetRecipeById
         }
     }
 
-    public static async Task<Results<Ok<HateoasResponse<Response>>, BadRequest>> Handler(Request id, [FromServices] ICurrentUser currentUser, [FromServices] IAppDbContext dbContext, [FromServices] IUnitOfWork unitOfWork, [FromServices] IHateoasBuilderFactory hateoasBuilderFactory, CancellationToken cancellationToken)
+    public static async Task<Results<Ok<HateoasResponse<Response>>, BadRequest>> Handler(Request id, [FromServices] ICurrentUser currentUser, [FromServices] IAppDbContext dbContext, [FromServices] IHateoasBuilderFactory hateoasBuilderFactory, CancellationToken cancellationToken)
     {
         Recipe? recipe = await GetRecipe(new RecipeId(id.Id), dbContext, cancellationToken);
 
         IEnumerable<Ingredient> recipeIngredients = await GetRecipeIngredients(recipe!, dbContext, cancellationToken);
-        IEnumerable<Unit> units = await unitOfWork.Units.GetAllAsync(cancellationToken);
+        List<UnitInfo> units = await dbContext.Units.AsNoTracking()
+            .Select(unit => new UnitInfo(unit.Id, unit.Name, unit.ShortName))
+            .ToListAsync(cancellationToken);
         IEnumerable<RecipeCategory> categories = recipe!.Categories.Count > 0
                                                ? await dbContext.RecipeCategories.Where(category => recipe.Categories.Contains(category.Id))
                                                                                  .AsNoTracking()
@@ -99,7 +102,7 @@ public static class GetRecipeById
                                           .ToListAsync(cancellationToken);
     }
 
-    private static Response MapToResponse(Recipe recipe, IEnumerable<Ingredient> recipeIngredients, IEnumerable<Unit> units, IEnumerable<RecipeCategory> recipeCategories)
+    private static Response MapToResponse(Recipe recipe, IEnumerable<Ingredient> recipeIngredients, IEnumerable<UnitInfo> units, IEnumerable<RecipeCategory> recipeCategories)
     {
         IEnumerable<RecipeIngredientDto> ingredients = recipe.Ingredients.Select(ingredient => MapToIngredientDto(ingredient, recipeIngredients, units));
         IEnumerable<RecipeSectionDto> sections = recipe.Sections.Select(MapRecipeSectionDto);
@@ -126,10 +129,10 @@ public static class GetRecipeById
         );
     }
 
-    private static RecipeIngredientDto MapToIngredientDto(RecipeIngredient recipeIngredient, IEnumerable<Ingredient> ingredients, IEnumerable<Unit> units)
+    private static RecipeIngredientDto MapToIngredientDto(RecipeIngredient recipeIngredient, IEnumerable<Ingredient> ingredients, IEnumerable<UnitInfo> units)
     {
         Ingredient? ingredient = ingredients.FirstOrDefault(i => i.Id == recipeIngredient.IngredientId);
-        Unit? unit = units.FirstOrDefault(u => u.Id == recipeIngredient.UnitId);
+        UnitInfo? unit = units.FirstOrDefault(u => u.Id == recipeIngredient.UnitId);
 
         return new RecipeIngredientDto
         (
@@ -148,7 +151,7 @@ public static class GetRecipeById
         );
     }
 
-    private static RecipeAmountDto MapToRecipeAmountDto(RecipeAmount recipeAmount, IEnumerable<Unit> units)
+    private static RecipeAmountDto MapToRecipeAmountDto(RecipeAmount recipeAmount, IEnumerable<UnitInfo> units)
     {
         return new RecipeAmountDto
         (

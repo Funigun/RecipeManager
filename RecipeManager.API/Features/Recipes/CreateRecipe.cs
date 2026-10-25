@@ -1,7 +1,6 @@
 using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 using RecipeManager.Api.Application.Abstractions;
-using RecipeManager.Api.Application.Database;
 using RecipeManager.Api.Domain.Common;
 using RecipeManager.Api.Domain.Ingredients;
 using RecipeManager.Api.Domain.Recipes;
@@ -38,7 +37,7 @@ public static class CreateRecipe
 
     public sealed class Validator : AbstractValidator<Request>
     {
-        public Validator(IAppDbContext dbContext, IUnitOfWork unitOfWork)
+        public Validator(IAppDbContext dbContext)
         {
             RuleFor(x => x.Title).ValidateRecipeTitle();
             RuleFor(x => x.Description).ValidateRecipeDescription();
@@ -46,7 +45,7 @@ public static class CreateRecipe
             RuleFor(x => x.VideoUrl).ValidateRecipeVideoUrl();
             RuleFor(x => x.Amount.Amount).ValidateRecipeAmount();
             RuleFor(x => x.Amount.Unit.Id).NotEmpty()
-                .MustReferenceExistingUnit(unitOfWork, "Provided invalid UnitId for recipe amount");
+                .MustReferenceExistingUnit(dbContext, "Provided invalid UnitId for recipe amount");
 
             RuleFor(x => x.NumberOfServings).ValidateRecipeNumberOfServings();
             RuleFor(x => x.Difficulty)
@@ -59,7 +58,7 @@ public static class CreateRecipe
             RuleFor(x => x.NutritionalValues.Proteins).ValidateNutritionalProteins();
             RuleFor(x => x.NutritionalValues.IngredientAmount).ValidateNutritionalAmount();
 
-            RuleFor(x => x.Ingredients).SetValidator(new RecipeIngredientsValidator(dbContext, unitOfWork));
+            RuleFor(x => x.Ingredients).SetValidator(new RecipeIngredientsValidator(dbContext));
             RuleFor(x => x.Sections).SetValidator(new RecipeSectionsValidator());
 
             RuleFor(x => x.Categories)
@@ -81,7 +80,7 @@ public static class CreateRecipe
 
     public sealed class RecipeIngredientsValidator : AbstractValidator<IEnumerable<RecipeIngredientDto>>
     {
-        public RecipeIngredientsValidator(IAppDbContext dbContext, IUnitOfWork unitOfWork)
+        public RecipeIngredientsValidator(IAppDbContext dbContext)
         {
             RuleFor(ingredients => ingredients)
                 .NotEmpty()
@@ -90,7 +89,7 @@ public static class CreateRecipe
                     ingredients => ingredients.Select(ingredient => ingredient.Ingredient.Id),
                     "Some of ingredients does not exist")
                 .MustReferenceExistingUnits(
-                    unitOfWork,
+                    dbContext,
                     ingredient => ingredient.Unit.Id,
                     "Some of units does not exist")
                 .MustHaveUniqueIds(ingredient => ingredient.Ingredient.Id, "Duplicate ingredients are not allowed");

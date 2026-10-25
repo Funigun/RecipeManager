@@ -249,6 +249,9 @@ dotnet_naming_style.begins_with_i.capitalization = pascal_case
 
 # Visual Studio.Analyzers
 
+# Startup pipeline calls intentionally discard their fluent builder return values.
+dotnet_diagnostic.IDE0058.severity = none
+
 # IDE0305: Collection initialization can be simplified
 dotnet_diagnostic.IDE0305.severity = none
 
@@ -335,11 +338,17 @@ dotnet_diagnostic.SA1111.severity = none
 # SA1128: Put constructors of derived types on a separate line
 dotnet_diagnostic.SA1128.severity = none
 
+# SA1200: Using directives should be placed correctly
+dotnet_diagnostic.SA1200.severity = none
+
 # SA1201: Constuctor should not follow a property
 dotnet_diagnostic.SA1201.severity = none
 
 # SA1309: Field should not use underscore prefix
 dotnet_diagnostic.SA1309.severity = none
+
+# SA1402: File may only contain a single type
+dotnet_diagnostic.SA1402.severity = none
 
 # SA1413: Use trailing comma in multi-line initializers
 dotnet_diagnostic.SA1413.severity = none
@@ -355,6 +364,9 @@ dotnet_diagnostic.SA1600.severity = none
 
 # SA1602: Enumeration items should be documented
 dotnet_diagnostic.SA1602.severity = none
+
+# SA1649: First type should match file name
+dotnet_diagnostic.SA1649.severity = none
 
 # SA1633: File should have header
 dotnet_diagnostic.SA1633.severity = none

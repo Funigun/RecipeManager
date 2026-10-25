@@ -1,7 +1,6 @@
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using RecipeManager.Api.Application.Abstractions;
-using RecipeManager.Api.Application.Database;
 using RecipeManager.Api.Domain.Recipes;
 
 namespace RecipeManager.Api.Features.Validation;

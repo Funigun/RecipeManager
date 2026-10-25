@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RecipeManager.Api.Application.Abstractions;
-using RecipeManager.Api.Application.Database;
 using RecipeManager.Api.Domain.Ingredients;
 using RecipeManager.Api.Domain.Units;
 using RecipeManager.Api.Shared.Contracts.Authorization;
@@ -12,6 +11,8 @@ namespace RecipeManager.Api.Features.Ingredients;
 
 public static class GetIngredientsForDropdown
 {
+    private sealed record UnitInfo(UnitId Id, string Name);
+
     public sealed record UnitForDropdownDto(Guid Id, string Name);
 
     public sealed record Response(Guid Id, string Name, string? RecipeUrl, IEnumerable<UnitForDropdownDto> AvailableUnits);
@@ -29,7 +30,7 @@ public static class GetIngredientsForDropdown
         }
     }
 
-    public static async Task<Results<Ok<IEnumerable<Response>>, NotFound>> Handler([FromQuery] string? ingredientName, [FromServices] IAppDbContext dbContext, [FromServices] IUnitOfWork unitOfWork, [FromServices] ICurrentUser currentUser, CancellationToken cancellationToken)
+    public static async Task<Results<Ok<IEnumerable<Response>>, NotFound>> Handler([FromQuery] string? ingredientName, [FromServices] IAppDbContext dbContext, [FromServices] ICurrentUser currentUser, CancellationToken cancellationToken)
     {
         IQueryable<Ingredient> query = dbContext.Ingredients.AsNoTracking()
                                                             .Include(ingredient => ingredient.IngredientUnitConvertions)
@@ -43,7 +44,9 @@ public static class GetIngredientsForDropdown
 
         IEnumerable<Ingredient> ingredients = await query.ToListAsync(cancellationToken);
 
-        IEnumerable<Unit> units = await unitOfWork.Units.GetAllAsync(cancellationToken);
+        List<UnitInfo> units = await dbContext.Units.AsNoTracking()
+            .Select(unit => new UnitInfo(unit.Id, unit.Name))
+            .ToListAsync(cancellationToken);
 
         IEnumerable<Response> results = ingredients.OrderBy(ingredient => ingredient.Name)
                                                    .Select(ingredient => new Response
@@ -52,7 +55,7 @@ public static class GetIngredientsForDropdown
                                                        ingredient.Name,
                                                        ingredient.Recipes.Any() ? $"/recipes/{ingredient.Recipes[0]}" : null,
                                                        units.Where(unit => ingredient.GetAvailableUnits().Contains(unit.Id))
-                                                            .Select(unit => new UnitForDropdownDto(unit.Id, unit.Name))
+                                                            .Select(unit => new UnitForDropdownDto(unit.Id.Value, unit.Name))
                                                    ));
 
         return TypedResults.Ok(results);

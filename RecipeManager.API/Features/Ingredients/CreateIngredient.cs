@@ -1,7 +1,6 @@
 using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 using RecipeManager.Api.Application.Abstractions;
-using RecipeManager.Api.Application.Database;
 using RecipeManager.Api.Domain.Common;
 using RecipeManager.Api.Domain.Ingredients;
 using RecipeManager.Api.Domain.Recipes;
@@ -34,7 +33,7 @@ public static class CreateIngredient
 
     public sealed class Validator : AbstractValidator<Request>
     {
-        public Validator(IAppDbContext dbContext, IUnitOfWork unitOfWork)
+        public Validator(IAppDbContext dbContext)
         {
             RuleFor(x => x.Name).ValidateIngredientName();
 
@@ -45,24 +44,24 @@ public static class CreateIngredient
             RuleFor(x => x.NutritionalValues.IngredientAmount).ValidateNutritionalAmount();
 
             RuleFor(x => x.NutritionalValues.IngredientUnitId)
-                .MustReferenceExistingUnit(unitOfWork, "Ingredient unit does not exist");
+                .MustReferenceExistingUnit(dbContext, "Ingredient unit does not exist");
 
             RuleFor(x => x.BaseUnit)
-                .MustReferenceExistingUnit(unitOfWork, "Base unit does not exist");
+                .MustReferenceExistingUnit(dbContext, "Base unit does not exist");
 
             RuleFor(x => x.IngredientPackage.PackageUnitId)
-                .MustReferenceExistingUnit(unitOfWork, "Package unit does not exist");
+                .MustReferenceExistingUnit(dbContext, "Package unit does not exist");
 
             RuleFor(x => x.IngredientPackage.PackageSize)
                 .GreaterThan(0).WithMessage("Package size must be greater than 0");
 
             RuleFor(x => x.IngredientPackage.PackageSizeUnitId)
-                .MustReferenceExistingUnit(unitOfWork, "Package size unit does not exist");
+                .MustReferenceExistingUnit(dbContext, "Package size unit does not exist");
 
             RuleForEach(x => x.IngredientUnitConvertions).ChildRules(convertion =>
             {
                 convertion.RuleFor(c => c.UnitToConvertId)
-                    .MustReferenceExistingUnit(unitOfWork, "Unit to convert does not exist");
+                    .MustReferenceExistingUnit(dbContext, "Unit to convert does not exist");
                 convertion.RuleFor(c => c.Ratio).GreaterThan(0).WithMessage("Ratio must be greater than 0");
             });
 

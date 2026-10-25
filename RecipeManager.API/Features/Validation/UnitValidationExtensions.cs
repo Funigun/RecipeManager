@@ -1,35 +1,32 @@
 using FluentValidation;
+using Microsoft.EntityFrameworkCore;
 using RecipeManager.Api.Application.Abstractions;
-using RecipeManager.Api.Application.Database;
 using RecipeManager.Api.Domain.Units;
 
 namespace RecipeManager.Api.Features.Validation;
 
 internal static class UnitValidationExtensions
 {
-    public static IRuleBuilderOptions<T, Guid> MustReferenceExistingUnit<T>(
-        this IRuleBuilder<T, Guid> ruleBuilder,
-        IUnitOfWork unitOfWork,
-        string message)
+    public static IRuleBuilderOptions<T, Guid> MustReferenceExistingUnit<T>(this IRuleBuilder<T, Guid> ruleBuilder, IAppDbContext dbContext, string message)
     {
         return ruleBuilder.MustAsync((id, cancellationToken) =>
-            unitOfWork.Units.AnyByIdAsync(new UnitId(id), cancellationToken))
+            dbContext.Units.AnyAsync(unit => unit.Id == new UnitId(id), cancellationToken))
             .WithMessage(message);
     }
 
     public static IRuleBuilderOptions<T, Guid?> MustReferenceExistingUnit<T>(
         this IRuleBuilder<T, Guid?> ruleBuilder,
-        IUnitOfWork unitOfWork,
+        IAppDbContext dbContext,
         string message)
     {
         return ruleBuilder.MustAsync(async (id, cancellationToken) =>
-            id is null || await unitOfWork.Units.AnyByIdAsync(new UnitId(id.Value), cancellationToken))
+            id is null || await dbContext.Units.AnyAsync(unit => unit.Id == new UnitId(id.Value), cancellationToken))
             .WithMessage(message);
     }
 
     public static IRuleBuilderOptions<T, IEnumerable<TItem>> MustReferenceExistingUnits<T, TItem>(
         this IRuleBuilder<T, IEnumerable<TItem>> ruleBuilder,
-        IUnitOfWork unitOfWork,
+        IAppDbContext dbContext,
         Func<TItem, Guid> idSelector,
         string message)
     {
@@ -40,54 +37,64 @@ internal static class UnitValidationExtensions
                 return false;
             }
 
-            IEnumerable<UnitId> ids = items.Select(idSelector)
-                                           .Select(id => new UnitId(id))
-                                           .Distinct();
+            List<UnitId> ids = items.Select(idSelector)
+                                    .Select(id => new UnitId(id))
+                                    .Distinct()
+                                    .ToList();
 
-            return await unitOfWork.Units.AreIdsValidAsync(ids, cancellationToken);
+            return ids.Count == 0 || await dbContext.Units.CountAsync(unit => ids.Contains(unit.Id), cancellationToken) == ids.Count;
         }).WithMessage(message);
     }
 
     public static IRuleBuilderOptions<T, string> MustHaveUniqueUnitName<T>(
         this IRuleBuilder<T, string> ruleBuilder,
-        IUnitOfWork unitOfWork,
+        IAppDbContext dbContext,
         string message)
     {
         return ruleBuilder.MustAsync(async (name, cancellationToken) =>
-            !await unitOfWork.Units.AnyByNameAsync(name, cancellationToken: cancellationToken))
+            !await dbContext.Units.AnyAsync(unit => unit.Name == name, cancellationToken))
             .WithMessage(message);
     }
 
     public static IRuleBuilderOptions<T, string> MustHaveUniqueUnitName<T>(
         this IRuleBuilder<T, string> ruleBuilder,
-        IUnitOfWork unitOfWork,
+        IAppDbContext dbContext,
         Func<UnitId> excludedIdSelector,
         string message)
     {
         return ruleBuilder.MustAsync(async (name, cancellationToken) =>
-            !await unitOfWork.Units.AnyByNameAsync(name, excludedIdSelector(), cancellationToken))
-            .WithMessage(message);
+        {
+            UnitId excludedId = excludedIdSelector();
+            return !await dbContext.Units.AnyAsync(unit => unit.Name == name && unit.Id != excludedId, cancellationToken);
+        }).WithMessage(message);
     }
 
-    public static IRuleBuilderOptions<T, string> MustHaveUniqueUnitShortName<T>(
-        this IRuleBuilder<T, string> ruleBuilder,
-        IUnitOfWork unitOfWork,
+    public static IRuleBuilderOptions<T, string?> MustHaveUniqueUnitShortName<T>(
+        this IRuleBuilder<T, string?> ruleBuilder,
+        IAppDbContext dbContext,
         string message)
     {
         return ruleBuilder.MustAsync(async (shortName, cancellationToken) =>
-            !await unitOfWork.Units.AnyByShortNameAsync(shortName, cancellationToken: cancellationToken))
+            shortName is null || !await dbContext.Units.AnyAsync(unit => unit.ShortName == shortName, cancellationToken))
             .WithMessage(message);
     }
 
-    public static IRuleBuilderOptions<T, string> MustHaveUniqueUnitShortName<T>(
-        this IRuleBuilder<T, string> ruleBuilder,
-        IUnitOfWork unitOfWork,
+    public static IRuleBuilderOptions<T, string?> MustHaveUniqueUnitShortName<T>(
+        this IRuleBuilder<T, string?> ruleBuilder,
+        IAppDbContext dbContext,
         Func<UnitId> excludedIdSelector,
         string message)
     {
         return ruleBuilder.MustAsync(async (shortName, cancellationToken) =>
-            !await unitOfWork.Units.AnyByShortNameAsync(shortName, excludedIdSelector(), cancellationToken))
-            .WithMessage(message);
+        {
+            if (shortName is null)
+            {
+                return true;
+            }
+
+            UnitId excludedId = excludedIdSelector();
+            return !await dbContext.Units.AnyAsync(unit => unit.ShortName == shortName && unit.Id != excludedId, cancellationToken);
+        }).WithMessage(message);
     }
 
     public static IRuleBuilderOptions<T, string> ValidateUnitName<T>(
@@ -118,8 +125,7 @@ internal static class UnitValidationExtensions
                           .WithMessage("Plural name must be at most 100 characters.");
     }
 
-    public static IRuleBuilderOptions<T, string?> ValidateUnitPluralShortName<T>(
-        this IRuleBuilder<T, string?> ruleBuilder)
+    public static IRuleBuilderOptions<T, string?> ValidateUnitPluralShortName<T>(this IRuleBuilder<T, string?> ruleBuilder)
     {
         return ruleBuilder.MaximumLength(30)
                           .WithMessage("Plural short name must be at most 20 characters.");
