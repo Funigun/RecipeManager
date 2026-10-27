@@ -2,6 +2,11 @@
   <Folder Name="/.github/">
     <File Path=".github/copilot-instructions.md" />
   </Folder>
+  <Folder Name="/.github/agents/" />
+  <Folder Name="/.github/instructions/">
+    <File Path=".github/instructions/blazor.instructions.md" />
+  </Folder>
+  <Folder Name="/.github/skills/" />
   <Folder Name="/.github/wiki/" />
   <Folder Name="/.github/wiki/domain/">
     <File Path=".github/wiki/domain/0001-unit.md" />

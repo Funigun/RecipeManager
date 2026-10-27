@@ -1,0 +1,655 @@
+﻿<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <meta content="web_standard" name="shell-type" />
+    <script>
+        (() => {
+            let storedTheme = null;
+            try {
+                storedTheme = localStorage.getItem('mise-theme');
+            } catch {
+                // Theme still follows the system preference when storage is unavailable.
+            }
+
+            const prefersDark = window.matchMedia?.('(prefers-color-scheme: dark)').matches ?? false;
+            if (storedTheme === 'dark' || (storedTheme !== 'light' && prefersDark)) {
+                document.documentElement.classList.add('dark');
+            }
+        })();
+    </script>
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&amp;family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet" />
+    <style>
+        :root {
+            color-scheme: light;
+        }
+
+        :root.dark {
+            color-scheme: dark;
+        }
+
+        @layer base {
+            html, body {
+                margin: 0;
+                padding: 0;
+            }
+
+            body {
+                min-height: 100vh;
+            }
+        }
+    </style>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "inverse-primary": "#95d4b3",
+                        "on-secondary-fixed": "#3c0700",
+                        "surface-container-low": "#f4f7f5",
+                        "primary-container": "#1b4332",
+                        "surface-container": "#eef2ef",
+                        "on-primary-fixed-variant": "#1b4332",
+                        "surface-variant": "#e2e8e3",
+                        "on-error-container": "#93000a",
+                        "error": "#ba1a1a",
+                        "on-primary": "#ffffff",
+                        "inverse-surface": "#26312c",
+                        "secondary-fixed-dim": "#f4a261",
+                        "secondary": "#e76f51",
+                        "on-primary-container": "#d8f3e4",
+                        "secondary-fixed": "#ffdad2",
+                        "inverse-on-surface": "#f4f7f5",
+                        "on-surface": "#1a202c",
+                        "on-secondary-container": "#3c0700",
+                        "on-primary-fixed": "#002114",
+                        "on-secondary": "#1a202c",
+                        "on-tertiary": "#1a202c",
+                        "on-background": "#1a202c",
+                        "surface-container-high": "#e8eeea",
+                        "surface-dim": "#e9ede9",
+                        "background": "#faf9f6",
+                        "on-surface-variant": "#64748b",
+                        "surface-bright": "#ffffff",
+                        "on-tertiary-fixed": "#2f1400",
+                        "tertiary-fixed": "#ffdcc4",
+                        "surface-tint": "#2d6a4f",
+                        "surface-container-highest": "#e2e8e3",
+                        "on-tertiary-container": "#2f1400",
+                        "primary-fixed-dim": "#95d4b3",
+                        "outline-variant": "#e2e8f0",
+                        "on-tertiary-fixed-variant": "#6f3800",
+                        "tertiary-container": "#f4a261",
+                        "secondary-container": "#e76f51",
+                        "error-container": "#ffdad6",
+                        "on-secondary-fixed-variant": "#83260e",
+                        "primary-fixed": "#b1f0ce",
+                        "tertiary": "#f4a261",
+                        "surface": "#faf9f6",
+                        "surface-container-lowest": "#ffffff",
+                        "outline": "#64748b",
+                        "tertiary-fixed-dim": "#e9c46a",
+                        "primary": "#2d6a4f",
+                        "on-error": "#ffffff",
+                        "dark-bg": "#0f1715",
+                        "dark-card": "#162420",
+                        "dark-surface": "#162420",
+                        "dark-elevated": "#1e332d",
+                        "dark-border": "#1e332d",
+                        "dark-border-subtle": "#1a2c26",
+                        "dark-text": "#f3f5f4",
+                        "dark-muted": "#c2c8c4",
+                        "dark-subtle": "#a1ada6",
+                        "dark-primary": "#2d6a4f",
+                        "dark-primary-hover": "#1b4332",
+                        "dark-accent": "#52b788",
+                        "dark-spice": "#e76f51"
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    spacing: {
+                        "gutter-sm": "1rem",
+                        "margin": "1.5rem",
+                        "gutter-lg": "2rem",
+                        "space-sm": "0.5rem",
+                        "space-xs": "0.25rem",
+                        "margin-desktop": "3rem",
+                        "margin-mobile": "1rem",
+                        "space-lg": "1.5rem",
+                        "space-md": "1rem",
+                        "gutter": "1.5rem",
+                        "space-xl": "2.5rem"
+                    },
+                    fontFamily: {
+                        "body-lg": ["Plus Jakarta Sans"],
+                        "label-md": ["Plus Jakarta Sans"],
+                        "title-md": ["Outfit"],
+                        "body-sm": ["Plus Jakarta Sans"],
+                        "label-sm": ["Plus Jakarta Sans"],
+                        "timer-display": ["Outfit"],
+                        "headline-lg": ["Outfit"],
+                        "body-md": ["Plus Jakarta Sans"],
+                        "label-lg": ["Plus Jakarta Sans"],
+                        "display-lg": ["Outfit"],
+                        "headline-md": ["Outfit"],
+                        "headline-xl": ["Outfit"],
+                        "headline-xl-mobile": ["Outfit"],
+                        "display-lg-mobile": ["Outfit"],
+                        "headline-sm": ["Outfit"]
+                    },
+                    fontSize: {
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "label-md": ["13px", { "lineHeight": "18px", "letterSpacing": "0.02em", "fontWeight": "600" }],
+                        "title-md": ["18px", { "lineHeight": "24px", "fontWeight": "500" }],
+                        "body-sm": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "label-sm": ["11px", { "lineHeight": "16px", "letterSpacing": "0.04em", "fontWeight": "700" }],
+                        "timer-display": ["48px", { "lineHeight": "52px", "letterSpacing": "0.02em", "fontWeight": "700" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "label-lg": ["15px", { "lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600" }],
+                        "display-lg": ["56px", { "lineHeight": "64px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.005em", "fontWeight": "600" }],
+                        "headline-xl": ["40px", { "lineHeight": "48px", "letterSpacing": "-0.015em", "fontWeight": "600" }],
+                        "headline-xl-mobile": ["28px", { "lineHeight": "36px", "letterSpacing": "-0.015em", "fontWeight": "600" }],
+                        "display-lg-mobile": ["36px", { "lineHeight": "44px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "headline-sm": ["20px", { "lineHeight": "28px", "fontWeight": "600" }]
+                    }
+                }
+            }
+        };
+    </script>
+</head>
+<body class="bg-background dark:bg-dark-bg font-body-md text-body-md text-on-surface dark:text-dark-text min-h-screen overflow-y-auto antialiased transition-colors duration-200">
+    <!-- Sticky Header -->
+    <header class="fixed top-0 w-full z-50 bg-background/95 dark:bg-dark-bg/95 backdrop-blur-md border-b border-outline-variant dark:border-dark-border transition-colors duration-200">
+        <div class="h-16 max-w-[1320px] mx-auto px-margin-mobile md:px-margin lg:px-margin-desktop flex items-center justify-between">
+            <div class="flex items-center gap-space-lg">
+                <a class="flex items-center gap-space-xs text-on-surface dark:text-dark-text" data-path="home" href="#">
+                    <span class="font-title-md text-title-md tracking-tight font-semibold text-on-surface dark:text-dark-text">Mise</span>
+                    <span class="material-symbols-outlined text-primary dark:text-dark-accent text-[18px]">eco</span>
+                </a>
+                <nav class="hidden md:flex items-center gap-space-lg" data-active-classes="text-on-surface dark:text-dark-text font-semibold">
+                    <a class="text-on-surface-variant dark:text-dark-muted font-label-md text-label-md hover:text-on-surface dark:hover:text-dark-text transition-colors" data-path="features" href="#">Features</a>
+                    <a class="text-on-surface-variant dark:text-dark-muted font-label-md text-label-md hover:text-on-surface dark:hover:text-dark-text transition-colors" data-path="cookbooks" href="#">Cookbooks</a>
+                    <a class="text-on-surface-variant dark:text-dark-muted font-label-md text-label-md hover:text-on-surface dark:hover:text-dark-text transition-colors" data-path="meal-planning" href="#">Meal Planning</a>
+                </nav>
+            </div>
+            <div class="flex items-center gap-space-md">
+                <!-- Functional Dark Mode Toggle Button -->
+                <button aria-label="Toggle dark mode" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-outline-variant dark:border-dark-border bg-surface-container-lowest dark:bg-dark-card text-on-surface dark:text-dark-text hover:bg-surface-container-low dark:hover:bg-dark-surface transition-colors font-label-md text-label-md shadow-sm" id="theme-toggle" type="button">
+                    <span class="material-symbols-outlined text-[17px] text-on-surface dark:text-dark-accent" id="theme-toggle-icon">dark_mode</span>
+                    <span class="hidden sm:inline" id="theme-toggle-text">Dark</span>
+                </button>
+                <a class="font-label-md text-label-md text-on-surface-variant dark:text-dark-muted hover:text-on-surface dark:hover:text-dark-text transition-colors" data-path="sign-in" href="#">Sign in</a>
+                <a class="bg-primary hover:bg-primary-container dark:bg-dark-primary dark:hover:bg-dark-primary-hover text-on-primary font-label-md text-label-md px-4 py-2 rounded-lg transition-colors shadow-sm" data-path="sign-up" href="#">Create your account</a>
+                <div class="w-8 h-8 rounded-full bg-primary dark:bg-dark-primary flex items-center justify-center">
+                    <span class="material-symbols-outlined text-on-primary text-[18px]">person</span>
+                </div>
+            </div>
+        </div>
+    </header>
+    <!-- Main Scrollable Content -->
+    <main class="w-full pt-16 bg-background dark:bg-dark-bg min-h-screen transition-colors duration-200">
+        <div class="flex flex-col w-full">
+            <!-- Hero Section -->
+            <section class="max-w-[1320px] mx-auto w-full px-margin-mobile md:px-margin lg:px-margin-desktop pt-12 md:pt-20 pb-12">
+                <div class="max-w-3xl flex flex-col gap-6">
+                    <h1 class="font-headline-xl md:font-display-lg text-headline-xl md:text-display-lg text-on-surface dark:text-dark-text tracking-tight leading-[1.1]">
+                        A quiet, organized place for your recipes.
+                    </h1>
+                    <p class="font-body-lg text-body-lg text-on-surface-variant dark:text-dark-muted leading-relaxed max-w-2xl">
+                        Mise helps you collect your personal recipes, group them into customized cookbooks, plan weekly meals, and share them directly with friends and family.
+                    </p>
+                    <div class="flex flex-wrap items-center gap-3 pt-2">
+                        <a class="inline-flex items-center justify-center bg-primary hover:bg-primary-container dark:bg-dark-primary dark:hover:bg-dark-primary-hover text-on-primary font-label-lg text-label-lg px-5 py-2.5 rounded-lg transition-colors shadow-sm" data-path="sign-up" href="#">
+                            Create your account
+                        </a>
+                        <a class="inline-flex items-center justify-center bg-surface-container-lowest dark:bg-dark-card border border-outline-variant dark:border-dark-border text-on-surface dark:text-dark-text font-label-lg text-label-lg px-5 py-2.5 rounded-lg hover:bg-surface-container-low dark:hover:bg-dark-surface transition-colors shadow-sm" href="#recipe-preview">
+                            See how it works
+                        </a>
+                    </div>
+                </div>
+            </section>
+            <!-- Clean Recipe Interface Preview Section -->
+            <section class="max-w-[1320px] mx-auto w-full px-margin-mobile md:px-margin lg:px-margin-desktop py-8 md:py-12" id="recipe-preview">
+                <!-- Sleek Modern Product Card Container -->
+                <div class="bg-surface-container-lowest dark:bg-dark-card border border-outline-variant dark:border-dark-border rounded-xl shadow-lg dark:shadow-lg overflow-hidden flex flex-col transition-colors duration-200">
+                    <div class="grid grid-cols-1 lg:grid-cols-12 min-h-[640px]">
+                        <!-- Sidebar Navigation -->
+                        <aside class="lg:col-span-3 bg-surface-container-lowest dark:bg-dark-surface border-b lg:border-b-0 lg:border-r border-outline-variant dark:border-dark-border p-5 flex flex-col justify-between transition-colors duration-200">
+                            <div class="flex flex-col gap-6">
+                                <!-- App Search inside UI -->
+                                <div class="flex items-center gap-2.5 px-3 py-2 rounded-lg bg-surface-container-low dark:bg-dark-card border border-outline-variant/50 dark:border-dark-border text-on-surface-variant dark:text-dark-subtle">
+                                    <span class="material-symbols-outlined text-[18px] text-outline dark:text-dark-subtle">search</span>
+                                    <span class="font-body-sm text-body-sm text-outline dark:text-dark-subtle">Filter 42 recipes...</span>
+                                </div>
+                                <!-- Library section -->
+                                <div class="flex flex-col gap-1">
+                                    <span class="px-2 font-label-sm text-label-sm text-outline dark:text-dark-subtle uppercase tracking-wider mb-1">Library</span>
+                                    <a class="flex items-center justify-between px-2.5 py-1.5 rounded-lg text-on-surface-variant dark:text-dark-muted hover:bg-surface-container-low dark:hover:bg-dark-card font-body-sm text-body-sm transition-colors" href="#">
+                                        <span class="flex items-center gap-2">
+                                            <span class="material-symbols-outlined text-[17px] text-outline dark:text-dark-subtle">menu_book</span>
+                                            <span>All Recipes</span>
+                                        </span>
+                                        <span class="text-outline dark:text-dark-subtle font-label-sm text-label-sm">42</span>
+                                    </a>
+                                    <a class="flex items-center justify-between px-2.5 py-1.5 rounded-lg text-on-surface-variant dark:text-dark-muted hover:bg-surface-container-low dark:hover:bg-dark-card font-body-sm text-body-sm transition-colors" href="#">
+                                        <span class="flex items-center gap-2">
+                                            <span class="material-symbols-outlined text-[17px] text-outline dark:text-dark-subtle">calendar_today</span>
+                                            <span>Meal Plan</span>
+                                        </span>
+                                        <span class="w-1.5 h-1.5 rounded-full bg-secondary dark:bg-secondary-container"></span>
+                                    </a>
+                                    <a class="flex items-center justify-between px-2.5 py-1.5 rounded-lg text-on-surface-variant dark:text-dark-muted hover:bg-surface-container-low dark:hover:bg-dark-card font-body-sm text-body-sm transition-colors" href="#">
+                                        <span class="flex items-center gap-2">
+                                            <span class="material-symbols-outlined text-[17px] text-outline dark:text-dark-subtle">shopping_bag</span>
+                                            <span>Shopping List</span>
+                                        </span>
+                                        <span class="text-outline dark:text-dark-subtle font-label-sm text-label-sm">11</span>
+                                    </a>
+                                </div>
+                                <!-- Cookbooks Section -->
+                                <div class="flex flex-col gap-1">
+                                    <div class="flex items-center justify-between px-2 mb-1">
+                                        <span class="font-label-sm text-label-sm text-outline dark:text-dark-subtle uppercase tracking-wider">Cookbooks</span>
+                                        <button aria-label="Add collection" class="text-outline dark:text-dark-subtle hover:text-on-surface dark:hover:text-dark-text text-[14px]" type="button">+</button>
+                                    </div>
+                                    <a class="flex items-center justify-between px-2.5 py-1.5 rounded-lg bg-surface-container-low dark:bg-dark-card text-primary dark:text-dark-accent font-label-md text-label-md" href="#">
+                                        <span class="flex items-center gap-2">
+                                            <span class="w-2 h-2 rounded-full bg-primary dark:bg-dark-accent"></span>
+                                            <span>Weeknight Dinners</span>
+                                        </span>
+                                        <span class="font-label-sm text-label-sm text-primary dark:text-dark-accent">14</span>
+                                    </a>
+                                    <a class="flex items-center justify-between px-2.5 py-1.5 rounded-lg text-on-surface-variant dark:text-dark-muted hover:bg-surface-container-low dark:hover:bg-dark-card font-body-sm text-body-sm transition-colors" href="#">
+                                        <span class="flex items-center gap-2">
+                                            <span class="w-2 h-2 rounded-full bg-outline-variant dark:border dark:border-dark-border"></span>
+                                            <span>Weekend Baking</span>
+                                        </span>
+                                        <span class="text-outline dark:text-dark-subtle font-label-sm text-label-sm">8</span>
+                                    </a>
+                                    <a class="flex items-center justify-between px-2.5 py-1.5 rounded-lg text-on-surface-variant dark:text-dark-muted hover:bg-surface-container-low dark:hover:bg-dark-card font-body-sm text-body-sm transition-colors" href="#">
+                                        <span class="flex items-center gap-2">
+                                            <span class="w-2 h-2 rounded-full bg-outline-variant dark:border dark:border-dark-border"></span>
+                                            <span>Autumn Soups</span>
+                                        </span>
+                                        <span class="text-outline dark:text-dark-subtle font-label-sm text-label-sm">6</span>
+                                    </a>
+                                    <a class="flex items-center justify-between px-2.5 py-1.5 rounded-lg text-on-surface-variant dark:text-dark-muted hover:bg-surface-container-low dark:hover:bg-dark-card font-body-sm text-body-sm transition-colors" href="#">
+                                        <span class="flex items-center gap-2">
+                                            <span class="w-2 h-2 rounded-full bg-outline-variant dark:border dark:border-dark-border"></span>
+                                            <span>Ferments &amp; Pantry</span>
+                                        </span>
+                                        <span class="text-outline dark:text-dark-subtle font-label-sm text-label-sm">14</span>
+                                    </a>
+                                </div>
+                                <!-- Tags section -->
+                                <div class="flex flex-col gap-2">
+                                    <span class="px-2 font-label-sm text-label-sm text-outline dark:text-dark-subtle uppercase tracking-wider">Tags</span>
+                                    <div class="flex flex-wrap gap-1.5 px-2">
+                                        <span class="px-2 py-0.5 rounded bg-surface-container-low dark:bg-dark-card text-on-surface-variant dark:text-dark-muted border border-transparent dark:border-dark-border font-label-sm text-label-sm">Vegetarian</span>
+                                        <span class="px-2 py-0.5 rounded bg-surface-container-low dark:bg-dark-card text-on-surface-variant dark:text-dark-muted border border-transparent dark:border-dark-border font-label-sm text-label-sm">&lt; 30 mins</span>
+                                        <span class="px-2 py-0.5 rounded bg-surface-container-low dark:bg-dark-card text-on-surface-variant dark:text-dark-muted border border-transparent dark:border-dark-border font-label-sm text-label-sm">Pasta</span>
+                                        <span class="px-2 py-0.5 rounded bg-surface-container-low dark:bg-dark-card text-on-surface-variant dark:text-dark-muted border border-transparent dark:border-dark-border font-label-sm text-label-sm">Make-ahead</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="pt-6">
+                                <button class="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-surface-container-low dark:bg-dark-card border border-outline-variant/60 dark:border-dark-border text-on-surface dark:text-dark-text font-label-md text-label-md hover:bg-surface-container dark:hover:bg-dark-elevated transition-colors" type="button">
+                                    <span class="material-symbols-outlined text-[18px]">add</span>
+                                    <span>New recipe</span>
+                                </button>
+                            </div>
+                        </aside>
+                        <!-- Main Recipe Detail Canvas -->
+                        <div class="lg:col-span-9 bg-surface-container-lowest dark:bg-dark-card p-6 md:p-10 flex flex-col gap-8 transition-colors duration-200">
+                            <!-- Header metadata -->
+                            <div class="flex flex-col gap-4">
+                                <div class="flex flex-wrap items-center justify-between gap-4">
+                                    <div class="flex items-center gap-2">
+                                        <span class="px-2.5 py-1 rounded bg-surface-container-low dark:bg-dark-surface text-primary dark:text-dark-accent font-label-sm text-label-sm font-semibold border border-transparent dark:border-dark-border">Weeknight Dinners</span>
+                                        <span class="text-outline dark:text-dark-subtle font-body-sm text-body-sm">·</span>
+                                        <span class="text-on-surface-variant dark:text-dark-muted font-body-sm text-body-sm">Last cooked Sunday</span>
+                                    </div>
+                                    <div class="flex items-center gap-2">
+                                        <button class="px-3 py-1.5 rounded-lg bg-surface-container-low dark:bg-dark-surface text-on-surface dark:text-dark-text border border-outline-variant/50 dark:border-dark-border font-label-md text-label-md hover:bg-surface-container dark:hover:bg-dark-elevated transition-colors flex items-center gap-1.5" type="button">
+                                            <span class="material-symbols-outlined text-[16px]">edit</span>
+                                            <span>Edit</span>
+                                        </button>
+                                        <button class="px-3 py-1.5 rounded-lg bg-primary hover:bg-primary-container dark:bg-dark-primary dark:hover:bg-dark-primary-hover text-on-primary font-label-md text-label-md transition-colors flex items-center gap-1.5 shadow-sm" type="button">
+                                            <span class="material-symbols-outlined text-[16px]">skillet</span>
+                                            <span>Cook Mode</span>
+                                        </button>
+                                    </div>
+                                </div>
+                                <h2 class="font-headline-lg text-headline-lg md:font-headline-xl md:text-headline-xl text-on-surface dark:text-dark-text tracking-tight">
+                                    Lemon &amp; Ricotta Rigatoni with Crispy Capers
+                                </h2>
+                                <!-- Quick Specs Row -->
+                                <div class="flex flex-wrap items-center gap-6 py-3 bg-surface-container-low dark:bg-dark-surface px-4 rounded-lg border border-outline-variant/40 dark:border-dark-border">
+                                    <div class="flex items-center gap-2">
+                                        <span class="material-symbols-outlined text-[18px] text-outline dark:text-dark-subtle">schedule</span>
+                                        <span class="text-on-surface-variant dark:text-dark-muted font-body-sm text-body-sm">Prep: <strong class="text-on-surface dark:text-dark-text font-medium">15m</strong></span>
+                                    </div>
+                                    <div class="text-outline dark:text-dark-subtle font-body-sm text-body-sm">·</div>
+                                    <div class="flex items-center gap-2">
+                                        <span class="material-symbols-outlined text-[18px] text-outline dark:text-dark-subtle">local_fire_department</span>
+                                        <span class="text-on-surface-variant dark:text-dark-muted font-body-sm text-body-sm">Cook: <strong class="text-on-surface dark:text-dark-text font-medium">18m</strong></span>
+                                    </div>
+                                    <div class="text-outline dark:text-dark-subtle font-body-sm text-body-sm">·</div>
+                                    <div class="flex items-center gap-2">
+                                        <span class="material-symbols-outlined text-[18px] text-outline dark:text-dark-subtle">group</span>
+                                        <span class="text-on-surface-variant dark:text-dark-muted font-body-sm text-body-sm">Servings:</span>
+                                        <div class="inline-flex items-center rounded bg-surface-container-lowest dark:bg-dark-card border border-outline-variant/60 dark:border-dark-border px-1 shadow-sm">
+                                            <button aria-label="Decrease servings" class="w-6 h-6 flex items-center justify-center text-outline dark:text-dark-muted hover:text-on-surface dark:hover:text-dark-text font-medium text-[14px]" id="serve-minus" type="button">-</button>
+                                            <span class="w-6 text-center font-label-md text-label-md text-on-surface dark:text-dark-text" id="serve-count">4</span>
+                                            <button aria-label="Increase servings" class="w-6 h-6 flex items-center justify-center text-outline dark:text-dark-muted hover:text-on-surface dark:hover:text-dark-text font-medium text-[14px]" id="serve-plus" type="button">+</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- 2-Column Recipe Content -->
+                            <div class="grid grid-cols-1 md:grid-cols-12 gap-8 items-start">
+                                <!-- Left Column: Ingredients Checklist -->
+                                <div class="md:col-span-5 flex flex-col gap-4">
+                                    <div class="flex items-center justify-between pb-2 border-b border-outline-variant/40 dark:border-dark-border">
+                                        <h3 class="font-headline-sm text-headline-sm text-on-surface dark:text-dark-text">Ingredients</h3>
+                                        <span class="font-label-sm text-label-sm text-outline dark:text-dark-subtle">8 items</span>
+                                    </div>
+                                    <div class="flex flex-col gap-2.5" id="ingredients-list">
+                                        <label class="flex items-start gap-3 p-2 rounded-lg hover:bg-surface-container-low dark:hover:bg-dark-surface cursor-pointer transition-colors group">
+                                            <input class="mt-0.5 rounded accent-primary dark:accent-dark-accent cursor-pointer w-4 h-4 bg-transparent border-outline dark:border-dark-border" type="checkbox" />
+                                            <span class="font-body-md text-body-md text-on-surface dark:text-dark-text group-has-[:checked]:line-through group-has-[:checked]:text-outline dark:group-has-[:checked]:text-dark-subtle">
+                                                <strong class="font-semibold text-on-surface dark:text-dark-text group-has-[:checked]:text-outline dark:group-has-[:checked]:text-dark-subtle">450g</strong> rigatoni pasta
+                                            </span>
+                                        </label>
+                                        <label class="flex items-start gap-3 p-2 rounded-lg hover:bg-surface-container-low dark:hover:bg-dark-surface cursor-pointer transition-colors group">
+                                            <input class="mt-0.5 rounded accent-primary dark:accent-dark-accent cursor-pointer w-4 h-4 bg-transparent border-outline dark:border-dark-border" type="checkbox" />
+                                            <span class="font-body-md text-body-md text-on-surface dark:text-dark-text group-has-[:checked]:line-through group-has-[:checked]:text-outline dark:group-has-[:checked]:text-dark-subtle">
+                                                <strong class="font-semibold text-on-surface dark:text-dark-text group-has-[:checked]:text-outline dark:group-has-[:checked]:text-dark-subtle">250g</strong> whole milk ricotta
+                                            </span>
+                                        </label>
+                                        <label class="flex items-start gap-3 p-2 rounded-lg hover:bg-surface-container-low dark:hover:bg-dark-surface cursor-pointer transition-colors group">
+                                            <input class="mt-0.5 rounded accent-primary dark:accent-dark-accent cursor-pointer w-4 h-4 bg-transparent border-outline dark:border-dark-border" type="checkbox" />
+                                            <span class="font-body-md text-body-md text-on-surface dark:text-dark-text group-has-[:checked]:line-through group-has-[:checked]:text-outline dark:group-has-[:checked]:text-dark-subtle">
+                                                <strong class="font-semibold text-on-surface dark:text-dark-text group-has-[:checked]:text-outline dark:group-has-[:checked]:text-dark-subtle">2</strong> Meyer lemons (zest and juice)
+                                            </span>
+                                        </label>
+                                        <label class="flex items-start gap-3 p-2 rounded-lg hover:bg-surface-container-low dark:hover:bg-dark-surface cursor-pointer transition-colors group">
+                                            <input class="mt-0.5 rounded accent-primary dark:accent-dark-accent cursor-pointer w-4 h-4 bg-transparent border-outline dark:border-dark-border" type="checkbox" />
+                                            <span class="font-body-md text-body-md text-on-surface dark:text-dark-text group-has-[:checked]:line-through group-has-[:checked]:text-outline dark:group-has-[:checked]:text-dark-subtle">
+                                                <strong class="font-semibold text-on-surface dark:text-dark-text group-has-[:checked]:text-outline dark:group-has-[:checked]:text-dark-subtle">3 cloves</strong> garlic, thinly sliced
+                                            </span>
+                                        </label>
+                                        <label class="flex items-start gap-3 p-2 rounded-lg hover:bg-surface-container-low dark:hover:bg-dark-surface cursor-pointer transition-colors group">
+                                            <input class="mt-0.5 rounded accent-primary dark:accent-dark-accent cursor-pointer w-4 h-4 bg-transparent border-outline dark:border-dark-border" type="checkbox" />
+                                            <span class="font-body-md text-body-md text-on-surface dark:text-dark-text group-has-[:checked]:line-through group-has-[:checked]:text-outline dark:group-has-[:checked]:text-dark-subtle">
+                                                <strong class="font-semibold text-on-surface dark:text-dark-text group-has-[:checked]:text-outline dark:group-has-[:checked]:text-dark-subtle">3 tbsp</strong> capers, rinsed and patted dry
+                                            </span>
+                                        </label>
+                                        <label class="flex items-start gap-3 p-2 rounded-lg hover:bg-surface-container-low dark:hover:bg-dark-surface cursor-pointer transition-colors group">
+                                            <input class="mt-0.5 rounded accent-primary dark:accent-dark-accent cursor-pointer w-4 h-4 bg-transparent border-outline dark:border-dark-border" type="checkbox" />
+                                            <span class="font-body-md text-body-md text-on-surface dark:text-dark-text group-has-[:checked]:line-through group-has-[:checked]:text-outline dark:group-has-[:checked]:text-dark-subtle">
+                                                <strong class="font-semibold text-on-surface dark:text-dark-text group-has-[:checked]:text-outline dark:group-has-[:checked]:text-dark-subtle">1 bunch</strong> fresh sweet basil, torn
+                                            </span>
+                                        </label>
+                                        <label class="flex items-start gap-3 p-2 rounded-lg hover:bg-surface-container-low dark:hover:bg-dark-surface cursor-pointer transition-colors group">
+                                            <input class="mt-0.5 rounded accent-primary dark:accent-dark-accent cursor-pointer w-4 h-4 bg-transparent border-outline dark:border-dark-border" type="checkbox" />
+                                            <span class="font-body-md text-body-md text-on-surface dark:text-dark-text group-has-[:checked]:line-through group-has-[:checked]:text-outline dark:group-has-[:checked]:text-dark-subtle">
+                                                <strong class="font-semibold text-on-surface dark:text-dark-text group-has-[:checked]:text-outline dark:group-has-[:checked]:text-dark-subtle">40g</strong> Parmigiano-Reggiano, grated
+                                            </span>
+                                        </label>
+                                        <label class="flex items-start gap-3 p-2 rounded-lg hover:bg-surface-container-low dark:hover:bg-dark-surface cursor-pointer transition-colors group">
+                                            <input class="mt-0.5 rounded accent-primary dark:accent-dark-accent cursor-pointer w-4 h-4 bg-transparent border-outline dark:border-dark-border" type="checkbox" />
+                                            <span class="font-body-md text-body-md text-on-surface dark:text-dark-text group-has-[:checked]:line-through group-has-[:checked]:text-outline dark:group-has-[:checked]:text-dark-subtle">
+                                                Flaky sea salt &amp; cracked black pepper
+                                            </span>
+                                        </label>
+                                    </div>
+                                    <!-- Restrained Note Card -->
+                                    <div class="mt-3 p-3.5 rounded-lg bg-surface-container-low dark:bg-dark-surface border border-outline-variant/40 dark:border-dark-border text-on-surface-variant dark:text-dark-muted flex items-start gap-2.5">
+                                        <span class="material-symbols-outlined text-[18px] text-tertiary dark:text-amber-400 mt-0.5">tips_and_updates</span>
+                                        <p class="font-body-sm text-body-sm leading-relaxed">
+                                            <strong class="text-on-surface dark:text-dark-text font-medium">Tip:</strong> Reserve at least 1/2 cup of salty starchy pasta water right before draining. It binds the lemon ricotta into a glossy emulsion.
+                                        </p>
+                                    </div>
+                                </div>
+                                <!-- Right Column: Step-by-Step Instructions -->
+                                <div class="md:col-span-7 flex flex-col gap-4">
+                                    <div class="flex items-center justify-between pb-2 border-b border-outline-variant/40 dark:border-dark-border">
+                                        <h3 class="font-headline-sm text-headline-sm text-on-surface dark:text-dark-text">Instructions</h3>
+                                        <span class="font-label-sm text-label-sm text-outline dark:text-dark-subtle">4 steps</span>
+                                    </div>
+                                    <div class="flex flex-col gap-6">
+                                        <!-- Step 1 -->
+                                        <div class="flex gap-4">
+                                            <div class="w-7 h-7 rounded-full bg-surface-container-low dark:bg-dark-surface text-on-surface dark:text-dark-text border border-outline-variant/60 dark:border-dark-border font-title-md text-title-md flex items-center justify-center shrink-0">
+                                                1
+                                            </div>
+                                            <div class="flex flex-col gap-1.5 pt-0.5">
+                                                <h4 class="font-title-md text-title-md text-on-surface dark:text-dark-text font-medium">Boil the rigatoni</h4>
+                                                <p class="font-body-md text-body-md text-on-surface-variant dark:text-dark-muted leading-relaxed">
+                                                    Bring a large pot of heavily salted water to a rolling boil. Drop the rigatoni and cook until just shy of al dente, about 11 minutes.
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <!-- Step 2 -->
+                                        <div class="flex gap-4">
+                                            <div class="w-7 h-7 rounded-full bg-surface-container-low dark:bg-dark-surface text-on-surface dark:text-dark-text border border-outline-variant/60 dark:border-dark-border font-title-md text-title-md flex items-center justify-center shrink-0">
+                                                2
+                                            </div>
+                                            <div class="flex flex-col gap-1.5 pt-0.5">
+                                                <h4 class="font-title-md text-title-md text-on-surface dark:text-dark-text font-medium">Crisp the capers</h4>
+                                                <p class="font-body-md text-body-md text-on-surface-variant dark:text-dark-muted leading-relaxed">
+                                                    Heat 3 tablespoons of extra-virgin olive oil in a wide skillet over medium heat. Fry the dried capers until blistered and crisp, about 3 minutes. Remove with a slotted spoon and drain on parchment.
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <!-- Step 3 -->
+                                        <div class="flex gap-4">
+                                            <div class="w-7 h-7 rounded-full bg-surface-container-low dark:bg-dark-surface text-on-surface dark:text-dark-text border border-outline-variant/60 dark:border-dark-border font-title-md text-title-md flex items-center justify-center shrink-0">
+                                                3
+                                            </div>
+                                            <div class="flex flex-col gap-1.5 pt-0.5">
+                                                <h4 class="font-title-md text-title-md text-on-surface dark:text-dark-text font-medium">Fold the ricotta base</h4>
+                                                <p class="font-body-md text-body-md text-on-surface-variant dark:text-dark-muted leading-relaxed">
+                                                    In a serving bowl, whisk ricotta, lemon zest, lemon juice, grated Parmigiano, and sliced garlic with 1/4 cup hot pasta cooking water until velvety and loose.
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <!-- Step 4 -->
+                                        <div class="flex gap-4">
+                                            <div class="w-7 h-7 rounded-full bg-surface-container-low dark:bg-dark-surface text-on-surface dark:text-dark-text border border-outline-variant/60 dark:border-dark-border font-title-md text-title-md flex items-center justify-center shrink-0">
+                                                4
+                                            </div>
+                                            <div class="flex flex-col gap-1.5 pt-0.5">
+                                                <h4 class="font-title-md text-title-md text-on-surface dark:text-dark-text font-medium">Toss and finish</h4>
+                                                <p class="font-body-md text-body-md text-on-surface-variant dark:text-dark-muted leading-relaxed">
+                                                    Transfer hot drained pasta directly into the bowl. Toss vigorously to coat every tube. Scatter crispy capers, cracked black pepper, and torn fresh basil over top just before plating.
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <!-- Core Features Section -->
+            <section class="max-w-[1320px] mx-auto w-full px-margin-mobile md:px-margin lg:px-margin-desktop py-16 md:py-24">
+                <div class="flex flex-col gap-3 max-w-2xl mb-12">
+                    <h2 class="font-headline-lg md:font-headline-xl text-headline-lg md:text-headline-xl text-on-surface dark:text-dark-text tracking-tight">
+                        Built for how you actually cook.
+                    </h2>
+                    <p class="font-body-lg text-body-lg text-on-surface-variant dark:text-dark-muted">
+                        A straightforward set of tools designed to get out of your way.
+                    </p>
+                </div>
+                <!-- 4 Clean Cards Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Feature 1 -->
+                    <div class="bg-surface-container-lowest dark:bg-dark-card border border-outline-variant dark:border-dark-border p-8 rounded-xl flex flex-col gap-4 shadow-sm hover:shadow-md transition-shadow">
+                        <div class="w-10 h-10 rounded-lg bg-surface-container-low dark:bg-dark-surface border border-outline-variant/50 dark:border-dark-border flex items-center justify-center text-primary dark:text-dark-accent">
+                            <span class="material-symbols-outlined text-[22px]">format_list_bulleted</span>
+                        </div>
+                        <h3 class="font-headline-sm text-headline-sm text-on-surface dark:text-dark-text">
+                            1. Personal recipe collection
+                        </h3>
+                        <p class="font-body-md text-body-md text-on-surface-variant dark:text-dark-muted leading-relaxed">
+                            Save your own recipes with clean ingredient lists, custom prep notes, and clear steps. No ad clutter, intrusive video popups, or lengthy life stories to scroll through.
+                        </p>
+                    </div>
+                    <!-- Feature 2 -->
+                    <div class="bg-surface-container-lowest dark:bg-dark-card border border-outline-variant dark:border-dark-border p-8 rounded-xl flex flex-col gap-4 shadow-sm hover:shadow-md transition-shadow">
+                        <div class="w-10 h-10 rounded-lg bg-surface-container-low dark:bg-dark-surface border border-outline-variant/50 dark:border-dark-border flex items-center justify-center text-primary dark:text-dark-accent">
+                            <span class="material-symbols-outlined text-[22px]">auto_stories</span>
+                        </div>
+                        <h3 class="font-headline-sm text-headline-sm text-on-surface dark:text-dark-text">
+                            2. Custom cookbooks
+                        </h3>
+                        <p class="font-body-md text-body-md text-on-surface-variant dark:text-dark-muted leading-relaxed">
+                            Organize recipes into collections that make sense to you—like ‘Quick Lunches’, ‘Holiday Baking’, or ‘Comfort Food’. Move items freely between binders.
+                        </p>
+                    </div>
+                    <!-- Feature 3 -->
+                    <div class="bg-surface-container-lowest dark:bg-dark-card border border-outline-variant dark:border-dark-border p-8 rounded-xl flex flex-col gap-4 shadow-sm hover:shadow-md transition-shadow">
+                        <div class="w-10 h-10 rounded-lg bg-surface-container-low dark:bg-dark-surface border border-outline-variant/50 dark:border-dark-border flex items-center justify-center text-primary dark:text-dark-accent">
+                            <span class="material-symbols-outlined text-[22px]">calendar_month</span>
+                        </div>
+                        <h3 class="font-headline-sm text-headline-sm text-on-surface dark:text-dark-text">
+                            3. Weekly meal planning
+                        </h3>
+                        <p class="font-body-md text-body-md text-on-surface-variant dark:text-dark-muted leading-relaxed">
+                            Assign recipes to days of the week to take the guesswork out of dinner, and automatically generate a consolidated shopping list sorted by grocery aisle.
+                        </p>
+                    </div>
+                    <!-- Feature 4 -->
+                    <div class="bg-surface-container-lowest dark:bg-dark-card border border-outline-variant dark:border-dark-border p-8 rounded-xl flex flex-col gap-4 shadow-sm hover:shadow-md transition-shadow">
+                        <div class="w-10 h-10 rounded-lg bg-surface-container-low dark:bg-dark-surface border border-outline-variant/50 dark:border-dark-border flex items-center justify-center text-primary dark:text-dark-accent">
+                            <span class="material-symbols-outlined text-[22px]">link</span>
+                        </div>
+                        <h3 class="font-headline-sm text-headline-sm text-on-surface dark:text-dark-text">
+                            4. Direct sharing
+                        </h3>
+                        <p class="font-body-md text-body-md text-on-surface-variant dark:text-dark-muted leading-relaxed">
+                            Share an individual recipe or an entire cookbook with friends and family via a clean, readable private link. No account required for them to view and cook.
+                        </p>
+                    </div>
+                </div>
+            </section>
+            <!-- Restrained Closing Call to Action -->
+            <section class="max-w-[1320px] mx-auto w-full px-margin-mobile md:px-margin lg:px-margin-desktop pb-20">
+                <div class="bg-surface-container-low dark:bg-dark-card border border-outline-variant dark:border-dark-border rounded-xl p-8 md:p-14 flex flex-col md:flex-row md:items-center justify-between gap-8 transition-colors duration-200">
+                    <div class="flex flex-col gap-2 max-w-xl">
+                        <h2 class="font-headline-lg text-headline-lg text-on-surface dark:text-dark-text tracking-tight">
+                            Start organizing your kitchen.
+                        </h2>
+                        <p class="font-body-md text-body-md text-on-surface-variant dark:text-dark-muted leading-relaxed">
+                            Free to use. Keep your recipes neatly organized and easy to find whenever you cook.
+                        </p>
+                    </div>
+                    <div>
+                        <a class="inline-flex items-center justify-center bg-primary hover:bg-primary-container dark:bg-dark-primary dark:hover:bg-dark-primary-hover text-on-primary font-label-lg text-label-lg px-6 py-3 rounded-lg transition-colors shadow-sm whitespace-nowrap" data-path="sign-up" href="#">
+                            Create your account
+                        </a>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+    <!-- Footer -->
+    <footer class="w-full bg-surface-container-low dark:bg-dark-bg border-t border-outline-variant dark:border-dark-border py-space-xl transition-colors duration-200">
+        <div class="max-w-[1320px] mx-auto px-margin-mobile md:px-margin lg:px-margin-desktop flex flex-col md:flex-row items-center justify-between gap-space-md">
+            <div class="flex items-center gap-space-xs text-on-surface-variant dark:text-dark-muted font-body-sm text-body-sm">
+                <span class="material-symbols-outlined text-primary dark:text-dark-accent text-[16px]">eco</span>
+                <span>Mise — a calm place for your recipes.</span>
+            </div>
+            <div class="flex items-center gap-space-lg font-label-md text-label-md text-on-surface-variant dark:text-dark-muted">
+                <a class="hover:text-on-surface dark:hover:text-dark-text transition-colors" data-path="privacy" href="#">Privacy</a>
+                <a class="hover:text-on-surface dark:hover:text-dark-text transition-colors" data-path="terms" href="#">Terms</a>
+                <a class="hover:text-on-surface dark:hover:text-dark-text transition-colors" data-path="contact" href="#">Contact</a>
+                <span class="text-outline dark:text-dark-subtle font-body-sm text-body-sm">© 2025 Mise. All rights reserved.</span>
+            </div>
+        </div>
+    </footer>
+    <!-- Scripts: Servings counter & Fully Functional Interactive Dark Mode -->
+    <script>
+        (function () {
+            // Servings adjustment
+            const serveCountEl = document.getElementById('serve-count');
+            const plusBtn = document.getElementById('serve-plus');
+            const minusBtn = document.getElementById('serve-minus');
+
+            if (serveCountEl && plusBtn && minusBtn) {
+                let count = 4;
+                plusBtn.addEventListener('click', function () {
+                    if (count < 12) {
+                        count += 1;
+                        serveCountEl.textContent = count;
+                    }
+                });
+                minusBtn.addEventListener('click', function () {
+                    if (count > 1) {
+                        count -= 1;
+                        serveCountEl.textContent = count;
+                    }
+                });
+            }
+
+            // Dark mode toggle
+            const themeToggleBtn = document.getElementById('theme-toggle');
+            const themeIcon = document.getElementById('theme-toggle-icon');
+            const themeText = document.getElementById('theme-toggle-text');
+
+            function updateThemeUI(isDark) {
+                document.documentElement.classList.toggle('dark', isDark);
+                themeToggleBtn?.setAttribute('aria-pressed', String(isDark));
+                themeToggleBtn?.setAttribute('aria-label', isDark ? 'Switch to light mode' : 'Switch to dark mode');
+
+                if (isDark) {
+                    if (themeIcon) {
+                        themeIcon.textContent = 'light_mode';
+                    }
+                    if (themeText) {
+                        themeText.textContent = 'Light';
+                    }
+                } else {
+                    if (themeIcon) {
+                        themeIcon.textContent = 'dark_mode';
+                    }
+                    if (themeText) {
+                        themeText.textContent = 'Dark';
+                    }
+                }
+            }
+
+            updateThemeUI(document.documentElement.classList.contains('dark'));
+
+            if (themeToggleBtn) {
+                themeToggleBtn.addEventListener('click', function () {
+                    const currentlyDark = document.documentElement.classList.contains('dark');
+                    const nextState = !currentlyDark;
+                    try {
+                        localStorage.setItem('mise-theme', nextState ? 'dark' : 'light');
+                    } catch {
+                        // The theme can still be changed for the current page.
+                    }
+                    updateThemeUI(nextState);
+                });
+            }
+        })();
+    </script>
+</body>
+</html>
