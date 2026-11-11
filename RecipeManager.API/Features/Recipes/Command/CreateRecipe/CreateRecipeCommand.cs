@@ -41,7 +41,7 @@ public sealed class CreateRecipeCommandHandler(IAppDbContext dbContext, IValidat
     public async Task<Result<CreateRecipeResponse>> Handle(CreateRecipeCommand command, CancellationToken cancellationToken)
     {
         CreateRecipeRequest request = command.Request;
-        var validationResult = await validator.ValidateAsync(request, cancellationToken);
+        FluentValidation.Results.ValidationResult? validationResult = await validator.ValidateAsync(request, cancellationToken);
         if (!validationResult.IsValid)
         {
             return BaseValidator<CreateRecipeRequest>.ToValidationError(validationResult);

@@ -2,7 +2,6 @@
 using System.Text.Json;
 using RecipeManager.Api.Features.Recipes;
 using RecipeManager.Api.Features.Recipes.Query.GetRecipes;
-using RecipeManager.Api.Shared.Hateoas.Models;
 using RecipeManager.Integration.Tests.Common.Users;
 using RecipeManager.Integration.Tests.CoreApi.TestFixtures;
 
@@ -24,10 +23,11 @@ public sealed class GetRecipesTests : BaseIntegrationTest
         // Act
         HttpResponseMessage response = await HttpClient.GetAsync(RecipesGroup.Route, TestContext.Current.CancellationToken);
         string responseBody = await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
-        HateoasResponse<GetRecipesResponse>? recipesResponse = JsonSerializer.Deserialize<HateoasResponse<GetRecipesResponse>>(responseBody, JsonOptions);
+        GetRecipesResponse? recipesResponse = JsonSerializer.Deserialize<GetRecipesResponse>(responseBody, JsonOptions);
 
         // Assert
         response.EnsureSuccessStatusCode();
         Assert.NotNull(recipesResponse);
+        Assert.True(recipesResponse.Actions.CanAdd);
     }
 }

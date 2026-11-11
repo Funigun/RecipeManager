@@ -3,7 +3,6 @@ using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using RecipeManager.Api.Features.Ingredients;
 using RecipeManager.Api.Features.Ingredients.Query.GetIngredientById;
-using RecipeManager.Api.Shared.Hateoas.Models;
 using RecipeManager.Integration.Tests.Common.Users;
 using RecipeManager.Integration.Tests.CoreApi.TestFixtures;
 
@@ -26,14 +25,16 @@ public sealed class GetIngredientByIdTests : BaseIntegrationTest
         // Act
         HttpResponseMessage response = await HttpClient.GetAsync(IngredientsGroup.IngredientById(ingredientId), TestContext.Current.CancellationToken);
         string responseBody = await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
-        HateoasResponse<GetIngredientByIdResponse>? ingredientResponse = JsonSerializer.Deserialize<HateoasResponse<GetIngredientByIdResponse>>(responseBody, JsonOptions);
+        GetIngredientByIdResponse? ingredientResponse =
+            JsonSerializer.Deserialize<GetIngredientByIdResponse>(responseBody, JsonOptions);
 
         // Assert
         response.EnsureSuccessStatusCode();
         Assert.NotNull(ingredientResponse);
         Assert.Equal(System.Net.HttpStatusCode.OK, response.StatusCode);
-        Assert.Equal(ingredientId, ingredientResponse.Item.Id);
-        Assert.NotNull(ingredientResponse.Item.IngredientPackage);
-        Assert.True(ingredientResponse.Item.IngredientPackage.PackageSize > 0);
+        Assert.Equal(ingredientId, ingredientResponse.Id);
+        Assert.True(ingredientResponse.Actions.CanView);
+        Assert.NotNull(ingredientResponse.IngredientPackage);
+        Assert.True(ingredientResponse.IngredientPackage.PackageSize > 0);
     }
 }

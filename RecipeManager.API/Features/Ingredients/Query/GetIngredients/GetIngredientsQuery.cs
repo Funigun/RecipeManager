@@ -4,12 +4,10 @@ using RecipeManager.Api.Application;
 using RecipeManager.Api.Application.Abstractions;
 using RecipeManager.Api.Domain.Ingredients;
 using RecipeManager.Api.Domain.Units;
+using RecipeManager.Api.Features.Units;
 using RecipeManager.Api.Persistance.Extensions;
 using RecipeManager.Api.Shared.Contracts.Authorization;
-using RecipeManager.Api.Shared.Hateoas.Builder;
-using RecipeManager.Api.Shared.Hateoas.Common;
 using RecipeManager.Api.Shared.Hateoas.Models;
-using LinkOptions = RecipeManager.Api.Shared.Hateoas.Models.LinkOptions;
 
 namespace RecipeManager.Api.Features.Ingredients.Query.GetIngredients;
 
@@ -34,21 +32,22 @@ public sealed record GetIngredientsIngredientDto(
     string Name,
     string BaseUnit,
     IEnumerable<GetIngredientsUnitConvertionDto> IngredientUnitConvertions,
-    GetIngredientsNutritionalValueDto NutritionalValues);
+    GetIngredientsNutritionalValueDto NutritionalValues,
+    ItemActionDto Actions);
 
 public sealed record GetIngredientsResponse(
     int Page,
     int PageSize,
     int TotalCount,
-    IEnumerable<HateoasResponse<GetIngredientsIngredientDto>> Ingredients)
+    CollectionActionDto Actions,
+    IEnumerable<GetIngredientsIngredientDto> Ingredients)
     : PagedResult(Page, PageSize, TotalCount);
 
 public sealed class GetIngredientsQueryHandler(
     IAppDbContext dbContext,
-    ICurrentUser currentUser,
-    IHateoasBuilderFactory hateoasBuilderFactory)
+    ICurrentUser currentUser)
 {
-    public async Task<Result<HateoasResponse<GetIngredientsResponse>>> Handle(
+    public async Task<Result<GetIngredientsResponse>> Handle(
         GetIngredientsQuery query,
         CancellationToken cancellationToken)
     {
@@ -78,18 +77,16 @@ public sealed class GetIngredientsQueryHandler(
                     ingredient.NutritionalValue.Fats,
                     ingredient.NutritionalValue.Carbohydrates,
                     ingredient.NutritionalValue.IngredientAmount,
-                    unitNames[ingredient.NutritionalValue.IngredientUnit])))
+                    unitNames[ingredient.NutritionalValue.IngredientUnit]),
+                new ItemActionDto(true, true, true)))
             .ToList();
 
-        IEnumerable<HateoasResponse<GetIngredientsIngredientDto>> ingredientHateoas =
-            MapIngredientsToHateoasResponse(ingredientDtos, hateoasBuilderFactory);
-        HateoasResponse<GetIngredientsResponse> response = MapToHateoasResponse(
-            filter,
+        return new GetIngredientsResponse(
+            filter.Page,
+            filter.PageSize,
             totalCount,
-            ingredientHateoas,
-            hateoasBuilderFactory);
-
-        return response;
+            new CollectionActionDto(true),
+            ingredientDtos);
     }
 
     private static async Task<IEnumerable<IngredientCategoryId>> GetFilteredCategories(
@@ -121,42 +118,5 @@ public sealed class GetIngredientsQueryHandler(
         }
 
         return query.OrderBy(ingredient => ingredient.Name);
-    }
-
-    private static IEnumerable<HateoasResponse<GetIngredientsIngredientDto>> MapIngredientsToHateoasResponse(
-        IEnumerable<GetIngredientsIngredientDto> ingredients,
-        IHateoasBuilderFactory builderFactory)
-    {
-        if (!ingredients.Any())
-        {
-            return [];
-        }
-
-        HateoasCollectionResponseBuilder<GetIngredientsIngredientDto> ingredientsBuilder =
-            builderFactory.ForCollection(ingredients);
-        ingredientsBuilder.WithCollectionLink()
-            .WithGet(
-                LinkOptions.Create("GetIngredientById", HateoasRelConstants.Update, true),
-                ingredient => new { ingredientId = ingredient.Id })
-            .WithDelete(
-                LinkOptions.Create("DeleteIngredient", HateoasRelConstants.Delete, true),
-                ingredient => new { ingredientId = ingredient.Id });
-
-        return ingredientsBuilder.Build().Items;
-    }
-
-    private static HateoasResponse<GetIngredientsResponse> MapToHateoasResponse(
-        GetIngredientsFilterParameters filter,
-        int totalCount,
-        IEnumerable<HateoasResponse<GetIngredientsIngredientDto>> ingredients,
-        IHateoasBuilderFactory builderFactory)
-    {
-        GetIngredientsResponse response = new(filter.Page, filter.PageSize, totalCount, ingredients);
-
-        HateoasResponseBuilder<GetIngredientsResponse> responseBuilder = builderFactory.ForItem(response)
-            .AddPagedNavigation("GetIngredients", new { filter.Category, filter.Page, filter.PageSize })
-            .AddPost(LinkOptions.Create("CreateIngredient", HateoasRelConstants.Create, true), null);
-
-        return responseBuilder.Build();
     }
 }

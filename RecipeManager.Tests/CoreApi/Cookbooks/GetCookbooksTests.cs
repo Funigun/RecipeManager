@@ -1,6 +1,5 @@
 ﻿using RecipeManager.Api.Features.Cookbooks;
 using RecipeManager.Api.Features.Cookbooks.Query.GetCookbooks;
-using RecipeManager.Api.Shared.Hateoas.Models;
 using RecipeManager.Integration.Tests.Common.Users;
 using RecipeManager.Integration.Tests.CoreApi.TestFixtures;
 
@@ -22,10 +21,12 @@ public sealed class GetCookbooksTests : BaseIntegrationTest
         // Act
         HttpResponseMessage response = await HttpClient.GetAsync(CookbooksGroup.Route, TestContext.Current.CancellationToken);
         string responseContent = await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
-        HateoasResponse<GetCookbooksResponse>? responseModel = System.Text.Json.JsonSerializer.Deserialize<HateoasResponse<GetCookbooksResponse>>(responseContent, JsonOptions);
+        GetCookbooksResponse? responseModel =
+            System.Text.Json.JsonSerializer.Deserialize<GetCookbooksResponse>(responseContent, JsonOptions);
 
         // Assert
         Assert.NotNull(responseModel);
         Assert.Equal(System.Net.HttpStatusCode.OK, response.StatusCode);
+        Assert.True(responseModel.Actions.CanAdd);
     }
 }

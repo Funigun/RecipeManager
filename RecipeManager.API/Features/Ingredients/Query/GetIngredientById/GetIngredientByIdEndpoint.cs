@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 using RecipeManager.Api.Application;
 using RecipeManager.Api.Presentation;
 using RecipeManager.Api.Shared.Endpoint;
-using RecipeManager.Api.Shared.Hateoas.Models;
 
 namespace RecipeManager.Api.Features.Ingredients.Query.GetIngredientById;
 
@@ -19,12 +18,12 @@ public sealed class GetIngredientByIdEndpoint : IEndpoint
                  .ProducesProblem(StatusCodes.Status401Unauthorized);
     }
 
-    private static async Task<Results<Ok<HateoasResponse<GetIngredientByIdResponse>>, ValidationProblem, ProblemHttpResult>> Handle(
+    private static async Task<Results<Ok<GetIngredientByIdResponse>, ValidationProblem, ProblemHttpResult>> Handle(
         Guid ingredientId,
         [FromServices] GetIngredientByIdQueryHandler queryHandler,
         CancellationToken cancellationToken)
     {
-        Result<HateoasResponse<GetIngredientByIdResponse>> result = await queryHandler.Handle(
+        Result<GetIngredientByIdResponse> result = await queryHandler.Handle(
             new GetIngredientByIdQuery(ingredientId),
             cancellationToken);
         return result.ToHttpResult(TypedResults.Ok);

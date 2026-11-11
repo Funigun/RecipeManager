@@ -29,5 +29,6 @@ public sealed class GetIngredientsTests : BaseIntegrationTest
         response.EnsureSuccessStatusCode();
         Assert.NotNull(ingredientResponse);
         Assert.Equal(System.Net.HttpStatusCode.OK, response.StatusCode);
+        Assert.True(ingredientResponse.Actions.CanAdd);
     }
 }

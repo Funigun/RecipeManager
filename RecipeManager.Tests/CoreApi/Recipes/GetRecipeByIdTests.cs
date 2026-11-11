@@ -4,7 +4,6 @@ using Microsoft.EntityFrameworkCore;
 using RecipeManager.Api.Domain.Recipes;
 using RecipeManager.Api.Features.Recipes;
 using RecipeManager.Api.Features.Recipes.Query.GetRecipeById;
-using RecipeManager.Api.Shared.Hateoas.Models;
 using RecipeManager.Integration.Tests.Common.Users;
 using RecipeManager.Integration.Tests.CoreApi.TestFixtures;
 
@@ -27,11 +26,12 @@ public sealed class GetRecipeByIdTests : BaseIntegrationTest
         // Act
         HttpResponseMessage response = await HttpClient.GetAsync(RecipesGroup.RecipeById(recipeId), TestContext.Current.CancellationToken);
         string responseBody = await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
-        HateoasResponse<GetRecipeByIdResponse>? recipeResponse = JsonSerializer.Deserialize<HateoasResponse<GetRecipeByIdResponse>>(responseBody, JsonOptions);
+        GetRecipeByIdResponse? recipeResponse = JsonSerializer.Deserialize<GetRecipeByIdResponse>(responseBody, JsonOptions);
 
         // Assert
         response.EnsureSuccessStatusCode();
         Assert.Equal(System.Net.HttpStatusCode.OK, response.StatusCode);
         Assert.NotNull(recipeResponse);
+        Assert.True(recipeResponse.Actions.CanView);
     }
 }

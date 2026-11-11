@@ -78,13 +78,13 @@ internal sealed class RecipeSectionsValidator : AbstractValidator<IEnumerable<Up
         RuleFor(sections => sections)
             .Must(sections =>
             {
-                var types = sections.Select(section => section.SectionType);
+                IEnumerable<int>? types = sections.Select(section => section.SectionType);
                 return types.Distinct().Count() == types.Count();
             })
             .WithMessage("Recipe sections must have unique types")
             .Must(sections =>
             {
-                var types = sections.Select(section => section.SectionType);
+                IEnumerable<int>? types = sections.Select(section => section.SectionType);
                 return types.Any(type => type == (int)RecipeSectionType.IngredientsPreparation) &&
                        types.Any(type => type == (int)RecipeSectionType.Cooking);
             })
@@ -100,7 +100,7 @@ internal sealed class RecipeSectionsValidator : AbstractValidator<IEnumerable<Up
                 .WithMessage("Recipe section must have steps with unique Order values")
                 .Must(steps =>
                 {
-                    var orders = steps.Select(step => step.Order).OrderBy(order => order).ToList();
+                    List<int>? orders = steps.Select(step => step.Order).OrderBy(order => order).ToList();
                     return orders.SequenceEqual(Enumerable.Range(1, orders.Count));
                 })
                 .WithMessage("Step orders must be consecutive starting from 1.");

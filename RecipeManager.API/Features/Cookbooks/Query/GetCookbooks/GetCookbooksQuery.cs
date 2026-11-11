@@ -2,12 +2,10 @@ using Microsoft.EntityFrameworkCore;
 using RecipeManager.Api.Application;
 using RecipeManager.Api.Application.Abstractions;
 using RecipeManager.Api.Domain.Cookbooks;
+using RecipeManager.Api.Features.Units;
 using RecipeManager.Api.Persistance.Extensions;
 using RecipeManager.Api.Shared.Contracts.Authorization;
-using RecipeManager.Api.Shared.Hateoas.Builder;
-using RecipeManager.Api.Shared.Hateoas.Common;
 using RecipeManager.Api.Shared.Hateoas.Models;
-using LinkOptions = RecipeManager.Api.Shared.Hateoas.Models.LinkOptions;
 
 namespace RecipeManager.Api.Features.Cookbooks.Query.GetCookbooks;
 
@@ -25,16 +23,16 @@ public sealed record GetCookbooksResponse(
     int Page,
     int PageSize,
     int TotalCount,
-    IEnumerable<HateoasResponse<GetCookbooksItemResponse>> Cookbooks) : PagedResult(Page, PageSize, TotalCount);
+    CollectionActionDto Actions,
+    IEnumerable<GetCookbooksItemResponse> Cookbooks) : PagedResult(Page, PageSize, TotalCount);
 
-public sealed record GetCookbooksItemResponse(Guid Id, string Title, string? CoverImageUrl);
+public sealed record GetCookbooksItemResponse(Guid Id, string Title, string? CoverImageUrl, ItemActionDto Actions);
 
 public sealed class GetCookbooksQueryHandler(
     IAppDbContext dbContext,
-    ICurrentUser currentUser,
-    IHateoasBuilderFactory hateoasBuilderFactory)
+    ICurrentUser currentUser)
 {
-    public async Task<Result<HateoasResponse<GetCookbooksResponse>>> Handle(
+    public async Task<Result<GetCookbooksResponse>> Handle(
         GetCookbooksQuery query,
         CancellationToken cancellationToken)
     {
@@ -59,24 +57,19 @@ public sealed class GetCookbooksQueryHandler(
             .Select(item => new GetCookbooksProjection(item.Id.Value, item.Title, item.CoverImageUrl))
             .ToListAsync(cancellationToken);
         List<GetCookbooksItemResponse> items = projections
-            .Select(item => new GetCookbooksItemResponse(item.Id, item.Title, item.CoverImageUrl))
+            .Select(item => new GetCookbooksItemResponse(
+                item.Id,
+                item.Title,
+                item.CoverImageUrl,
+                new ItemActionDto(true, true, true)))
             .ToList();
-
-        HateoasCollectionResponseBuilder<GetCookbooksItemResponse> cookbooksBuilder =
-            hateoasBuilderFactory.ForCollection(items);
-        cookbooksBuilder.WithCollectionLink()
-            .WithGet(
-                LinkOptions.Create("GetCookbookById", HateoasRelConstants.Self, true),
-                cookbook => new { id = cookbook.Id });
 
         GetCookbooksResponse response = new(
             parameters.Page,
             parameters.PageSize,
             totalCount,
-            cookbooksBuilder.Build().Items);
-        HateoasResponseBuilder<GetCookbooksResponse> responseBuilder = hateoasBuilderFactory.ForItem(response);
-        responseBuilder.AddPost(LinkOptions.Create("CreateCookbook", HateoasRelConstants.Create, true), null);
-
-        return responseBuilder.Build();
+            new CollectionActionDto(true),
+            items);
+        return response;
     }
 }

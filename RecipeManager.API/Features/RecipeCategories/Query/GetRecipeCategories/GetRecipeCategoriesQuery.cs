@@ -3,11 +3,9 @@ using RecipeManager.Api.Application.Abstractions;
 using RecipeManager.Api.Domain.Recipes;
 using RecipeManager.Api.Domain.Recipes.Enums;
 using RecipeManager.Api.Persistance.Extensions;
+using RecipeManager.Api.Features.Units;
 using RecipeManager.Api.Shared.Contracts.Authorization;
-using RecipeManager.Api.Shared.Hateoas.Builder;
-using RecipeManager.Api.Shared.Hateoas.Common;
 using RecipeManager.Api.Shared.Hateoas.Models;
-using LinkOptions = RecipeManager.Api.Shared.Hateoas.Models.LinkOptions;
 
 namespace RecipeManager.Api.Features.RecipeCategories.Query.GetRecipeCategories;
 
@@ -18,24 +16,24 @@ public sealed record GetRecipeCategoriesQuery(GetRecipeCategoriesRequest Request
 
 internal sealed record GetRecipeCategoriesProjection(Guid Id, string Name, RecipeCategoryType Type);
 
-public sealed record GetRecipeCategoryDto(Guid Id, string Name, string Type)
+public sealed record GetRecipeCategoryDto(Guid Id, string Name, string Type, ItemActionDto Actions)
 {
-    internal static GetRecipeCategoryDto FromProjection(GetRecipeCategoriesProjection category) =>
-        new(category.Id, category.Name, category.Type.ToFriendlyString());
+    internal static GetRecipeCategoryDto FromProjection(GetRecipeCategoriesProjection category, bool canEdit) =>
+        new(category.Id, category.Name, category.Type.ToFriendlyString(), new ItemActionDto(true, canEdit, canEdit));
 }
 
 public sealed record GetRecipeCategoriesResponse(
     int Page,
     int PageSize,
     int TotalCount,
-    IEnumerable<HateoasResponse<GetRecipeCategoryDto>> Categories) : PagedResult(Page, PageSize, TotalCount);
+    CollectionActionDto Actions,
+    IEnumerable<GetRecipeCategoryDto> Categories) : PagedResult(Page, PageSize, TotalCount);
 
 public sealed class GetRecipeCategoriesQueryHandler(
     IAppDbContext dbContext,
-    ICurrentUser currentUser,
-    IHateoasBuilderFactory hateoasBuilderFactory)
+    ICurrentUser currentUser)
 {
-    public async Task<HateoasResponse<GetRecipeCategoriesResponse>> Handle(
+    public async Task<GetRecipeCategoriesResponse> Handle(
         GetRecipeCategoriesQuery query,
         CancellationToken cancellationToken)
     {
@@ -53,28 +51,14 @@ public sealed class GetRecipeCategoriesQueryHandler(
             .ToListAsync(cancellationToken);
 
         bool canEdit = currentUser.HasRole(UserRoles.Admin);
-        IEnumerable<GetRecipeCategoryDto> categoryDtos = projections.Select(GetRecipeCategoryDto.FromProjection);
-        HateoasCollectionResponseBuilder<GetRecipeCategoryDto> categoriesBuilder =
-            hateoasBuilderFactory.ForCollection(categoryDtos);
-        if (canEdit)
-        {
-            categoriesBuilder
-                .WithCollectionLink()
-                    .WithDelete(
-                        LinkOptions.Create("DeleteRecipeCategory", HateoasRelConstants.Delete, canEdit),
-                        category => new { categoryId = category.Id })
-                .AddPost(LinkOptions.Create("CreateRecipeCategory", HateoasRelConstants.Create, canEdit), null);
-        }
-
+        IEnumerable<GetRecipeCategoryDto> categoryDtos = projections
+            .Select(category => GetRecipeCategoryDto.FromProjection(category, canEdit));
         GetRecipeCategoriesResponse response = new(
-            request.Page, request.PageSize, totalCount, categoriesBuilder.Build().Items);
-        HateoasResponseBuilder<GetRecipeCategoriesResponse> responseBuilder =
-            hateoasBuilderFactory.ForItem(response);
-        responseBuilder.AddPagedNavigation("GetRecipeCategories", new
-        {
-            page = request.Page,
-            pageSize = request.PageSize
-        });
-        return responseBuilder.Build();
+            request.Page,
+            request.PageSize,
+            totalCount,
+            new CollectionActionDto(canEdit),
+            categoryDtos);
+        return response;
     }
 }

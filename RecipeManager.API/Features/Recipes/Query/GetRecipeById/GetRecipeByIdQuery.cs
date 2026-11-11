@@ -7,11 +7,8 @@ using RecipeManager.Api.Domain.Recipes;
 using RecipeManager.Api.Domain.Recipes.Enums;
 using RecipeManager.Api.Domain.Recipes.ValueObjects;
 using RecipeManager.Api.Domain.Units;
+using RecipeManager.Api.Features.Units;
 using RecipeManager.Api.Shared.Contracts.Authorization;
-using RecipeManager.Api.Shared.Hateoas.Builder;
-using RecipeManager.Api.Shared.Hateoas.Common;
-using RecipeManager.Api.Shared.Hateoas.Models;
-using LinkOptions = RecipeManager.Api.Shared.Hateoas.Models.LinkOptions;
 
 namespace RecipeManager.Api.Features.Recipes.Query.GetRecipeById;
 
@@ -44,14 +41,14 @@ public sealed record GetRecipeByIdResponse(
     IEnumerable<GetRecipeByIdRecipeIngredientDto> Ingredients,
     IEnumerable<GetRecipeByIdSectionDto> Sections,
     IEnumerable<GetRecipeByIdCategoryDto> Categories,
-    GetRecipeByIdIngredientDto? Ingredient);
+    GetRecipeByIdIngredientDto? Ingredient,
+    ItemActionDto Actions);
 
 public sealed class GetRecipeByIdQueryHandler(
     IAppDbContext dbContext,
-    ICurrentUser currentUser,
-    IHateoasBuilderFactory hateoasBuilderFactory)
+    ICurrentUser currentUser)
 {
-    public async Task<Result<HateoasResponse<GetRecipeByIdResponse>>> Handle(
+    public async Task<Result<GetRecipeByIdResponse>> Handle(
         GetRecipeByIdQuery query,
         CancellationToken cancellationToken)
     {
@@ -80,27 +77,20 @@ public sealed class GetRecipeByIdQueryHandler(
             : [];
 
         GetRecipeByIdProjection projection = new(recipe, ingredients, units, categories);
-        GetRecipeByIdResponse response = MapToResponse(projection);
-        HateoasResponseBuilder<GetRecipeByIdResponse> responseBuilder = hateoasBuilderFactory.ForItem(response);
         bool isRecipeCreator = recipe.CreatedBy == currentUser.Id;
-        responseBuilder
-            .AddDelete(LinkOptions.Create("DeleteRecipe", HateoasRelConstants.Delete, isRecipeCreator),
-                new { RecipeId = recipe.Id })
-            .AddPut(LinkOptions.Create("UpdateRecipe", HateoasRelConstants.Update, isRecipeCreator),
-                new { RecipeId = recipe.Id });
-        return responseBuilder.Build();
+        return MapToResponse(projection, isRecipeCreator);
     }
 
-    private static GetRecipeByIdResponse MapToResponse(GetRecipeByIdProjection projection)
+    private static GetRecipeByIdResponse MapToResponse(GetRecipeByIdProjection projection, bool canEdit)
     {
         Recipe recipe = projection.Recipe;
-        var ingredients = recipe.Ingredients.Select(item =>
+        IEnumerable<GetRecipeByIdRecipeIngredientDto>? ingredients = recipe.Ingredients.Select(item =>
             MapIngredient(item, projection.Ingredients, projection.Units));
-        var sections = recipe.Sections.Select(section => new GetRecipeByIdSectionDto(
+        IEnumerable<GetRecipeByIdSectionDto>? sections = recipe.Sections.Select(section => new GetRecipeByIdSectionDto(
             (int)section.Type,
             section.Steps.Select(step => new GetRecipeByIdStepDto(step.Order, step.Description, step.ImageUrl)),
             section.Type is RecipeSectionType.Cooking or RecipeSectionType.IngredientsPreparation));
-        var categories = projection.Categories.Select(category =>
+        IEnumerable<GetRecipeByIdCategoryDto>? categories = projection.Categories.Select(category =>
             new GetRecipeByIdCategoryDto(category.Id.Value, category.Name));
 
         Ingredient? recipeIngredient = projection.Ingredients.FirstOrDefault(item => item.Id == recipe.IngredientId);
@@ -133,7 +123,8 @@ public sealed class GetRecipeByIdQueryHandler(
             ingredients,
             sections,
             categories,
-            recipeIngredientDto);
+            recipeIngredientDto,
+            new ItemActionDto(true, canEdit, canEdit));
     }
 
     private static GetRecipeByIdRecipeIngredientDto MapIngredient(

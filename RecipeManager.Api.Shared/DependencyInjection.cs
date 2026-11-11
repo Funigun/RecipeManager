@@ -6,8 +6,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using RecipeManager.Api.Shared.Contracts.Authorization;
 using RecipeManager.Api.Shared.Endpoint;
-using RecipeManager.Api.Shared.Hateoas.Builder;
-using RecipeManager.Api.Shared.Hateoas.Common;
 using RecipeManager.Api.Shared.Middleware;
 
 namespace RecipeManager.Api.Shared;
@@ -17,8 +15,6 @@ public static class DependencyInjection
     public static IServiceCollection AddSharedServices(this IServiceCollection services)
     {
         services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
-        services.AddScoped<IHateoasBuilderFactory, HateoasBuilder>();
-        services.AddScoped<HateoasLinkService>();
         services.AddScoped<ICurrentUser, CurrentUser>();
 
         return services;

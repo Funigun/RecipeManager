@@ -2,7 +2,6 @@
 using System.Text.Json;
 using RecipeManager.Api.Features.RecipeCategories;
 using RecipeManager.Api.Features.RecipeCategories.Query.GetRecipeCategories;
-using RecipeManager.Api.Shared.Hateoas.Models;
 using RecipeManager.Integration.Tests.Common.Users;
 using RecipeManager.Integration.Tests.CoreApi.TestFixtures;
 
@@ -26,7 +25,7 @@ public sealed class GetCategoriesTests : BaseIntegrationTest
     }
 
     [Fact]
-    public async Task GetRecipeCategories_ShouldReturn_Categories_WithoutLinks_ForNonAdminUser()
+    public async Task GetRecipeCategories_ShouldDisableChanges_ForNonAdminUser()
     {
         // Arrange
         HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", TokenMockFactory.GenerateJwtToken(UserMockFactory.CreateMockedUser()));
@@ -39,21 +38,21 @@ public sealed class GetCategoriesTests : BaseIntegrationTest
         string content = await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
         Assert.NotNull(content);
 
-        HateoasResponse<GetRecipeCategoriesResponse>? responseModel = JsonSerializer.Deserialize<HateoasResponse<GetRecipeCategoriesResponse>>(content, JsonOptions);
+        GetRecipeCategoriesResponse? responseModel = JsonSerializer.Deserialize<GetRecipeCategoriesResponse>(content, JsonOptions);
 
         Assert.NotNull(responseModel);
-        Assert.NotEmpty(responseModel.Item.Categories);
-        Assert.Empty(responseModel.Links);
-
-        //Assert.NotEmpty(categories.Items);
-        //Assert.All(categories.Items, category =>
-        //{
-        //    Assert.Empty(category.Links);
-        //});
+        Assert.False(responseModel.Actions.CanAdd);
+        Assert.NotEmpty(responseModel.Categories);
+        Assert.All(responseModel.Categories, category =>
+        {
+            Assert.True(category.Actions.CanView);
+            Assert.False(category.Actions.CanEdit);
+            Assert.False(category.Actions.CanDelete);
+        });
     }
 
     [Fact]
-    public async Task GetRecipeCategories_ShouldReturn_Categories_WithLinks_ForAdminUser()
+    public async Task GetRecipeCategories_ShouldEnableChanges_ForAdminUser()
     {
         // Arrange
         HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", TokenMockFactory.GenerateJwtToken(UserMockFactory.CreateMockedAdmin()));
@@ -66,15 +65,14 @@ public sealed class GetCategoriesTests : BaseIntegrationTest
         string content = await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
         Assert.NotNull(content);
 
-        HateoasResponse<GetRecipeCategoriesResponse>? categories = JsonSerializer.Deserialize<HateoasResponse<GetRecipeCategoriesResponse>>(content, JsonOptions);
-        Assert.NotNull(categories.Item.Categories);
-        Assert.Empty(categories.Links);
-
-        // ToDo: tbc: string content looks fine, but deserialized obj lacks links in items
-        //Assert.NotEmpty(categories.Links);
-        //Assert.All(categories.Items, category =>
-        //{
-        //    Assert.NotEmpty(category.Links);
-        //});
+        GetRecipeCategoriesResponse? categories = JsonSerializer.Deserialize<GetRecipeCategoriesResponse>(content, JsonOptions);
+        Assert.NotNull(categories);
+        Assert.True(categories.Actions.CanAdd);
+        Assert.NotEmpty(categories.Categories);
+        Assert.All(categories.Categories, category =>
+        {
+            Assert.True(category.Actions.CanEdit);
+            Assert.True(category.Actions.CanDelete);
+        });
     }
 }

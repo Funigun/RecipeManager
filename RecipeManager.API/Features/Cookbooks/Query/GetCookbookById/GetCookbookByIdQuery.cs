@@ -3,11 +3,8 @@ using RecipeManager.Api.Application;
 using RecipeManager.Api.Application.Abstractions;
 using RecipeManager.Api.Domain.Cookbooks;
 using RecipeManager.Api.Domain.Recipes;
+using RecipeManager.Api.Features.Units;
 using RecipeManager.Api.Shared.Contracts.Authorization;
-using RecipeManager.Api.Shared.Hateoas.Builder;
-using RecipeManager.Api.Shared.Hateoas.Common;
-using RecipeManager.Api.Shared.Hateoas.Models;
-using LinkOptions = RecipeManager.Api.Shared.Hateoas.Models.LinkOptions;
 
 namespace RecipeManager.Api.Features.Cookbooks.Query.GetCookbookById;
 
@@ -20,12 +17,17 @@ internal sealed record GetCookbookByIdProjection(
     string? CoverImageUrl,
     string CreatedBy);
 
-public sealed record GetCookbookByIdRecipeDto(Guid Id, string Title, string? Description, string? ImageUrl);
+public sealed record GetCookbookByIdRecipeDto(
+    Guid Id,
+    string Title,
+    string? Description,
+    string? ImageUrl,
+    ItemActionDto Actions);
 
 public sealed record GetCookbookByIdCategoryDto(
     Guid Id,
     string Name,
-    IEnumerable<HateoasResponse<GetCookbookByIdRecipeDto>> Recipes,
+    IEnumerable<GetCookbookByIdRecipeDto> Recipes,
     IEnumerable<GetCookbookByIdCategoryDto> Subcategories);
 
 public sealed record GetCookbookByIdResponse(
@@ -33,14 +35,14 @@ public sealed record GetCookbookByIdResponse(
     string Title,
     string Description,
     string? CoverImageUrl,
-    IEnumerable<GetCookbookByIdCategoryDto> Categories);
+    IEnumerable<GetCookbookByIdCategoryDto> Categories,
+    ItemActionDto Actions);
 
 public sealed class GetCookbookByIdQueryHandler(
     IAppDbContext dbContext,
-    ICurrentUser currentUser,
-    IHateoasBuilderFactory hateoasBuilderFactory)
+    ICurrentUser currentUser)
 {
-    public async Task<Result<HateoasResponse<GetCookbookByIdResponse>>> Handle(
+    public async Task<Result<GetCookbookByIdResponse>> Handle(
         GetCookbookByIdQuery query,
         CancellationToken cancellationToken)
     {
@@ -75,34 +77,20 @@ public sealed class GetCookbookByIdQueryHandler(
                 recipe.Id.Value,
                 recipe.Title,
                 recipe.Description,
-                recipe.ImageURL))
+                recipe.ImageURL,
+                new ItemActionDto(true, false, false)))
             .ToListAsync(cancellationToken);
 
-        GetCookbookByIdResponse response = MapToResponse(cookbook, categories, recipes);
-        HateoasResponseBuilder<GetCookbookByIdResponse> builder = hateoasBuilderFactory.ForItem(response);
-
         bool isCookbookCreator = cookbook.CreatedBy == currentUser.Id;
-        builder.AddDelete(
-                   LinkOptions.Create("DeleteCookbook", HateoasRelConstants.Delete, isCookbookCreator),
-                   new { CookbookId = cookbook.Id })
-               .AddPut(
-                   LinkOptions.Create("UpdateCookbook", HateoasRelConstants.Update, isCookbookCreator),
-                   new { CookbookId = cookbook.Id });
-
-        return builder.Build();
+        return MapToResponse(cookbook, categories, recipes, isCookbookCreator);
     }
 
-    private GetCookbookByIdResponse MapToResponse(
+    private static GetCookbookByIdResponse MapToResponse(
         GetCookbookByIdProjection cookbook,
         IEnumerable<CookbookCategory> categories,
-        IEnumerable<GetCookbookByIdRecipeDto> recipes)
+        IEnumerable<GetCookbookByIdRecipeDto> recipes,
+        bool canEdit)
     {
-        HateoasCollectionResponseBuilder<GetCookbookByIdRecipeDto> recipesBuilder = hateoasBuilderFactory.ForCollection(recipes);
-        recipesBuilder.WithCollectionLink()
-            .WithGet(
-                LinkOptions.Create("GetRecipeById", HateoasRelConstants.Self, true),
-                recipe => new { Id = recipe.Id });
-        IEnumerable<HateoasResponse<GetCookbookByIdRecipeDto>> hateoasRecipes = recipesBuilder.Build().Items;
         IEnumerable<CookbookCategory> rootCategories = categories.Where(category => category.ParentId is null);
 
         return new GetCookbookByIdResponse(
@@ -110,19 +98,20 @@ public sealed class GetCookbookByIdQueryHandler(
             cookbook.Title,
             cookbook.Description,
             cookbook.CoverImageUrl,
-            rootCategories.Select(category => MapToCategoryDto(category, categories, hateoasRecipes)));
+            rootCategories.Select(category => MapToCategoryDto(category, categories, recipes)),
+            new ItemActionDto(true, canEdit, canEdit));
     }
 
     private static GetCookbookByIdCategoryDto MapToCategoryDto(
         CookbookCategory category,
         IEnumerable<CookbookCategory> allCategories,
-        IEnumerable<HateoasResponse<GetCookbookByIdRecipeDto>> recipes)
+        IEnumerable<GetCookbookByIdRecipeDto> recipes)
     {
         IEnumerable<CookbookCategory> subcategories = allCategories.Where(item => item.ParentId == category.Id);
         IEnumerable<GetCookbookByIdCategoryDto> subcategoryDtos = subcategories
             .Select(subcategory => MapToCategoryDto(subcategory, allCategories, recipes));
-        IEnumerable<HateoasResponse<GetCookbookByIdRecipeDto>> categoryRecipes = recipes
-            .Where(recipe => category.Recipes.Contains(new RecipeId(recipe.Item.Id)));
+        IEnumerable<GetCookbookByIdRecipeDto> categoryRecipes = recipes
+            .Where(recipe => category.Recipes.Contains(new RecipeId(recipe.Id)));
 
         return new GetCookbookByIdCategoryDto(category.Id.Value, category.Name, categoryRecipes, subcategoryDtos);
     }
