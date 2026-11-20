@@ -1,0 +1,129 @@
+:root {
+    --rm-font-display: "Outfit", sans-serif;
+    --rm-font-body: "Plus Jakarta Sans", sans-serif;
+    --rm-canvas: var(--mud-palette-background, #faf9f6);
+    --rm-surface: var(--mud-palette-surface, #ffffff);
+    --rm-surface-soft: var(--mud-palette-background-gray, #f4f7f5);
+    --rm-ink: var(--mud-palette-text-primary, #1a202c);
+    --rm-muted: var(--mud-palette-text-secondary, #64748b);
+    --rm-line: var(--mud-palette-divider, #e2e8f0);
+    --rm-herb: var(--mud-palette-primary, #2d6a4f);
+    --rm-herb-dark: #1b4332;
+    --rm-herb-soft: var(--rm-surface-soft);
+    --rm-spice: var(--mud-palette-secondary, #e76f51);
+    --rm-citrus: #f4a261;
+    --rm-mustard: #e9c46a;
+    --rm-radius-sm: 0.5rem;
+    --rm-radius: 0.75rem;
+    --rm-radius-lg: 1rem;
+    --rm-radius-xl: 1.5rem;
+    --rm-radius-pill: 9999px;
+    --rm-space-xs: 0.25rem;
+    --rm-space-sm: 0.5rem;
+    --rm-space-md: 1rem;
+    --rm-space-lg: 1.5rem;
+    --rm-space-xl: 2.5rem;
+    --rm-shadow-card: 0 4px 16px -2px rgb(45 106 79 / 8%), 0 2px 6px -1px rgb(0 0 0 / 4%);
+    --rm-shadow-overlay: 0 12px 32px -4px rgb(27 67 50 / 16%);
+}
+
+html,
+body,
+#app {
+    min-height: 100%;
+}
+
+body {
+    min-width: 320px;
+    margin: 0;
+    background: var(--rm-canvas);
+    color: var(--rm-ink);
+    font-family: var(--rm-font-body);
+    font-size: 1rem;
+    line-height: 1.5;
+    text-rendering: optimizeLegibility;
+    transition: background-color 180ms ease, color 180ms ease;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+.mud-typography-h1,
+.mud-typography-h2,
+.mud-typography-h3,
+.mud-typography-h4,
+.mud-typography-h5,
+.mud-typography-h6 {
+    font-family: var(--rm-font-display);
+}
+
+a,
+button {
+    -webkit-tap-highlight-color: transparent;
+}
+
+:focus-visible {
+    outline: 3px solid var(--rm-citrus);
+    outline-offset: 2px;
+}
+
+::selection {
+    background: var(--rm-herb);
+    color: #ffffff;
+}
+
+.rm-app-bar.mud-appbar {
+    border-bottom: 1px solid var(--rm-line);
+    background: var(--rm-canvas);
+    color: var(--rm-ink);
+}
+
+.rm-main-content {
+    min-height: 100vh;
+    background: var(--rm-canvas);
+}
+
+.rm-page-container {
+    width: calc(100% - 2rem);
+    max-width: 1320px;
+    margin-inline: auto;
+    padding-block: var(--rm-space-xl);
+}
+
+.rm-card {
+    border: 1px solid var(--rm-line);
+    border-radius: var(--rm-radius-lg);
+    background: var(--rm-surface);
+    box-shadow: var(--rm-shadow-card);
+}
+
+.rm-surface-soft {
+    background: var(--rm-surface-soft);
+}
+
+.rm-pill {
+    border-radius: var(--rm-radius-pill);
+}
+
+.rm-icon {
+    font-family: "Material Symbols Outlined";
+    font-feature-settings: "liga";
+    font-style: normal;
+    font-weight: normal;
+    line-height: 1;
+}
+
+@media (min-width: 768px) {
+    .rm-page-container {
+        width: calc(100% - 3rem);
+    }
+}
+
+@media (min-width: 1024px) {
+    .rm-page-container {
+        width: calc(100% - 6rem);
+    }
+}

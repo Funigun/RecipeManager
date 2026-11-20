@@ -1,0 +1,1780 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#faf9f6" />
+    <title>Admin panel · Mise</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+    <style>
+        :root {
+            color-scheme: light;
+            --canvas: #faf9f6;
+            --surface: #ffffff;
+            --surface-soft: #f4f7f5;
+            --surface-raised: #eef2ef;
+            --ink: #1a202c;
+            --muted: #64748b;
+            --line: #e2e8f0;
+            --green: #2d6a4f;
+            --green-dark: #1b4332;
+            --green-soft: #e8f3ec;
+            --amber-soft: #fff4e8;
+            --amber-ink: #8b4b12;
+            --shadow: 0 4px 16px -2px rgba(45, 106, 79, .08), 0 2px 6px -1px rgba(0, 0, 0, .04);
+        }
+
+        :root.dark {
+            color-scheme: dark;
+            --canvas: #0f1715;
+            --surface: #162420;
+            --surface-soft: #1a2c26;
+            --surface-raised: #1e332d;
+            --ink: #f3f5f4;
+            --muted: #a1ada6;
+            --line: #294039;
+            --green: #52b788;
+            --green-dark: #1b4332;
+            --green-soft: #1e332d;
+            --amber-soft: #39291d;
+            --amber-ink: #f4a261;
+            --shadow: 0 4px 16px -2px rgba(0, 0, 0, .2);
+        }
+
+        * { box-sizing: border-box; }
+        .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+
+        body {
+            margin: 0;
+            min-width: 320px;
+            min-height: 100vh;
+            background: var(--canvas);
+            color: var(--ink);
+            font: 14px/1.5 "Plus Jakarta Sans", sans-serif;
+            transition: background-color .2s, color .2s;
+        }
+
+        button, input, select { font: inherit; }
+        button { color: inherit; }
+        a { color: inherit; text-decoration: none; }
+        .icon { font-family: "Material Symbols Outlined"; font-weight: normal; font-style: normal; font-size: 20px; line-height: 1; font-feature-settings: "liga"; -webkit-font-feature-settings: "liga"; }
+
+        .app-header {
+            position: sticky;
+            z-index: 5;
+            top: 0;
+            height: 68px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 clamp(20px, 4vw, 56px);
+            border-bottom: 1px solid var(--line);
+            background: color-mix(in srgb, var(--canvas) 94%, transparent);
+            backdrop-filter: blur(12px);
+        }
+
+        .brand, .header-actions, .admin-label, .breadcrumbs, .page-heading, .section-heading, .toolbar, .search-box, .select-box, .unit-name, .factor, .row-actions, .tab-button, .callout, .user-profile, .sidebar-link {
+            display: flex;
+            align-items: center;
+        }
+
+        .brand { gap: 9px; font: 600 21px/1 "Outfit", sans-serif; letter-spacing: -.03em; }
+        .brand .icon { color: var(--green); font-size: 19px; }
+        .header-actions { gap: 14px; }
+        .admin-label { gap: 7px; color: var(--muted); font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
+        .admin-label .icon { color: var(--green); font-size: 18px; }
+        .header-divider { height: 24px; width: 1px; background: var(--line); }
+        .theme-button, .icon-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid var(--line);
+            background: var(--surface);
+            cursor: pointer;
+        }
+        .theme-button { gap: 8px; padding: 8px 11px; border-radius: 9px; color: var(--muted); font-size: 12px; font-weight: 700; }
+        .theme-button .icon { font-size: 17px; }
+        .user-profile { gap: 9px; }
+        .avatar { display: grid; width: 34px; height: 34px; place-items: center; border-radius: 50%; background: var(--green); color: white; font: 600 13px "Outfit", sans-serif; }
+        .user-name { font-size: 12px; font-weight: 700; }
+
+        .layout { display: grid; grid-template-columns: 232px minmax(0, 1fr); min-height: calc(100vh - 68px); }
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 28px 16px 20px;
+            border-right: 1px solid var(--line);
+            background: var(--surface);
+        }
+        .sidebar-top { display: flex; flex-direction: column; gap: 28px; }
+        .workspace-label { padding: 0 12px; color: var(--muted); font-size: 10px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
+        .sidebar-nav { display: flex; flex-direction: column; gap: 5px; }
+        .sidebar-link { min-height: 42px; gap: 12px; padding: 0 12px; border-radius: 8px; color: var(--muted); font-weight: 600; }
+        .sidebar-link .icon { color: var(--muted); font-size: 19px; }
+        .sidebar-link.active { background: var(--green-soft); color: var(--green); }
+        .sidebar-link.active .icon { color: var(--green); }
+        .sidebar-foot { padding: 14px 12px 0; border-top: 1px solid var(--line); color: var(--muted); font-size: 11px; }
+
+        main { width: 100%; max-width: 1480px; margin: 0 auto; padding: 34px clamp(22px, 4vw, 60px) 56px; }
+        .breadcrumbs { gap: 9px; margin-bottom: 22px; color: var(--muted); font-size: 12px; font-weight: 600; }
+        .breadcrumbs .icon { font-size: 15px; }
+        .breadcrumbs .current { color: var(--ink); }
+        .page-heading { align-items: flex-start; justify-content: space-between; gap: 24px; margin-bottom: 27px; }
+        h1, h2, h3, p { margin: 0; }
+        h1, h2, h3 { font-family: "Outfit", sans-serif; }
+        h1 { font-size: clamp(29px, 3vw, 36px); font-weight: 600; letter-spacing: -.035em; line-height: 1.15; }
+        .page-heading p { max-width: 610px; margin-top: 8px; color: var(--muted); font-size: 14px; }
+        .top-action, .primary-button, .secondary-button {
+            min-height: 40px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            border-radius: 8px;
+            padding: 0 14px;
+            font-size: 12px;
+            font-weight: 700;
+            white-space: nowrap;
+            cursor: pointer;
+        }
+        .top-action, .secondary-button { border: 1px solid var(--line); background: var(--surface); color: var(--ink); }
+        .top-action .icon, .primary-button .icon, .secondary-button .icon { font-size: 18px; }
+        .primary-button { border: 1px solid var(--green); background: var(--green); color: #fff; box-shadow: 0 2px 5px rgba(45, 106, 79, .13); }
+        .primary-button:hover { background: var(--green-dark); }
+        .tabs {
+            display: flex;
+            gap: 5px;
+            overflow-x: auto;
+            border-bottom: 1px solid var(--line);
+            scrollbar-width: thin;
+        }
+        .tab-button {
+            position: relative;
+            flex: 0 0 auto;
+            gap: 8px;
+            min-height: 49px;
+            padding: 0 16px;
+            border: 0;
+            background: transparent;
+            color: var(--muted);
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+        .tab-button .icon { font-size: 18px; }
+        .tab-button[aria-selected="true"] { color: var(--green); }
+        .tab-button[aria-selected="true"]::after { position: absolute; right: 12px; bottom: -1px; left: 12px; height: 2px; border-radius: 2px 2px 0 0; background: var(--green); content: ""; }
+        .tab-panel { padding-top: 25px; }
+        .tab-panel[hidden] { display: none; }
+
+        .section-heading { align-items: flex-start; justify-content: space-between; gap: 20px; margin-bottom: 19px; }
+        .section-heading h2 { font-size: 20px; font-weight: 600; letter-spacing: -.02em; }
+        .section-heading p { margin-top: 5px; color: var(--muted); font-size: 12px; }
+        .catalog-card { overflow: hidden; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); box-shadow: var(--shadow); }
+        .catalog-card-head { display: flex; align-items: center; justify-content: space-between; gap: 18px; padding: 17px 19px; border-bottom: 1px solid var(--line); }
+        .catalog-title { font: 600 16px "Outfit", sans-serif; }
+        .catalog-caption { margin-top: 4px; color: var(--muted); font-size: 11px; }
+        .toolbar { justify-content: flex-end; gap: 9px; flex-wrap: wrap; }
+        .search-box, .select-box { height: 37px; gap: 8px; border: 1px solid var(--line); border-radius: 7px; background: var(--surface); color: var(--muted); }
+        .search-box { width: 210px; padding: 0 10px; }
+        .search-box .icon, .select-box .icon { flex: 0 0 auto; font-size: 17px; }
+        .search-box input { width: 100%; min-width: 0; border: 0; outline: 0; background: transparent; color: var(--ink); font-size: 11px; }
+        .search-box input::placeholder { color: var(--muted); opacity: .9; }
+        .select-box { position: relative; padding: 0 9px; }
+        .select-box select { max-width: 135px; border: 0; outline: 0; appearance: none; background: transparent; color: var(--ink); font-size: 11px; cursor: pointer; }
+        .select-box .select-arrow { margin-left: -5px; font-size: 16px; pointer-events: none; }
+        .table-wrap { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; text-align: left; }
+        thead { background: var(--surface-soft); }
+        th { height: 40px; padding: 0 17px; color: var(--muted); font-size: 9px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; white-space: nowrap; }
+        td { height: 63px; padding: 9px 17px; border-top: 1px solid var(--line); font-size: 11px; white-space: nowrap; }
+        tbody tr:hover { background: color-mix(in srgb, var(--surface-soft) 55%, transparent); }
+        .unit-name { gap: 10px; }
+        .unit-glyph { display: grid; flex: 0 0 31px; width: 31px; height: 31px; place-items: center; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); color: var(--muted); font: 600 11px "Outfit", sans-serif; }
+        .unit-primary { font-weight: 700; }
+        .unit-secondary { margin-top: 2px; color: var(--muted); font-size: 10px; }
+        .short-name { color: var(--ink); font-weight: 600; }
+        .plural { color: var(--muted); }
+        .group-badge { display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--line); border-radius: 999px; padding: 4px 9px; background: var(--surface); color: var(--muted); font-size: 10px; font-weight: 700; }
+        .group-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); }
+        .factor { gap: 7px; }
+        .reference-badge { display: inline-flex; align-items: center; gap: 5px; border-radius: 5px; padding: 4px 7px; background: var(--green-soft); color: var(--green); font-size: 9px; font-weight: 700; }
+        .reference-badge .icon { font-size: 13px; }
+        .factor-value { font-weight: 700; font-variant-numeric: tabular-nums; }
+        .factor-note { color: var(--muted); font-size: 10px; }
+        .row-actions { justify-content: flex-end; gap: 5px; }
+        .icon-button { width: 30px; height: 30px; border-radius: 7px; color: var(--muted); }
+        .icon-button:hover, .theme-button:hover, .secondary-button:hover { background: var(--surface-soft); }
+        .icon-button .icon { font-size: 17px; }
+        .table-footer { display: flex; justify-content: space-between; gap: 15px; padding: 12px 17px; border-top: 1px solid var(--line); color: var(--muted); font-size: 10px; }
+        .callout { align-items: flex-start; gap: 10px; margin-top: 15px; padding: 13px 15px; border: 1px solid color-mix(in srgb, var(--amber-ink) 18%, var(--line)); border-radius: 9px; background: var(--amber-soft); color: var(--amber-ink); }
+        .callout .icon { margin-top: 1px; font-size: 17px; }
+        .callout p { font-size: 10px; line-height: 1.6; }
+        .callout strong { font-weight: 700; }
+        .empty-row { height: 70px; color: var(--muted); text-align: center; }
+        .ingredients-layout { display: grid; grid-template-columns: minmax(210px, 250px) minmax(0, 1fr); align-items: start; gap: 16px; }
+        .category-card { overflow: hidden; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); box-shadow: var(--shadow); }
+        .category-card-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 16px; border-bottom: 1px solid var(--line); }
+        .category-card-head h3, .conversion-section-title { font-size: 14px; font-weight: 600; }
+        .category-card-head button { width: 30px; height: 30px; border-radius: 7px; color: var(--green); }
+        .category-list { display: flex; flex-direction: column; padding: 7px; }
+        .category-item { display: flex; align-items: center; }
+        .category-choice { display: flex; width: 100%; align-items: center; justify-content: space-between; gap: 8px; min-height: 38px; padding: 0 9px; border: 0; border-radius: 7px; background: transparent; color: var(--muted); font-size: 11px; font-weight: 600; text-align: left; cursor: pointer; }
+        .category-choice:hover { background: var(--surface-soft); }
+        .category-choice.active { background: var(--green-soft); color: var(--green); }
+        .category-choice-main { display: flex; min-width: 0; align-items: center; gap: 8px; }
+        .category-choice-count { color: var(--muted); font-size: 10px; font-variant-numeric: tabular-nums; }
+        .category-edit { display: inline-flex; flex: 0 0 24px; width: 24px; height: 24px; align-items: center; justify-content: center; border: 0; border-radius: 5px; background: transparent; color: var(--muted); opacity: 0; cursor: pointer; }
+        .category-item:hover .category-edit, .category-edit:focus-visible { opacity: 1; }
+        .category-edit .icon { font-size: 15px; }
+        .ingredient-catalog { min-width: 0; }
+        .ingredient-table { min-width: 790px; }
+        .ingredient-name-cell { display: flex; align-items: center; gap: 9px; }
+        .ingredient-avatar { display: grid; flex: 0 0 31px; width: 31px; height: 31px; place-items: center; border-radius: 8px; background: var(--green-soft); color: var(--green); }
+        .ingredient-avatar .icon { font-size: 17px; }
+        .ingredient-name { font-weight: 700; }
+        .ingredient-subtitle { margin-top: 2px; color: var(--muted); font-size: 9px; }
+        .ingredient-primary { font-weight: 700; }
+        .ingredient-primary small { color: var(--muted); font-size: 9px; font-weight: 500; }
+        .category-chips { display: flex; max-width: 185px; flex-wrap: wrap; gap: 4px; }
+        .category-chip { display: inline-block; border: 1px solid var(--line); border-radius: 999px; padding: 3px 7px; background: var(--surface-soft); color: var(--muted); font-size: 9px; font-weight: 600; }
+        .shopping-category { color: var(--ink); font-size: 10px; font-weight: 600; }
+        .conversion-count { border: 0; border-radius: 6px; padding: 5px 8px; background: var(--green-soft); color: var(--green); font-size: 9px; font-weight: 700; cursor: pointer; }
+        .conversion-count.none { background: var(--surface-soft); color: var(--muted); }
+        .ingredient-actions { display: flex; justify-content: flex-end; gap: 5px; }
+        .conversion-callout { margin: 0; }
+        .conversion-primary { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 18px; padding: 14px; border: 1px solid var(--line); border-radius: 9px; background: var(--surface-soft); }
+        .conversion-primary-label { color: var(--muted); font-size: 9px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+        .conversion-primary-value { margin-top: 4px; font: 600 17px "Outfit", sans-serif; }
+        .conversion-primary .group-badge { background: var(--surface); }
+        .conversion-section { margin-top: 18px; }
+        .conversion-section-title { margin-bottom: 8px; }
+        .automatic-units { display: flex; flex-wrap: wrap; gap: 6px; min-height: 28px; }
+        .automatic-unit { display: inline-flex; align-items: center; gap: 5px; border: 1px solid var(--line); border-radius: 6px; padding: 5px 8px; background: var(--surface); color: var(--muted); font-size: 10px; }
+        .automatic-unit strong { color: var(--ink); }
+        .conversion-list { display: flex; flex-direction: column; gap: 7px; }
+        .conversion-entry { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 11px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); }
+        .conversion-equation { font-size: 11px; font-weight: 700; font-variant-numeric: tabular-nums; }
+        .conversion-entry-detail { margin-top: 2px; color: var(--muted); font-size: 9px; }
+        .conversion-entry-actions { display: flex; gap: 4px; }
+        .conversion-entry-actions button { min-width: 28px; height: 28px; border: 1px solid var(--line); border-radius: 6px; background: var(--surface); color: var(--muted); cursor: pointer; }
+        .conversion-entry-actions button .icon { font-size: 15px; }
+        .conversion-empty { border: 1px dashed var(--line); border-radius: 8px; padding: 12px; color: var(--muted); font-size: 10px; text-align: center; }
+        .conversion-form { display: grid; grid-template-columns: minmax(140px, 1.4fr) minmax(110px, 1fr) auto; align-items: end; gap: 9px; margin-top: 10px; }
+        .conversion-form .form-field { gap: 5px; }
+        .conversion-form .form-field label { font-size: 9px; }
+        .conversion-form input, .conversion-form select { height: 36px; }
+        .conversion-form .primary-button { min-height: 36px; padding: 0 10px; font-size: 10px; }
+        .conversion-footnote { margin-top: 12px; color: var(--muted); font-size: 9px; line-height: 1.55; }
+        .unit-dialog {
+            width: min(540px, calc(100vw - 32px));
+            max-height: min(760px, calc(100vh - 32px));
+            padding: 0;
+            overflow: auto;
+            border: 1px solid var(--line);
+            border-radius: 16px;
+            background: var(--surface);
+            color: var(--ink);
+            box-shadow: 0 20px 60px rgba(15, 23, 21, .22);
+        }
+        .unit-dialog::backdrop { background: rgba(15, 23, 21, .42); backdrop-filter: blur(3px); }
+        .dialog-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; padding: 23px 24px 18px; border-bottom: 1px solid var(--line); }
+        .dialog-eyebrow { margin-bottom: 5px; color: var(--green); font-size: 9px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
+        .dialog-head h2 { font-size: 22px; font-weight: 600; letter-spacing: -.025em; }
+        .dialog-head p { margin-top: 5px; color: var(--muted); font-size: 11px; }
+        .dialog-close { flex: 0 0 auto; }
+        .dialog-form { display: flex; flex-direction: column; gap: 17px; padding: 20px 24px 23px; }
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .form-field { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+        .form-field.full { grid-column: 1 / -1; }
+        .form-field label, .reference-toggle-label { color: var(--ink); font-size: 11px; font-weight: 700; }
+        .form-field input, .form-field select {
+            width: 100%;
+            height: 40px;
+            border: 1px solid var(--line);
+            border-radius: 7px;
+            outline: 0;
+            padding: 0 11px;
+            background: var(--surface);
+            color: var(--ink);
+            font-size: 12px;
+        }
+        .form-field input:focus, .form-field select:focus { border-color: var(--green); box-shadow: 0 0 0 3px color-mix(in srgb, var(--green) 15%, transparent); }
+        .form-field input:disabled { background: var(--surface-soft); color: var(--muted); }
+        .field-hint { color: var(--muted); font-size: 10px; line-height: 1.45; }
+        .reference-toggle { display: flex; align-items: flex-start; gap: 10px; padding: 12px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface-soft); }
+        .reference-toggle input { flex: 0 0 auto; width: 15px; height: 15px; margin: 2px 0 0; accent-color: var(--green); }
+        .reference-toggle-label { display: block; }
+        .reference-toggle .field-hint { display: block; margin-top: 3px; }
+        .dialog-footer { display: flex; justify-content: flex-end; gap: 9px; padding-top: 4px; }
+        .dialog-footer button { min-width: 96px; }
+        .reference-note { display: none; }
+        .unit-dialog[data-editing-reference="true"] .reference-note { display: block; }
+        .category-form { display: flex; flex-direction: column; gap: 14px; }
+        .classification-options { display: flex; flex-wrap: wrap; gap: 7px; }
+        .classification-option { display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--line); border-radius: 7px; padding: 7px 9px; background: var(--surface); color: var(--muted); font-size: 10px; cursor: pointer; }
+        .classification-option:has(input:checked) { border-color: color-mix(in srgb, var(--green) 38%, var(--line)); background: var(--green-soft); color: var(--green); }
+        .classification-option input { width: 13px; height: 13px; margin: 0; accent-color: var(--green); }
+        .ingredient-note { color: var(--muted); font-size: 9px; line-height: 1.5; }
+
+        @media (max-width: 900px) {
+            .layout { grid-template-columns: 72px minmax(0, 1fr); }
+            .sidebar { align-items: center; padding-right: 10px; padding-left: 10px; }
+            .workspace-label, .sidebar-link span:not(.icon), .sidebar-foot { display: none; }
+            .sidebar-top { align-items: center; }
+            .sidebar-nav { align-items: center; }
+            .sidebar-link { justify-content: center; width: 44px; padding: 0; }
+            .ingredients-layout { grid-template-columns: 1fr; }
+            .category-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); }
+            .category-edit { opacity: 1; }
+            .catalog-card-head { align-items: flex-start; flex-direction: column; }
+            .toolbar { justify-content: flex-start; width: 100%; }
+        }
+        @media (max-width: 600px) {
+            .app-header { height: 60px; padding: 0 16px; }
+            .admin-label, .header-divider, .user-name, .theme-text { display: none; }
+            .layout { grid-template-columns: 1fr; min-height: calc(100vh - 60px); }
+            .sidebar { position: sticky; z-index: 4; top: 60px; order: 2; flex-direction: row; justify-content: center; padding: 8px; border-top: 1px solid var(--line); border-right: 0; }
+            .sidebar-top, .sidebar-nav { width: 100%; }
+            .sidebar-top { gap: 0; }
+            .sidebar-nav { flex-direction: row; justify-content: space-around; }
+            .layout > main { grid-row: 1; }
+            main { padding: 24px 16px 36px; }
+            .breadcrumbs { margin-bottom: 17px; }
+            .page-heading { align-items: flex-start; flex-direction: column; margin-bottom: 19px; }
+            .page-heading .top-action { min-height: 36px; }
+            .tabs { margin-right: -16px; }
+            .tab-button { min-height: 45px; padding: 0 12px; font-size: 11px; }
+            .tab-button .icon { font-size: 16px; }
+            .section-heading { flex-direction: column; }
+            .search-box { flex: 1 1 160px; }
+            .select-box { flex: 1 0 130px; }
+            .select-box select { max-width: none; width: 100%; }
+            .toolbar .primary-button { flex: 1 0 100%; }
+            .catalog-card-head { padding: 15px; }
+            th, td { padding-right: 12px; padding-left: 12px; }
+            .table-footer { flex-direction: column; gap: 4px; padding: 11px 12px; }
+            .dialog-head, .dialog-form { padding-right: 18px; padding-left: 18px; }
+            .form-grid { grid-template-columns: 1fr; }
+            .form-field.full { grid-column: auto; }
+            .conversion-form { grid-template-columns: 1fr 1fr; }
+            .conversion-form .form-field:first-child { grid-column: 1 / -1; }
+            .conversion-form .primary-button { grid-column: 1 / -1; }
+        }
+    </style>
+</head>
+<body>
+    <header class="app-header">
+        <a class="brand" href="#" aria-label="Mise home">
+            <span>Mise</span>
+            <span class="icon" aria-hidden="true">eco</span>
+        </a>
+        <div class="header-actions">
+            <div class="admin-label"><span class="icon" aria-hidden="true">admin_panel_settings</span> Admin workspace</div>
+            <span class="header-divider" aria-hidden="true"></span>
+            <button class="theme-button" id="theme-toggle" type="button" aria-label="Switch to dark mode">
+                <span class="icon" id="theme-icon" aria-hidden="true">dark_mode</span>
+                <span class="theme-text" id="theme-text">Dark</span>
+            </button>
+            <div class="user-profile" aria-label="Signed in as Alex Morgan">
+                <span class="avatar" aria-hidden="true">AM</span>
+                <span class="user-name">Alex Morgan</span>
+            </div>
+        </div>
+    </header>
+
+    <div class="layout">
+        <aside class="sidebar" aria-label="Admin navigation">
+            <div class="sidebar-top">
+                <div class="workspace-label">Workspace</div>
+                <nav class="sidebar-nav">
+                    <a class="sidebar-link" href="#" aria-label="Overview"><span class="icon" aria-hidden="true">space_dashboard</span><span>Overview</span></a>
+                    <a class="sidebar-link active" href="#catalogs" aria-current="page" aria-label="Catalogs"><span class="icon" aria-hidden="true">inventory_2</span><span>Catalogs</span></a>
+                    <a class="sidebar-link" href="#" aria-label="People"><span class="icon" aria-hidden="true">group</span><span>People</span></a>
+                    <a class="sidebar-link" href="#" aria-label="Settings"><span class="icon" aria-hidden="true">settings</span><span>Settings</span></a>
+                </nav>
+            </div>
+            <div class="sidebar-foot">Global catalogs are shared across Mise.</div>
+        </aside>
+
+        <main id="catalogs">
+            <div class="breadcrumbs" aria-label="Breadcrumb">
+                <span>Workspace</span><span class="icon" aria-hidden="true">chevron_right</span><span class="current">Catalogs</span>
+            </div>
+
+            <div class="page-heading">
+                <div>
+                    <h1>Admin panel</h1>
+                    <p>Manage the shared catalogs that keep ingredient quantities and meal planning consistent for everyone.</p>
+                </div>
+                <button class="top-action" type="button"><span class="icon" aria-hidden="true">help</span> Admin guide</button>
+            </div>
+
+            <div class="tabs" role="tablist" aria-label="Admin catalog sections">
+                <button class="tab-button" id="tab-units" role="tab" type="button" aria-selected="true" aria-controls="panel-units" tabindex="0">
+                    <span class="icon" aria-hidden="true">straighten</span> Units management
+                </button>
+                <button class="tab-button" id="tab-ingredients" role="tab" type="button" aria-selected="false" aria-controls="panel-ingredients" tabindex="-1">
+                    <span class="icon" aria-hidden="true">nutrition</span> Ingredients management
+                </button>
+                <button class="tab-button" id="tab-shopping" role="tab" type="button" aria-selected="false" aria-controls="panel-shopping" tabindex="-1">
+                    <span class="icon" aria-hidden="true">shopping_basket</span> Shopping Cart categories
+                </button>
+                <button class="tab-button" id="tab-meals" role="tab" type="button" aria-selected="false" aria-controls="panel-meals" tabindex="-1">
+                    <span class="icon" aria-hidden="true">restaurant</span> Meal Planner categories
+                </button>
+            </div>
+
+            <section class="tab-panel" id="panel-units" role="tabpanel" aria-labelledby="tab-units">
+                <div class="section-heading">
+                    <div>
+                        <h2>Shared measurement units</h2>
+                        <p>One global catalog for all users. Every unit belongs to a group with one reference unit.</p>
+                    </div>
+                </div>
+
+                <div class="catalog-card">
+                    <div class="catalog-card-head">
+                        <div>
+                            <div class="catalog-title">Unit catalog</div>
+                            <div class="catalog-caption">Names and within-group factors relative to each reference unit</div>
+                        </div>
+                        <div class="toolbar">
+                            <label class="search-box">
+                                <span class="icon" aria-hidden="true">search</span>
+                                <input id="unit-search" type="search" placeholder="Search units..." aria-label="Search units" />
+                            </label>
+                            <label class="select-box">
+                                <span class="icon" aria-hidden="true">filter_list</span>
+                                <select id="group-filter" aria-label="Filter by unit group">
+                                    <option value="all">All groups</option>
+                                    <option value="Mass">Mass</option>
+                                    <option value="Volume">Volume</option>
+                                    <option value="Count">Count</option>
+                                </select>
+                                <span class="icon select-arrow" aria-hidden="true">expand_more</span>
+                            </label>
+                            <button class="primary-button" id="add-unit-button" type="button"><span class="icon" aria-hidden="true">add</span> Add a unit</button>
+                        </div>
+                    </div>
+
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th scope="col">Unit</th>
+                                    <th scope="col">Short name</th>
+                                    <th scope="col">Plural name</th>
+                                    <th scope="col">Unit group</th>
+                                    <th scope="col">Relative to reference</th>
+                                    <th scope="col"><span class="sr-only">Actions</span></th>
+                                </tr>
+                            </thead>
+                            <tbody id="unit-rows">
+                                <tr data-group="Mass" data-search="gram g grams mass">
+                                    <td><div class="unit-name"><span class="unit-glyph">g</span><div><div class="unit-primary">Gram</div><div class="unit-secondary">Reference unit</div></div></div></td>
+                                    <td class="short-name">g</td>
+                                    <td class="plural">grams</td>
+                                    <td><span class="group-badge"><span class="group-dot"></span>Mass</span></td>
+                                    <td><span class="reference-badge"><span class="icon" aria-hidden="true">flag</span> Reference</span></td>
+                                    <td><div class="row-actions"><button class="icon-button" type="button" aria-label="Edit Gram"><span class="icon" aria-hidden="true">edit</span></button><button class="icon-button" type="button" aria-label="More actions for Gram"><span class="icon" aria-hidden="true">more_horiz</span></button></div></td>
+                                </tr>
+                                <tr data-group="Mass" data-search="milligram mg milligrams mass">
+                                    <td><div class="unit-name"><span class="unit-glyph">mg</span><div><div class="unit-primary">Milligram</div><div class="unit-secondary">1 mg = 0.001 g</div></div></div></td>
+                                    <td class="short-name">mg</td>
+                                    <td class="plural">milligrams</td>
+                                    <td><span class="group-badge"><span class="group-dot"></span>Mass</span></td>
+                                    <td><div class="factor"><span class="factor-value">0.001</span><span class="factor-note">× gram</span></div></td>
+                                    <td><div class="row-actions"><button class="icon-button" type="button" aria-label="Edit Milligram"><span class="icon" aria-hidden="true">edit</span></button><button class="icon-button" type="button" aria-label="More actions for Milligram"><span class="icon" aria-hidden="true">more_horiz</span></button></div></td>
+                                </tr>
+                                <tr data-group="Mass" data-search="kilogram kg kilograms mass">
+                                    <td><div class="unit-name"><span class="unit-glyph">kg</span><div><div class="unit-primary">Kilogram</div><div class="unit-secondary">1 kg = 1,000 g</div></div></div></td>
+                                    <td class="short-name">kg</td>
+                                    <td class="plural">kilograms</td>
+                                    <td><span class="group-badge"><span class="group-dot"></span>Mass</span></td>
+                                    <td><div class="factor"><span class="factor-value">1,000</span><span class="factor-note">× gram</span></div></td>
+                                    <td><div class="row-actions"><button class="icon-button" type="button" aria-label="Edit Kilogram"><span class="icon" aria-hidden="true">edit</span></button><button class="icon-button" type="button" aria-label="More actions for Kilogram"><span class="icon" aria-hidden="true">more_horiz</span></button></div></td>
+                                </tr>
+                                <tr data-group="Volume" data-search="milliliter ml milliliters volume">
+                                    <td><div class="unit-name"><span class="unit-glyph">mL</span><div><div class="unit-primary">Milliliter</div><div class="unit-secondary">Reference unit</div></div></div></td>
+                                    <td class="short-name">mL</td>
+                                    <td class="plural">milliliters</td>
+                                    <td><span class="group-badge"><span class="group-dot"></span>Volume</span></td>
+                                    <td><span class="reference-badge"><span class="icon" aria-hidden="true">flag</span> Reference</span></td>
+                                    <td><div class="row-actions"><button class="icon-button" type="button" aria-label="Edit Milliliter"><span class="icon" aria-hidden="true">edit</span></button><button class="icon-button" type="button" aria-label="More actions for Milliliter"><span class="icon" aria-hidden="true">more_horiz</span></button></div></td>
+                                </tr>
+                                <tr data-group="Volume" data-search="teaspoon tsp teaspoons volume">
+                                    <td><div class="unit-name"><span class="unit-glyph">tsp</span><div><div class="unit-primary">Teaspoon</div><div class="unit-secondary">1 tsp = 4.92892 mL</div></div></div></td>
+                                    <td class="short-name">tsp</td>
+                                    <td class="plural">teaspoons</td>
+                                    <td><span class="group-badge"><span class="group-dot"></span>Volume</span></td>
+                                    <td><div class="factor"><span class="factor-value">4.92892</span><span class="factor-note">× milliliter</span></div></td>
+                                    <td><div class="row-actions"><button class="icon-button" type="button" aria-label="Edit Teaspoon"><span class="icon" aria-hidden="true">edit</span></button><button class="icon-button" type="button" aria-label="More actions for Teaspoon"><span class="icon" aria-hidden="true">more_horiz</span></button></div></td>
+                                </tr>
+                                <tr data-group="Volume" data-search="liter l liters volume">
+                                    <td><div class="unit-name"><span class="unit-glyph">L</span><div><div class="unit-primary">Liter</div><div class="unit-secondary">1 L = 1,000 mL</div></div></div></td>
+                                    <td class="short-name">L</td>
+                                    <td class="plural">liters</td>
+                                    <td><span class="group-badge"><span class="group-dot"></span>Volume</span></td>
+                                    <td><div class="factor"><span class="factor-value">1,000</span><span class="factor-note">× milliliter</span></div></td>
+                                    <td><div class="row-actions"><button class="icon-button" type="button" aria-label="Edit Liter"><span class="icon" aria-hidden="true">edit</span></button><button class="icon-button" type="button" aria-label="More actions for Liter"><span class="icon" aria-hidden="true">more_horiz</span></button></div></td>
+                                </tr>
+                                <tr data-group="Count" data-search="piece pc pieces count each">
+                                    <td><div class="unit-name"><span class="unit-glyph">pc</span><div><div class="unit-primary">Piece</div><div class="unit-secondary">Reference unit</div></div></div></td>
+                                    <td class="short-name">pc</td>
+                                    <td class="plural">pieces</td>
+                                    <td><span class="group-badge"><span class="group-dot"></span>Count</span></td>
+                                    <td><span class="reference-badge"><span class="icon" aria-hidden="true">flag</span> Reference</span></td>
+                                    <td><div class="row-actions"><button class="icon-button" type="button" aria-label="Edit Piece"><span class="icon" aria-hidden="true">edit</span></button><button class="icon-button" type="button" aria-label="More actions for Piece"><span class="icon" aria-hidden="true">more_horiz</span></button></div></td>
+                                </tr>
+                                <tr data-group="Count" data-search="dozen doz dozens count">
+                                    <td><div class="unit-name"><span class="unit-glyph">doz</span><div><div class="unit-primary">Dozen</div><div class="unit-secondary">1 dozen = 12 pieces</div></div></div></td>
+                                    <td class="short-name">doz</td>
+                                    <td class="plural">dozens</td>
+                                    <td><span class="group-badge"><span class="group-dot"></span>Count</span></td>
+                                    <td><div class="factor"><span class="factor-value">12</span><span class="factor-note">× piece</span></div></td>
+                                    <td><div class="row-actions"><button class="icon-button" type="button" aria-label="Edit Dozen"><span class="icon" aria-hidden="true">edit</span></button><button class="icon-button" type="button" aria-label="More actions for Dozen"><span class="icon" aria-hidden="true">more_horiz</span></button></div></td>
+                                </tr>
+                                <tr class="empty-row" id="empty-row" hidden><td colspan="6">No units match your search.</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="table-footer">
+                        <span id="results-count">Showing 8 units</span>
+                        <span>Global catalog · Available to all users</span>
+                    </div>
+                </div>
+
+                <div class="callout">
+                    <span class="icon" aria-hidden="true">info</span>
+                    <p><strong>How unit conversions work:</strong> Within a group, each unit's factor is relative to that group's reference unit. Conversions between different groups are defined for a specific global ingredient—not in this catalog.</p>
+                </div>
+            </section>
+
+            <section class="tab-panel" id="panel-ingredients" role="tabpanel" aria-labelledby="tab-ingredients" hidden>
+                <div class="section-heading">
+                    <div>
+                        <h2>Global ingredients &amp; categories</h2>
+                        <p>Maintain the shared ingredient catalog and the classification categories used to organize it.</p>
+                    </div>
+                </div>
+
+                <div class="ingredients-layout">
+                    <aside class="category-card" aria-label="Ingredient classification categories">
+                        <div class="category-card-head">
+                            <h3>Ingredient categories</h3>
+                            <button class="icon-button" id="add-ingredient-category" type="button" aria-label="Add ingredient category"><span class="icon" aria-hidden="true">add</span></button>
+                        </div>
+                        <nav class="category-list" id="ingredient-category-list" aria-label="Filter by ingredient category"></nav>
+                    </aside>
+
+                    <div class="catalog-card ingredient-catalog">
+                        <div class="catalog-card-head">
+                            <div>
+                                <div class="catalog-title">Global ingredient catalog</div>
+                                <div class="catalog-caption">Admin-managed ingredients available to all users</div>
+                            </div>
+                            <div class="toolbar">
+                                <label class="search-box">
+                                    <span class="icon" aria-hidden="true">search</span>
+                                    <input id="ingredient-search" type="search" placeholder="Search ingredients..." aria-label="Search ingredients" />
+                                </label>
+                                <button class="primary-button" id="add-ingredient-button" type="button"><span class="icon" aria-hidden="true">add</span> Add ingredient</button>
+                            </div>
+                        </div>
+                        <div class="table-wrap">
+                            <table class="ingredient-table">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Ingredient</th>
+                                        <th scope="col">Primary unit</th>
+                                        <th scope="col">Classification</th>
+                                        <th scope="col">Shopping-list category</th>
+                                        <th scope="col">Conversions</th>
+                                        <th scope="col"><span class="sr-only">Actions</span></th>
+                                    </tr>
+                                </thead>
+                                <tbody id="ingredient-rows">
+                                    <tr class="empty-row" id="empty-ingredients" hidden><td colspan="6">No ingredients match this view.</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="table-footer">
+                            <span id="ingredient-results-count">Showing 4 ingredients</span>
+                            <span>Global catalog · Managed by admins</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="callout conversion-callout">
+                    <span class="icon" aria-hidden="true">lightbulb</span>
+                    <p><strong>Conversion proposal:</strong> units in the same group as an ingredient's primary unit are available automatically from the unit catalog. Add ingredient-specific conversions only for alternate units from another group, and map each one directly to this ingredient's primary unit (for example, <em>1 tsp flour = 2.6 g</em>).</p>
+                </div>
+            </section>
+            <section class="tab-panel" id="panel-shopping" role="tabpanel" aria-labelledby="tab-shopping" hidden>
+                <div class="section-heading">
+                    <div>
+                        <h2>Shopping Cart categories</h2>
+                        <p>Manage the global categories used to group ingredients on generated shopping lists.</p>
+                    </div>
+                    <button class="primary-button" id="add-shopping-category" type="button"><span class="icon" aria-hidden="true">add</span> Add category</button>
+                </div>
+                <div class="catalog-card">
+                    <div class="catalog-card-head">
+                        <div>
+                            <div class="catalog-title">Shopping-list category catalog</div>
+                            <div class="catalog-caption">Shared categories used by global and private ingredients</div>
+                        </div>
+                    </div>
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr><th scope="col">Category</th><th scope="col">Availability</th><th scope="col"><span class="sr-only">Actions</span></th></tr>
+                            </thead>
+                            <tbody id="shopping-category-rows"></tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="callout">
+                    <span class="icon" aria-hidden="true">info</span>
+                    <p><strong>Shared catalog, personal order.</strong> Admins maintain the available categories. Each user can arrange their own shopping-list order without changing anyone else's.</p>
+                </div>
+            </section>
+            <section class="tab-panel" id="panel-meals" role="tabpanel" aria-labelledby="tab-meals" hidden>
+                <div class="section-heading">
+                    <div>
+                        <h2>Meal Planner categories</h2>
+                        <p>Maintain the shared categories available when recipes are assigned to a day.</p>
+                    </div>
+                    <button class="primary-button" id="add-meal-category" type="button"><span class="icon" aria-hidden="true">add</span> Add category</button>
+                </div>
+                <div class="catalog-card">
+                    <div class="catalog-card-head">
+                        <div>
+                            <div class="catalog-title">Meal category catalog</div>
+                            <div class="catalog-caption">Standard categories available to every meal plan</div>
+                        </div>
+                    </div>
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr><th scope="col">Category</th><th scope="col">Used for</th><th scope="col"><span class="sr-only">Actions</span></th></tr>
+                            </thead>
+                            <tbody id="meal-category-rows"></tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="callout">
+                    <span class="icon" aria-hidden="true">info</span>
+                    <p><strong>Meal-plan rule.</strong> Each recipe assignment has exactly one meal category. A day can contain multiple recipes in the same category.</p>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <dialog class="unit-dialog" id="unit-dialog" aria-labelledby="unit-dialog-title" aria-describedby="unit-dialog-description">
+        <div class="dialog-head">
+            <div>
+                <div class="dialog-eyebrow">Global catalog</div>
+                <h2 id="unit-dialog-title">Add a unit</h2>
+                <p id="unit-dialog-description">Add a measurement unit for everyone to use.</p>
+            </div>
+            <button class="icon-button dialog-close" id="close-unit-dialog" type="button" aria-label="Close dialog"><span class="icon" aria-hidden="true">close</span></button>
+        </div>
+        <form class="dialog-form" id="unit-form">
+            <div class="form-grid">
+                <div class="form-field">
+                    <label for="unit-name-input">Unit name</label>
+                    <input id="unit-name-input" name="name" type="text" placeholder="e.g. Ounce" required maxlength="60" />
+                </div>
+                <div class="form-field">
+                    <label for="unit-short-name-input">Short name</label>
+                    <input id="unit-short-name-input" name="shortName" type="text" placeholder="e.g. oz" required maxlength="16" />
+                </div>
+                <div class="form-field full">
+                    <label for="unit-plural-input">Plural name</label>
+                    <input id="unit-plural-input" name="pluralName" type="text" placeholder="e.g. ounces" required maxlength="60" />
+                </div>
+                <div class="form-field full">
+                    <label for="unit-group-input">Unit group</label>
+                    <select id="unit-group-input" name="group" required>
+                        <option value="Mass">Mass</option>
+                        <option value="Volume">Volume</option>
+                        <option value="Count">Count</option>
+                    </select>
+                </div>
+                <div class="form-field full">
+                    <label class="reference-toggle" for="unit-reference-input">
+                        <input id="unit-reference-input" name="reference" type="checkbox" />
+                        <span>
+                            <span class="reference-toggle-label">Make this the reference unit</span>
+                            <span class="field-hint">Each unit group has exactly one reference unit. Factors are expressed relative to it.</span>
+                        </span>
+                    </label>
+                </div>
+                <div class="form-field full" id="unit-factor-field">
+                    <label id="unit-factor-label" for="unit-factor-input">Factor to reference unit</label>
+                    <input id="unit-factor-input" name="factor" type="number" min="0.000000001" step="any" placeholder="e.g. 28.3495" required />
+                    <span class="field-hint" id="unit-factor-hint">How many reference units are in one of this unit?</span>
+                    <span class="field-hint reference-note">Enter this unit's current factor to the existing reference; other factors will adjust if you make it the new reference.</span>
+                </div>
+            </div>
+            <div class="dialog-footer">
+                <button class="secondary-button" id="cancel-unit-dialog" type="button">Cancel</button>
+                <button class="primary-button" id="save-unit-button" type="submit">Add unit</button>
+            </div>
+        </form>
+    </dialog>
+
+    <dialog class="unit-dialog" id="ingredient-dialog" aria-labelledby="ingredient-dialog-title" aria-describedby="ingredient-dialog-description">
+        <div class="dialog-head">
+            <div>
+                <div class="dialog-eyebrow">Shared catalog</div>
+                <h2 id="ingredient-dialog-title">Add global ingredient</h2>
+                <p id="ingredient-dialog-description">Add an ingredient and its catalog details.</p>
+            </div>
+            <button class="icon-button dialog-close" data-close-dialog="ingredient-dialog" type="button" aria-label="Close dialog"><span class="icon" aria-hidden="true">close</span></button>
+        </div>
+        <form class="dialog-form" id="ingredient-form">
+            <div class="form-grid">
+                <div class="form-field full">
+                    <label for="ingredient-name-input">Ingredient name</label>
+                    <input id="ingredient-name-input" name="name" type="text" placeholder="e.g. All-purpose flour" required maxlength="100" />
+                </div>
+                <div class="form-field full">
+                    <label for="ingredient-primary-unit">Primary unit</label>
+                    <select id="ingredient-primary-unit" name="primaryUnit" required></select>
+                    <span class="field-hint" id="ingredient-primary-unit-hint">Same-group units are available automatically.</span>
+                </div>
+                <div class="form-field full">
+                    <label>Ingredient categories</label>
+                    <div class="classification-options" id="ingredient-classifications"></div>
+                    <span class="field-hint">These are classification categories; shopping-list categories are managed separately.</span>
+                </div>
+                <div class="form-field full">
+                    <label for="ingredient-shopping-category">Shopping-list category</label>
+                    <select id="ingredient-shopping-category" name="shoppingCategory" required></select>
+                    <span class="ingredient-note">Required when the ingredient is not produced by a preparation recipe.</span>
+                </div>
+            </div>
+            <div class="dialog-footer">
+                <button class="secondary-button" data-close-dialog="ingredient-dialog" type="button">Cancel</button>
+                <button class="primary-button" id="save-ingredient-button" type="submit">Add ingredient</button>
+            </div>
+        </form>
+    </dialog>
+
+    <dialog class="unit-dialog" id="category-dialog" aria-labelledby="category-dialog-title" aria-describedby="category-dialog-description">
+        <div class="dialog-head">
+            <div>
+                <div class="dialog-eyebrow">Ingredient classification</div>
+                <h2 id="category-dialog-title">Add category</h2>
+                <p id="category-dialog-description">Create a category for organizing global ingredients.</p>
+            </div>
+            <button class="icon-button dialog-close" data-close-dialog="category-dialog" type="button" aria-label="Close dialog"><span class="icon" aria-hidden="true">close</span></button>
+        </div>
+        <form class="dialog-form category-form" id="category-form">
+            <div class="form-field">
+                <label for="category-name-input">Category name</label>
+                <input id="category-name-input" name="name" type="text" placeholder="e.g. Vegetables" required maxlength="60" />
+            </div>
+            <div class="dialog-footer">
+                <button class="secondary-button" data-close-dialog="category-dialog" type="button">Cancel</button>
+                <button class="primary-button" id="save-category-button" type="submit">Add category</button>
+            </div>
+        </form>
+    </dialog>
+
+    <dialog class="unit-dialog" id="global-category-dialog" aria-labelledby="global-category-dialog-title" aria-describedby="global-category-dialog-description">
+        <div class="dialog-head">
+            <div>
+                <div class="dialog-eyebrow" id="global-category-dialog-eyebrow">Global catalog</div>
+                <h2 id="global-category-dialog-title">Add category</h2>
+                <p id="global-category-dialog-description">Add a category to the shared catalog.</p>
+            </div>
+            <button class="icon-button dialog-close" data-close-dialog="global-category-dialog" type="button" aria-label="Close dialog"><span class="icon" aria-hidden="true">close</span></button>
+        </div>
+        <form class="dialog-form category-form" id="global-category-form">
+            <div class="form-field">
+                <label for="global-category-name-input">Category name</label>
+                <input id="global-category-name-input" name="name" type="text" placeholder="e.g. Bakery" required maxlength="60" />
+            </div>
+            <div class="dialog-footer">
+                <button class="secondary-button" data-close-dialog="global-category-dialog" type="button">Cancel</button>
+                <button class="primary-button" id="save-global-category-button" type="submit">Add category</button>
+            </div>
+        </form>
+    </dialog>
+
+    <dialog class="unit-dialog" id="conversion-dialog" aria-labelledby="conversion-dialog-title" aria-describedby="conversion-dialog-description">
+        <div class="dialog-head">
+            <div>
+                <div class="dialog-eyebrow">Global ingredient</div>
+                <h2 id="conversion-dialog-title">Ingredient conversions</h2>
+                <p id="conversion-dialog-description">Map alternate units directly to this ingredient's primary unit.</p>
+            </div>
+            <button class="icon-button dialog-close" data-close-dialog="conversion-dialog" type="button" aria-label="Close dialog"><span class="icon" aria-hidden="true">close</span></button>
+        </div>
+        <div class="dialog-form">
+            <div class="conversion-primary">
+                <div>
+                    <div class="conversion-primary-label">Primary unit for <span id="conversion-ingredient-name">ingredient</span></div>
+                    <div class="conversion-primary-value" id="conversion-primary-unit">Gram (g)</div>
+                </div>
+                <span class="group-badge"><span class="group-dot"></span><span id="conversion-primary-group">Mass</span></span>
+            </div>
+            <section class="conversion-section">
+                <h3 class="conversion-section-title">Same-group units · automatic</h3>
+                <div class="automatic-units" id="automatic-unit-list"></div>
+            </section>
+            <section class="conversion-section">
+                <h3 class="conversion-section-title">Ingredient-specific conversions</h3>
+                <div class="conversion-list" id="ingredient-conversion-list"></div>
+                <form class="conversion-form" id="add-conversion-form">
+                    <div class="form-field">
+                        <label for="alternate-unit-select">Alternate unit</label>
+                        <select id="alternate-unit-select" required></select>
+                    </div>
+                    <div class="form-field">
+                        <label for="conversion-factor-input">Primary units per 1 alternate</label>
+                        <input id="conversion-factor-input" type="number" min="0.000000001" step="any" placeholder="e.g. 120" required />
+                    </div>
+                    <button class="primary-button" id="save-conversion-button" type="submit"><span class="icon" aria-hidden="true">add</span> Add conversion</button>
+                </form>
+                <p class="conversion-footnote">Each mapping is ingredient-specific and points directly to the primary unit above. Cross-group conversions are not added to the shared unit catalog.</p>
+            </section>
+            <div class="dialog-footer">
+                <button class="primary-button" data-close-dialog="conversion-dialog" type="button">Done</button>
+            </div>
+        </div>
+    </dialog>
+
+    <script>
+        (() => {
+            const tabs = Array.from(document.querySelectorAll('[role="tab"]'));
+            const panels = Array.from(document.querySelectorAll('[role="tabpanel"]'));
+
+            function activateTab(tab, moveFocus = false) {
+                tabs.forEach((item) => {
+                    const selected = item === tab;
+                    item.setAttribute('aria-selected', String(selected));
+                    item.tabIndex = selected ? 0 : -1;
+                });
+                panels.forEach((panel) => {
+                    panel.hidden = panel.id !== tab.getAttribute('aria-controls');
+                });
+                if (moveFocus) tab.focus();
+            }
+
+            tabs.forEach((tab, index) => {
+                tab.addEventListener('click', () => activateTab(tab));
+                tab.addEventListener('keydown', (event) => {
+                    const nextIndex = event.key === 'ArrowRight'
+                        ? (index + 1) % tabs.length
+                        : event.key === 'ArrowLeft'
+                            ? (index - 1 + tabs.length) % tabs.length
+                            : -1;
+                    if (nextIndex >= 0) {
+                        event.preventDefault();
+                        activateTab(tabs[nextIndex], true);
+                    }
+                });
+            });
+
+            const search = document.getElementById('unit-search');
+            const filter = document.getElementById('group-filter');
+            const unitRows = document.getElementById('unit-rows');
+            const emptyRow = document.getElementById('empty-row');
+            const resultsCount = document.getElementById('results-count');
+            const units = Array.from(unitRows.querySelectorAll('tr[data-group]'), (row, index) => {
+                const isReference = row.querySelector('.reference-badge') !== null;
+                return {
+                    id: `unit-${index + 1}`,
+                    name: row.querySelector('.unit-primary').textContent.trim(),
+                    shortName: row.cells[1].textContent.trim(),
+                    pluralName: row.cells[2].textContent.trim(),
+                    group: row.dataset.group,
+                    reference: isReference,
+                    factor: isReference ? null : row.querySelector('.factor-value').textContent.replaceAll(',', '').trim()
+                };
+            });
+            let nextUnitId = units.length + 1;
+            const ingredientCategories = [
+                { id: 'baking', name: 'Baking' },
+                { id: 'dairy', name: 'Dairy' },
+                { id: 'fruits', name: 'Fruits' },
+                { id: 'grains', name: 'Grains' },
+                { id: 'herbs', name: 'Herbs' },
+                { id: 'oils', name: 'Oils & fats' },
+                { id: 'vegetables', name: 'Vegetables' }
+            ];
+            const shoppingCategories = ['Produce', 'Bakery', 'Dairy', 'Meat & seafood', 'Pantry', 'Spices', 'Frozen'];
+            const mealCategories = ['Breakfast', 'Lunch', 'Dinner', 'Snack'];
+            const getUnitByName = (name) => units.find((unit) => unit.name === name);
+            const ingredients = [
+                {
+                    id: 'flour',
+                    name: 'All-purpose flour',
+                    primaryUnitId: getUnitByName('Gram').id,
+                    categoryIds: ['baking', 'grains'],
+                    shoppingCategory: 'Pantry',
+                    conversions: [{ unitId: getUnitByName('Teaspoon').id, factor: '2.6' }]
+                },
+                {
+                    id: 'tomato',
+                    name: 'Tomato',
+                    primaryUnitId: getUnitByName('Gram').id,
+                    categoryIds: ['fruits', 'vegetables'],
+                    shoppingCategory: 'Produce',
+                    conversions: [{ unitId: getUnitByName('Piece').id, factor: '123' }]
+                },
+                {
+                    id: 'olive-oil',
+                    name: 'Olive oil',
+                    primaryUnitId: getUnitByName('Milliliter').id,
+                    categoryIds: ['oils'],
+                    shoppingCategory: 'Pantry',
+                    conversions: []
+                },
+                {
+                    id: 'parmesan',
+                    name: 'Parmesan',
+                    primaryUnitId: getUnitByName('Gram').id,
+                    categoryIds: ['dairy'],
+                    shoppingCategory: 'Dairy',
+                    conversions: []
+                }
+            ];
+            let nextIngredientId = 1;
+            let nextIngredientCategoryId = 1;
+            let selectedIngredientCategory = 'all';
+            let editingIngredientId = null;
+            let editingCategoryId = null;
+            let editingGlobalCategory = null;
+            let activeConversionIngredientId = null;
+            let editingConversionUnitId = null;
+
+            function formatFactor(value) {
+                return Number(value).toLocaleString('en-US', { maximumFractionDigits: 9 });
+            }
+
+            function appendText(parent, tagName, className, value) {
+                const element = document.createElement(tagName);
+                if (className) element.className = className;
+                element.textContent = value;
+                parent.append(element);
+                return element;
+            }
+
+            function createIcon(name) {
+                const icon = document.createElement('span');
+                icon.className = 'icon';
+                icon.setAttribute('aria-hidden', 'true');
+                icon.textContent = name;
+                return icon;
+            }
+
+            function renderUnits() {
+                unitRows.querySelectorAll('tr[data-group]').forEach((row) => row.remove());
+                const query = search.value.trim().toLowerCase();
+                const selectedGroup = filter.value;
+                let visibleCount = 0;
+
+                units.forEach((unit) => {
+                    const row = document.createElement('tr');
+                    row.dataset.group = unit.group;
+                    row.dataset.search = `${unit.name} ${unit.shortName} ${unit.pluralName} ${unit.group}`.toLowerCase();
+                    const matches = (selectedGroup === 'all' || unit.group === selectedGroup)
+                        && row.dataset.search.includes(query);
+                    row.hidden = !matches;
+                    if (matches) visibleCount += 1;
+
+                    const unitCell = row.insertCell();
+                    const unitName = document.createElement('div');
+                    unitName.className = 'unit-name';
+                    appendText(unitName, 'span', 'unit-glyph', unit.shortName);
+                    const unitText = document.createElement('div');
+                    appendText(unitText, 'div', 'unit-primary', unit.name);
+                    const referenceUnit = units.find((item) => item.group === unit.group && item.reference);
+                    const unitDetail = unit.reference
+                        ? 'Reference unit'
+                        : `1 ${unit.shortName} = ${formatFactor(unit.factor)} ${referenceUnit?.shortName ?? ''}`;
+                    appendText(unitText, 'div', 'unit-secondary', unitDetail);
+                    unitName.append(unitText);
+                    unitCell.append(unitName);
+
+                    appendText(row.insertCell(), 'span', 'short-name', unit.shortName);
+                    appendText(row.insertCell(), 'span', 'plural', unit.pluralName);
+
+                    const groupBadge = document.createElement('span');
+                    groupBadge.className = 'group-badge';
+                    appendText(groupBadge, 'span', 'group-dot', '');
+                    groupBadge.append(document.createTextNode(unit.group));
+                    row.insertCell().append(groupBadge);
+
+                    const factorCell = row.insertCell();
+                    if (unit.reference) {
+                        const badge = document.createElement('span');
+                        badge.className = 'reference-badge';
+                        badge.append(createIcon('flag'), document.createTextNode(' Reference'));
+                        factorCell.append(badge);
+                    } else {
+                        const factor = document.createElement('div');
+                        factor.className = 'factor';
+                        appendText(factor, 'span', 'factor-value', formatFactor(unit.factor));
+                        appendText(factor, 'span', 'factor-note', `× ${referenceUnit?.name.toLowerCase() ?? 'reference'}`);
+                        factorCell.append(factor);
+                    }
+
+                    const actions = document.createElement('div');
+                    actions.className = 'row-actions';
+                    const editButton = document.createElement('button');
+                    editButton.className = 'icon-button';
+                    editButton.type = 'button';
+                    editButton.dataset.action = 'edit-unit';
+                    editButton.dataset.unitId = unit.id;
+                    editButton.setAttribute('aria-label', `Edit ${unit.name}`);
+                    editButton.append(createIcon('edit'));
+                    actions.append(editButton);
+                    const moreButton = document.createElement('button');
+                    moreButton.className = 'icon-button';
+                    moreButton.type = 'button';
+                    moreButton.setAttribute('aria-label', `More actions for ${unit.name}`);
+                    moreButton.append(createIcon('more_horiz'));
+                    actions.append(moreButton);
+                    row.insertCell().append(actions);
+
+                    unitRows.insertBefore(row, emptyRow);
+                });
+
+                emptyRow.hidden = visibleCount > 0;
+                resultsCount.textContent = `Showing ${visibleCount} ${visibleCount === 1 ? 'unit' : 'units'}`;
+            }
+
+            const ingredientRows = document.getElementById('ingredient-rows');
+            const ingredientEmptyRow = document.getElementById('empty-ingredients');
+            const ingredientSearch = document.getElementById('ingredient-search');
+            const ingredientCategoryList = document.getElementById('ingredient-category-list');
+
+            function renderIngredientCategories() {
+                ingredientCategoryList.replaceChildren();
+
+                function addCategoryChoice(id, name, count, category = null) {
+                    const item = document.createElement('div');
+                    item.className = 'category-item';
+                    const choice = document.createElement('button');
+                    choice.className = `category-choice${selectedIngredientCategory === id ? ' active' : ''}`;
+                    choice.type = 'button';
+                    choice.dataset.categoryId = id;
+                    const main = document.createElement('span');
+                    main.className = 'category-choice-main';
+                    appendText(main, 'span', 'icon', category ? 'sell' : 'grid_view').setAttribute('aria-hidden', 'true');
+                    appendText(main, 'span', '', name);
+                    choice.append(main);
+                    const trailing = document.createElement('span');
+                    trailing.className = 'category-choice-count';
+                    trailing.textContent = String(count);
+                    choice.append(main, trailing);
+                    if (category) {
+                        const editButton = document.createElement('button');
+                        editButton.className = 'category-edit';
+                        editButton.type = 'button';
+                        editButton.dataset.action = 'edit-category';
+                        editButton.dataset.categoryId = category.id;
+                        editButton.setAttribute('aria-label', `Edit ${category.name} category`);
+                        editButton.append(createIcon('edit'));
+                        item.append(choice, editButton);
+                    } else {
+                        item.append(choice);
+                    }
+                    ingredientCategoryList.append(item);
+                }
+
+                addCategoryChoice('all', 'All ingredients', ingredients.length);
+                ingredientCategories.forEach((category) => {
+                    const count = ingredients.filter((ingredient) => ingredient.categoryIds.includes(category.id)).length;
+                    addCategoryChoice(category.id, category.name, count, category);
+                });
+            }
+
+            function renderIngredients() {
+                ingredientRows.querySelectorAll('tr[data-ingredient-id]').forEach((row) => row.remove());
+                const query = ingredientSearch.value.trim().toLowerCase();
+                let visibleCount = 0;
+
+                ingredients.forEach((ingredient) => {
+                    const primaryUnit = units.find((unit) => unit.id === ingredient.primaryUnitId);
+                    if (!primaryUnit) return;
+                    const categoryNames = ingredient.categoryIds
+                        .map((id) => ingredientCategories.find((category) => category.id === id)?.name)
+                        .filter(Boolean);
+                    const matchesCategory = selectedIngredientCategory === 'all'
+                        || ingredient.categoryIds.includes(selectedIngredientCategory);
+                    const matchesSearch = `${ingredient.name} ${primaryUnit.name} ${categoryNames.join(' ')} ${ingredient.shoppingCategory}`
+                        .toLowerCase()
+                        .includes(query);
+                    const matches = matchesCategory && matchesSearch;
+
+                    const row = document.createElement('tr');
+                    row.dataset.ingredientId = ingredient.id;
+                    row.hidden = !matches;
+                    if (matches) visibleCount += 1;
+
+                    const nameCell = row.insertCell();
+                    const nameWrap = document.createElement('div');
+                    nameWrap.className = 'ingredient-name-cell';
+                    const avatar = document.createElement('span');
+                    avatar.className = 'ingredient-avatar';
+                    avatar.append(createIcon('nutrition'));
+                    nameWrap.append(avatar);
+                    const nameText = document.createElement('div');
+                    appendText(nameText, 'div', 'ingredient-name', ingredient.name);
+                    appendText(nameText, 'div', 'ingredient-subtitle', 'Global ingredient');
+                    nameWrap.append(nameText);
+                    nameCell.append(nameWrap);
+
+                    const primaryCell = row.insertCell();
+                    const primaryLabel = appendText(primaryCell, 'div', 'ingredient-primary', primaryUnit.name);
+                    appendText(primaryLabel, 'small', '', ` (${primaryUnit.shortName})`);
+
+                    const categoriesCell = row.insertCell();
+                    const chips = document.createElement('div');
+                    chips.className = 'category-chips';
+                    categoryNames.forEach((name) => appendText(chips, 'span', 'category-chip', name));
+                    categoriesCell.append(chips);
+                    appendText(row.insertCell(), 'span', 'shopping-category', ingredient.shoppingCategory);
+
+                    const conversionButton = document.createElement('button');
+                    conversionButton.className = `conversion-count${ingredient.conversions.length ? '' : ' none'}`;
+                    conversionButton.type = 'button';
+                    conversionButton.dataset.action = 'manage-conversions';
+                    conversionButton.dataset.ingredientId = ingredient.id;
+                    conversionButton.textContent = ingredient.conversions.length
+                        ? `${ingredient.conversions.length} custom`
+                        : 'Manage';
+                    conversionButton.setAttribute('aria-label', `Manage conversions for ${ingredient.name}`);
+                    row.insertCell().append(conversionButton);
+
+                    const actions = document.createElement('div');
+                    actions.className = 'ingredient-actions';
+                    const editButton = document.createElement('button');
+                    editButton.className = 'icon-button';
+                    editButton.type = 'button';
+                    editButton.dataset.action = 'edit-ingredient';
+                    editButton.dataset.ingredientId = ingredient.id;
+                    editButton.setAttribute('aria-label', `Edit ${ingredient.name}`);
+                    editButton.append(createIcon('edit'));
+                    actions.append(editButton);
+                    row.insertCell().append(actions);
+                    ingredientRows.insertBefore(row, ingredientEmptyRow);
+                });
+
+                ingredientEmptyRow.hidden = visibleCount > 0;
+                document.getElementById('ingredient-results-count').textContent =
+                    `Showing ${visibleCount} ${visibleCount === 1 ? 'ingredient' : 'ingredients'}`;
+                renderIngredientCategories();
+            }
+
+            const shoppingCategoryRows = document.getElementById('shopping-category-rows');
+            const mealCategoryRows = document.getElementById('meal-category-rows');
+
+            function renderGlobalCategoryRows(type) {
+                const isShopping = type === 'shopping';
+                const categories = isShopping ? shoppingCategories : mealCategories;
+                const rows = isShopping ? shoppingCategoryRows : mealCategoryRows;
+                rows.replaceChildren();
+                categories.forEach((name, index) => {
+                    const row = rows.insertRow();
+                    appendText(row.insertCell(), 'span', 'unit-primary', name);
+                    const scope = document.createElement('span');
+                    scope.className = 'group-badge';
+                    appendText(scope, 'span', 'group-dot', '');
+                    scope.append(document.createTextNode(
+                        isShopping ? 'Shared · users set their own order' : 'Available to all meal plans'
+                    ));
+                    row.insertCell().append(scope);
+                    const actions = document.createElement('div');
+                    actions.className = 'row-actions';
+                    const editButton = document.createElement('button');
+                    editButton.className = 'icon-button';
+                    editButton.type = 'button';
+                    editButton.dataset.action = 'edit-catalog-category';
+                    editButton.dataset.catalogType = type;
+                    editButton.dataset.categoryIndex = String(index);
+                    editButton.setAttribute('aria-label', `Edit ${name}`);
+                    editButton.append(createIcon('edit'));
+                    actions.append(editButton);
+                    row.insertCell().append(actions);
+                });
+            }
+
+            search.addEventListener('input', renderUnits);
+            filter.addEventListener('change', renderUnits);
+
+            const unitDialog = document.getElementById('unit-dialog');
+            const unitForm = document.getElementById('unit-form');
+            const dialogTitle = document.getElementById('unit-dialog-title');
+            const dialogDescription = document.getElementById('unit-dialog-description');
+            const saveButton = document.getElementById('save-unit-button');
+            const nameInput = document.getElementById('unit-name-input');
+            const shortNameInput = document.getElementById('unit-short-name-input');
+            const pluralNameInput = document.getElementById('unit-plural-input');
+            const groupInput = document.getElementById('unit-group-input');
+            const referenceInput = document.getElementById('unit-reference-input');
+            const factorInput = document.getElementById('unit-factor-input');
+            const factorLabel = document.getElementById('unit-factor-label');
+            const factorHint = document.getElementById('unit-factor-hint');
+            let editingUnitId = null;
+
+            function updateFactorFields() {
+                const unit = units.find((item) => item.id === editingUnitId);
+                const isCurrentReference = Boolean(unit?.reference && unit.group === groupInput.value);
+                const isNewReference = referenceInput.checked && !isCurrentReference;
+                factorLabel.textContent = isNewReference ? 'Factor to current reference' : 'Factor to reference unit';
+                factorHint.textContent = isNewReference
+                    ? 'How many current reference units are in one of this unit?'
+                    : 'How many reference units are in one of this unit?';
+                factorInput.disabled = isCurrentReference;
+                factorInput.required = !isCurrentReference;
+                factorInput.value = isCurrentReference ? '1' : factorInput.value;
+                unitDialog.dataset.editingReference = String(isNewReference);
+            }
+
+            function openUnitDialog(unit = null) {
+                editingUnitId = unit?.id ?? null;
+                unitForm.reset();
+                dialogTitle.textContent = unit ? 'Edit unit' : 'Add a unit';
+                dialogDescription.textContent = unit
+                    ? 'Update this shared measurement unit.'
+                    : 'Add a measurement unit for everyone to use.';
+                saveButton.textContent = unit ? 'Save changes' : 'Add unit';
+                nameInput.value = unit?.name ?? '';
+                shortNameInput.value = unit?.shortName ?? '';
+                pluralNameInput.value = unit?.pluralName ?? '';
+                groupInput.value = unit?.group ?? (filter.value === 'all' ? 'Mass' : filter.value);
+                referenceInput.checked = Boolean(unit?.reference);
+                referenceInput.disabled = Boolean(unit?.reference);
+                groupInput.disabled = Boolean(unit?.reference);
+                factorInput.value = unit?.factor ?? '';
+                updateFactorFields();
+                unitDialog.showModal();
+                nameInput.focus();
+            }
+
+            document.getElementById('add-unit-button').addEventListener('click', () => openUnitDialog());
+            unitRows.addEventListener('click', (event) => {
+                const editButton = event.target.closest('[data-action="edit-unit"]');
+                if (!editButton) return;
+                const unit = units.find((item) => item.id === editButton.dataset.unitId);
+                if (unit) openUnitDialog(unit);
+            });
+            groupInput.addEventListener('change', () => {
+                const editingUnit = units.find((unit) => unit.id === editingUnitId);
+                if (!editingUnit || editingUnit.group !== groupInput.value) factorInput.value = '';
+                updateFactorFields();
+            });
+            referenceInput.addEventListener('change', updateFactorFields);
+            document.getElementById('close-unit-dialog').addEventListener('click', () => unitDialog.close());
+            document.getElementById('cancel-unit-dialog').addEventListener('click', () => unitDialog.close());
+
+            unitForm.addEventListener('submit', (event) => {
+                event.preventDefault();
+                const name = nameInput.value.trim();
+                const shortName = shortNameInput.value.trim();
+                const pluralName = pluralNameInput.value.trim();
+                const group = groupInput.value;
+                const isReference = referenceInput.checked;
+                const editingUnit = units.find((unit) => unit.id === editingUnitId);
+                const isCurrentReference = Boolean(editingUnit?.reference && editingUnit.group === group);
+                const enteredFactor = isCurrentReference ? 1 : Number(factorInput.value);
+                const factor = isReference ? null : enteredFactor;
+
+                if (!name || !shortName || !pluralName || (!isReference && !(enteredFactor > 0)) || (isReference && !isCurrentReference && !(enteredFactor > 0))) {
+                    unitForm.reportValidity();
+                    return;
+                }
+
+                if (isReference && !isCurrentReference) {
+                    units.filter((unit) => unit.group === group && unit !== editingUnit).forEach((unit) => {
+                        const oldFactor = unit.reference ? 1 : Number(unit.factor);
+                        unit.factor = String(oldFactor / enteredFactor);
+                        unit.reference = false;
+                    });
+                }
+
+                if (editingUnit) {
+                    Object.assign(editingUnit, {
+                        name,
+                        shortName,
+                        pluralName,
+                        group,
+                        reference: isReference,
+                        factor
+                    });
+                } else {
+                    units.push({
+                        id: `unit-${nextUnitId++}`,
+                        name,
+                        shortName,
+                        pluralName,
+                        group,
+                        reference: isReference,
+                        factor
+                    });
+                }
+
+                renderUnits();
+                unitDialog.close();
+            });
+
+            renderUnits();
+
+            const ingredientDialog = document.getElementById('ingredient-dialog');
+            const ingredientForm = document.getElementById('ingredient-form');
+            const ingredientNameInput = document.getElementById('ingredient-name-input');
+            const primaryUnitInput = document.getElementById('ingredient-primary-unit');
+            const classificationOptions = document.getElementById('ingredient-classifications');
+            const shoppingCategoryInput = document.getElementById('ingredient-shopping-category');
+            const categoryDialog = document.getElementById('category-dialog');
+            const categoryForm = document.getElementById('category-form');
+            const categoryNameInput = document.getElementById('category-name-input');
+            const conversionDialog = document.getElementById('conversion-dialog');
+            const conversionRows = document.getElementById('ingredient-conversion-list');
+            const automaticUnitList = document.getElementById('automatic-unit-list');
+            const alternateUnitSelect = document.getElementById('alternate-unit-select');
+            const conversionFactorInput = document.getElementById('conversion-factor-input');
+            const conversionForm = document.getElementById('add-conversion-form');
+            const saveConversionButton = document.getElementById('save-conversion-button');
+
+            function populateIngredientForm(ingredient = null) {
+                primaryUnitInput.replaceChildren();
+                units.slice().sort((first, second) => first.name.localeCompare(second.name)).forEach((unit) => {
+                    const option = document.createElement('option');
+                    option.value = unit.id;
+                    option.textContent = `${unit.name} (${unit.shortName}) · ${unit.group}`;
+                    primaryUnitInput.append(option);
+                });
+
+                shoppingCategoryInput.replaceChildren();
+                shoppingCategories.forEach((name) => {
+                    const option = document.createElement('option');
+                    option.value = name;
+                    option.textContent = name;
+                    shoppingCategoryInput.append(option);
+                });
+
+                classificationOptions.replaceChildren();
+                ingredientCategories.forEach((category) => {
+                    const label = document.createElement('label');
+                    label.className = 'classification-option';
+                    const checkbox = document.createElement('input');
+                    checkbox.type = 'checkbox';
+                    checkbox.name = 'classification';
+                    checkbox.value = category.id;
+                    checkbox.checked = Boolean(ingredient?.categoryIds.includes(category.id));
+                    label.append(checkbox, document.createTextNode(category.name));
+                    classificationOptions.append(label);
+                });
+
+                ingredientNameInput.value = ingredient?.name ?? '';
+                primaryUnitInput.value = ingredient?.primaryUnitId ?? units[0].id;
+                shoppingCategoryInput.value = ingredient?.shoppingCategory ?? shoppingCategories[0];
+                document.getElementById('ingredient-primary-unit-hint').textContent =
+                    `Units in the ${units.find((unit) => unit.id === primaryUnitInput.value)?.group} group are available automatically.`;
+            }
+
+            function openIngredientDialog(ingredient = null) {
+                editingIngredientId = ingredient?.id ?? null;
+                ingredientForm.reset();
+                populateIngredientForm(ingredient);
+                document.getElementById('ingredient-dialog-title').textContent =
+                    ingredient ? 'Edit global ingredient' : 'Add global ingredient';
+                document.getElementById('ingredient-dialog-description').textContent =
+                    ingredient ? 'Update this ingredient in the shared catalog.' : 'Add an ingredient and its catalog details.';
+                document.getElementById('save-ingredient-button').textContent =
+                    ingredient ? 'Save changes' : 'Add ingredient';
+                ingredientDialog.showModal();
+                ingredientNameInput.focus();
+            }
+
+            primaryUnitInput.addEventListener('change', () => {
+                const primaryUnit = units.find((unit) => unit.id === primaryUnitInput.value);
+                document.getElementById('ingredient-primary-unit-hint').textContent =
+                    `Units in the ${primaryUnit?.group ?? 'selected'} group are available automatically. Review ingredient-specific ratios if you change the primary unit.`;
+            });
+
+            ingredientForm.addEventListener('submit', (event) => {
+                event.preventDefault();
+                const name = ingredientNameInput.value.trim();
+                const primaryUnit = units.find((unit) => unit.id === primaryUnitInput.value);
+                if (!name || !primaryUnit || !shoppingCategoryInput.value) {
+                    ingredientForm.reportValidity();
+                    return;
+                }
+
+                const categoryIds = Array.from(
+                    classificationOptions.querySelectorAll('input[name="classification"]:checked'),
+                    (checkbox) => checkbox.value
+                );
+                const ingredient = ingredients.find((item) => item.id === editingIngredientId);
+                if (ingredient) {
+                    Object.assign(ingredient, {
+                        name,
+                        primaryUnitId: primaryUnit.id,
+                        categoryIds,
+                        shoppingCategory: shoppingCategoryInput.value
+                    });
+                    ingredient.conversions = ingredient.conversions.filter((conversion) =>
+                        units.find((unit) => unit.id === conversion.unitId)?.group !== primaryUnit.group
+                    );
+                } else {
+                    ingredients.push({
+                        id: `global-${nextIngredientId++}`,
+                        name,
+                        primaryUnitId: primaryUnit.id,
+                        categoryIds,
+                        shoppingCategory: shoppingCategoryInput.value,
+                        conversions: []
+                    });
+                }
+                renderIngredients();
+                ingredientDialog.close();
+            });
+
+            function openCategoryDialog(category = null) {
+                editingCategoryId = category?.id ?? null;
+                categoryForm.reset();
+                categoryNameInput.value = category?.name ?? '';
+                document.getElementById('category-dialog-title').textContent =
+                    category ? 'Edit ingredient category' : 'Add ingredient category';
+                document.getElementById('category-dialog-description').textContent =
+                    category ? 'Update this classification category.' : 'Create a classification category for global ingredients.';
+                document.getElementById('save-category-button').textContent =
+                    category ? 'Save changes' : 'Add category';
+                categoryDialog.showModal();
+                categoryNameInput.focus();
+            }
+
+            categoryForm.addEventListener('submit', (event) => {
+                event.preventDefault();
+                const name = categoryNameInput.value.trim();
+                if (!name) {
+                    categoryForm.reportValidity();
+                    return;
+                }
+
+                const category = ingredientCategories.find((item) => item.id === editingCategoryId);
+                if (category) {
+                    category.name = name;
+                } else {
+                    const id = `category-${nextIngredientCategoryId++}`;
+                    ingredientCategories.push({ id, name });
+                    selectedIngredientCategory = id;
+                }
+                renderIngredients();
+                categoryDialog.close();
+            });
+
+            const globalCategoryDialog = document.getElementById('global-category-dialog');
+            const globalCategoryForm = document.getElementById('global-category-form');
+            const globalCategoryNameInput = document.getElementById('global-category-name-input');
+
+            function openGlobalCategoryDialog(type, index = null) {
+                const isShopping = type === 'shopping';
+                const categories = isShopping ? shoppingCategories : mealCategories;
+                const category = index === null ? null : categories[index];
+                editingGlobalCategory = { type, index };
+                globalCategoryForm.reset();
+                globalCategoryNameInput.setCustomValidity('');
+                globalCategoryNameInput.value = category ?? '';
+                globalCategoryNameInput.placeholder = isShopping ? 'e.g. Bakery' : 'e.g. Brunch';
+                document.getElementById('global-category-dialog-eyebrow').textContent =
+                    isShopping ? 'Shopping-list catalog' : 'Meal-planner catalog';
+                document.getElementById('global-category-dialog-title').textContent =
+                    `${category ? 'Edit' : 'Add'} ${isShopping ? 'shopping cart' : 'meal planner'} category`;
+                document.getElementById('global-category-dialog-description').textContent =
+                    isShopping
+                        ? 'This shared category will be available for shopping-list ingredients.'
+                        : 'This shared category will be available for meal-plan assignments.';
+                document.getElementById('save-global-category-button').textContent =
+                    category ? 'Save changes' : 'Add category';
+                globalCategoryDialog.showModal();
+                globalCategoryNameInput.focus();
+            }
+
+            globalCategoryForm.addEventListener('submit', (event) => {
+                event.preventDefault();
+                const name = globalCategoryNameInput.value.trim();
+                if (!name || !editingGlobalCategory) {
+                    globalCategoryForm.reportValidity();
+                    return;
+                }
+
+                const { type, index } = editingGlobalCategory;
+                const isShopping = type === 'shopping';
+                const categories = isShopping ? shoppingCategories : mealCategories;
+                const duplicate = categories.some((category, categoryIndex) =>
+                    categoryIndex !== index && category.toLowerCase() === name.toLowerCase()
+                );
+                if (duplicate) {
+                    globalCategoryNameInput.setCustomValidity('A category with this name already exists.');
+                    globalCategoryNameInput.reportValidity();
+                    return;
+                }
+                globalCategoryNameInput.setCustomValidity('');
+
+                if (index === null) {
+                    categories.push(name);
+                } else {
+                    const oldName = categories[index];
+                    categories[index] = name;
+                    if (isShopping) {
+                        ingredients.forEach((ingredient) => {
+                            if (ingredient.shoppingCategory === oldName) ingredient.shoppingCategory = name;
+                        });
+                    }
+                }
+
+                renderGlobalCategoryRows(type);
+                if (isShopping) renderIngredients();
+                editingGlobalCategory = null;
+                globalCategoryDialog.close();
+            });
+
+            function handleCatalogCategoryEdit(event, type) {
+                const button = event.target.closest('[data-action="edit-catalog-category"]');
+                if (button) openGlobalCategoryDialog(type, Number(button.dataset.categoryIndex));
+            }
+
+            shoppingCategoryRows.addEventListener('click', (event) => handleCatalogCategoryEdit(event, 'shopping'));
+            mealCategoryRows.addEventListener('click', (event) => handleCatalogCategoryEdit(event, 'meal'));
+            document.getElementById('add-shopping-category').addEventListener('click', () => openGlobalCategoryDialog('shopping'));
+            document.getElementById('add-meal-category').addEventListener('click', () => openGlobalCategoryDialog('meal'));
+            renderGlobalCategoryRows('shopping');
+            renderGlobalCategoryRows('meal');
+
+            document.getElementById('add-ingredient-button').addEventListener('click', () => openIngredientDialog());
+            document.getElementById('add-ingredient-category').addEventListener('click', () => openCategoryDialog());
+            ingredientSearch.addEventListener('input', renderIngredients);
+            ingredientCategoryList.addEventListener('click', (event) => {
+                const editButton = event.target.closest('[data-action="edit-category"]');
+                if (editButton) {
+                    const category = ingredientCategories.find((item) => item.id === editButton.dataset.categoryId);
+                    if (category) openCategoryDialog(category);
+                    return;
+                }
+                const choice = event.target.closest('[data-category-id]');
+                if (choice) {
+                    selectedIngredientCategory = choice.dataset.categoryId;
+                    renderIngredients();
+                }
+            });
+            function openConversionDialog(ingredient) {
+                activeConversionIngredientId = ingredient.id;
+                editingConversionUnitId = null;
+                document.getElementById('conversion-dialog-title').textContent = `Conversions · ${ingredient.name}`;
+                document.getElementById('conversion-ingredient-name').textContent = ingredient.name;
+                conversionDialog.showModal();
+                renderConversionEditor();
+            }
+
+            function renderConversionEditor() {
+                const ingredient = ingredients.find((item) => item.id === activeConversionIngredientId);
+                if (!ingredient) return;
+                const primaryUnit = units.find((unit) => unit.id === ingredient.primaryUnitId);
+                if (!primaryUnit) return;
+                document.getElementById('conversion-ingredient-name').textContent = ingredient.name;
+                document.getElementById('conversion-primary-unit').textContent = `${primaryUnit.name} (${primaryUnit.shortName})`;
+                document.getElementById('conversion-primary-group').textContent = primaryUnit.group;
+
+                automaticUnitList.replaceChildren();
+                const referenceUnit = units.find((unit) => unit.group === primaryUnit.group && unit.reference);
+                const primaryFactor = primaryUnit.reference ? 1 : Number(primaryUnit.factor);
+                const groupUnits = units.filter((unit) => unit.group === primaryUnit.group && unit.id !== primaryUnit.id);
+                if (groupUnits.length) {
+                    groupUnits.forEach((unit) => {
+                        const unitFactor = unit.reference ? 1 : Number(unit.factor);
+                        const factor = unitFactor / primaryFactor;
+                        const chip = document.createElement('span');
+                        chip.className = 'automatic-unit';
+                        appendText(chip, 'strong', '', `1 ${unit.shortName} = ${formatFactor(factor)} ${primaryUnit.shortName}`);
+                        chip.append(document.createTextNode(` · via ${referenceUnit?.name ?? primaryUnit.group}`));
+                        automaticUnitList.append(chip);
+                    });
+                } else {
+                    appendText(automaticUnitList, 'span', 'conversion-empty', 'No other units in this unit group.');
+                }
+
+                conversionRows.replaceChildren();
+                const crossGroupConversions = ingredient.conversions.filter((conversion) =>
+                    units.find((unit) => unit.id === conversion.unitId)?.group !== primaryUnit.group
+                );
+                if (!crossGroupConversions.length) {
+                    appendText(conversionRows, 'div', 'conversion-empty', 'No ingredient-specific conversions yet.');
+                } else {
+                    crossGroupConversions.forEach((conversion) => {
+                        const alternateUnit = units.find((unit) => unit.id === conversion.unitId);
+                        if (!alternateUnit) return;
+                        const entry = document.createElement('div');
+                        entry.className = 'conversion-entry';
+                        const value = document.createElement('div');
+                        appendText(value, 'div', 'conversion-equation',
+                            `1 ${alternateUnit.name} (${alternateUnit.shortName}) = ${formatFactor(conversion.factor)} ${primaryUnit.shortName}`);
+                        appendText(value, 'div', 'conversion-entry-detail',
+                            `${alternateUnit.group} → ${primaryUnit.name} · specific to ${ingredient.name}`);
+                        entry.append(value);
+                        const actions = document.createElement('div');
+                        actions.className = 'conversion-entry-actions';
+                        const editButton = document.createElement('button');
+                        editButton.type = 'button';
+                        editButton.dataset.action = 'edit-conversion';
+                        editButton.dataset.unitId = alternateUnit.id;
+                        editButton.setAttribute('aria-label', `Edit conversion from ${alternateUnit.name}`);
+                        editButton.append(createIcon('edit'));
+                        actions.append(editButton);
+                        const removeButton = document.createElement('button');
+                        removeButton.type = 'button';
+                        removeButton.dataset.action = 'remove-conversion';
+                        removeButton.dataset.unitId = alternateUnit.id;
+                        removeButton.setAttribute('aria-label', `Remove conversion from ${alternateUnit.name}`);
+                        removeButton.append(createIcon('delete'));
+                        actions.append(removeButton);
+                        entry.append(actions);
+                        conversionRows.append(entry);
+                    });
+                }
+
+                const existingIds = ingredient.conversions
+                    .filter((conversion) => conversion.unitId !== editingConversionUnitId)
+                    .map((conversion) => conversion.unitId);
+                alternateUnitSelect.replaceChildren();
+                const alternateUnits = units.filter((unit) =>
+                    unit.group !== primaryUnit.group && (!existingIds.includes(unit.id) || unit.id === editingConversionUnitId)
+                );
+                alternateUnits.forEach((unit) => {
+                    const option = document.createElement('option');
+                    option.value = unit.id;
+                    option.textContent = `${unit.name} (${unit.shortName}) · ${unit.group}`;
+                    alternateUnitSelect.append(option);
+                });
+                if (!alternateUnits.length) {
+                    const option = document.createElement('option');
+                    option.value = '';
+                    option.textContent = 'No alternate-group units available';
+                    alternateUnitSelect.append(option);
+                    alternateUnitSelect.disabled = true;
+                } else {
+                    alternateUnitSelect.disabled = false;
+                }
+                saveConversionButton.disabled = alternateUnitSelect.disabled;
+                saveConversionButton.textContent = editingConversionUnitId ? 'Save conversion' : 'Add conversion';
+            }
+
+            ingredientRows.addEventListener('click', (event) => {
+                const action = event.target.closest('[data-action]');
+                if (!action) return;
+                const ingredient = ingredients.find((item) => item.id === action.dataset.ingredientId);
+                if (action.dataset.action === 'edit-ingredient' && ingredient) {
+                    editingIngredientId = ingredient.id;
+                    openIngredientDialog(ingredient);
+                } else if (action.dataset.action === 'manage-conversions' && ingredient) {
+                    openConversionDialog(ingredient);
+                }
+            });
+
+            conversionRows.addEventListener('click', (event) => {
+                const action = event.target.closest('[data-action]');
+                if (!action || !activeConversionIngredientId) return;
+                const ingredient = ingredients.find((item) => item.id === activeConversionIngredientId);
+                if (!ingredient) return;
+                const conversion = ingredient.conversions.find((item) => item.unitId === action.dataset.unitId);
+                if (action.dataset.action === 'edit-conversion' && conversion) {
+                    editingConversionUnitId = conversion.unitId;
+                    conversionForm.reset();
+                    conversionFactorInput.value = conversion.factor;
+                    renderConversionEditor();
+                    alternateUnitSelect.value = conversion.unitId;
+                } else if (action.dataset.action === 'remove-conversion') {
+                    ingredient.conversions = ingredient.conversions.filter((item) => item.unitId !== action.dataset.unitId);
+                    editingConversionUnitId = null;
+                    renderConversionEditor();
+                    renderIngredients();
+                }
+            });
+
+            conversionForm.addEventListener('submit', (event) => {
+                event.preventDefault();
+                const ingredient = ingredients.find((item) => item.id === activeConversionIngredientId);
+                const alternateUnit = units.find((unit) => unit.id === alternateUnitSelect.value);
+                const factor = Number(conversionFactorInput.value);
+                if (!ingredient || !alternateUnit || !(factor > 0) || alternateUnit.group === units.find((unit) => unit.id === ingredient.primaryUnitId)?.group) {
+                    conversionForm.reportValidity();
+                    return;
+                }
+
+                const existingConversion = ingredient.conversions.find((item) => item.unitId === editingConversionUnitId);
+                const duplicate = ingredient.conversions.some((item) =>
+                    item.unitId === alternateUnit.id && item !== existingConversion
+                );
+                if (duplicate) {
+                    alternateUnitSelect.setCustomValidity('This alternate unit already has a conversion.');
+                    alternateUnitSelect.reportValidity();
+                    return;
+                }
+                alternateUnitSelect.setCustomValidity('');
+                if (existingConversion) {
+                    existingConversion.unitId = alternateUnit.id;
+                    existingConversion.factor = String(factor);
+                } else {
+                    ingredient.conversions.push({ unitId: alternateUnit.id, factor: String(factor) });
+                }
+                editingConversionUnitId = null;
+                conversionForm.reset();
+                renderConversionEditor();
+                renderIngredients();
+            });
+
+            document.querySelectorAll('[data-close-dialog]').forEach((button) => {
+                button.addEventListener('click', () => document.getElementById(button.dataset.closeDialog).close());
+            });
+            document.getElementById('conversion-dialog').addEventListener('close', () => {
+                editingConversionUnitId = null;
+            });
+
+            renderIngredients();
+
+            const themeToggle = document.getElementById('theme-toggle');
+            const themeIcon = document.getElementById('theme-icon');
+            const themeText = document.getElementById('theme-text');
+
+            function setTheme(isDark) {
+                document.documentElement.classList.toggle('dark', isDark);
+                themeToggle.setAttribute('aria-label', isDark ? 'Switch to light mode' : 'Switch to dark mode');
+                themeIcon.textContent = isDark ? 'light_mode' : 'dark_mode';
+                themeText.textContent = isDark ? 'Light' : 'Dark';
+                try {
+                    localStorage.setItem('mise-theme', isDark ? 'dark' : 'light');
+                } catch {
+                    // The selected theme remains active for the current page.
+                }
+            }
+
+            try {
+                const savedTheme = localStorage.getItem('mise-theme');
+                if (savedTheme === 'dark' || (savedTheme !== 'light' && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                    setTheme(true);
+                }
+            } catch {
+                if (window.matchMedia('(prefers-color-scheme: dark)').matches) setTheme(true);
+            }
+
+            themeToggle.addEventListener('click', () => {
+                setTheme(!document.documentElement.classList.contains('dark'));
+            });
+        })();
+    </script>
+</body>
+</html>

@@ -10,7 +10,7 @@ Turn an approved PRD into User Story documents in the repository work-item hiera
 ## Before writing
 
 1. Locate `.work/<id>/prd.md`. If missing or `status` is not `approved`, stop and suggest `create-prd`.
-2. Read `wiki/domain` and inspect `Requirements/Epics/` for the relevant Epic and Feature directories and existing Story files. Use existing directory names and conventions where applicable.
+2. Read `wiki/domain` (if the PRD introduces domain changes not yet reflected there, suggest running `domain-designer` first) and inspect `Requirements/Epics/` for the relevant Epic and Feature directories and existing Story files. Use existing directory names and conventions where applicable.
 3. Determine the target Epic and Feature for each Story. If either cannot be determined from the PRD and existing hierarchy, ask the user. Create missing Epic, Feature, or `User stories` directories only after the target names are clear. Do not create metadata documents for Epic or Feature directories.
 
 ## Hierarchy and coverage

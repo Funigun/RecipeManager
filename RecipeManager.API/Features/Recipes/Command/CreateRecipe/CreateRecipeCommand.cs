@@ -12,13 +12,21 @@ using RecipeManager.Api.Features.Validation;
 namespace RecipeManager.Api.Features.Recipes.Command.CreateRecipe;
 
 public sealed record CreateRecipeIngredientDto(CreateRecipeIngredientIdDto Ingredient, CreateRecipeUnitDto Unit, double Amount);
+
 public sealed record CreateRecipeIngredientIdDto(Guid Id, Guid? IngredientRecipe);
+
 public sealed record CreateRecipeUnitDto(Guid Id);
+
 public sealed record CreateRecipeAmountDto(double Amount, CreateRecipeUnitDto Unit);
+
 public sealed record CreateRecipeNutritionalValueDto(int Calories, double Proteins, double Fats, double Carbohydrates, int IngredientAmount, Guid IngredientUnitId);
+
 public sealed record CreateRecipeSectionDto(int SectionType, IEnumerable<CreateRecipeStepDto> Steps);
+
 public sealed record CreateRecipeStepDto(int Order, string Description, string? ImageUrl);
+
 public sealed record CreateRecipeCategoryDto(Guid Id);
+
 public sealed record CreateRecipeRequest(
     string Title,
     string Description,
@@ -32,8 +40,9 @@ public sealed record CreateRecipeRequest(
     IEnumerable<CreateRecipeSectionDto> Sections,
     IEnumerable<CreateRecipeCategoryDto> Categories,
     Guid? IngredientId);
+
 public sealed record CreateRecipeCommand(CreateRecipeRequest Request);
-internal sealed record CreateRecipeProjection(Guid Id);
+
 public sealed record CreateRecipeResponse(Guid Id);
 
 public sealed class CreateRecipeCommandHandler(IAppDbContext dbContext, IValidator<CreateRecipeRequest> validator)

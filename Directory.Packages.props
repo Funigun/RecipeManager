@@ -13,18 +13,19 @@
     <PackageVersion Include="Microsoft.Extensions.ServiceDiscovery" Version="10.11.0" />
     <PackageVersion Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="11.0.0-preview.6.26359.118" />
     <!-- Aspire with Open Telemetry packs -->
-    <PackageVersion Include="Aspire.Hosting.AppHost" Version="13.6.2" />
-    <PackageVersion Include="Aspire.Hosting.Blazor" Version="13.6.2-preview.1.26519.11" />
-    <PackageVersion Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.17.0" />
-    <PackageVersion Include="OpenTelemetry.Extensions.Hosting" Version="1.17.0" />
+    <PackageVersion Include="Aspire.Hosting.AppHost" Version="17.0.0" />
+    <PackageVersion Include="Aspire.Hosting.Dotnet" Version="17.0.0" />
+    <PackageVersion Include="Aspire.Hosting.Blazor" Version="17.0.0-preview.1.26567.5" />
+    <PackageVersion Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.18.0" />
+    <PackageVersion Include="OpenTelemetry.Extensions.Hosting" Version="1.18.0" />
     <PackageVersion Include="OpenTelemetry.Instrumentation.AspNetCore" Version="1.17.0" />
     <PackageVersion Include="OpenTelemetry.Instrumentation.Http" Version="1.17.0" />
     <PackageVersion Include="OpenTelemetry.Instrumentation.Runtime" Version="1.17.0" />
     <PackageVersion Include="OpenTelemetry.Instrumentation.EntityFrameworkCore" Version="1.17.0-beta.1" />
     <PackageVersion Include="OpenTelemetry.Instrumentation.SqlClient" Version="1.17.0-beta.1" />
     <PackageVersion Include="OpenTelemetry.Instrumentation.StackExchangeRedis" Version="1.17.0-beta.1" />
-    <PackageVersion Include="Aspire.Hosting.Redis" Version="13.6.2" />
-    <PackageVersion Include="Aspire.StackExchange.Redis" Version="13.6.2" />
+    <PackageVersion Include="Aspire.Hosting.Redis" Version="17.0.0" />
+    <PackageVersion Include="Aspire.StackExchange.Redis" Version="17.0.0" />
     <PackageVersion Include="StackExchange.Redis" Version="2.13.17" />
     <!-- Blazor packs -->
     <PackageVersion Include="Microsoft.AspNetCore.Components.WebAssembly" Version="11.0.0-preview.6.26359.118" />

@@ -1,6 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
-
-  <Sdk Name="Aspire.AppHost.Sdk" Version="13.6.2" />
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -10,15 +8,9 @@
 
   <ItemGroup>
     <PackageReference Include="Aspire.Hosting.AppHost" />
+    <PackageReference Include="Aspire.Hosting.Dotnet" />
     <PackageReference Include="Aspire.Hosting.Blazor" />
-	<PackageReference Include="Aspire.Hosting.Redis" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\RecipeManager.API\RecipeManager.Api.csproj" />
-    <ProjectReference Include="..\RecipeManager.Identity.API\RecipeManager.Identity.Api.csproj" />
-    <ProjectReference Include="..\RecipeManager.UI.Blazor\RecipeManager.UI.Blazor\RecipeManager.UI.Blazor.csproj" />
-    <ProjectReference Include="..\RecipeManager.UI\RecipeManager.UI.csproj" />
+    <PackageReference Include="Aspire.Hosting.Redis" />
   </ItemGroup>
 
 </Project>

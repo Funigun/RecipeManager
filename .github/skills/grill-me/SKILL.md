@@ -9,7 +9,7 @@ Resolve ambiguity through structured questions. Output is `decisions.md`, which 
 
 ## Before asking
 
-1. Read what already exists: `wiki/domain`, `wiki/adr`, relevant code, and `.github\copilot-instructions.md`. Never ask something the repo already answers. If the repo contradicts the user, say so and ask which is right.
+1. Read relevant code, `.github\copilot-instructions.md`. Never ask something the repo already answers. If the repo contradicts the user, say so and ask which is right.
 2. Locate or create `.work/<id>/decisions.md` (ask the user for `<id>` or a short topic slug if unknown). If it exists, resume and skip decided questions.
 3. Restate the topic in one or two sentences and confirm it only if it is genuinely unclear.
 

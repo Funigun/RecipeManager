@@ -5,12 +5,12 @@ description: Turn an approved `.work/<id>/decisions.md` (from grill-me) into `.w
 
 # Create PRD
 
-Convert resolved decisions into a testable product requirements document. The PRD says **what and why**, never **how**. Planning skills consume it later; `update-documentation` uses it to update `wiki/domain` and `wiki/adr`.
+Convert resolved decisions into a testable product requirements document. The PRD says **what and why**, never **how**. `domain-designer` uses it to update `wiki/domain`; planning skills consume it later.
 
 ## Before writing
 
 1. Locate `.work/<id>/decisions.md` (ask for `<id>` if unknown). If missing or `status` is not `approved`, stop and suggest `grill-me`.
-2. Read `wiki/domain`, `wiki/adr`, `.github\copilot-instructions.md`, and relevant code to align terminology and to fill the "Impact on existing system" section.
+2. Read `.github\copilot-instructions.md`, and relevant code to align terminology and to fill the "Impact on existing system" section.
 3. If `.work/<id>/prd.md` exists, update it instead of overwriting; keep IDs stable.
 
 ## Rules
@@ -70,7 +70,7 @@ As a <role> I want <capability> so that <value>.
 
 1. Show a short summary: counts of rules, stories and criteria, plus open questions.
 2. Ask for approval. On approval set `status: approved`; requested changes are applied and re-shown.
-3. Suggest the next step: `update-documentation` (domain docs and ADRs), then planning.
+3. Suggest the next step: `domain-designer` (domain shape in `wiki/domain`), then `prd-to-items`.
 
 ## Do not
 

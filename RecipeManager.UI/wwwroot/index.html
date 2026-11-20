@@ -4,10 +4,29 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>RecipeManager.UI</title>
-    <base href="/" />
+    <meta name="theme-color" content="#faf9f6" />
+    <title>Recipe Manager</title>
+    <base href="./" />
+    <script>
+        const gatewayAppPath = "/recipe-manager-ui";
+        const currentPath = window.location.pathname;
+        if (currentPath === gatewayAppPath || currentPath.startsWith(`${gatewayAppPath}/`)) {
+            const base = document.querySelector("base");
+            if (base) {
+                base.href = `${gatewayAppPath}/`;
+            }
+            if (currentPath === gatewayAppPath) {
+                window.location.replace(`${gatewayAppPath}/${window.location.search}${window.location.hash}`);
+            }
+        }
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+    <link href="_content/MudBlazor/MudBlazor.min.css" rel="stylesheet" />
     <link rel="preload" id="webassembly" />
     <link rel="stylesheet" href="css/app.css" />
+    <link rel="stylesheet" href="css/design-system.css" />
     <!-- If you add any scoped CSS files, uncomment the following to load them
     <link href="RecipeManager.UI.styles.css" rel="stylesheet" /> -->
     <script type="importmap"></script>
@@ -27,7 +46,7 @@
         <a href="." class="reload">Reload</a>
         <span class="dismiss">🗙</span>
     </div>
+    <script src="_content/MudBlazor/MudBlazor.min.js"></script>
     <script src="_framework/blazor.webassembly#[.{fingerprint}].js"></script>
 </body>
-
 </html>

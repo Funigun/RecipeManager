@@ -3,27 +3,35 @@ IDistributedApplicationBuilder builder = DistributedApplication.CreateBuilder(ar
 IResourceBuilder<RedisResource> redisCache = builder.AddRedis("Cache")
                                                     .WithRedisInsight();
 
-IResourceBuilder<ProjectResource> identityApi = builder.AddProject<Projects.RecipeManager_Identity_Api>("recipe-manager-identity-api");
+IResourceBuilder<Aspire.Hosting.Dotnet.DotnetProjectResource>? identityApi = builder.AddDotnetProject(
+    "recipe-manager-identity-api",
+    "..\\RecipeManager.Identity.API\\RecipeManager.Identity.API.csproj");
 
-IResourceBuilder<ProjectResource> coreApi = builder.AddProject<Projects.RecipeManager_Api>("recipe-manager-api")
-                                                   .WaitFor(identityApi)
-                                                   .WaitFor(redisCache)
-                                                   .WithReference(redisCache);
+IResourceBuilder<Aspire.Hosting.Dotnet.DotnetProjectResource>? coreApi = builder.AddDotnetProject(
+                  "recipe-manager-api",
+                  "..\\RecipeManager.API\\RecipeManager.Api.csproj")
+              .WaitFor(identityApi)
+              .WaitFor(redisCache)
+              .WithReference(redisCache);
 
-builder.AddProject<Projects.RecipeManager_UI_Blazor>("recipe-manager-ui-blazor")
+builder.AddDotnetProject(
+           "recipe-manager-ui-blazor",
+           "..\\RecipeManager.UI.Blazor\\RecipeManager.UI.Blazor\\RecipeManager.UI.Blazor.csproj")
        .WaitFor(identityApi)
        .WaitFor(coreApi)
        .WithReference(identityApi)
        .WithReference(coreApi);
 
 #pragma warning disable ASPIREBLAZOR001
-IResourceBuilder<BlazorWasmAppResource> blazorUi = builder.AddBlazorWasmProject<Projects.RecipeManager_UI>("recipe-manager-ui")
-                                                          .WithReference(identityApi)
-                                                          .WithReference(coreApi);
+IResourceBuilder<BlazorWasmAppResource> blazorUi = builder.AddBlazorWasmApp(
+                                                        "recipe-manager-ui",
+                                                        "..\\RecipeManager.UI\\RecipeManager.UI.csproj")
+                                                        .WithReference(identityApi)
+                                                        .WithReference(coreApi);
 
-builder.AddBlazorGateway("recipe-manager-ui-gateway")
+builder.AddDotnetProjectBlazorGateway("recipe-manager-ui-gateway")
        .WithExternalHttpEndpoints()
-       .WithBlazorClientApp(blazorUi, proxyTelemetry: true);
+       .WithBlazorClientApp(blazorUi);
 #pragma warning restore ASPIREBLAZOR001
 
 await builder.Build().RunAsync();

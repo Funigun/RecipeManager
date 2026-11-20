@@ -1,3 +1,64 @@
 ﻿@inherits LayoutComponentBase
 
-@Body
+<MudThemeProvider Theme="@ThemeService.Current.Theme" IsDarkMode="@ThemeService.Current.IsDarkMode" />
+<MudPopoverProvider />
+<MudDialogProvider />
+<MudSnackbarProvider />
+
+<MudLayout>
+    <MudAppBar Class="rm-app-bar" Elevation="1">
+        <MudText Typo="Typo.h6">Recipe Manager</MudText>
+        <MudSpacer />
+        <MudButton Href="./" Color="Color.Inherit">Home</MudButton>
+        <MudTooltip Text="Sign in">
+            <MudIconButton Href="login"
+                           Icon="@Icons.Material.Filled.Login"
+                           Color="Color.Inherit"
+                           aria-label="Sign in" />
+        </MudTooltip>
+        <MudTooltip Text="Register">
+            <MudIconButton Href="register"
+                           Icon="@Icons.Material.Filled.PersonAdd"
+                           Color="Color.Inherit"
+                           aria-label="Register" />
+        </MudTooltip>
+        <MudTooltip Text="Profile">
+            <MudIconButton Href="profile"
+                           Icon="@Icons.Material.Filled.AccountCircle"
+                           Color="Color.Inherit"
+                           aria-label="Profile" />
+        </MudTooltip>
+        <MudMenu>
+            <ActivatorContent>
+                <MudTooltip Text="Theme">
+                    <MudIconButton Icon="@Icons.Material.Filled.Palette"
+                                   Color="Color.Inherit"
+                                   aria-label="Theme" />
+                </MudTooltip>
+            </ActivatorContent>
+            <ChildContent>
+                @foreach (ThemeDefinition theme in ThemeCatalog.Themes)
+                {
+                    <MudMenuItem OnClick="@(() => OnThemeSelectionChanged(theme.Id))">@theme.Name</MudMenuItem>
+                }
+            </ChildContent>
+        </MudMenu>
+    </MudAppBar>
+
+    <MudMainContent Class="rm-main-content">
+        <MudContainer MaxWidth="MaxWidth.False" Class="rm-page-container">
+            @Body
+        </MudContainer>
+    </MudMainContent>
+</MudLayout>
+
+@code {
+    [Inject]
+    private ThemeService ThemeService { get; set; } = null!;
+
+    private Task OnThemeSelectionChanged(string themeId)
+    {
+        ThemeService.SelectTheme(themeId);
+        return Task.CompletedTask;
+    }
+}

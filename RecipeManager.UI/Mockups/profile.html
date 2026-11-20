@@ -1,0 +1,1190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="shell-type" content="web_standard" />
+    <title>Your account · Mise</title>
+    <script>
+        (() => {
+            let storedTheme = null;
+            try {
+                storedTheme = localStorage.getItem('mise-theme');
+            } catch {
+                // Theme still follows the system preference when storage is unavailable.
+            }
+
+            const prefersDark = window.matchMedia?.('(prefers-color-scheme: dark)').matches ?? false;
+            if (storedTheme === 'dark' || (storedTheme !== 'light' && prefersDark)) {
+                document.documentElement.classList.add('dark');
+            }
+        })();
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+    <style>
+        :root {
+            color-scheme: light;
+            font-family: "Plus Jakarta Sans", sans-serif;
+            color: #1a202c;
+            background: #faf9f6;
+            font-synthesis: none;
+            text-rendering: optimizeLegibility;
+        }
+
+        :root.dark {
+            color-scheme: dark;
+            color: #f3f5f4;
+            background: #0f1715;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            min-width: 320px;
+            min-height: 100vh;
+            margin: 0;
+            background: #faf9f6;
+            color: #1a202c;
+            font-size: 14px;
+            line-height: 1.5;
+            transition: background-color 180ms ease, color 180ms ease;
+        }
+
+        .dark body {
+            background: #0f1715;
+            color: #f3f5f4;
+        }
+
+        button, input {
+            font: inherit;
+        }
+
+        button, a {
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        button {
+            cursor: pointer;
+        }
+
+        .material-symbols-outlined {
+            font-size: 20px;
+            font-variation-settings: "FILL" 0, "wght" 500, "GRAD" 0, "opsz" 20;
+            line-height: 1;
+            vertical-align: middle;
+        }
+
+        .topbar {
+            position: sticky;
+            z-index: 2;
+            top: 0;
+            border-bottom: 1px solid #e2e8f0;
+            background: rgb(250 249 246 / 94%);
+            backdrop-filter: blur(12px);
+        }
+
+        .dark .topbar {
+            border-color: #1e332d;
+            background: rgb(15 23 21 / 94%);
+        }
+
+        .topbar-inner, .page, .footer-inner {
+            width: min(100% - 48px, 1180px);
+            margin-inline: auto;
+        }
+
+        .topbar-inner {
+            display: flex;
+            min-height: 68px;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+        }
+
+        .brand {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-family: Outfit, sans-serif;
+            font-size: 20px;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+        }
+
+        .brand .material-symbols-outlined {
+            color: #2d6a4f;
+        }
+
+        .dark .brand .material-symbols-outlined {
+            color: #52b788;
+        }
+
+        .topbar-actions, .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .text-link {
+            color: #64748b;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .dark .text-link {
+            color: #c2c8c4;
+        }
+
+        .text-link:hover, .dark .text-link:hover {
+            color: #2d6a4f;
+        }
+
+        .dark .text-link:hover {
+            color: #52b788;
+        }
+
+        .theme-button, .icon-button, .button {
+            display: inline-flex;
+            min-height: 40px;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            background: #fff;
+            color: #1a202c;
+            font-size: 13px;
+            font-weight: 600;
+            transition: background-color 150ms ease, border-color 150ms ease, color 150ms ease;
+        }
+
+        .theme-button, .icon-button {
+            padding: 8px 11px;
+        }
+
+        .dark .theme-button, .dark .icon-button, .dark .button-secondary {
+            border-color: #1e332d;
+            background: #162420;
+            color: #f3f5f4;
+        }
+
+        .theme-button:hover, .icon-button:hover, .button-secondary:hover {
+            background: #f4f7f5;
+        }
+
+        .dark .theme-button:hover, .dark .icon-button:hover, .dark .button-secondary:hover {
+            background: #1e332d;
+        }
+
+        .avatar {
+            display: grid;
+            width: 36px;
+            height: 36px;
+            flex: 0 0 auto;
+            place-items: center;
+            border-radius: 50%;
+            background: #d8f3e4;
+            color: #1b4332;
+            font-family: Outfit, sans-serif;
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .dark .avatar {
+            background: #1e332d;
+            color: #a8e7c5;
+        }
+
+        .page {
+            min-height: calc(100vh - 128px);
+            padding-block: 48px 72px;
+        }
+
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 28px;
+            color: #64748b;
+            font-size: 12px;
+        }
+
+        .dark .breadcrumb {
+            color: #a1ada6;
+        }
+
+        .breadcrumb .material-symbols-outlined {
+            font-size: 16px;
+        }
+
+        .intro {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+
+        .eyebrow {
+            margin: 0 0 7px;
+            color: #64748b;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+        }
+
+        .dark .eyebrow {
+            color: #a1ada6;
+        }
+
+        h1, h2, h3, p {
+            margin-top: 0;
+        }
+
+        h1, h2, h3 {
+            font-family: Outfit, sans-serif;
+        }
+
+        h1 {
+            margin-bottom: 8px;
+            font-size: clamp(30px, 4vw, 40px);
+            font-weight: 600;
+            letter-spacing: -0.035em;
+            line-height: 1.15;
+        }
+
+        .intro-copy {
+            max-width: 590px;
+            margin-bottom: 0;
+            color: #64748b;
+            font-size: 15px;
+        }
+
+        .dark .intro-copy {
+            color: #c2c8c4;
+        }
+
+        .account-chip, .status, .security-label {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            border-radius: 999px;
+            font-size: 11px;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .account-chip {
+            padding: 7px 10px;
+            background: #f4f7f5;
+            color: #1b4332;
+        }
+
+        .dark .account-chip {
+            background: #162420;
+            color: #a8e7c5;
+        }
+
+        .layout {
+            display: grid;
+            grid-template-columns: 248px minmax(0, 1fr);
+            align-items: start;
+            gap: 24px;
+        }
+
+        .sidebar, .card {
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            background: #fff;
+            box-shadow: 0 4px 16px -2px rgb(45 106 79 / 6%), 0 2px 6px -1px rgb(0 0 0 / 3%);
+        }
+
+        .dark .sidebar, .dark .card {
+            border-color: #1e332d;
+            background: #162420;
+            box-shadow: none;
+        }
+
+        .sidebar {
+            position: sticky;
+            top: 92px;
+            padding: 18px 12px;
+        }
+
+        .sidebar-heading {
+            margin: 0 10px 12px;
+            color: #64748b;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+        }
+
+        .dark .sidebar-heading {
+            color: #a1ada6;
+        }
+
+        .nav-item {
+            display: flex;
+            min-height: 42px;
+            align-items: center;
+            gap: 11px;
+            padding: 9px 10px;
+            border-radius: 8px;
+            color: #64748b;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .dark .nav-item {
+            color: #c2c8c4;
+        }
+
+        .nav-item:hover {
+            background: #f4f7f5;
+            color: #1a202c;
+        }
+
+        .dark .nav-item:hover {
+            background: #1e332d;
+            color: #f3f5f4;
+        }
+
+        .nav-item.active {
+            background: #f4f7f5;
+            color: #2d6a4f;
+        }
+
+        .dark .nav-item.active {
+            background: #1e332d;
+            color: #52b788;
+        }
+
+        .nav-item .material-symbols-outlined {
+            font-size: 18px;
+        }
+
+        .sidebar-divider {
+            height: 1px;
+            margin: 14px 10px;
+            background: #e2e8f0;
+        }
+
+        .dark .sidebar-divider {
+            background: #1e332d;
+        }
+
+        .sidebar-note {
+            display: flex;
+            gap: 9px;
+            margin: 6px 8px 0;
+            padding: 11px;
+            border-radius: 10px;
+            background: #f4f7f5;
+            color: #64748b;
+            font-size: 11px;
+            line-height: 1.55;
+        }
+
+        .dark .sidebar-note {
+            background: #0f1715;
+            color: #c2c8c4;
+        }
+
+        .sidebar-note .material-symbols-outlined {
+            flex: 0 0 auto;
+            color: #2d6a4f;
+            font-size: 17px;
+        }
+
+        .dark .sidebar-note .material-symbols-outlined {
+            color: #52b788;
+        }
+
+        .content {
+            display: grid;
+            gap: 18px;
+        }
+
+        .card {
+            overflow: hidden;
+        }
+
+        .card-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 20px;
+            padding: 22px 24px 18px;
+            border-bottom: 1px solid #eef2ef;
+        }
+
+        .dark .card-header {
+            border-color: #1e332d;
+        }
+
+        .card-header h2 {
+            margin-bottom: 5px;
+            font-size: 19px;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+        }
+
+        .card-header p {
+            margin-bottom: 0;
+            color: #64748b;
+            font-size: 12px;
+        }
+
+        .dark .card-header p {
+            color: #a1ada6;
+        }
+
+        .security-label {
+            padding: 6px 9px;
+            background: #f4f7f5;
+            color: #2d6a4f;
+        }
+
+        .dark .security-label {
+            background: #1e332d;
+            color: #a8e7c5;
+        }
+
+        .security-label .material-symbols-outlined {
+            font-size: 14px;
+        }
+
+        .card-body {
+            padding: 22px 24px 24px;
+        }
+
+        .identity-row {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 22px;
+        }
+
+        .avatar.large {
+            width: 56px;
+            height: 56px;
+            font-size: 18px;
+        }
+
+        .identity-name {
+            margin-bottom: 3px;
+            font-family: Outfit, sans-serif;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .identity-caption {
+            margin: 0;
+            color: #64748b;
+            font-size: 12px;
+        }
+
+        .dark .identity-caption {
+            color: #a1ada6;
+        }
+
+        .email-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            padding: 16px;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            background: #faf9f6;
+        }
+
+        .dark .email-row {
+            border-color: #1e332d;
+            background: #0f1715;
+        }
+
+        .field-label {
+            display: block;
+            margin-bottom: 5px;
+            color: #64748b;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.03em;
+            text-transform: uppercase;
+        }
+
+        .dark .field-label {
+            color: #a1ada6;
+        }
+
+        .email-value {
+            font-size: 14px;
+            font-weight: 600;
+            overflow-wrap: anywhere;
+        }
+
+        .status {
+            margin-top: 6px;
+            padding: 4px 7px;
+            background: #e7f5ec;
+            color: #1b4332;
+        }
+
+        .dark .status {
+            background: #1e332d;
+            color: #a8e7c5;
+        }
+
+        .status .material-symbols-outlined {
+            font-size: 14px;
+        }
+
+        .button {
+            min-height: 38px;
+            flex: 0 0 auto;
+            padding: 8px 12px;
+        }
+
+        .button-primary {
+            border-color: #2d6a4f;
+            background: #2d6a4f;
+            color: #fff;
+        }
+
+        .button-primary:hover {
+            border-color: #1b4332;
+            background: #1b4332;
+        }
+
+        .button-secondary {
+            border-color: #e2e8f0;
+            background: #fff;
+            color: #1a202c;
+        }
+
+        .button-link {
+            min-height: 38px;
+            padding: 8px 4px;
+            border: 0;
+            background: transparent;
+            color: #2d6a4f;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .dark .button-link {
+            color: #a8e7c5;
+        }
+
+        .pending {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            margin-top: 12px;
+            padding: 13px 15px;
+            border: 1px solid #f3d9ae;
+            border-radius: 10px;
+            background: #fff9ee;
+            color: #6f3800;
+        }
+
+        .dark .pending {
+            border-color: #5b4223;
+            background: #292319;
+            color: #ffd1a8;
+        }
+
+        .pending > .material-symbols-outlined {
+            margin-top: 1px;
+            color: #a85c13;
+        }
+
+        .dark .pending > .material-symbols-outlined {
+            color: #f4a261;
+        }
+
+        .pending strong {
+            display: block;
+            margin-bottom: 2px;
+            font-size: 12px;
+        }
+
+        .pending p {
+            margin-bottom: 0;
+            font-size: 11px;
+            line-height: 1.6;
+        }
+
+        .pending-email {
+            color: #3c0700;
+            font-weight: 700;
+        }
+
+        .dark .pending-email {
+            color: #ffe2cc;
+        }
+
+        .form-panel {
+            display: none;
+            margin-top: 16px;
+            padding: 18px;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            background: #faf9f6;
+        }
+
+        .dark .form-panel {
+            border-color: #1e332d;
+            background: #0f1715;
+        }
+
+        .form-panel.open {
+            display: block;
+        }
+
+        .form-panel h3 {
+            margin-bottom: 5px;
+            font-size: 16px;
+        }
+
+        .form-help {
+            margin-bottom: 14px;
+            color: #64748b;
+            font-size: 12px;
+        }
+
+        .dark .form-help {
+            color: #a1ada6;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 13px;
+        }
+
+        .form-field.full {
+            grid-column: 1 / -1;
+        }
+
+        .form-field label {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .form-field input {
+            width: 100%;
+            min-height: 42px;
+            padding: 9px 11px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            outline: none;
+            background: #fff;
+            color: #1a202c;
+        }
+
+        .dark .form-field input {
+            border-color: #334940;
+            background: #162420;
+            color: #f3f5f4;
+        }
+
+        .form-field input:focus {
+            border-color: #2d6a4f;
+            box-shadow: 0 0 0 3px rgb(45 106 79 / 14%);
+        }
+
+        .dark .form-field input:focus {
+            border-color: #52b788;
+        }
+
+        .form-actions {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 10px;
+            margin-top: 14px;
+        }
+
+        .notice {
+            display: none;
+            margin-top: 12px;
+            padding: 10px 12px;
+            border-radius: 8px;
+            background: #e7f5ec;
+            color: #1b4332;
+            font-size: 12px;
+        }
+
+        .dark .notice {
+            background: #1e332d;
+            color: #a8e7c5;
+        }
+
+        .notice.visible {
+            display: block;
+        }
+
+        .password-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+        }
+
+        .password-summary {
+            display: flex;
+            align-items: center;
+            gap: 13px;
+        }
+
+        .password-icon {
+            display: grid;
+            width: 42px;
+            height: 42px;
+            flex: 0 0 auto;
+            place-items: center;
+            border-radius: 10px;
+            background: #f4f7f5;
+            color: #2d6a4f;
+        }
+
+        .dark .password-icon {
+            background: #1e332d;
+            color: #52b788;
+        }
+
+        .password-title {
+            margin-bottom: 3px;
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .password-meta {
+            margin: 0;
+            color: #64748b;
+            font-size: 11px;
+        }
+
+        .dark .password-meta {
+            color: #a1ada6;
+        }
+
+        .security-tip {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 16px 18px;
+            border: 1px solid #d5e9db;
+            border-radius: 12px;
+            background: #f0f8f2;
+            color: #1b4332;
+        }
+
+        .dark .security-tip {
+            border-color: #1e332d;
+            background: #162420;
+            color: #a8e7c5;
+        }
+
+        .security-tip .material-symbols-outlined {
+            margin-top: 1px;
+            font-size: 19px;
+        }
+
+        .security-tip strong {
+            display: block;
+            margin-bottom: 2px;
+            font-size: 12px;
+        }
+
+        .security-tip p {
+            margin: 0;
+            color: #52665a;
+            font-size: 11px;
+        }
+
+        .dark .security-tip p {
+            color: #c2c8c4;
+        }
+
+        .footer {
+            border-top: 1px solid #e2e8f0;
+            background: #f4f7f5;
+        }
+
+        .dark .footer {
+            border-color: #1e332d;
+            background: #0f1715;
+        }
+
+        .footer-inner {
+            display: flex;
+            min-height: 60px;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            color: #64748b;
+            font-size: 11px;
+        }
+
+        .dark .footer-inner {
+            color: #a1ada6;
+        }
+
+        @media (max-width: 760px) {
+            .topbar-inner, .page, .footer-inner {
+                width: min(100% - 32px, 1180px);
+            }
+
+            .page {
+                padding-block: 30px 48px;
+            }
+
+            .intro {
+                align-items: flex-start;
+                flex-direction: column;
+                gap: 14px;
+            }
+
+            .layout {
+                grid-template-columns: 1fr;
+                gap: 16px;
+            }
+
+            .sidebar {
+                position: static;
+                display: flex;
+                align-items: center;
+                gap: 5px;
+                overflow-x: auto;
+                padding: 8px;
+            }
+
+            .sidebar-heading, .sidebar-divider, .sidebar-note {
+                display: none;
+            }
+
+            .nav-item {
+                flex: 0 0 auto;
+                min-height: 40px;
+            }
+        }
+
+        @media (max-width: 520px) {
+            .topbar-inner, .page, .footer-inner {
+                width: min(100% - 28px, 1180px);
+            }
+
+            .topbar-inner {
+                min-height: 60px;
+            }
+
+            .text-link, .user-menu .avatar {
+                display: none;
+            }
+
+            .theme-button {
+                min-width: 40px;
+                padding-inline: 9px;
+            }
+
+            .theme-button span:last-child {
+                display: none;
+            }
+
+            .breadcrumb {
+                margin-bottom: 20px;
+            }
+
+            .card-header, .card-body {
+                padding-inline: 17px;
+            }
+
+            .card-header {
+                padding-block: 18px 15px;
+            }
+
+            .card-header p {
+                max-width: 260px;
+            }
+
+            .security-label {
+                padding: 6px;
+                font-size: 0;
+            }
+
+            .email-row, .password-row {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+
+            .email-row .button {
+                width: 100%;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .form-field.full {
+                grid-column: auto;
+            }
+
+            .footer-inner {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+
+            .footer-inner {
+                justify-content: center;
+                padding-block: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="topbar">
+        <div class="topbar-inner">
+            <a class="brand" href="#" aria-label="Mise home">
+                Mise <span class="material-symbols-outlined" aria-hidden="true">eco</span>
+            </a>
+            <div class="topbar-actions">
+                <button class="theme-button" id="theme-toggle" type="button" aria-label="Switch to dark mode" aria-pressed="false">
+                    <span class="material-symbols-outlined" id="theme-icon" aria-hidden="true">dark_mode</span>
+                    <span id="theme-label">Dark</span>
+                </button>
+                <a class="text-link" href="#">My kitchen</a>
+                <div class="user-menu" aria-label="Signed-in account">
+                    <span class="avatar" aria-hidden="true">AM</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="page">
+        <nav class="breadcrumb" aria-label="Breadcrumb">
+            <a href="#">My kitchen</a>
+            <span class="material-symbols-outlined" aria-hidden="true">chevron_right</span>
+            <span aria-current="page">Account settings</span>
+        </nav>
+
+        <section class="intro" aria-labelledby="page-title">
+            <div>
+                <p class="eyebrow">Your Mise account</p>
+                <h1 id="page-title">Account settings</h1>
+                <p class="intro-copy">Manage the email and password you use to sign in. These settings apply only to your account.</p>
+            </div>
+            <span class="account-chip"><span class="material-symbols-outlined" aria-hidden="true">verified_user</span>Private to you</span>
+        </section>
+
+        <div class="layout">
+            <aside class="sidebar" aria-label="Account settings navigation">
+                <p class="sidebar-heading">Settings</p>
+                <a class="nav-item active" href="#account" aria-current="page">
+                    <span class="material-symbols-outlined" aria-hidden="true">person</span>
+                    Account
+                </a>
+                <a class="nav-item" href="#security">
+                    <span class="material-symbols-outlined" aria-hidden="true">shield_lock</span>
+                    Sign-in &amp; security
+                </a>
+                <div class="sidebar-divider"></div>
+                <div class="sidebar-note">
+                    <span class="material-symbols-outlined" aria-hidden="true">lock</span>
+                    <span>Your account details are yours. You can update your sign-in email after verifying the new address.</span>
+                </div>
+            </aside>
+
+            <div class="content">
+                <section class="card" id="account" aria-labelledby="account-title">
+                    <div class="card-header">
+                        <div>
+                            <h2 id="account-title">Account information</h2>
+                            <p>Your sign-in email and its verification status.</p>
+                        </div>
+                        <span class="security-label"><span class="material-symbols-outlined" aria-hidden="true">lock</span>Private</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="identity-row">
+                            <span class="avatar large" aria-hidden="true">AM</span>
+                            <div>
+                                <div class="identity-name">Alex Morgan</div>
+                                <p class="identity-caption">Mise account holder</p>
+                            </div>
+                        </div>
+
+                        <div class="email-row">
+                            <div>
+                                <span class="field-label">Current sign-in email</span>
+                                <div class="email-value">alex.morgan@example.com</div>
+                                <span class="status"><span class="material-symbols-outlined" aria-hidden="true">check_circle</span>Verified</span>
+                            </div>
+                            <button class="button button-secondary" type="button" data-toggle="email-form" aria-expanded="false">
+                                <span class="material-symbols-outlined" aria-hidden="true">edit</span>
+                                Change email
+                            </button>
+                        </div>
+
+                        <div class="pending" role="status">
+                            <span class="material-symbols-outlined" aria-hidden="true">mark_email_unread</span>
+                            <div>
+                                <strong>Email change awaiting verification</strong>
+                                <p>We sent a verification link to <span class="pending-email">alex.morgan.new@example.com</span>. Your current email remains your sign-in email until you verify the new one.</p>
+                            </div>
+                        </div>
+
+                        <form class="form-panel" id="email-form">
+                            <h3>Change your sign-in email</h3>
+                            <p class="form-help">We’ll send a verification link to your new address. Your current email stays active until verification is complete.</p>
+                            <div class="form-grid">
+                                <div class="form-field full">
+                                    <label for="new-email">New email address</label>
+                                    <input id="new-email" name="new-email" type="email" placeholder="you@example.com" autocomplete="email" required />
+                                </div>
+                            </div>
+                            <div class="form-actions">
+                                <button class="button button-primary" type="submit">Send verification link</button>
+                                <button class="button button-secondary" type="button" data-close="email-form">Cancel</button>
+                            </div>
+                            <div class="notice" role="status">Mockup only — no changes were saved.</div>
+                        </form>
+                    </div>
+                </section>
+
+                <section class="card" id="security" aria-labelledby="security-title">
+                    <div class="card-header">
+                        <div>
+                            <h2 id="security-title">Password &amp; security</h2>
+                            <p>Keep your account access secure and up to date.</p>
+                        </div>
+                        <span class="security-label"><span class="material-symbols-outlined" aria-hidden="true">verified_user</span>Secure sign-in</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="password-row">
+                            <div class="password-summary">
+                                <span class="password-icon"><span class="material-symbols-outlined" aria-hidden="true">key</span></span>
+                                <div>
+                                    <div class="password-title">Password</div>
+                                    <p class="password-meta">Last updated recently</p>
+                                </div>
+                            </div>
+                            <button class="button button-secondary" type="button" data-toggle="password-form" aria-expanded="false">
+                                Change password
+                                <span class="material-symbols-outlined" aria-hidden="true">arrow_forward</span>
+                            </button>
+                        </div>
+
+                        <form class="form-panel" id="password-form">
+                            <h3>Choose a new password</h3>
+                            <p class="form-help">Enter your current password, then choose and confirm a new one.</p>
+                            <div class="form-grid">
+                                <div class="form-field full">
+                                    <label for="current-password">Current password</label>
+                                    <input id="current-password" name="current-password" type="password" autocomplete="current-password" required />
+                                </div>
+                                <div class="form-field">
+                                    <label for="new-password">New password</label>
+                                    <input id="new-password" name="new-password" type="password" autocomplete="new-password" required />
+                                </div>
+                                <div class="form-field">
+                                    <label for="confirm-password">Confirm new password</label>
+                                    <input id="confirm-password" name="confirm-password" type="password" autocomplete="new-password" required />
+                                </div>
+                            </div>
+                            <div class="form-actions">
+                                <button class="button button-primary" type="submit">Update password</button>
+                                <button class="button button-secondary" type="button" data-close="password-form">Cancel</button>
+                            </div>
+                            <div class="notice" role="status">Mockup only — no changes were saved.</div>
+                        </form>
+
+                    </div>
+                </section>
+
+                <div class="security-tip">
+                    <span class="material-symbols-outlined" aria-hidden="true">info</span>
+                    <div>
+                        <strong>Your email change is not active yet</strong>
+                        <p>For your security, a new sign-in email only takes effect after you verify it. Until then, keep signing in with your current address.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="footer-inner">
+            <span>Mise — a calm place for your recipes.</span>
+            <span>Account settings · Private to you</span>
+        </div>
+    </footer>
+
+    <script>
+        (() => {
+            const themeButton = document.getElementById('theme-toggle');
+            const themeIcon = document.getElementById('theme-icon');
+            const themeLabel = document.getElementById('theme-label');
+
+            function updateTheme(isDark) {
+                document.documentElement.classList.toggle('dark', isDark);
+                themeButton?.setAttribute('aria-pressed', String(isDark));
+                themeButton?.setAttribute('aria-label', isDark ? 'Switch to light mode' : 'Switch to dark mode');
+                if (themeIcon) themeIcon.textContent = isDark ? 'light_mode' : 'dark_mode';
+                if (themeLabel) themeLabel.textContent = isDark ? 'Light' : 'Dark';
+            }
+
+            updateTheme(document.documentElement.classList.contains('dark'));
+            themeButton?.addEventListener('click', () => {
+                const isDark = !document.documentElement.classList.contains('dark');
+                try {
+                    localStorage.setItem('mise-theme', isDark ? 'dark' : 'light');
+                } catch {
+                    // The theme can still be changed for the current page.
+                }
+                updateTheme(isDark);
+            });
+
+            document.querySelectorAll('[data-toggle]').forEach((button) => {
+                button.addEventListener('click', () => {
+                    const form = document.getElementById(button.dataset.toggle);
+                    if (!form) return;
+                    const isOpen = form.classList.toggle('open');
+                    button.setAttribute('aria-expanded', String(isOpen));
+                    if (isOpen) form.querySelector('input')?.focus();
+                });
+            });
+
+            document.querySelectorAll('[data-close]').forEach((button) => {
+                button.addEventListener('click', () => {
+                    const form = document.getElementById(button.dataset.close);
+                    form?.classList.remove('open');
+                    document.querySelector(`[data-toggle="${button.dataset.close}"]`)?.setAttribute('aria-expanded', 'false');
+                });
+            });
+
+            document.querySelectorAll('.form-panel').forEach((form) => {
+                form.addEventListener('submit', (event) => {
+                    event.preventDefault();
+                    form.querySelector('.notice')?.classList.add('visible');
+                });
+            });
+        })();
+    </script>
+</body>
+</html>
