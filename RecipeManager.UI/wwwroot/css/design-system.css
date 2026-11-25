@@ -116,6 +116,99 @@ button {
     line-height: 1;
 }
 
+.rm-brand {
+    color: inherit;
+    text-decoration: none;
+}
+
+.rm-primary-nav,
+.rm-public-nav {
+    display: flex;
+    align-items: center;
+    gap: var(--rm-space-xs);
+}
+
+.rm-nav-link {
+    border-radius: var(--rm-radius-sm);
+    color: inherit;
+    font-weight: 600;
+    padding: 0.5rem 0.75rem;
+    text-decoration: none;
+}
+
+.rm-nav-link:hover,
+.rm-nav-link.active {
+    background: var(--rm-herb-soft);
+    color: var(--rm-herb-dark);
+}
+
+.rm-mobile-nav {
+    display: none;
+}
+
+.rm-shell {
+    display: flex;
+    min-height: calc(100vh - 64px);
+}
+
+.rm-admin-sidebar {
+    background: var(--rm-surface);
+    border-right: 1px solid var(--rm-line);
+    flex: 0 0 16rem;
+    padding: var(--rm-space-lg) var(--rm-space-md);
+}
+
+.rm-admin-nav-label {
+    color: var(--rm-muted);
+    display: block;
+    margin: 0 0 var(--rm-space-sm) var(--rm-space-md);
+}
+
+.rm-admin-nav .mud-nav-link {
+    border-radius: var(--rm-radius-sm);
+    min-height: 44px;
+}
+
+.rm-admin-nav .mud-nav-link.active {
+    background: var(--rm-herb-soft);
+    color: var(--rm-herb-dark);
+}
+
+.rm-page-container {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.rm-page-heading {
+    margin: 0;
+    text-align: center;
+}
+
+.rm-landing {
+    align-items: center;
+    display: grid;
+    min-height: min(68vh, 42rem);
+    text-align: center;
+}
+
+.rm-landing-content {
+    margin-inline: auto;
+    max-width: 44rem;
+}
+
+.rm-landing-copy {
+    color: var(--rm-muted);
+    margin: var(--rm-space-md) auto var(--rm-space-lg);
+    max-width: 36rem;
+}
+
+.rm-landing-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--rm-space-sm);
+    justify-content: center;
+}
+
 @media (min-width: 768px) {
     .rm-page-container {
         width: calc(100% - 3rem);
@@ -125,5 +218,38 @@ button {
 @media (min-width: 1024px) {
     .rm-page-container {
         width: calc(100% - 6rem);
+    }
+}
+
+@media (max-width: 767.98px) {
+    .rm-primary-nav,
+    .rm-public-nav {
+        display: none;
+    }
+
+    .rm-shell {
+        flex-direction: column;
+    }
+
+    .rm-mobile-nav {
+        display: inline-flex;
+    }
+
+    .rm-admin-sidebar {
+        border-bottom: 1px solid var(--rm-line);
+        border-right: 0;
+        flex: 0 0 auto;
+        overflow-x: auto;
+        padding: var(--rm-space-sm);
+    }
+
+    .rm-admin-nav {
+        display: flex;
+        gap: var(--rm-space-xs);
+        width: max-content;
+    }
+
+    .rm-admin-nav-label {
+        margin-left: var(--rm-space-sm);
     }
 }

@@ -1,0 +1,8 @@
+@using Microsoft.AspNetCore.Components
+
+<h1 class="mud-typography mud-typography-h3 rm-page-heading">@Title </h1>
+
+@code {
+    [Parameter, EditorRequired]
+    public string Title { get; set; } = string.Empty;
+}

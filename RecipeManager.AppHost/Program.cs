@@ -14,14 +14,6 @@ IResourceBuilder<Aspire.Hosting.Dotnet.DotnetProjectResource>? coreApi = builder
               .WaitFor(redisCache)
               .WithReference(redisCache);
 
-builder.AddDotnetProject(
-           "recipe-manager-ui-blazor",
-           "..\\RecipeManager.UI.Blazor\\RecipeManager.UI.Blazor\\RecipeManager.UI.Blazor.csproj")
-       .WaitFor(identityApi)
-       .WaitFor(coreApi)
-       .WithReference(identityApi)
-       .WithReference(coreApi);
-
 #pragma warning disable ASPIREBLAZOR001
 IResourceBuilder<BlazorWasmAppResource> blazorUi = builder.AddBlazorWasmApp(
                                                         "recipe-manager-ui",

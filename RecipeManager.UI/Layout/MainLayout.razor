@@ -7,27 +7,56 @@
 
 <MudLayout>
     <MudAppBar Class="rm-app-bar" Elevation="1">
-        <MudText Typo="Typo.h6">Recipe Manager</MudText>
+        <MudText Typo="Typo.h6">
+            <a class="rm-brand" href="@HomeHref">Recipe Manager</a>
+        </MudText>
         <MudSpacer />
-        <MudButton Href="./" Color="Color.Inherit">Home</MudButton>
-        <MudTooltip Text="Sign in">
-            <MudIconButton Href="login"
-                           Icon="@Icons.Material.Filled.Login"
-                           Color="Color.Inherit"
-                           aria-label="Sign in" />
-        </MudTooltip>
-        <MudTooltip Text="Register">
-            <MudIconButton Href="register"
-                           Icon="@Icons.Material.Filled.PersonAdd"
-                           Color="Color.Inherit"
-                           aria-label="Register" />
-        </MudTooltip>
-        <MudTooltip Text="Profile">
-            <MudIconButton Href="profile"
-                           Icon="@Icons.Material.Filled.AccountCircle"
-                           Color="Color.Inherit"
-                           aria-label="Profile" />
-        </MudTooltip>
+
+        @if (IsAppArea)
+        {
+            <nav class="rm-primary-nav" aria-label="Main navigation">
+                <NavLink class="rm-nav-link" href="dishes">Dishes</NavLink>
+                <NavLink class="rm-nav-link" href="recipes">Recipes</NavLink>
+                <NavLink class="rm-nav-link" href="cookbooks">Cookbooks</NavLink>
+                <NavLink class="rm-nav-link" href="meal-plans">Meal plans</NavLink>
+                <NavLink class="rm-nav-link" href="profile">Profile</NavLink>
+            </nav>
+            <MudMenu Class="rm-mobile-nav">
+                <ActivatorContent>
+                    <MudIconButton Icon="@Icons.Material.Filled.Menu"
+                                   Color="Color.Inherit"
+                                   aria-label="Open main navigation" />
+                </ActivatorContent>
+                <ChildContent>
+                    <MudMenuItem Href="dishes">Dishes</MudMenuItem>
+                    <MudMenuItem Href="recipes">Recipes</MudMenuItem>
+                    <MudMenuItem Href="cookbooks">Cookbooks</MudMenuItem>
+                    <MudMenuItem Href="meal-plans">Meal plans</MudMenuItem>
+                    <MudMenuItem Href="profile">Profile</MudMenuItem>
+                </ChildContent>
+            </MudMenu>
+        }
+        else
+        {
+            <nav class="rm-public-nav" aria-label="Main navigation">
+                <NavLink class="rm-nav-link" href="./" Match="NavLinkMatch.All">Home</NavLink>
+                <NavLink class="rm-nav-link" href="login">Sign in</NavLink>
+                <NavLink class="rm-nav-link" href="register">Register</NavLink>
+            </nav>
+            <MudMenu Class="rm-mobile-nav">
+                <ActivatorContent>
+                    <MudIconButton Icon="@Icons.Material.Filled.Menu"
+                                   Color="Color.Inherit"
+                                   aria-label="Open main navigation" />
+                </ActivatorContent>
+                <ChildContent>
+                    <MudMenuItem Href="./">Home</MudMenuItem>
+                    <MudMenuItem Href="login">Sign in</MudMenuItem>
+                    <MudMenuItem Href="register">Register</MudMenuItem>
+                </ChildContent>
+            </MudMenu>
+        }
+
         <MudMenu>
             <ActivatorContent>
                 <MudTooltip Text="Theme">
@@ -46,15 +75,55 @@
     </MudAppBar>
 
     <MudMainContent Class="rm-main-content">
-        <MudContainer MaxWidth="MaxWidth.False" Class="rm-page-container">
-            @Body
-        </MudContainer>
+        <div class="rm-shell">
+            @if (IsAdminArea)
+            {
+                <aside class="rm-admin-sidebar" aria-label="Admin navigation">
+                    <MudText Typo="Typo.overline" Class="rm-admin-nav-label">Admin catalogs</MudText>
+                    <MudNavMenu Class="rm-admin-nav">
+                        <MudNavLink Href="admin" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Dashboard">Overview</MudNavLink>
+                        <MudNavLink Href="admin/units" Icon="@Icons.Material.Filled.Straighten">Units</MudNavLink>
+                        <MudNavLink Href="admin/ingredients" Icon="@Icons.Material.Filled.Restaurant">Global ingredients</MudNavLink>
+                        <MudNavLink Href="admin/ingredient-categories" Icon="@Icons.Material.Filled.Category">Ingredient categories</MudNavLink>
+                        <MudNavLink Href="admin/recipe-categories" Icon="@Icons.Material.Filled.RestaurantMenu">Recipe categories</MudNavLink>
+                        <MudNavLink Href="admin/shopping-list-categories" Icon="@Icons.Material.Filled.ShoppingBasket">Shopping-list categories</MudNavLink>
+                        <MudNavLink Href="admin/meal-categories" Icon="@Icons.Material.Filled.Restaurant">Meal categories</MudNavLink>
+                    </MudNavMenu>
+                </aside>
+            }
+
+            <main class="rm-page-container">
+                @Body
+            </main>
+        </div>
     </MudMainContent>
 </MudLayout>
 
 @code {
     [Inject]
     private ThemeService ThemeService { get; set; } = null!;
+
+    [Inject]
+    private NavigationManager Navigation { get; set; } = null!;
+
+    private string CurrentRoute
+    {
+        get
+        {
+            string route = Navigation.ToBaseRelativePath(Navigation.Uri);
+            int queryOrFragmentIndex = route.IndexOfAny(['?', '#']);
+            return (queryOrFragmentIndex >= 0 ? route[..queryOrFragmentIndex] : route).Trim('/');
+        }
+    }
+    private string HomeHref => IsAppArea ? "kitchen" : "./";
+
+    private bool IsAdminArea =>
+        CurrentRoute.Equals("admin", StringComparison.OrdinalIgnoreCase) ||
+        CurrentRoute.StartsWith("admin/", StringComparison.OrdinalIgnoreCase);
+
+    private bool IsAppArea =>
+        IsAdminArea ||
+        CurrentRoute is "kitchen" or "dishes" or "recipes" or "cookbooks" or "meal-plans" or "profile";
 
     private Task OnThemeSelectionChanged(string themeId)
     {
