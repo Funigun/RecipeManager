@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Sign in - Mise</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <style>
+        :root {
+            color-scheme: light;
+            font-family: "Plus Jakarta Sans", sans-serif;
+            color: #161c27;
+            background: #f9f9ff;
+            font-synthesis: none;
+            text-rendering: optimizeLegibility;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            min-width: 320px;
+            min-height: 100vh;
+            margin: 0;
+            display: grid;
+            place-items: center;
+            padding: 32px 16px;
+            background: #f9f9ff;
+        }
+
+        a { color: #0f5238; }
+
+        .shell {
+            width: min(100%, 440px);
+        }
+
+        .brand {
+            display: block;
+            margin: 0 0 24px;
+            color: #0f5238;
+            font: 700 27px/1 "Outfit", sans-serif;
+            letter-spacing: -0.04em;
+            text-align: center;
+            text-decoration: none;
+        }
+
+        .card {
+            padding: 40px;
+            border: 1px solid #e3e8e3;
+            border-radius: 20px;
+            background: #fff;
+            box-shadow: 0 12px 36px rgb(22 28 39 / 6%);
+        }
+
+        h1 {
+            margin: 0;
+            font: 600 30px/1.2 "Outfit", sans-serif;
+            letter-spacing: -0.025em;
+        }
+
+        .intro {
+            margin: 10px 0 28px;
+            color: #59645f;
+            font-size: 15px;
+            line-height: 1.6;
+        }
+
+        form { display: grid; gap: 20px; }
+
+        .field { display: grid; gap: 8px; }
+
+        label {
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        input {
+            width: 100%;
+            min-height: 48px;
+            padding: 12px 14px;
+            border: 1px solid #bfc9c1;
+            border-radius: 9px;
+            background: #fff;
+            color: #161c27;
+            font: inherit;
+        }
+
+        input:focus {
+            border-color: #0f5238;
+            outline: 3px solid rgb(15 82 56 / 15%);
+        }
+
+        button {
+            min-height: 50px;
+            margin-top: 4px;
+            border: 0;
+            border-radius: 9px;
+            background: #0f5238;
+            color: #fff;
+            font: 700 15px "Plus Jakarta Sans", sans-serif;
+            cursor: pointer;
+        }
+
+        button:hover { background: #0b422e; }
+
+        .switch {
+            margin: 24px 0 0;
+            color: #59645f;
+            font-size: 14px;
+            text-align: center;
+        }
+
+        .switch a { font-weight: 700; }
+
+        .prototype-note {
+            min-height: 20px;
+            margin: 16px 0 0;
+            color: #59645f;
+            font-size: 12px;
+            line-height: 1.5;
+            text-align: center;
+        }
+
+        @media (max-width: 480px) {
+            .card { padding: 30px 24px; }
+        }
+    </style>
+</head>
+<body>
+    <main class="shell">
+        <a class="brand" href="login.html" aria-label="Mise home">Mise</a>
+        <section class="card" aria-labelledby="page-title">
+            <h1 id="page-title">Welcome back</h1>
+            <p class="intro">Sign in to manage your recipes and meal plans.</p>
+            <form id="login-form">
+                <div class="field">
+                    <label for="username">Username</label>
+                    <input id="username" name="userName" type="text" autocomplete="username" required />
+                </div>
+                <div class="field">
+                    <label for="password">Password</label>
+                    <input id="password" name="password" type="password" autocomplete="current-password" required />
+                </div>
+                <button type="submit">Sign in</button>
+            </form>
+            <p class="switch">New to Mise? <a href="register.html">Create an account</a></p>
+        </section>
+        <p class="prototype-note" id="prototype-note" aria-live="polite">Prototype preview - sign-in is not connected.</p>
+    </main>
+    <script>
+        document.querySelector("#login-form").addEventListener("submit", event => {
+            event.preventDefault();
+            document.querySelector("#prototype-note").textContent = "Prototype preview - no sign-in request was sent.";
+        });
+    </script>
+</body>
+</html>

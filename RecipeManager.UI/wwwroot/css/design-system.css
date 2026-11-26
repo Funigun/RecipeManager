@@ -65,7 +65,7 @@ button {
     -webkit-tap-highlight-color: transparent;
 }
 
-:focus-visible {
+:where(a, button, input, select, textarea, [tabindex]:not([tabindex="-1"])):focus-visible {
     outline: 3px solid var(--rm-citrus);
     outline-offset: 2px;
 }
@@ -84,6 +84,17 @@ button {
 .rm-main-content {
     min-height: 100vh;
     background: var(--rm-canvas);
+}
+
+#blazor-error-ui {
+    border-top: 1px solid var(--rm-line);
+    background: var(--rm-surface-soft);
+    color: var(--rm-ink);
+    box-shadow: var(--rm-shadow-overlay);
+}
+
+#blazor-error-ui a {
+    color: var(--rm-herb);
 }
 
 .rm-page-container {
@@ -121,11 +132,62 @@ button {
     text-decoration: none;
 }
 
+.rm-app-bar .mud-toolbar {
+    position: relative;
+}
+
 .rm-primary-nav,
 .rm-public-nav {
     display: flex;
     align-items: center;
     gap: var(--rm-space-xs);
+}
+
+.rm-public-nav {
+    left: 50%;
+    position: absolute;
+    transform: translateX(-50%);
+}
+
+.rm-public-spacer {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.rm-header-actions,
+.rm-public-account-actions {
+    align-items: center;
+    display: flex;
+}
+
+.rm-header-actions {
+    gap: var(--rm-space-sm);
+}
+
+.rm-public-header-actions {
+    margin-left: auto;
+}
+
+.rm-public-account-actions {
+    gap: var(--rm-space-xs);
+}
+
+.rm-public-auth-button {
+    white-space: nowrap;
+}
+
+.rm-public-auth-button.mud-button-filled {
+    background-color: var(--rm-herb);
+    color: #ffffff;
+}
+
+.rm-public-auth-button.mud-button-filled:hover {
+    background-color: var(--rm-herb-dark);
+}
+
+.rm-public-auth-button.mud-button-outlined {
+    border-color: var(--rm-line);
+    color: var(--rm-ink);
 }
 
 .rm-nav-link {
@@ -184,6 +246,21 @@ button {
     text-align: center;
 }
 
+.rm-page-heading:focus {
+    outline: none;
+}
+
+.rm-landing-footer {
+    align-items: center;
+    background: var(--rm-herb);
+    color: #ffffff;
+    display: flex;
+    justify-content: center;
+    min-height: 4rem;
+    padding: var(--rm-space-md);
+    text-align: center;
+}
+
 .rm-landing {
     align-items: center;
     display: grid;
@@ -194,19 +271,56 @@ button {
 .rm-landing-content {
     margin-inline: auto;
     max-width: 44rem;
+    padding-block: var(--rm-space-lg);
 }
 
 .rm-landing-copy {
     color: var(--rm-muted);
-    margin: var(--rm-space-md) auto var(--rm-space-lg);
+    margin: var(--rm-space-md) auto 0;
     max-width: 36rem;
 }
 
-.rm-landing-actions {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--rm-space-sm);
-    justify-content: center;
+.rm-features {
+    margin: 0 auto;
+    max-width: 68rem;
+    scroll-margin-top: 5rem;
+}
+
+.rm-features-heading {
+    margin-bottom: var(--rm-space-lg);
+    text-align: center;
+}
+
+.rm-features-heading h2 {
+    margin-bottom: var(--rm-space-sm);
+}
+
+.rm-features-copy,
+.rm-feature-placeholder {
+    color: var(--rm-muted);
+}
+
+.rm-feature-grid {
+    display: grid;
+    gap: var(--rm-space-md);
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
+}
+
+.rm-feature-card {
+    border: 1px solid var(--rm-line);
+    border-radius: var(--rm-radius-lg);
+    background: var(--rm-surface);
+    box-shadow: var(--rm-shadow-card);
+    min-width: 0;
+    padding: var(--rm-space-lg);
+}
+
+.rm-feature-card h3 {
+    margin-bottom: var(--rm-space-sm);
+}
+
+.rm-feature-placeholder {
+    margin: 0;
 }
 
 @media (min-width: 768px) {
@@ -225,6 +339,28 @@ button {
     .rm-primary-nav,
     .rm-public-nav {
         display: none;
+    }
+
+    .rm-public-app-bar .mud-toolbar {
+        flex-wrap: wrap;
+        height: auto;
+        min-height: 64px;
+        padding-block: var(--rm-space-sm);
+    }
+
+    .rm-public-app-bar .rm-public-spacer {
+        flex: 0 0 100%;
+        height: 0;
+        order: 1;
+    }
+
+    .rm-public-app-bar .rm-public-header-actions {
+        margin-left: auto;
+        order: 2;
+    }
+
+    .rm-public-app-bar .rm-mobile-nav {
+        order: 3;
     }
 
     .rm-shell {
@@ -251,5 +387,12 @@ button {
 
     .rm-admin-nav-label {
         margin-left: var(--rm-space-sm);
+    }
+}
+
+@media (max-width: 400px) {
+    .rm-public-app-bar .rm-public-auth-button.mud-button-root {
+        min-width: 0;
+        padding-inline: var(--rm-space-sm);
     }
 }

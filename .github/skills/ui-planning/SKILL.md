@@ -1,6 +1,6 @@
 ---
 name: ui-planning
-description: Plan the Blazor UI part of a User Story and write `.work/<id>/plan-ui.md`. Use when the user asks to plan a UI feature or slice. Identifies which backend endpoints are consumed. Read-only; never writes application code.
+description: Plan the Blazor UI part of a User Story and write a concrete companion plan beside the Story. Use when the user asks to plan a UI feature or slice. Identifies which backend endpoints are consumed. Read-only; never writes application code.
 ---
 
 # UI planning
@@ -14,15 +14,15 @@ Turn a Story (and an approved contract, when one exists) into an ordered, implem
 3. Resolve the backend API to consume, in this order:
    1. `.work/<id>/contract.md` (must be `status: approved`).
    2. The OpenAPI document, when the project profile or solution provides one.
-   3. Endpoint files under `RecipeManager.API/Features/<Domain>`, DTOs in API Shared, and validators in Shared Contracts.
+   3. Endpoint files in the owning API project (for example, `RecipeManager.API/Features/<Domain>` or `RecipeManager.Identity.API/Features/<Domain>`), their DTOs, and relevant validators in Shared Contracts or the API project.
 4. If a required endpoint, field or link does not exist, record a `Backend gap` and stop planning the dependent tasks. Never invent an endpoint. Suggest running `backend-planning` or `contract-design` for it.
 5. Reuse existing components, services and pages; inspect the UI projects before planning new ones.
 
 ## Plan format
 
-Write the plan with this structure:
+Write the plan beside its Story as `<story-slug>-ui-plan.md`. Use this structure:
 
-```markdown
+````markdown
 ---
 status: draft
 story: <repo-relative path of target Story>
@@ -44,6 +44,14 @@ depends_on: [contract.md]   # omit when there is no contract
 ## Scope
 <pages, components, navigation, render modes affected>
 
+## File structure
+```text
+<repository-relative project path>/
+├── <ExistingFile.razor> [modify] — <specific responsibility>
+├── <NewFile.cs> [create] — <specific responsibility>
+└── <ExistingTest.cs> [modify] — <specific coverage>
+```
+
 ## Tasks
 | ID | Description | Files/area | Depends on | Covers (AC-/R-) |
 |---|---|---|---|---|
@@ -55,7 +63,7 @@ depends_on: [contract.md]   # omit when there is no contract
 
 ## Risks and open questions
 - ...
-```
+````
 
 ## Provenance (required)
 
@@ -65,7 +73,10 @@ depends_on: [contract.md]   # omit when there is no contract
 ## Rules for tasks
 
 - Each task is small, verifiable and ordered; dependencies are explicit and acyclic.
+- The file structure is a concrete implementation map, not a scaffold manifest: list every file expected to be created, modified, or deleted, once, with repository-relative paths and `[create]`, `[modify]`, or `[delete]` markers. Do not list unaffected files or generic folders as changes.
+- Use exact paths and component/resource/test names supported by the repository and the Story. Every planned file must appear in at least one task, and every task's file references must appear in the file structure. Do not invent file names or routes to fill gaps; record unresolved choices under Risks and open questions.
 - Every acceptance criterion of the target Story is covered by at least one task and test row. Report any that are not.
+- Inspect the existing UI test infrastructure. If there is no UI/component test harness, label the checks as manual browser verification instead of implying automated tests or inventing a test project.
 - Use shared validators from Shared Contracts; do not duplicate validation rules in the UI.
 - Cover loading, empty, error and validation states for each screen.
 

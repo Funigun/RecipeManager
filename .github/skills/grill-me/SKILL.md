@@ -1,6 +1,7 @@
 ---
 name: grill-me
 description: Interview the user one question at a time to turn a vague idea, feature, domain rule set or bug into resolved decisions. Use when the user says "grill me", has an unclear idea, or needs requirements or domain rules clarified before a PRD. Asks questions only; never writes the PRD or code.
+disable-model-invocation: true
 ---
 
 # Grill me

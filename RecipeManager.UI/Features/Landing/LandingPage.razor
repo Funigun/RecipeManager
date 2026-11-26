@@ -1,16 +1,40 @@
 ﻿@page "/"
+@inject IStringLocalizer<LandingPage> Localizer
 
-<PageTitle>Welcome</PageTitle>
+<PageTitle>@Localizer["PageTitle"]</PageTitle>
 
 <section class="rm-landing">
     <div class="rm-landing-content">
-        <PageHeading Title="Welcome to Recipe Manager" />
-        <MudText Typo="Typo.body1" Class="rm-landing-copy">
-            Keep your recipes organized, plan meals, and make your kitchen easier to manage.
-        </MudText>
-        <div class="rm-landing-actions">
-            <MudButton Href="register" Variant="Variant.Filled" Color="Color.Primary">Create account</MudButton>
-            <MudButton Href="login" Variant="Variant.Outlined" Color="Color.Primary">Sign in</MudButton>
-        </div>
+        <PageHeading Title="@Localizer["HeroHeading"]" />
+        <MudText Typo="Typo.body1" Class="rm-landing-copy">@Localizer["HeroDescription"]</MudText>
+    </div>
+</section>
+
+<section id="features" class="rm-features" aria-labelledby="rm-features-heading">
+    <div class="rm-features-heading">
+        <h2 id="rm-features-heading" class="mud-typography mud-typography-h4">@Localizer["FeaturesHeading"]</h2>
+        <MudText Typo="Typo.body1" Class="rm-features-copy">@Localizer["FeaturesDescription"]</MudText>
+    </div>
+    <div class="rm-feature-grid">
+        <section class="rm-feature-card" aria-labelledby="rm-feature-dishes">
+            <h3 id="rm-feature-dishes" class="mud-typography mud-typography-h6">@Localizer["Dishes"]</h3>
+            <MudText Typo="Typo.body2" Class="rm-feature-placeholder">@Localizer["Placeholder"]</MudText>
+        </section>
+        <section class="rm-feature-card" aria-labelledby="rm-feature-recipes">
+            <h3 id="rm-feature-recipes" class="mud-typography mud-typography-h6">@Localizer["Recipes"]</h3>
+            <MudText Typo="Typo.body2" Class="rm-feature-placeholder">@Localizer["Placeholder"]</MudText>
+        </section>
+        <section class="rm-feature-card" aria-labelledby="rm-feature-cookbooks">
+            <h3 id="rm-feature-cookbooks" class="mud-typography mud-typography-h6">@Localizer["Cookbooks"]</h3>
+            <MudText Typo="Typo.body2" Class="rm-feature-placeholder">@Localizer["Placeholder"]</MudText>
+        </section>
+        <section class="rm-feature-card" aria-labelledby="rm-feature-meal-plan">
+            <h3 id="rm-feature-meal-plan" class="mud-typography mud-typography-h6">@Localizer["MealPlan"]</h3>
+            <MudText Typo="Typo.body2" Class="rm-feature-placeholder">@Localizer["Placeholder"]</MudText>
+        </section>
+        <section class="rm-feature-card" aria-labelledby="rm-feature-shared">
+            <h3 id="rm-feature-shared" class="mud-typography mud-typography-h6">@Localizer["UnitsAndCategories"]</h3>
+            <MudText Typo="Typo.body2" Class="rm-feature-placeholder">@Localizer["Placeholder"]</MudText>
+        </section>
     </div>
 </section>

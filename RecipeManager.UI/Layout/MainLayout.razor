@@ -1,4 +1,5 @@
 ﻿@inherits LayoutComponentBase
+@inject IStringLocalizer<MainLayout> Localizer
 
 <MudThemeProvider Theme="@ThemeService.Current.Theme" IsDarkMode="@ThemeService.Current.IsDarkMode" />
 <MudPopoverProvider />
@@ -6,14 +7,14 @@
 <MudSnackbarProvider />
 
 <MudLayout>
-    <MudAppBar Class="rm-app-bar" Elevation="1">
+    <MudAppBar Class="@(IsAppArea ? "rm-app-bar" : "rm-app-bar rm-public-app-bar")" Elevation="1">
         <MudText Typo="Typo.h6">
             <a class="rm-brand" href="@HomeHref">Recipe Manager</a>
         </MudText>
-        <MudSpacer />
 
         @if (IsAppArea)
         {
+            <MudSpacer />
             <nav class="rm-primary-nav" aria-label="Main navigation">
                 <NavLink class="rm-nav-link" href="dishes">Dishes</NavLink>
                 <NavLink class="rm-nav-link" href="recipes">Recipes</NavLink>
@@ -38,10 +39,10 @@
         }
         else
         {
+            <div class="rm-public-spacer" aria-hidden="true"></div>
             <nav class="rm-public-nav" aria-label="Main navigation">
-                <NavLink class="rm-nav-link" href="./" Match="NavLinkMatch.All">Home</NavLink>
-                <NavLink class="rm-nav-link" href="login">Sign in</NavLink>
-                <NavLink class="rm-nav-link" href="register">Register</NavLink>
+                <NavLink class="rm-nav-link" href="./" Match="NavLinkMatch.All">@Localizer["Home"]</NavLink>
+                <a class="rm-nav-link" href="./#features">@Localizer["Features"]</a>
             </nav>
             <MudMenu Class="rm-mobile-nav">
                 <ActivatorContent>
@@ -50,28 +51,43 @@
                                    aria-label="Open main navigation" />
                 </ActivatorContent>
                 <ChildContent>
-                    <MudMenuItem Href="./">Home</MudMenuItem>
-                    <MudMenuItem Href="login">Sign in</MudMenuItem>
-                    <MudMenuItem Href="register">Register</MudMenuItem>
+                    <MudMenuItem Href="./">@Localizer["Home"]</MudMenuItem>
+                    <MudMenuItem Href="./#features">@Localizer["Features"]</MudMenuItem>
                 </ChildContent>
             </MudMenu>
         }
 
-        <MudMenu>
-            <ActivatorContent>
-                <MudTooltip Text="Theme">
-                    <MudIconButton Icon="@Icons.Material.Filled.Palette"
-                                   Color="Color.Inherit"
-                                   aria-label="Theme" />
-                </MudTooltip>
-            </ActivatorContent>
-            <ChildContent>
-                @foreach (ThemeDefinition theme in ThemeCatalog.Themes)
-                {
-                    <MudMenuItem OnClick="@(() => OnThemeSelectionChanged(theme.Id))">@theme.Name</MudMenuItem>
-                }
-            </ChildContent>
-        </MudMenu>
+        <div class="@(IsAppArea ? "rm-header-actions" : "rm-header-actions rm-public-header-actions")">
+            @if (!IsAppArea)
+            {
+                <div class="rm-public-account-actions">
+                    <MudButton Class="rm-public-auth-button"
+                               Variant="Variant.Outlined"
+                               Color="Color.Primary"
+                               Size="Size.Small">@Localizer["SignIn"]</MudButton>
+                    <MudButton Class="rm-public-auth-button"
+                               Variant="Variant.Filled"
+                               Color="Color.Primary"
+                               Size="Size.Small">@Localizer["Register"]</MudButton>
+                </div>
+            }
+
+            <MudMenu Class="rm-theme-menu">
+                <ActivatorContent>
+                    <MudTooltip Text="Theme">
+                        <MudIconButton Icon="@Icons.Material.Filled.Palette"
+                                       Color="Color.Inherit"
+                                       aria-label="Theme" />
+                    </MudTooltip>
+                </ActivatorContent>
+                <ChildContent>
+                    @foreach (ThemeDefinition theme in ThemeCatalog.Themes)
+                    {
+                        <MudMenuItem OnClick="@(() => OnThemeSelectionChanged(theme.Id))">@theme.Name</MudMenuItem>
+                    }
+                </ChildContent>
+            </MudMenu>
+        </div>
     </MudAppBar>
 
     <MudMainContent Class="rm-main-content">
@@ -96,6 +112,13 @@
                 @Body
             </main>
         </div>
+
+        @if (CurrentRoute.Length == 0)
+        {
+            <footer class="rm-landing-footer">
+                <span>@Localizer["FooterText"]</span>
+            </footer>
+        }
     </MudMainContent>
 </MudLayout>
 

@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="PageTitle" xml:space="preserve">
+    <value>Welcome</value>
+  </data>
+  <data name="HeroHeading" xml:space="preserve">
+    <value>Welcome to Recipe Manager</value>
+  </data>
+  <data name="HeroDescription" xml:space="preserve">
+    <value>Keep your recipes organized, plan meals, and make your kitchen easier to manage.</value>
+  </data>
+  <data name="FeaturesHeading" xml:space="preserve">
+    <value>Explore the features</value>
+  </data>
+  <data name="FeaturesDescription" xml:space="preserve">
+    <value>A few of the ways Recipe Manager can support your kitchen.</value>
+  </data>
+  <data name="Dishes" xml:space="preserve">
+    <value>Dishes</value>
+  </data>
+  <data name="Recipes" xml:space="preserve">
+    <value>Recipes</value>
+  </data>
+  <data name="Cookbooks" xml:space="preserve">
+    <value>Cookbooks</value>
+  </data>
+  <data name="MealPlan" xml:space="preserve">
+    <value>Meal Plan</value>
+  </data>
+  <data name="UnitsAndCategories" xml:space="preserve">
+    <value>Units and categories</value>
+  </data>
+  <data name="Placeholder" xml:space="preserve">
+    <value>Feature details coming soon.</value>
+  </data>
+</root>
