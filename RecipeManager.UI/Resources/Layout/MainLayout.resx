@@ -24,6 +24,9 @@
   <data name="Register" xml:space="preserve">
     <value>Register</value>
   </data>
+  <data name="AuthenticationDialogTitle" xml:space="preserve">
+    <value>Account access</value>
+  </data>
   <data name="FooterText" xml:space="preserve">
     <value>Recipe Manager 2027 All rights reserved</value>
   </data>

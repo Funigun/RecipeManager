@@ -1,5 +1,6 @@
 ﻿@inherits LayoutComponentBase
 @inject IStringLocalizer<MainLayout> Localizer
+@inject IDialogService DialogService
 
 <MudThemeProvider Theme="@ThemeService.Current.Theme" IsDarkMode="@ThemeService.Current.IsDarkMode" />
 <MudPopoverProvider />
@@ -64,11 +65,17 @@
                     <MudButton Class="rm-public-auth-button"
                                Variant="Variant.Outlined"
                                Color="Color.Primary"
-                               Size="Size.Small">@Localizer["SignIn"]</MudButton>
+                               Size="Size.Small"
+                               OnClick="@(() => OpenAuthenticationDialogAsync(AuthenticationMode.SignIn))">
+                        @Localizer["SignIn"]
+                    </MudButton>
                     <MudButton Class="rm-public-auth-button"
                                Variant="Variant.Filled"
                                Color="Color.Primary"
-                               Size="Size.Small">@Localizer["Register"]</MudButton>
+                               Size="Size.Small"
+                               OnClick="@(() => OpenAuthenticationDialogAsync(AuthenticationMode.Registration))">
+                        @Localizer["Register"]
+                    </MudButton>
                 </div>
             }
 
@@ -152,5 +159,24 @@
     {
         ThemeService.SelectTheme(themeId);
         return Task.CompletedTask;
+    }
+
+    private async Task OpenAuthenticationDialogAsync(AuthenticationMode initialMode)
+    {
+        DialogParameters<AuthenticationDialog> parameters = new()
+        {
+            { dialog => dialog.InitialMode, initialMode }
+        };
+        DialogOptions options = new()
+        {
+            CloseButton = true,
+            FullWidth = true,
+            MaxWidth = MaxWidth.Small
+        };
+
+        await DialogService.ShowAsync<AuthenticationDialog>(
+            Localizer["AuthenticationDialogTitle"],
+            parameters,
+            options);
     }
 }

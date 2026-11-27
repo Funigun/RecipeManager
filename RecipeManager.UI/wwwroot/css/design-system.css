@@ -154,8 +154,7 @@ button {
     min-width: 0;
 }
 
-.rm-header-actions,
-.rm-public-account-actions {
+.rm-header-actions {
     align-items: center;
     display: flex;
 }
@@ -169,6 +168,8 @@ button {
 }
 
 .rm-public-account-actions {
+    align-items: center;
+    display: flex;
     gap: var(--rm-space-xs);
 }
 
@@ -280,6 +281,30 @@ button {
     max-width: 36rem;
 }
 
+.rm-auth-dialog .mud-dialog-content {
+    padding: var(--rm-space-lg);
+}
+
+.rm-auth-heading {
+    margin: 0 0 var(--rm-space-md);
+    text-align: center;
+}
+
+.rm-auth-form {
+    display: grid;
+    gap: var(--rm-space-md);
+}
+
+.rm-auth-validation {
+    color: var(--mud-palette-error);
+    font-size: 0.875rem;
+}
+
+.rm-auth-form-switch {
+    margin-top: var(--rm-space-sm);
+    text-align: center;
+}
+
 .rm-features {
     margin: 0 auto;
     max-width: 68rem;
@@ -360,7 +385,12 @@ button {
     }
 
     .rm-public-app-bar .rm-mobile-nav {
+        margin-left: 0;
         order: 3;
+    }
+
+    .rm-auth-dialog .mud-dialog-content {
+        padding: var(--rm-space-md);
     }
 
     .rm-shell {
@@ -391,7 +421,7 @@ button {
 }
 
 @media (max-width: 400px) {
-    .rm-public-app-bar .rm-public-auth-button.mud-button-root {
+    .rm-public-auth-button.mud-button-root {
         min-width: 0;
         padding-inline: var(--rm-space-sm);
     }

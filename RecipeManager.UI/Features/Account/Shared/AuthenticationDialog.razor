@@ -1,0 +1,59 @@
+@inject IStringLocalizer<AuthenticationDialog> Localizer
+
+<MudDialog Class="rm-auth-dialog">
+    <DialogContent>
+        <MudText Typo="Typo.h5" Class="rm-auth-heading">
+            @Localizer[_mode == AuthenticationMode.SignIn ? "SignInTitle" : "RegistrationTitle"]
+        </MudText>
+
+        @if (_mode == AuthenticationMode.SignIn)
+        {
+            <SignInView SuccessMessage="@_successMessage"
+                        OnSwitchToRegister="SwitchToRegistration"
+                        OnSignedIn="CloseAfterSignIn" />
+        }
+        else
+        {
+            <RegisterView OnSwitchToSignIn="SwitchToSignIn" OnRegistrationSucceeded="RegistrationSucceeded" />
+        }
+    </DialogContent>
+</MudDialog>
+
+@code {
+    [CascadingParameter]
+    private IMudDialogInstance DialogInstance { get; set; } = null!;
+
+    [Parameter]
+    public AuthenticationMode InitialMode { get; set; }
+
+    private AuthenticationMode _mode;
+    private string? _successMessage;
+
+    protected override void OnInitialized()
+    {
+        _mode = InitialMode;
+    }
+
+    private void SwitchToRegistration()
+    {
+        _mode = AuthenticationMode.Registration;
+        _successMessage = null;
+    }
+
+    private void SwitchToSignIn()
+    {
+        _mode = AuthenticationMode.SignIn;
+        _successMessage = null;
+    }
+
+    private void RegistrationSucceeded(string message)
+    {
+        _mode = AuthenticationMode.SignIn;
+        _successMessage = message;
+    }
+
+    private void CloseAfterSignIn()
+    {
+        DialogInstance.Close();
+    }
+}

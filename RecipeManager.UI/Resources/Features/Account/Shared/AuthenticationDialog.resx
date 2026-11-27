@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="SignInTitle" xml:space="preserve">
+    <value>Sign in</value>
+  </data>
+  <data name="RegistrationTitle" xml:space="preserve">
+    <value>Create an account</value>
+  </data>
+  <data name="Username" xml:space="preserve">
+    <value>Username</value>
+  </data>
+  <data name="Email" xml:space="preserve">
+    <value>Email</value>
+  </data>
+  <data name="Password" xml:space="preserve">
+    <value>Password</value>
+  </data>
+  <data name="ConfirmPassword" xml:space="preserve">
+    <value>Confirm password</value>
+  </data>
+  <data name="SignInAction" xml:space="preserve">
+    <value>Sign in</value>
+  </data>
+  <data name="RegisterAction" xml:space="preserve">
+    <value>Register</value>
+  </data>
+  <data name="NeedAccount" xml:space="preserve">
+    <value>Don't have an account?</value>
+  </data>
+  <data name="HaveAccount" xml:space="preserve">
+    <value>Already have an account?</value>
+  </data>
+  <data name="UsernameRequired" xml:space="preserve">
+    <value>Enter a username.</value>
+  </data>
+  <data name="UsernameTooLong" xml:space="preserve">
+    <value>Username must be 15 characters or fewer.</value>
+  </data>
+  <data name="EmailRequired" xml:space="preserve">
+    <value>Enter an email address.</value>
+  </data>
+  <data name="EmailInvalid" xml:space="preserve">
+    <value>Enter a valid email address.</value>
+  </data>
+  <data name="PasswordRequired" xml:space="preserve">
+    <value>Enter a password.</value>
+  </data>
+  <data name="PasswordTooShort" xml:space="preserve">
+    <value>Password must be at least 10 characters long.</value>
+  </data>
+  <data name="PasswordLowercase" xml:space="preserve">
+    <value>Password must include a lowercase letter.</value>
+  </data>
+  <data name="PasswordUppercase" xml:space="preserve">
+    <value>Password must include an uppercase letter.</value>
+  </data>
+  <data name="PasswordDigit" xml:space="preserve">
+    <value>Password must include a digit.</value>
+  </data>
+  <data name="PasswordSpecial" xml:space="preserve">
+    <value>Password must include a special character.</value>
+  </data>
+  <data name="ConfirmPasswordRequired" xml:space="preserve">
+    <value>Confirm your password.</value>
+  </data>
+  <data name="PasswordMismatch" xml:space="preserve">
+    <value>Passwords do not match.</value>
+  </data>
+  <data name="SignInFailed" xml:space="preserve">
+    <value>Sign in failed. Check your username and password and try again.</value>
+  </data>
+  <data name="SignInRequestFailed" xml:space="preserve">
+    <value>We couldn't complete sign in. Please try again.</value>
+  </data>
+  <data name="RegistrationFailed" xml:space="preserve">
+    <value>We couldn't create your account with those details. Please review them and try again.</value>
+  </data>
+  <data name="RegistrationRequestFailed" xml:space="preserve">
+    <value>We couldn't complete registration. Please try again.</value>
+  </data>
+  <data name="RegistrationSuccess" xml:space="preserve">
+    <value>Your account was created. Sign in to continue.</value>
+  </data>
+</root>

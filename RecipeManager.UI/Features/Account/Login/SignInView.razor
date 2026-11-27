@@ -1,0 +1,108 @@
+@using RecipeManager.UI.Features.Account.Login.Models
+@using System.Text.Json
+@inject IStringLocalizer<AuthenticationDialog> Localizer
+@inject SignInApiClient SignInApiClient
+@inject UiAuthenticationStateProvider AuthenticationState
+@inject NavigationManager Navigation
+@using RecipeManager.UI.Shared.Navigation
+
+<SignInForm Model="@_model"
+            EditContext="@_editContext"
+            IsSubmitting="@_isSubmitting"
+            ErrorMessage="@_errorMessage"
+            SuccessMessage="@SuccessMessage"
+            OnSubmit="SubmitAsync"
+            OnSwitchToRegister="@OnSwitchToRegister" />
+
+@code {
+    [Parameter]
+    public string? SuccessMessage { get; set; }
+
+    [Parameter]
+    public EventCallback OnSwitchToRegister { get; set; }
+
+    [Parameter]
+    public EventCallback OnSignedIn { get; set; }
+
+    private readonly SignInFormModel _model = new();
+    private EditContext _editContext = null!;
+    private ValidationMessageStore _validationMessages = null!;
+    private bool _isSubmitting;
+    private string? _errorMessage;
+
+    protected override void OnInitialized()
+    {
+        _editContext = new EditContext(_model);
+        _validationMessages = new ValidationMessageStore(_editContext);
+        _editContext.OnFieldChanged += OnFieldChanged;
+    }
+
+    private async Task SubmitAsync(EditContext _)
+    {
+        _validationMessages.Clear();
+        if (string.IsNullOrWhiteSpace(_model.UserName))
+        {
+            _validationMessages.Add(() => _model.UserName, Localizer["UsernameRequired"]);
+        }
+        else if (_model.UserName.Length > 15)
+        {
+            _validationMessages.Add(() => _model.UserName, Localizer["UsernameTooLong"]);
+        }
+
+        if (string.IsNullOrWhiteSpace(_model.Password))
+        {
+            _validationMessages.Add(() => _model.Password, Localizer["PasswordRequired"]);
+        }
+
+        _editContext.NotifyValidationStateChanged();
+        if (_editContext.GetValidationMessages().Any())
+        {
+            return;
+        }
+
+        _errorMessage = null;
+        _isSubmitting = true;
+        try
+        {
+            SignInResponse? response = await SignInApiClient.SignInAsync(
+                new SignInRequest(_model.UserName, _model.Password));
+
+            if (response is null ||
+                string.IsNullOrWhiteSpace(response.Token) ||
+                string.IsNullOrWhiteSpace(response.RefreshToken) ||
+                !AuthenticationState.TrySignIn(response.Token, response.RefreshToken, response.ExpirationDate))
+            {
+                _errorMessage = Localizer["SignInFailed"];
+                return;
+            }
+
+            string destination = AuthenticationState.IsAdministrator ? UiRoutes.Admin : UiRoutes.Dishes;
+            await OnSignedIn.InvokeAsync();
+            Navigation.NavigateTo(destination);
+        }
+        catch (HttpRequestException)
+        {
+            _errorMessage = Localizer["SignInRequestFailed"];
+        }
+        catch (TaskCanceledException)
+        {
+            _errorMessage = Localizer["SignInRequestFailed"];
+        }
+        catch (JsonException)
+        {
+            _errorMessage = Localizer["SignInRequestFailed"];
+        }
+        finally
+        {
+            _isSubmitting = false;
+        }
+    }
+
+    private void OnFieldChanged(object? sender, FieldChangedEventArgs eventArgs)
+    {
+        _validationMessages.Clear(eventArgs.FieldIdentifier);
+        _editContext.NotifyValidationStateChanged();
+        _errorMessage = null;
+        _ = InvokeAsync(StateHasChanged);
+    }
+}

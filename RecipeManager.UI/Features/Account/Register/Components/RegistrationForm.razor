@@ -1,0 +1,94 @@
+@using RecipeManager.UI.Features.Account.Register.Models
+@inject IStringLocalizer<AuthenticationDialog> Localizer
+
+<EditForm EditContext="@EditContext" OnSubmit="@OnSubmit">
+    <div class="rm-auth-form">
+        <MudTextField T="string"
+                      @bind-Value="Model.UserName"
+                      For="@(() => Model.UserName)"
+                      Label="@Localizer["Username"]"
+                      Required="true"
+                      RequiredError="@Localizer["UsernameRequired"]"
+                      MaxLength="15"
+                      Disabled="@IsSubmitting" />
+        <ValidationMessage For="@(() => Model.UserName)" class="rm-auth-validation" />
+
+        <MudTextField T="string"
+                      @bind-Value="Model.Email"
+                      For="@(() => Model.Email)"
+                      Label="@Localizer["Email"]"
+                      InputType="InputType.Email"
+                      Required="true"
+                      RequiredError="@Localizer["EmailRequired"]"
+                      Disabled="@IsSubmitting" />
+        <ValidationMessage For="@(() => Model.Email)" class="rm-auth-validation" />
+
+        <MudTextField T="string"
+                      @bind-Value="Model.Password"
+                      For="@(() => Model.Password)"
+                      Label="@Localizer["Password"]"
+                      InputType="InputType.Password"
+                      Required="true"
+                      RequiredError="@Localizer["PasswordRequired"]"
+                      Disabled="@IsSubmitting" />
+        <ValidationMessage For="@(() => Model.Password)" class="rm-auth-validation" />
+
+        <MudTextField T="string"
+                      @bind-Value="Model.ConfirmPassword"
+                      For="@(() => Model.ConfirmPassword)"
+                      Label="@Localizer["ConfirmPassword"]"
+                      InputType="InputType.Password"
+                      Required="true"
+                      RequiredError="@Localizer["ConfirmPasswordRequired"]"
+                      Disabled="@IsSubmitting" />
+        <ValidationMessage For="@(() => Model.ConfirmPassword)" class="rm-auth-validation" />
+
+        @if (!string.IsNullOrWhiteSpace(ErrorMessage))
+        {
+            <MudAlert Severity="Severity.Error" Dense="true" role="alert">@ErrorMessage</MudAlert>
+        }
+
+        <MudButton Color="Color.Primary"
+                   Variant="Variant.Filled"
+                   ButtonType="ButtonType.Submit"
+                   Disabled="@IsSubmitting"
+                   aria-busy="@IsSubmitting">
+            @if (IsSubmitting)
+            {
+                <MudProgressCircular Size="Size.Small" Indeterminate="true" Class="mr-2" />
+            }
+            @Localizer["RegisterAction"]
+        </MudButton>
+
+        <div class="rm-auth-form-switch">
+            <MudText Typo="Typo.body2" Inline="true">@Localizer["HaveAccount"]</MudText>
+            <MudButton Variant="Variant.Text"
+                       Color="Color.Primary"
+                       ButtonType="ButtonType.Button"
+                       Disabled="@IsSubmitting"
+                       OnClick="@OnSwitchToSignIn">
+                @Localizer["SignInAction"]
+            </MudButton>
+        </div>
+    </div>
+</EditForm>
+
+@code {
+    [Parameter, EditorRequired]
+    public RegistrationFormModel Model { get; set; } = null!;
+
+    [Parameter, EditorRequired]
+    public EditContext EditContext { get; set; } = null!;
+
+    [Parameter]
+    public bool IsSubmitting { get; set; }
+
+    [Parameter]
+    public string? ErrorMessage { get; set; }
+
+    [Parameter]
+    public EventCallback<EditContext> OnSubmit { get; set; }
+
+    [Parameter]
+    public EventCallback OnSwitchToSignIn { get; set; }
+}

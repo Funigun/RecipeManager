@@ -1,0 +1,150 @@
+@using System.ComponentModel.DataAnnotations
+@using RecipeManager.UI.Features.Account.Register.Models
+@inject IStringLocalizer<AuthenticationDialog> Localizer
+@inject RegistrationApiClient RegistrationApiClient
+
+<RegistrationForm Model="@_model"
+                  EditContext="@_editContext"
+                  IsSubmitting="@_isSubmitting"
+                  ErrorMessage="@_errorMessage"
+                  OnSubmit="SubmitAsync"
+                  OnSwitchToSignIn="@OnSwitchToSignIn" />
+
+@code {
+    [Parameter]
+    public EventCallback OnSwitchToSignIn { get; set; }
+
+    [Parameter]
+    public EventCallback<string> OnRegistrationSucceeded { get; set; }
+
+    private readonly RegistrationFormModel _model = new();
+    private readonly EmailAddressAttribute _emailAddressValidator = new();
+    private EditContext _editContext = null!;
+    private ValidationMessageStore _validationMessages = null!;
+    private bool _isSubmitting;
+    private string? _errorMessage;
+
+    protected override void OnInitialized()
+    {
+        _editContext = new EditContext(_model);
+        _validationMessages = new ValidationMessageStore(_editContext);
+        _editContext.OnFieldChanged += OnFieldChanged;
+    }
+
+    private async Task SubmitAsync(EditContext _)
+    {
+        ValidateForm();
+        _editContext.NotifyValidationStateChanged();
+        if (_editContext.GetValidationMessages().Any())
+        {
+            return;
+        }
+
+        _errorMessage = null;
+        _isSubmitting = true;
+        try
+        {
+            bool succeeded = await RegistrationApiClient.RegisterAsync(
+                new RegistrationRequest(_model.UserName, _model.Password, _model.Email));
+
+            if (!succeeded)
+            {
+                _errorMessage = Localizer["RegistrationFailed"];
+                return;
+            }
+
+            await OnRegistrationSucceeded.InvokeAsync(Localizer["RegistrationSuccess"]);
+        }
+        catch (HttpRequestException)
+        {
+            _errorMessage = Localizer["RegistrationRequestFailed"];
+        }
+        catch (TaskCanceledException)
+        {
+            _errorMessage = Localizer["RegistrationRequestFailed"];
+        }
+        finally
+        {
+            _isSubmitting = false;
+        }
+    }
+
+    private void ValidateForm()
+    {
+        _validationMessages.Clear();
+
+        if (string.IsNullOrWhiteSpace(_model.UserName))
+        {
+            _validationMessages.Add(() => _model.UserName, Localizer["UsernameRequired"]);
+        }
+        else if (_model.UserName.Length > 15)
+        {
+            _validationMessages.Add(() => _model.UserName, Localizer["UsernameTooLong"]);
+        }
+
+        if (string.IsNullOrWhiteSpace(_model.Email))
+        {
+            _validationMessages.Add(() => _model.Email, Localizer["EmailRequired"]);
+        }
+        else if (!_emailAddressValidator.IsValid(_model.Email))
+        {
+            _validationMessages.Add(() => _model.Email, Localizer["EmailInvalid"]);
+        }
+
+        if (string.IsNullOrEmpty(_model.Password))
+        {
+            _validationMessages.Add(() => _model.Password, Localizer["PasswordRequired"]);
+        }
+        else
+        {
+            if (_model.Password.Length < 10)
+            {
+                _validationMessages.Add(() => _model.Password, Localizer["PasswordTooShort"]);
+            }
+
+            if (!_model.Password.Any(character => character is >= 'a' and <= 'z'))
+            {
+                _validationMessages.Add(() => _model.Password, Localizer["PasswordLowercase"]);
+            }
+
+            if (!_model.Password.Any(character => character is >= 'A' and <= 'Z'))
+            {
+                _validationMessages.Add(() => _model.Password, Localizer["PasswordUppercase"]);
+            }
+
+            if (!_model.Password.Any(character => character is >= '0' and <= '9'))
+            {
+                _validationMessages.Add(() => _model.Password, Localizer["PasswordDigit"]);
+            }
+
+            if (!_model.Password.Any(character => !(character is >= 'a' and <= 'z') &&
+                                                  !(character is >= 'A' and <= 'Z') &&
+                                                  !(character is >= '0' and <= '9')))
+            {
+                _validationMessages.Add(() => _model.Password, Localizer["PasswordSpecial"]);
+            }
+        }
+
+        if (string.IsNullOrEmpty(_model.ConfirmPassword))
+        {
+            _validationMessages.Add(() => _model.ConfirmPassword, Localizer["ConfirmPasswordRequired"]);
+        }
+        else if (!string.Equals(_model.Password, _model.ConfirmPassword, StringComparison.Ordinal))
+        {
+            _validationMessages.Add(() => _model.ConfirmPassword, Localizer["PasswordMismatch"]);
+        }
+    }
+
+    private void OnFieldChanged(object? sender, FieldChangedEventArgs eventArgs)
+    {
+        _validationMessages.Clear(eventArgs.FieldIdentifier);
+        if (eventArgs.FieldIdentifier.FieldName == nameof(_model.Password))
+        {
+            _validationMessages.Clear(new FieldIdentifier(_model, nameof(_model.ConfirmPassword)));
+        }
+
+        _editContext.NotifyValidationStateChanged();
+        _errorMessage = null;
+        _ = InvokeAsync(StateHasChanged);
+    }
+}
